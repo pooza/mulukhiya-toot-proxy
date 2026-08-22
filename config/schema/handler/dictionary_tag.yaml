@@ -1,6 +1,12 @@
 label: 辞書タグ
 description: 本文中のキーワードに基づいてハッシュタグを自動付与します
 properties:
+  cache:
+    properties:
+      ttl:
+        minimum: 1
+        type: integer
+    type: object
   dics:
     items:
       properties:

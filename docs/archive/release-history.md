@@ -2,6 +2,32 @@
 
 CLAUDE.md から分離した過去のリリースノート。直近リリースは [CLAUDE.md](../CLAUDE.md) を参照。
 
+## リリース済み: 5.30.0（2026-08-02）
+
+性能・観測性・セキュリティのハードニング回。新機能の追加はない。**主軸 #4464 のゴール（ニチアサ実況の数秒をハンドラ単位で説明できる状態）を達成し、その実測から出た修正をまとめて出荷した**回でもある。
+
+- **#4464 perf: pre_toot ハンドラの所要時間を計装する** — 閾値超のイベントだけ 1 行 JSON。既定 OFF（`/profile/handler/enable`）。08-02 の実況で lbock 07-26 と突き合わせ、1 秒超 119 件(89%)→79 件(61%)・p50 4.8s→1.1s を確認（詳細は下記「投稿レイテンシ調査の記録」節）
+- **#4481 / #4490 perf: 出荷設定からホスト名 `localhost` を排除** — Ruby 3.4+ の HEv2 により `/etc/hosts` に `::1 localhost` を持たないホストでは 1 接続 305ms。Redis DSN 3 箇所と nginx サンプルの `proxy_pass` 13 箇所を `127.0.0.1` 化。nginx 側は「暗黙 upstream 2 ピア → 負荷時に無条件 502」も同時に塞ぐ
+- **#4494 / #4482 perf: タグハンドラの重複評価と辞書の重複構築を削る** — `result.push(addition_tags:)` の短縮記法がメソッド呼び出しになる副作用で 1 投稿 3 回評価。`TaggingDictionary`（Redis GET + Marshal・725KB）は 1 投稿で 6 回構築されていた
+- **#4466 obs: `/health` に Ruby ランタイム情報（version / YJIT）** — YJIT は Rust の無い環境でビルド時に黙って外れる。既定では NG にせず `/runtime/require_yjit` で opt-in
+- **#4461 obs/並行性: 5.29.0 レビュー黄まとめ 4 件** — 保存の二重 alert 解消（`UserConfig#update!` 新設）、StartupNotificationWorker の rescue デッドマン化、compose RMW の fresh read 強制、ロック TTL 10s→30s
+- **#4410 security: リダイレクト経由 SSRF を per-hop ホスト検証で塞ぐ** — 初段だけ検証しても HTTParty がリダイレクトを追うため無意味だった。追従を切ると GAS（番組表・読み辞書の実体）が壊れるので、ginseng-core 1.15.29 に `host_validator` を入れて各ホップを検証。検証は再送処理の外
+- **#4483 fix: 番組表エディタの ✔ が表示されない** — 素の U+2714 が Linux の絵文字フォント環境で描画されない。Font Awesome へ置換。⚠ **Issue に書かれていた flex-shrink 説を検証せずに実装して外した**（MEMORY `feedback_verify-before-claiming-fixed`）
+- **#4509 fix: `RACK_ENV=production` で起動不能** — `json-schema` を Gemfile に書いておらず `Bundler.require` の対象外。ginseng-core 1.15.31 で `Environment.type` が ENV を先に見るようになり、`Ginseng::Config` の autoload 副作用が消えて顕在化。**ステージング検証で捕捉**
+- **ginseng-\* の open Issue 6 件を全消化** — core 1.15.31（`Logger#mask` の破壊的変更・`Environment.type` の ENV 無視・`RBENV_VERSION` の引き継ぎ）/ fediverse 1.8.26（nodeinfo の contact_account nil・numeric_ap_id の publicize）/ redis 2.0.5（`create_key` の破壊的変更）。Ruby 4 の frozen string で落ちる `String#nokogiri`・`URI.normalize_component` も是正
+- **テスト実行状況の可視化** — ginseng-core #488 で `disable?` のケースを pass ではなく omission として集計。**822 件中 304 件（37%）が実際には実行されていない**ことが判明（#4503）
+- **リリース前 5観点レビュー** — 真の赤 0。赤近い黄 2 件（StartupNotificationWorker の `disable?` 未短絡・保存失敗メッセージへの例外クラス名混入）をインライン是正。残りは #4506 / #4508 / #4511 として 5.31.0 へ
+- **ステージング検証（省略不可）**: dev24-27 全 4 台で 5.30.0・health 200・WebUI 200 を確認。さらに **#4461 の RMW / ロックを dev24 の実 DB + Redis で 9 項目検証**（この範囲は単体テストが実行されていないため実機で担保）
+- **本番デプロイ: 4 台完了**（2026-08-02、zugoga / shallu / sweep / gomander、全台 version 5.30.0 / health 200 / `yjit_enabled: true`）。あわせて **Postgres DSN の `localhost` を `127.0.0.1` 化**、**`/runtime/require_yjit: true` を全台に投入**、**gomander を `develop` 運用から `main` へ戻した**（lbock→gomander 移行の残件を解消）
+
+### 振り返り
+
+**ステージング検証が本番停止級のバグを捕まえた 2 例目**。#4509 は `rake test` 822 件も CI も緑のまま通過していた（どちらも `RACK_ENV` を立てないため）。1 例目は 5.28.0 の省略障害（MEMORY `project_5280-staging-skip-postmortem`）で、あちらは「省略したから起きた」、今回は「実施したから防げた」。
+
+**「守れているつもりの緑」を 2 つ潰した**。ひとつは #4503（822 件中 304 件が未実行なのに 100% passed と出ていた）。もうひとつは #4410 の作業中に既存テストが 1 件落ちた件で、これは **SSRF ガードが正しく効いた結果**だった（`https://dic.test/` は解決できず fail-closed）。差し替えを恒久化すると以後のテストでガードが効かなくなるため、当該テストだけ `ensure` で復元する形にした。
+
+**⚠ `require_yjit: true` は monit と組み合わさると再起動ループになる**。monit は `/mulukhiya/api/health` の 200 を 3 サイクル監視し、失敗すると 3 サービスを再起動する。YJIT 欠落は再起動で直らないため、Rust 無しで Ruby を作り直した瞬間にループへ入る。全台 YJIT 有効を確認したうえで投入している。
+
 ## リリース済み: 5.29.0（2026-07-18）
 
 投稿テンプレート（定形投稿）per-user CRUD API を主軸に、fedi-test-harness のテスト信頼性向上と本番で沈黙していた実バグ1件の修正を束ねた回。**5.28.0 で省略したステージング検証を Proxmox ステージング dev24-27 で全台実施できた最初のリリース**（前回の教訓 `project_5280-staging-skip-postmortem` を実運用で解消）。

@@ -19,8 +19,13 @@ module Mulukhiya
       FileUtils.rm_rf(dir) if dir
     end
 
+    # ⚠ **host_validator は gem の upload へ渡さない。**あちらは version /
+    # filename / description を見るリクエストパラメータで、SSRF ガードは
+    # 取得側 (MediaFile.download) の関心事 (#4576)。
     def upload_remote_resource(uri, params = {})
-      payload = {file: {tempfile: MediaFile.download(uri)}}
+      params = params.dup
+      validator = params.delete(:host_validator)
+      payload = {file: {tempfile: MediaFile.download(uri, host_validator: validator)}}
       params[:version] ||= 1
       Event.new(:pre_upload, params).dispatch(payload)
       response = upload(payload.dig(:file, :tempfile).path, params)

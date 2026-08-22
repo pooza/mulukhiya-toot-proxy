@@ -90,6 +90,8 @@ handler:
       - https://pf.korako.me/plugins/community-hashtag-map.json
     cache_ttl: 3600
   dictionary_tag:
+    cache:
+      ttl: 3600
     dics: []
     word:
       min: 2
@@ -379,6 +381,8 @@ mastodon:
     color: '#6364FF'
   url: https://mstdn.example.com/
 media:
+  download:
+    max_bytes: 33554432
   metadata:
     cache:
       ttl: 8640000
@@ -465,7 +469,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 5.33.0
+  version: 5.34.0
 parser:
   note:
     fields:

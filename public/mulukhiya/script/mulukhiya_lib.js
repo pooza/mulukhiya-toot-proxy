@@ -239,6 +239,15 @@ export const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
+    // 次回放送日だけを進める (#4585)。days は連打をまとめた日数で、既定は 1 日。
+    globals.methods.advanceProgramNextOn = async (key, days) => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.post(`/mulukhiya/api/admin/program/entry/${encodeURIComponent(key)}/next_on/advance`, {days})
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
     globals.methods.createProgramTags = program => {
       const tags = []
       if (program) {

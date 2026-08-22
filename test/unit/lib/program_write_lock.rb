@@ -59,6 +59,13 @@ module Mulukhiya
       assert_locked {@program.increment_episode('test_lock_increment')}
     end
 
+    # 日付 ＋ も書き込みなので同じロックの内側で行う (#4585)。
+    def test_advance_next_on_blocked
+      return if disable?
+
+      assert_locked {@program.advance_next_on('test_lock_advance')}
+    end
+
     # auto_update の pull（ProgramUpdateWorker）とエディタの編集は同じ YAML /
     # Redis を触るので、save も同じロックで直列化する。別々にすると交差する。
     def test_save_blocked

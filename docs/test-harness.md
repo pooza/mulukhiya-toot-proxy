@@ -115,16 +115,24 @@ Mastodon をもう一度走らせたまま「両系緑」とゲートを通せ�
   `.env.test` と一致しているかを毎回見る:
 
   ```text
-  TestHarness: controller=misskey url=http://localhost:3000
+  TestHarness: controller=misskey url=http://localhost:3001
   ```
 
-  ⚠ **`url=` は取り違えの判別に使えない。**Misskey ハーネスも既定が `MISSKEY_PORT=3000` で、
-  両系とも `localhost:3000` を出す（2026-08-11 に確認。以前ここに書いていた `:3001` は誤り）。
-  **見るのは `controller=` の側**。
+  **`url=` も判別に使える**（2026-08-16 実走確認）。Mastodon が `localhost:3000`、
+  Misskey が `localhost:3001`（pooza/chubo2#165 で `MISSKEY_PORT` の既定が 3001 になった）。
+  ⚠ ただし**判定の主は `controller=` の側**のままにする。`url=` はポート設定に依存し、
+  下記のとおり古い `.env` を持つ環境では両系とも 3000 を出すため。
 
-⚠ **両ハーネスは同時に起動できない**（ポート 3000 が衝突する）。片方を `teardown.sh` してから
-もう片方を `setup.sh` する。`setup.sh` は 1 系あたり 8〜9 分かかるので、ゲート 1 回に
-20 分前後は見ておくこと（pooza/chubo2#165）。
+**両ハーネスは同時に起動できる**（Mastodon 3000 / Misskey 3001、DB も 5433 / 5434 で非衝突。
+2026-08-16 に同時稼働と両系実走を確認）。片方ずつ `teardown.sh` → `setup.sh` する必要は無くなった。
+
+⚠ **既定の変更は `.env.example` にしか入っていない。**`.env` は gitignore されていて更新の導線が
+無いため、**pooza/chubo2#165 より前に構築した環境は `MISSKEY_PORT=3000` のまま**で、従来どおり
+衝突する。`grep MISSKEY_PORT .env` で確かめ、3000 なら `teardown.sh` → `setup.sh` で作り直す
+（`.env` ごと消えて `.env.example` から作り直され、`.config/default.yml` の `url` も揃う。8〜9 分）。
+⚠ **ポート衝突で proxy の起動に失敗した後は、`docker compose up -d` では復旧しない。**
+ネットワーク未接続のコンテナが再利用され `host not found in upstream "web"` を繰り返すので、
+`docker compose rm -sf proxy` で作り直す（pooza/chubo2#178）。
 
 - 結果を記録するときは、この行もセットで残す（後から取り違えを検証できる）
 

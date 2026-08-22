@@ -22,7 +22,7 @@ module Mulukhiya
         @renderer.status = 422
         @renderer.message = payload.errors
       else
-        reporter = webhook.post(payload)
+        reporter = webhook.post(payload, {headers: forwarded_headers})
         @renderer.message = reporter.response.parsed_response
         @renderer.status = reporter.response.code
       end

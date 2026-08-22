@@ -86,7 +86,7 @@ html lang='ja' data-theme='light'
             label
               span 次回放送日
               input type='date' v-model='form.values.next_on' title='空欄なら毎日。日付を入れるとその日に1回だけ通知し、過ぎたら止まります'
-            small.field-note 空欄＝毎日。ウィークリー枠は日付を入れる（一覧の話数欄にある ＋ ボタンで、話数と一緒に1週進みます）。
+            small.field-note 空欄＝毎日。ウィークリー枠は日付を入れる（一覧の次回放送日欄にある ＋ ボタンで1日ずつ進みます。翌週にするなら7回）。
           .field-container
             label
               span 説明
@@ -141,14 +141,17 @@ html lang='ja' data-theme='light'
               tr v-for='({key, entry}) in sortedEntries' :key='key' :class="{disabled: !entry.enable, clickable: editable}" @click='editable && openEdit(key)'
                 td
                   template v-if='entry.next_on'
-                    small :class="{stale: isStaleNextOn(entry), invalid: isInvalidNextOn(entry)}"
-                      | {{entry.next_on}}
-                    span.tag.stale v-if='isStaleNextOn(entry)' v-tooltip.top="'次回放送日が過ぎています。通知は止まっています'"
+                    small :class="{stale: isStaleNextOn(displayNextOn(key, entry)), invalid: isInvalidNextOn(entry.next_on)}"
+                      | {{displayNextOn(key, entry)}}
+                    span.tag.stale v-if='isStaleNextOn(displayNextOn(key, entry))' v-tooltip.top="'次回放送日が過ぎています。通知は止まっています'"
                       i class='fa fa-circle-exclamation' aria-hidden='true'
                       span.sr-only 次回放送日が過去
-                    span.tag.invalid v-if='isInvalidNextOn(entry)' v-tooltip.top="'次回放送日が日付として読めません。通知は止まっています'"
+                    span.tag.invalid v-if='isInvalidNextOn(entry.next_on)' v-tooltip.top="'次回放送日が日付として読めません。通知は止まっています'"
                       i class='fa fa-triangle-exclamation' aria-hidden='true'
                       span.sr-only 次回放送日が不正
+                    button.small @click.stop='advanceNextOn(key, entry)' v-if='editable && !isInvalidNextOn(entry.next_on)' :disabled='isLocked(key)' v-tooltip.top="'次回放送日を1日進める（連打でまとめて送信）'"
+                      i class='fa fa-plus'
+                      span.sr-only 次回放送日を1日進める
                   small.muted v-else='' 毎日
                 td
                   small v-if='entry.start_time'
@@ -163,7 +166,7 @@ html lang='ja' data-theme='light'
                 td
                   span v-if='entry.episode'
                     | {{entry.episode}}{{entry.episode_suffix || '話'}}
-                  button.small @click.stop='incrementEpisode(key)' v-if='editable' :disabled='isBusy(key)' v-tooltip.top="'次回（話数を1つ、次回放送日を1週進める）'"
+                  button.small @click.stop='incrementEpisode(key)' v-if='editable' :disabled='isBusy(key)' v-tooltip.top="'話数を1つ進める（次回放送日は変わりません）'"
                     i class='fa fa-plus'
                 td
                   code v-if='entry.annict_episode_id'
@@ -209,6 +212,9 @@ html lang='ja' data-theme='light'
         // 同じ規則 (next_on 昇順 → start_time 昇順、日付なしは末尾)。
         const TIME_FORMAT = /^([01]?\d|2[0-3]):[0-5]\d$/
         const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土']
+        // 1 リクエストで進められる日数の上限 (#4585)。サーバー側の
+        // Program::NEXT_ON_ADVANCE_MAX_DAYS と揃える。
+        const NEXT_ON_ADVANCE_MAX_DAYS = 366
 
         // 開始時刻を 0 時からの分に直す。HH:MM として読めない値はその日の末尾へ。
         const startMinutes = entry => {
@@ -234,13 +240,31 @@ html lang='ja' data-theme='light'
           return minutesA < minutesB ? -1 : 1
         }
 
+        // YYYY-MM-DD として実在する日付か (#4558)。
+        // ⚠ Number.isNaN だけでは足りない。Date.UTC(2026, 1, 31) は 3/3 へ
+        // 繰り上がるので NaN にならず、存在しない日付が通ってしまう。
+        // ⚠ 端末のタイムゾーンを混ぜてはいけないので UTC で組む。
+        const isValidDateValue = value => {
+          const text = String(value)
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(text)) return false
+          const [year, month, day] = text.split('-').map(Number)
+          const date = new Date(Date.UTC(year, month - 1, day))
+          return date.getUTCFullYear() === year &&
+            date.getUTCMonth() + 1 === month &&
+            date.getUTCDate() === day
+        }
+
         // まとめコピーの日付見出し。UTC で組んで UTC で曜日を読むので、端末の
         // タイムゾーンによらず next_on の日付そのものの曜日になる。
         // 日付として読めない値はそのまま出す (見出しごと消さない)。
+        //
+        // ⚠ **曜日を付けるのは実在する日付のときだけ (#4558)。**一覧では
+        // 「不正」バッジを出しているのに、コピーした見出しには
+        // `2026-02-31 (火)` と一見もっともらしい曜日が付いていた。
         const formatDateHeading = value => {
+          if (!isValidDateValue(value)) return String(value)
           const [year, month, day] = String(value).split('-').map(Number)
           const date = new Date(Date.UTC(year, month - 1, day))
-          if (Number.isNaN(date.getTime())) return String(value)
           return `${value} (${WEEKDAYS[date.getUTCDay()]})`
         }
 
@@ -254,6 +278,13 @@ html lang='ja' data-theme='light'
               // 「次回」の二度押しは話数 +2・次回放送日 +14 日になり、その週の
               // 通知が丸ごと消える。往復が終わるまでボタンを止める (#4373)。
               busy: {},
+              // 日付 ＋ の連打を畳むための保留日数とタイマー (#4585)。+1 日は
+              // 「翌週にしたければ 7 回押す」前提なので連打が常用操作になる。
+              // ⚠ 1 クリック 1 リクエストにすると、7 往復ぶん待たされたうえ
+              // 書き込みロックも 7 回取ることになる (#4534 の 409 が増える)。
+              // 画面は先に進め、サーバーへはまとめて 1 回だけ送る。
+              pendingDays: {},
+              pendingTimers: {},
               annict: {keyword: null, works: [], episodes: []},
               form: {
                 open: false,
@@ -304,7 +335,7 @@ html lang='ja' data-theme='light'
               }
             },
             loadEntries () {
-              this.methods.getPrograms()
+              return this.methods.getPrograms()
                 .then(e => {this.entries = e || {}})
                 .catch(e => Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'}))
             },
@@ -318,6 +349,15 @@ html lang='ja' data-theme='light'
               this.form.open = true
             },
             openEdit (key) {
+              if (this.isLocked(key)) return
+              // ⚠ **保留中の日付 ＋ を先に送り切る** (PR #4588 の Codex P2)。
+              // ここで開くと古い next_on をフォームへ写し取り、保存でその日付を
+              // 書き戻して、押したはずの ＋ が黙って消える。送信と再読込みを
+              // 待ってから、サーバーの値で開き直す。
+              if (this.pendingDays[key]) {
+                this.flushNextOn(key).then(_ => this.openEdit(key))
+                return
+              }
               const entry = this.entries[key]
               if (!entry) return
               this.form.editKey = key
@@ -385,17 +425,12 @@ html lang='ja' data-theme='light'
             // 日付として読めない next_on。サーバーは fail-closed で通知を出さない
             // ので、一覧でも「過去日」ではなく「不正」として区別する。文字列比較
             // だけだと 2026-02-31 を過去日、2026/08/08 を未来日と誤って読む。
-            isInvalidNextOn (entry) {
-              if (!entry.next_on) return false
-              const value = String(entry.next_on)
-              if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return true
-              // 実在する日付か。2026-02-31 は Date が 3/3 へ繰り上げるので往復で見る。
-              // ⚠ ここは端末のタイムゾーンを混ぜてはいけないので UTC で組む。
-              const [year, month, day] = value.split('-').map(Number)
-              const date = new Date(Date.UTC(year, month - 1, day))
-              return date.getUTCFullYear() !== year ||
-                date.getUTCMonth() + 1 !== month ||
-                date.getUTCDate() !== day
+            // ⚠ 判定の実体は isValidDateValue に 1 本化してある (#4558)。
+            // まとめコピーの見出しと判定がずれると、「一覧では不正なのに
+            // コピーにはそれらしい曜日が付く」が再発する。
+            isInvalidNextOn (nextOn) {
+              if (!nextOn) return false
+              return !isValidDateValue(nextOn)
             },
             // 今日 (JST) を YYYY-MM-DD で。⚠ ブラウザのローカル日付では組まない。
             // ProgramCalendar は next_on を +09:00 固定で解釈するので、国外の端末で
@@ -418,13 +453,25 @@ html lang='ja' data-theme='light'
             },
             // next_on が過去日か。過ぎるとカレンダーに出なくなる (#4373) ので、
             // 一覧で気づけるようにする。日付だけで比較する（当日は過去扱いしない）。
-            isStaleNextOn (entry) {
-              if (!entry.next_on) return false
-              if (this.isInvalidNextOn(entry)) return false
-              return entry.next_on < this.todayKeyJst()
+            isStaleNextOn (nextOn) {
+              if (!nextOn) return false
+              if (this.isInvalidNextOn(nextOn)) return false
+              return nextOn < this.todayKeyJst()
             },
-            isBusy (key) {
+            // リクエストが実際に飛んでいる最中か。日付 ＋ の連打はこれで止める
+            // （止めてしまうと 1 クリック 1 往復に戻ってしまうため）。
+            isLocked (key) {
               return !!this.busy[key]
+            },
+            // この行への書き込みを止めるべきか。
+            //
+            // ⚠ **保留中の日付 ＋ も「書き込み中」に数える** (PR #4588 の Codex P2)。
+            // 600ms の debounce 窓では busy がまだ立っていないので、素朴に書くと
+            // その隙に編集フォームが開けて古い next_on を写し取り、保存で
+            // **押したはずの ＋ を黙って書き戻す**。他の行操作も flush と重なって
+            // 409 を踏み、溜めたクリックごと捨てられる。
+            isBusy (key) {
+              return this.isLocked(key) || !!this.pendingDays[key]
             },
             toggleEnable (key, entry) {
               if (this.isBusy(key)) return
@@ -454,6 +501,65 @@ html lang='ja' data-theme='light'
                   this.loadEntries()
                 })
                 .catch(e => Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'}))
+                .finally(_ => {delete this.busy[key]})
+            },
+            // YYYY-MM-DD を days 日進める。⚠ 端末のタイムゾーンを混ぜない
+            // （UTC で組んで UTC で取り出す）。読めない値はそのまま返す。
+            addDaysToDateKey (value, days) {
+              if (!/^\d{4}-\d{2}-\d{2}$/.test(String(value))) return value
+              const [year, month, day] = String(value).split('-').map(Number)
+              const date = new Date(Date.UTC(year, month - 1, day + days))
+              const pad = (v, digits) => String(v).padStart(digits, '0')
+              return `${pad(date.getUTCFullYear(), 4)}-${pad(date.getUTCMonth() + 1, 2)}-${pad(date.getUTCDate(), 2)}`
+            },
+            // 保留中の連打を織り込んだ next_on (#4585)。表示だけをこれで進め、
+            // entry.next_on は触らない。
+            //
+            // ⚠ **並び替えのキーが next_on なので、実体を進めると連打の途中で行が
+            // 動く**（一覧は next_on 昇順・#4540）。2 回目のクリックが別の行に
+            // 当たってしまうため、行が動くのはサーバーの応答を取り込んだ 1 回だけに
+            // する。
+            displayNextOn (key, entry) {
+              const days = this.pendingDays[key] || 0
+              if (!days) return entry.next_on
+              return this.addDaysToDateKey(entry.next_on, days)
+            },
+            // 次回放送日だけを +1 日 (#4585)。話数は動かさない。
+            //
+            // 表示はクリックごとに即進め、サーバーへは連打が止まってから
+            // まとめて 1 回だけ送る。⚠ 失敗しても loadEntries() でサーバーの値を
+            // 取り直すので、表示のズレは残らない。
+            advanceNextOn (key, entry) {
+              if (this.isLocked(key)) return
+              if (!entry.next_on || this.isInvalidNextOn(entry.next_on)) return
+              this.pendingDays[key] = (this.pendingDays[key] || 0) + 1
+              clearTimeout(this.pendingTimers[key])
+              // 上限に達したらその場で送る。⚠ 黙って握り潰すと、押したのに
+              // 進まない理由が誰にも分からなくなる。
+              if (this.pendingDays[key] >= NEXT_ON_ADVANCE_MAX_DAYS) {
+                this.flushNextOn(key)
+                return
+              }
+              this.pendingTimers[key] = setTimeout(_ => this.flushNextOn(key), 600)
+            },
+            // 溜めた日数をまとめて 1 回で送る。⚠ **Promise を返すこと。**
+            // openEdit が「先に送り切ってから開く」ために待つ (PR #4588 の Codex P2)。
+            flushNextOn (key) {
+              const days = this.pendingDays[key]
+              delete this.pendingDays[key]
+              clearTimeout(this.pendingTimers[key])
+              delete this.pendingTimers[key]
+              if (!days) return Promise.resolve()
+              this.busy[key] = true
+              return this.methods.advanceProgramNextOn(key, days)
+                .then(_ => {
+                  Swal.fire({title: `次回放送日を+${days}日しました。`, toast: true, position: 'top-end', icon: 'success', showConfirmButton: false, timer: 2000})
+                  return this.loadEntries()
+                })
+                .catch(e => {
+                  Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'})
+                  return this.loadEntries()
+                })
                 .finally(_ => {delete this.busy[key]})
             },
             copyText (text, label) {

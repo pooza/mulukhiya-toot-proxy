@@ -182,10 +182,273 @@ git diff Gemfile.lock
 # 5. 問題なければコミット
 ```
 
+## リリース済み: 5.33.0（2026-08-12）
+
+**土台テーマは「テストが実際に走っていない」の解消**で、#4503 → #4508 → #4492 の順に消化して完了した（5.32.0 から丸ごと繰り越し）。
+そこへ #4524（SSRF の DNS リバインディング）・#4534（番組表の書き込みロック）・#4549 / #4559 / #4560 / #4567 が乗った回。
+依存する ginseng-core は 1.15.34 → **1.16.2**（pooza/ginseng-core#499 / #503）。GitHub マイルストーンは #631。
+
+**本番デプロイ: 4 台完了**（2026-08-12、shallu → zugoga → gomander → sweep の順。
+全台 version 5.33.0 / health 200（全サブシステム OK）/ `yjit_enabled: true` / Ruby 4.0.6 据え置き）。
+**5.32.1 が zugoga 限定だったことによるバージョンの不揃いは、これで解消した。**
+⚠ **ただしこの不揃いを「だからリリースを急ぐべき」の根拠に使わないこと**（2026-08-12 ユーザー明示: 「不揃いは特に気にしていません」）。
+揃っていない状態そのものに実害は無い。**急ぐ理由が要るときは実害のあるものを挙げる。**
+
+デプロイで踏んだこと 3 件:
+
+- ⚠ **`BUNDLED WITH` が 4.0.17 → 4.0.18 に上がっていた。**4 台とも `bundle install` の前に `gem install bundler -v 4.0.18` を明示した。
+  ステージングで踏んだ罠（[[project_staging-app-deploy-runbook]]）が本番でもそのまま出る。**`bundle update` を含む回は毎回この確認が要る**
+- ⚠ **`pgrep -f mulukhiya` では listener が漏れる。**プロセス名は `ruby: bin/listener_daemon.rb start` で `mulukhiya` を含まない。
+  「生存 pid が吐いたログだけを見る」検証をこれでやると、**listener を素通ししたまま「エラー 0」と言える**。`pgrep -f "mulukhiya|listener_daemon"` で取ること
+- sweep で `rbenv: cannot rehash: ~/.rbenv/shims/.rbenv-shim exists` が出た。**2026-07-09 に中断した rehash の置き土産**で他 3 台には無い。
+  退避して `rbenv rehash` で解消（shim 46 本のまま）。⚠ **その直後の `bundle --version` が 2.6.9 に見えるのは正常**
+  （sweep は `rbenv global = system`。リポジトリ内では `.ruby-version` により 4.0.6 + bundler 4.0.18 が選ばれる）
+
+**本番でも実機確認を取った**（デプロイ手順を通っただけで満足しない）:
+
+```text
+--- #4574 ゼロアドレス（shallu） ---
+  0.0.0.0              internal=true
+  ::                   internal=true
+  64:ff9b:1::7f00:1    internal=true
+  255.255.255.255      internal=true
+  100.64.0.1           internal=true
+  公開 8.8.8.8               internal=false
+  公開 2001:4860:4860::8888  internal=false
+--- #4575 setnx（shallu・テスト用キー。実キー program には触れない） ---
+  1st=true 2nd=false value="v1"
+```
+
+⚠ **新設した予約レンジが正当な宛先を巻き込んでいないことも確かめた**（4 台とも `Rejected host` が 0 件）。
+再起動後の生存 3 プロセスが吐いたログにエラーは 4 台とも 0 行（shallu 255 行 / zugoga 213 行 / gomander 244 行 / sweep 138 行 中）。
+`/mulukhiya/`・`/mulukhiya/app/program`・`/mulukhiya/api/program.ics` も 4 台とも 200。
+
+**リリース時点の実測**: `rake test` **975 tests / 1335 assertions / 0 failures / 0 errors / 313 omissions**。
+5.33.0 でテストは 954 → 975 に増えたが **omission は 313 のまま**（新規 21 件はすべて実際に走っている）なので、
+CI の `omission_baseline`（mastodon 313 / misskey 302）は据え置きでよい。
+
+### リリース前 5 観点レビュー（2026-08-12 実施・赤 2 件を是正）
+
+5 観点を独立したサブエージェントで並列に走らせ、指摘を合流させた。**重複を畳んで実質の赤は 4 件。**
+⚠ **セキュリティ観点と観測性観点が独立に同じ 2 件へ到達**した（ゼロアドレス・キャッシュ温めの競合）。裏付けとしては強い部類。
+
+| 観点 | 赤 | 黄 | 緑 |
+| --- | --- | --- | --- |
+| セキュリティ | 3 | 1 | 3 |
+| 並行性・ライフサイクル | 1 | 2 | 4 |
+| エラー処理・観測性 | 1 | 5 | 2 |
+| API 契約 | 1 | 2 | 3 |
+| スタイル・規約 | 0 | 3 | 3 |
+
+**本リリースで対応した赤 2 件**（どちらも今回の新規コード自身の穴）:
+
+- **#4574 内部アドレス判定がゼロアドレスを素通り**（PR #4580）— `private? / loopback? / link_local?` は `0.0.0.0` と `::` にすべて false を返す。**実測で `Net::HTTP#ipaddr = "0.0.0.0"` がループバックの待受へ 200 で到達**。⚠ **ブラインドではない**（各ホップの失敗が `errors` に積まれ `reportable?` が必ず true を返すので、`Connection refused` と `Bad response NNN` の差が投稿者へ戻る＝結果の見える内部ポートスキャン）。⚠ **#4524 が作った穴ではない**（v5.32.1 の `public?` も同じ 3 述語）。#4524 が変えたのは pinning で決定的な経路になった点で、**述語を書き直したのが 5.33.0 だから塞ぐならこのリリース**
+  - Codex P1（マージ前）で **RFC 8215 の local-use NAT64 prefix `64:ff9b:1::/48`** の漏れを指摘され取り込んだ。RFC 6146 の well-known prefix `64:ff9b::/96` とは**別レンジ**。⚠ この Issue 自体が「NAT64 のある環境で顕在化しうる」を理由にレンジを足しているので、片方だけ塞ぐのは筋が通らない
+- **#4575 読み経路のキャッシュ温めがロックの外**（PR #4581）— `load_from_yaml` が**読み経路のまま無条件 SET** を撃つ。**#4534 は書き手同士を直列化したが、書き手 × 読み手が残っていた**（「塞いだつもりで開いていた」の 4 度目）。`program` キャッシュに TTL が無く `load` はキャッシュを優先するので、以降すべての面が旧データを返し、次の編集が YAML まで巻き戻す。⚠ **窓はミリ秒ではない**（Redis 再起動直後は死んだソケットを掴んだ最初の 1 コマンドが必ず例外になり、リトライで 1 秒以上眠る＝**デプロイ直後の編集がいちばん危ない**）。読み経路だけ `SET NX` に分けた。⚠ **読み経路をロックに載せる方向は採らない**（読みは書きより桁違いに多く 409 が跳ね上がる）
+
+**既存の赤 2 件は別建て（#4576・5.34.0）**。`is_cat` の webfinger が無検証（リダイレクト未検証 + pinning 無し）と、webhook の `image_url` が **full-read SSRF**。⚠ **5.33.0 に積まなかった**のは、修正が全画像ハンドラと webfinger 経路に及び、**CDN への pinning は「複数 A レコードのフォールバックが効かない」既知のトレードオフを広い面へ適用する**ことになるため（harness 実走込みの独立サイクルが要る＝2026-08-12 ユーザー判断）。
+
+**黄・緑の受け皿は用途別に 3 本**: #4577（観測性 4 件）／ #4578（`views/*.slim` 16 本が未 lint）／ #4579（409 の恒久・一過性が判別できない）。
+
+#### ⚠ サブエージェントの報告をコードで検証せずに写して、危険な docs を書いた
+
+api.md に「Annict の staleness で載らなかったときは**再実行すれば解決する**」と書いたが、**従うとデータがずれる**（PR #4582 の Codex P1 で発覚、`20c872de` で是正）。
+
+`increment_episode` のロック内は **①話数 +1 → ②`annict_episode_id` を nil → ③`next_on` を 7 日前進 → ④`annict_applicable?` の判定 → ⑤`save`（無条件）** の順で、**ガードが閉じるのは ④ の「Annict メタデータを載せるか」だけ**。増分そのものは成功して保存済みなので、再実行すると**話数を飛ばして日付が 7 日ずれる**。正しくは `PUT /admin/program/entry/:key` で補う。
+
+**赤 4 件は実コードと実測で裏を取ったのに、黄 1 件を素通しした。**サブエージェントの結論は額面どおり受け取らない、が観点ごとに緩まないようにする。同じ誤りを写していた #4579 / #4577 にも訂正コメントを入れてある。
+
+### ステージング検証・2 回目（2026-08-12・レビュー是正後・**4 台とも緑**）
+
+赤 2 件の是正を含む `dd85ee7b` を dev24-27 へ再適用。**4 台とも version 5.33.0・health 200（全サブシステム OK）・
+WebUI 200・番組表エディタ 200**。⚠ **再起動後のプロセスが吐いたログに新しいエラー署名は無い**
+（生存 pid で絞って確認。残るのは GAS の HEAD 403 と #4573 の辞書エラーで、いずれも既存事象）。
+
+**是正 2 件が実機で効いていることを dev25 で直接確認した**（手順を通っただけで満足しない）:
+
+```text
+--- #4574 ゼロアドレス ---
+  0.0.0.0              internal=true
+  ::                   internal=true
+  64:ff9b:1::7f00:1    internal=true
+  公開: 8.8.8.8 internal=false
+--- #4575 setnx ---
+  1st=true 2nd=false value="v1"
+```
+
+### ⚠ 旧: ステージング検証・1 回目（2026-08-12・4 台とも緑・**レビュー是正前の記録**）
+
+`develop` の HEAD（`640ee959`）を dev24 美食丼 / dev25 キュアスタ！ / dev26 デルムリン丼（Mastodon）/ dev27 ダイスキー（Misskey）へ適用。
+**4 台とも version 5.33.0・`/mulukhiya/api/health` 200（redis / sidekiq / postgres / streaming すべて OK）・WebUI 200**、
+番組表エディタ（`/mulukhiya/app/program`）と `.ics`（`/mulukhiya/api/program.ics`）も 200。
+**再起動後のプロセスが吐いたログにエラーは 1 行も無い**（生存 pid で grep して確認。再起動前の pid が吐いた辞書取得エラーは 5.32.0 時点からの既存事象）。
+
+- ⚠ **`Gemfile.lock` の `BUNDLED WITH` が 4.0.18 に上がっている**（`640ee959`）のに 4 台の bundler は 4.0.17 だった。
+  **FreeBSD では bundler の自己インストール → 再 exec が `/bin/sh` へフォールバックして落ちる**（[[project_staging-app-deploy-runbook]] の既知の罠）ので、
+  `bundle install` の前に `gem install bundler -v 4.0.18` を明示した。**`bundle update` を含む回のデプロイでは毎回この確認が要る**
+- ⚠ **ssh 越しに `service mulukhiya-listener restart` を素で叩くとセッションが返ってこない**。
+  デーモンが ssh の stdout を握ったままになるため。`</dev/null >/dev/null 2>&1` を付けること（health は別セッションから叩けば確認できる）
+- dev24-26 は monit が `/mulukhiya/api/health` を 3 サイクル監視して 3 サービスを再起動する構成なので、
+  デプロイ中は `monit unmonitor mulukhiya` → 完了後 `monit monitor mulukhiya` で挟んだ。⚠ **`monit monitor` の反映は次サイクル**（直後の summary は `monitor pending` と出る）
+- dev27 の `yjit_enabled: false` は既知の欠落（pooza/chubo2#123）で退行ではない。dev24-26 は `yjit_enabled: true`
+
+**モンキーテスト待ち**: #4534（番組表の書き込みロック）と #4560（`warn` の JSON 化・マスキング）は
+ステージングで目視できるためクローズせず開けてある。確認項目は各 Issue のコメントが正本。
+
+### harness 実走ゲート（2026-08-12 再実走・**「新規の失敗ゼロ」で非ブロック化**）
+
+レビュー是正後の HEAD（`2c69bb31`）で両系を再実走。**両系 0 failures は満たせていない**が、
+**#4508 の前例（「既知集合と完全一致 = 新規の失敗ゼロ」で通す）に倣って非ブロック化した**（2026-08-12 ユーザー判断）。
+
+| 系 | 結果 |
+| --- | --- |
+| Mastodon（`tagging_dictionary` 空） | **1050 tests / 0 failures / 0 errors** / 152 omissions |
+| Mastodon（キャッシュ温） | 1050 tests / 1 failures（`RemoteTagHandlerTest`） |
+| Misskey（キャッシュ空・3 回） | 1053 tests / **1 failures**（`RemoteTagHandlerTest`）/ 0 errors / 141 omissions |
+
+**非ブロック化の根拠は A/B。**`tagging_dictionary` をクリアしたうえで**同一コミットを連続実行**して比較し、
+是正前 HEAD（`640ee959`）でも Misskey 2/2 で同じく落ちることを確認した（現行は 3/3）。**新規の失敗ではない。**
+受け皿は **#4584**（`キュアスタ!` が reject される・原因未特定）。
+
+#### ⚠ この日踏んだ落とし穴 2 つ（#4583 / #4584 として起票）
+
+- **`tagging_dictionary` が TTL 無し（実測 `TTL` = -1）で Redis に居座り、実行をまたいでもコミットを切り替えても残る。**
+  **ゲートの結果が「前に一度回したか」で変わる**（同一コミット・同一 harness で 0 failures → 1 failures）。
+  当面は **実走の前に `redis-cli -n 1 UNLINK tagging_dictionary`** を踏む。#4503 / #4559 と同じ「守れているつもりの緑」型 → **#4583**
+  （⚠ **2026-08-15 着地。以降この手作業は不要**でスイートのロード時に自動で捨てる）
+- ⚠ **A/B はコミットを交互に変えるだけでは足りない。**`DictionaryTagHandlerTest` を「5.33.0 の退行」と判断しかけた。
+  交互に 4 回回すと 2→1→2→1 ときれいに再現したが、**同一コミットを 2 回続けて**回すと 2→1 と揺れた。
+  **run 単位の状態依存とコミット差は、同一コミットの連続実行を入れないと区別できない。**
+
+### ⚠ 旧: harness 実走ゲート（2026-08-11・両系緑で通過・**レビュー是正前の記録**）
+
+同一 HEAD（`develop` = #4572 マージ後）で両系を実走。**判定基準（両系 0 failures / 0 errors、`TestHarness: controller=` が狙った系と一致）をいずれも満たす。**
+
+| 系 | 結果 | announce |
+| --- | --- | --- |
+| Mastodon（harness v4.6.5） | **1042 tests / 2079 assertions / 0 failures / 0 errors / 152 omissions** | `controller=mastodon url=http://localhost:3000` |
+| Misskey（harness 2026.7.0） | **1045 tests / 2112 assertions / 0 failures / 0 errors / 141 omissions** | `controller=misskey url=http://localhost:3000` |
+
+omission は両系とも 2026-08-09 の参考値（152 / 141）と**完全一致**。tests が参考値（1001 / 1004）より増えているのは #4534 系列で 16 件足したぶんとシード差。上流バージョンの昇格は伴わないので台帳（harness-verified-versions.yaml）は据え置き。
+
+#### ⚠ この日踏んだ落とし穴 3 つ（次回も踏む）
+
+- **両ハーネスは同時に起動できない。**Misskey ハーネスも `MISSKEY_PORT=3000` で Mastodon と衝突する。**片方を `teardown.sh` してからもう片方を `setup.sh`**（`setup.sh` は 1 系あたり 8〜9 分）。⚠ **`url=` は両系とも `localhost:3000` なので取り違えの判別に使えない。`controller=` の側を見ること**（#4559 のドキュメント例にある `:3001` は実態と違う）
+- ⚠ **系の分離に `env -i` を使うなら `LANG` を残す。**落とすと Ruby の外部エンコーディングが US-ASCII になり、**製品と無関係な `invalid byte sequence in US-ASCII` が 6 件（1 failures / 5 errors）出る**。退行と読み違えかけた。`env -i HOME PATH TERM LANG LC_ALL` で足りる（`MASTODON_count=0` を実走前に出して分離も確かめた）
+- ⚠ **Mastodon 実走中に出る `TestHarness: DB 接続に失敗したためスキップ: ... password authentication failed for user "u"` は正常。**`TestHarnessTest` が配線を検証するために**わざと偽 DSN（`postgres://u:p@…`）を差している**もので、環境の不備ではない。DB 依存テストは実際に走っている（omission が 313 → 152 に減っているのが証拠）
+
+### 着地済み: #4534 番組表の書き込みが無ロックの read-modify-write（2026-08-11）
+
+**5.32.0 で意図的に見送っていた最後の実装項目。**「実況が使う書き込み経路そのものにロックを入れる変更」なので、ニチアサ（次は 08-16）まで runway のあるタイミングで入れた。
+
+- `ProgramLockStorage` を新設。`ComposeTemplateLockStorage`（#4457 / #4460）と同型（`SET NX EX` + compare-and-delete + fail-open、TTL は**定数** 30 秒）。番組表はインスタンスに 1 つなので key も 1 つ
+- 編集 4 メソッドは `lock.synchronize` の内側で `fetcher.save` を直接呼ぶ。⚠ **公開 `save` 経由にすると自分のロックと衝突する**
+- **`save` もロックに載せた。**auto_update の pull（`ProgramUpdateWorker`）とエディタの編集は同じ YAML / Redis を触るので、別ロックにすると交差する
+- `ProgramUpdateWorker` は競合を **alert に上げず**次の周回へ送る（every 1m で追いつく。直列化が意図どおり働いた結果を毎分 Sentry に流すのは #4542 と同型）
+- ⚠ **ロックの正テストを `ProgramTest` に置かなかった。**あちらの `disable?` は `livecure?`（`var/program.yaml` が在るか `/program/urls` が設定されているか）で丸ごと倒れるので、番組表を持たない環境では**一度も走らない**（#4549 で `absolute_uri` をクラスメソッドへ出したのと同じ理由）。`ProgramWriteLockTest` として独立させた
+  - ⚠ **例外クラスだけでなくメッセージまで見る。**`auto_update` の 409 も `ConflictError` なので、クラスだけだと**ロックが無くても緑になる**
+  - ⚠ このテストは書き込みを 1 つも成功させない（全ケースがロック獲得の時点で倒れる）ので、`var/program.yaml` も Redis も触らない
+
+#### ⚠ 初版は Annict をロックの内側に置いていた（同日中に是正・PR #4571）
+
+**「話数の +1 とサブタイトルの解決は不可分だから」という理由で内側に置いたのは誤り**だった（PR #4569 の Codex P2）。
+
+- `/service/annict/timeout: 5` は **open と read の双方**に効くので、3 回で素直に **TTL(30 秒) に届く**。ロックが先に失効すると別の編集が獲得でき、そこへ元のリクエストが書き戻して**塞いだはずの lost update がそのまま戻る**
+- ⚠ **TTL を伸ばす手は採らない。**プロセスが死んだときに編集が止まる時間もそのまま伸びる
+- ⚠ **ロックを持っている区間にネットワーク I/O を入れない**、が一般則。Annict はロックの外で先に引き、**「引いた時点の話数と作品 ID」を持ち回ってロックの中で一致を確かめる**。判定は純関数 `annict_applicable?` に出し、`ProgramAnnictStalenessTest` で検証する
+  - ⚠ **話数だけでは足りない**（PR #4571 の Codex P2 → PR #4572）。`ProgramEntryUpdateContract` は `annict_work_id` の変更を許しているので、待っている間に作品を差し替えられると**話数は同じだが別作品**になり、旧作品のサブタイトルが載る。**照合は話数と作品 ID の両方**
+- ⚠ **存在チェックの正本はロックの中に残す。**外で `NotFoundError` を上げると、**ロック競合より先に 404 を返す**ようになり `ProgramWriteLockTest` が実際に落ちた
+- 付随: `persist` を潰して `fetcher.save` 直呼びにした。⚠ **`Metrics/ClassLength` の上限 200 行に合わせるための削りであって設計判断ではない。**この学びを踏まえ、PR #4572 で 201 行になった際は**同じ捻出をせず inline disable で明示**した。正しい直し方（参照系と編集系の分離）は **#4570**
+
+⚠ **この #4534 の系列は「塞いだつもりで開いていた」が 3 連続で出た**（TTL 超過 → 作品 ID 未照合）。**ロックや排他を入れる変更は、入れた直後の Codex 追撃まで込みで 1 セットと見る。**
+
+### 着地済み: #4567 route-not-found 以外の 404 を omit していた（2026-08-11）
+
+PR #4557 の Codex P2。**2026-08-10 の棚卸し（直近 8 PR 横断）でも取り残されていた**もので、同期のリアクション 0 走査で拾った。`endpoint_missing?` が `statusCode == 404` だけを見ていたため、ルートには届いたうえで参照先が無い 404 まで「エンドポイント未提供」として omit し、webhook のルーティング退行を飲みうる状態だった。
+
+⚠ **初版（PR #4568）の `message` 部分一致でも足りず、同日中に是正した**（PR #4568 の Codex P2 → PR #4571）。ハンドラが同じ Fastify 包絡で `Webhook <path> not found` を返すと path を含むので一致し、**ルートは在るのに omit する**。route-miss の文面ごと（`Route POST:<path> not found`）突き合わせる。`Webhook#command` は必ず POST なのでメソッド名も固定でよい。
+
+⚠ 文言が将来ずれた場合は omit されず **assert で赤くなる**方向に倒れる。実退行を飲むより検証条件のズレに気づけるほうを採った。
+
+### Codex レビューの棚卸し（2026-08-11）
+
+**⚠ 前日「直近 8 PR を横断で走査し全件処理した」と記録したのに、PR #4557 の P2 が 1 件リアクション 0 で残っていた。**同じセッション中に PR をマージし続けると、走査の後に着いたコメントがそのまま落ちる。さらに本日マージした PR #4568 / #4569 の**両方**にマージ直後 P2 が届いた（どちらも実質的な穴で、同セッション中に PR #4571 で消化）。
+
+**PR を出したセッションは、締める直前にもう一度リアクション 0 走査を回すこと。**「棚卸し済み」は次セッションへの免罪符にならない。
+
+### 着地済み: #4524 SSRF allowlist の DNS リバインディング（2026-08-10）
+
+**「名前で検証して名前で接続する」構造そのものを畳んだ。**`RemoteHost.public?` は解決結果を真偽値に潰していたので、権威 DNS を握った相手が検証時だけ公開 IP アドレスを返し、接続時に 127.0.0.1 を返せた（TOCTOU）。**#4410 のホップ検証も #4523 のプリフライト検証も、この構造がある限り素通りできる。**
+
+- `RemoteHost.allowed_address` を新設し、`validator` は**真偽値でなく接続先の IP アドレス** を返す。ginseng-core 1.16.0 が文字列を受けると `Net::HTTP#ipaddr=` で接続先を固定する（pooza/ginseng-core#503 / PR #504、`Ginseng::PinnedAddressAdapter`）
+- ⚠ **`ipaddr=` は接続先だけを差し替える。**`Host:` ヘッダと TLS の SNI・証明書検証はホスト名のままなので HTTPS の検証は壊れない
+- ⚠ **pinning はホップごとに付け替える**（リダイレクト先は別ホスト）
+- ⚠ **IPv4 があれば IPv4 を採る。**`getaddresses` は A と AAAA を混ぜて返すので素直に先頭を採ると IPv6 を掴む（#4464 で踏んだ `::1` の 305ms と同型）
+- **トレードオフ**: アドレスを 1 本に固定するので、**複数 A レコードのフォールバックは効かなくなる**。対象は管理者が設定した少数の URL なので許容した
+- ⚠ 拒否の戻りが **`false` → `nil`** に変わった。呼び出し元はいずれも真偽で判定しているので falsy であればよい
+
+**マージ後に Codex の P1 が 2 件届き、同日中に是正した（PR #4565 / pooza/ginseng-core#505、1.16.1）。どちらも「塞いだつもりで開いていた」型。**
+
+- **短縮 URL の展開だけ pinning を素通りしていた** — `ShortenedURLHandler#permitted_host?` が validator の戻り（IP アドレス）を捨て、`fetch_redirect` は名前で GET し直していた。⚠ **ここは `host_validator` に任せられない**（あちらは追従まで肩代わりして最終レスポンスだけ返すので展開先が取れない）。**追うのがこちらである以上、pinning もこちらの責務**
+- **プロキシ経由では pinning が効かない** — `Net::HTTP#connect` は `proxy?` のとき `@ipaddr` を見ずプロキシへ繋ぎ、平文なら絶対 URI・HTTPS なら CONNECT でホスト名を渡す。**名前を解決するのはプロキシ**なのでリバインディングは成立する。fail-closed にした。⚠ `Net::HTTP.new` の proxy 引数は既定が `:ENV` なので、`http_proxy` を置いた環境では**明示していなくても**該当する
+  - さらに P2 で「その拒否を `repeat` が 5 回叩き直す」（上流レスポンスの無い `GatewayError` は `source_status` が 502 = 一時障害と読まれる）ことが判明し、`Ginseng::PinningError` を新設して非再送に（pooza/ginseng-core#506、**1.16.2**）。⚠ **設定起因の失敗を再送で解決しようとしない**
+
+### 5.31.0 レビュー由来の受け皿 Issue
+
+5.32.0 で **#4535 / #4536 と #4537 の 1・4**、2026-08-10 に **#4537 の 2・3・5・6**（PR #4563）を消化した。残りは 1 本。
+
+- **#4534** 番組表書き込みの無ロック RMW（サーバー側ロック・size:M）。**5.32.0 では意図的に見送った**（実況が使う書き込み経路そのものにロックを入れる変更で、二度押しは #4533 でクライアント側が塞いである）
+- **#4537 の 2・3・5・6（着地）** — Spotify の `invalid_request` を運用側不備に分類（⚠ `Ginseng::AuthError` は **403**、401 ではない）／`webhook.url` を `available?` で nullable 化／効かない `silent_statuses: [413]` の撤去・透過を Hash 限定に・`source_body` のメモ化（ginseng-core 1.15.37）／`Mulukhiya::ForeignGatewayError` を新設し、**引用元（他人のサーバー）由来は #4480 の透過に乗せない**
+  - ⚠ **ForeignGatewayError は現状どの経路からもリクエスト層へ届かない**（呼び出し元がすべて degrade する）。「届いたときに透過されない」不変条件を型で担保するためのもの
+
+### Codex レビューの棚卸し（2026-08-10）
+
+直近マージ 8 PR を横断でリアクション 0 走査（[[feedback_codex-review-window-too-narrow]]）。**取り残し 8 件（5 PR ぶん）**があり、全件に返信 + リアクションを付けて処理した。受け皿は 3 本で、**うち 2 本は同日中に着地**。
+
+- **#4558 番組表の `next_on` に `Time` を手書きすると Redis キャッシュ往復で無効値になる（保留中）** — PR #4546 P1 / #4548 P2。**素の Ruby で再現済み。**`load_from_yaml` が coerce 前の生ハッシュを `update_cache` に渡すため、Redis には `"2026-08-08 18:00:00 +0900"` が入る。**1 回目（キャッシュミス）だけ正しく、2 回目以降は無効値**になって VEVENT が黙って消える。⚠ **キャッシュ層を挟むと上流の正規化が静かに外れる**のは #4549（`base_uri` の相対解決）と同型。あわせて `format_date` の無条件 `getutc` が明示オフセット付きの値を 1 日ずらす件（PR #4546 P2、`2026-08-08 00:30:00 +09:00` → 08-07）と、まとめコピーの見出しが `2026-02-31 (火)` と存在しない日付に曜日を付ける件（PR #4548 P2）も同 Issue へ
+  - ⚠ **本番が実際に踏んでいるかは未確認**（VPN が繋がらず `var/program.yaml` を見られなかった）。ユーザー判断で**着手を保留**している。修正自体は単体テストで閉じるので、本番確認を待たずに書ける
+- **#4559 リリースゲートの穴 2 件（着地・PR #4561）** — PR #4555 P1 / P2。①同じシェルで両系を source すると `MASTODON_*` が残り、**Misskey のつもりで Mastodon を 2 回走らせたまま「両系緑」と記録できる**（選択ルールは「手順（Misskey）」節にあるがゲートの節には無い）②omission 集計をパースできないと warning のまま success で、#4503 のラチェットが黙って無効化される
+  - **選択ルール自体は変えていない。**`TestHarness#announce` が run の頭で `TestHarness: controller=... url=...` を stderr に出すようにし、**取り違えに気づける手段を足す**方向で直した。ゲートの判定基準にも「この行が狙った系と一致していること」を追加
+  - 集計不能は `steps.test.outcome` で切り分けて fail closed。⚠ **テスト自体が落ちている run では追撃しない**（前段のステップが既に赤い）
+- **#4560 `logger.warn` がマスキング層を通らない + `unresolved_enclosures` が伸び続ける（着地・PR #4562）** — PR #4551 P1 は**却下（👎）**。`Ginseng::Logger < Syslog::Logger` なので `warn` は存在し `NoMethodError` にはならない。ただし `Ginseng::Logger` が上書きしているのは **`info` と `error` だけ**で、`warn` は `create_message` を通らず **JSON 化もマスキング（#4511 / #4533）もされない**（4 箇所、うち 1 つは URL を載せる）
+  - 直したのは ginseng-core 側（pooza/ginseng-core#499 → PR #500 / #501、**1.15.36**）。⚠ **呼び出し側を `info` に書き換えて回るのは対症療法**。severity は syslog の重要度として正当な使い分け
+  - ⚠ **初版（#500）は `message` を必須引数にしていて、ブロック形式 `logger.warn {expensive}` を `ArgumentError` で殺していた**（Codex P2）。#501 で省略可能引数 + ブロックへ戻し、severity 無効時はブロックを評価しない形に是正。**マージ直後に Codex が指摘 → 同セッションで是正**の流れが機能した例
+  - PR #4550 P2 側は `RSS20FeedRenderer#render` を新設して 1 レンダーぶんにスコープ。⚠ **テストは `RSS20FeedRendererTest` に置かない**（DBMS 無しでケースごと omit され一度も走らない。#4549 で `absolute_uri` をクラスメソッドにしたのと同じ理由）。親の `initialize` を呼ばないスタブで別クラスに置いた
+
+### 着地済み（2026-08-09）
+
+- **#4503 test: アカウント依存のテストが CI・手元で 1 件も走っていない** — **CI で走らせる方向は採らず、harness 実走をリリースゲートとして正式化する形で決着**した。CI には SNS の実サーバーも Mastodon の Postgres も無く、`config['/mastodon/url']` は `https://ci.example.com` のダミーなので、アカウント依存テストは**構造的に**走らない。3 点で着地:
+  - **報告の是正（済）**: pooza/ginseng-core#488 / #489 で `disable?` を omission 報告に。実測 **929 tests 中 313 件が omission**（それまでは pass に混ざっていた）
+  - **可視化とラチェット**: CI がジョブサマリに集計行と omission 件数を出し、`.github/workflows/test.yml` の `omission_baseline` を超えたら落ちる。⚠ **test-unit は 313 件 omission でも `100% passed` と出す**ので、集計行を読まないと気づけない
+  - **ゲートの明文化**: 通常リリース手順に「harness 実走（省略不可・両系 0 failures / 0 errors）」を追加。判定基準と切り分けは [test-harness.md](test-harness.md)「リリースゲートとしての実走」
+- **#4508 chore: sinatra 4.2.1 / rack-protection 4.2.1 / tilt 2.8.0 へ更新** — PR #4556。pin はモロヘイヤ側でなく **`pooza/ginseng-web` の gemspec** にあったので、そちらを `~>` から `>=` へ緩めるのが前提作業だった（pooza/ginseng-web#116 / 1.3.46。CVE-2024-21510 の下限 4.1.0 は保つ）
+  - ⚠ **起票時の前提が 1 つ違っていた。`mustermann 4.0.0` はこの更新では入らない**（sinatra 4.2.1 が `~>3.0` を要求する）。**メジャー跨ぎを含まない更新**だった
+  - **#4503 のゲートの初適用。**Mastodon（v4.6.5）1001 tests / 0 failures / 0 errors / 152 omissions ＝基準値と完全一致、Misskey（2026.7.0）1004 tests / 3 failures（当時の #4492 の既知集合と完全一致）/ 0 errors / 139 omissions。新規の失敗ゼロ
+  - 副産物: **ゲート文言「両系 0 failures」が #4492 のせいで満たせない**ことが露見した。直後に #4492 を解消したので例外は残っていない
+- **#4492 test: Misskey harness で恒常的に落ちる 3 件を解消** — PR #4557。**3 件のうち 1 件は harness 側の実バグ**で pooza/chubo2#161 / #162 で直した。これで **`project_harness-zero-error-goal`（両系エラー 0）を達成**
+  - ⚠ **`WebhookImageHandlerTest#test_handle_pre_webhook` は製品もテストも変更していない。**Misskey harness の `files` ボリュームが root 所有で、uid 991 の misskey が書けず drive アップロードが `EACCES` → 500 で全滅していた。**起票時の「Amazon の外部依存が原因」は誤り**（当該 URL は 200 を返していた）。harness が drive を一度も通していなかったので露見しなかった
+  - `SNSServiceTest#test_access_token` — Misskey の `access_token` 行は MiAuth / OAuth の認可時にしか作られず、harness が発行するのは**ユーザー固有トークン**なのでテーブルは 0 行。honest omit に。⚠ **Mastodon は Doorkeeper のトークン行を持つので対象外**にし、素通しさせている
+  - `WebhookTest#test_command` — omit ガードが HTML エラーページ前提だった。⚠ **Misskey harness は nginx を挟まない**ので Fastify が 404 の JSON 包絡を返し、ガードが素通りしていた
+- **#4516 / #4552 test/bug: harness 実走で常態化していた失敗 5 件をテスト側から解消** — PR #4553。5 件とも product の退行ではなく**検証側の前提ズレ**だったので、テスト側に寄せて **1001 tests / 0 failures / 0 errors / 152 omissions（100% passed）** にした
+  - `SNSServiceTest#test_info` — ⚠ **`metadata.maintainer` を出すのは Misskey だけ**。Mastodon はフォークの `pooza/mastodon` も `nodeName` / `nodeDescription` しか返さないので、**本番 3 台でも `maintainer_name` は nil**。harness 固有の欠落ではない（起票時の「harness に contact account を設定すれば直る」は誤り）。副次的に `MediaFeedRenderer` の RSS author は Mastodon で常に nil
+  - `MediaFeedRendererTest#test_to_s` — omit ガードを `#fetch` の描画条件と同じ順に並べ直した。`media_catalog?` が false なら entries は空のまま返る（既定 OFF・#4343）。**harness では依然 `<item>` の描画が検証されない**ので、通したければ harness 側で `media_catalog` を有効にする必要がある（chubo2#64 の続き）
+  - `ComposeTemplateContainerTest#test_write_reloads_user_config_inside_lock` — ⚠ **`Account#user_config` はメモ化される**。`TestCase#account` が返す同じインスタンスを渡すと、書き込みが成功していても最初に掴んだ空スナップショットを読む。読み直しは新しい account から行う
+  - `AttachmentTest#test_catalog` — ⚠ **製品側は直さない**。`:page` の既定値補完は API 境界の `MediaCatalogQueryService#normalize` が持っており（`cursor` 指定時は付けない、も含む）、モデル側にも足すと補完が 2 箇所に分かれる。起票時の「製品側で揃える」推奨は撤回
+  - `MediaMetadataStorageTest#test_push` — Amazon の実画像取得をやめ、`test/fixture/sample.jpg` を WebMock で返す。取得失敗時のネガティブキャッシュ（`{}`）が期待値と食い違って毎回ランダムに落ちていた
+
+### 振り返り
+
+**「塞いだつもりで開いていた」がこのリリースだけで 4 回出た。**#4534 の系列で 3 回（ロック TTL 超過 → 作品 ID 未照合 → 読み経路がロックの外）、#4524 で 2 回（短縮 URL の pinning 素通り・プロキシ経由の fail-open）。
+いずれも**排他や検証を「入れた」直後**に見つかっている。**ロックや SSRF ガードを入れる変更は、入れた直後の追撃レビューまで込みで 1 セットと見る**、が実測で裏付いた。
+
+**レビュー・harness・ステージングの 3 段が、それぞれ別のものを捕まえた。**5 観点レビューが赤 2 件（#4574 / #4575）、ステージング検証が #4573（本番で `related` 辞書 3 本が死んでいた既存事象）、harness が #4583 / #4584。**どれも他の段では出てこなかった。**
+
+**⚠ この回でいちばん危なかったのは、コードでなく docs だった。**サブエージェントの黄 1 件を検証せずに api.md へ写し、**従うとデータがずれる手順**を書いた（Codex P1 で発覚・`20c872de` で是正）。赤 4 件は実コードと実測で裏を取ったのに、黄だから素通しした。**観点や深刻度で検証の手を緩めない。**
+
 ## リリース済み: 5.32.1（2026-08-08、ホットフィックス）
 
 ⚠ **適用したのはデルムリン丼（zugoga）だけ**（ユーザー判断・実害が出ているのがこのサーバーのみのため）。
-shallu / gomander / sweep は 5.32.0 のままで、**本番のバージョンは意図的に不揃い**。5.33.0 で揃える。
+shallu / gomander / sweep は 5.32.0 のままで、**本番のバージョンは意図的に不揃い**だった。**2026-08-12 の 5.33.0 で 4 台とも揃えて解消済み。**
 
 - **#4549 カスタムフィードの相対 enclosure URL が解決されない** — 5.32.0 の直後に、zugoga の syslog へ
   `base_uri undefined` が**日 2 万行**積まれているのを見つけたのが端緒。追うと**ログノイズではなく機能不全**で、
@@ -334,284 +597,10 @@ shallu / zugoga / sweep / gomander、全台 version 5.31.0 / health 200 / `yjit_
 
 **リリース前レビューがこれを捕まえた**。`i` がボディで来るという指摘（🔴）が無ければ、デプロイ後の掃除は「掃除した端から再汚染される」状態で回っていた。ステージング検証が本番停止級を捕まえた 5.30.0 の #4509 と合わせて、**レビュー → ステージング → 本番の 3 段が 2 リリース続けて実際に仕事をしている**。
 
-## リリース済み: 5.30.0（2026-08-02）
-
-性能・観測性・セキュリティのハードニング回。新機能の追加はない。**主軸 #4464 のゴール（ニチアサ実況の数秒をハンドラ単位で説明できる状態）を達成し、その実測から出た修正をまとめて出荷した**回でもある。
-
-- **#4464 perf: pre_toot ハンドラの所要時間を計装する** — 閾値超のイベントだけ 1 行 JSON。既定 OFF（`/profile/handler/enable`）。08-02 の実況で lbock 07-26 と突き合わせ、1 秒超 119 件(89%)→79 件(61%)・p50 4.8s→1.1s を確認（詳細は下記「投稿レイテンシ調査の記録」節）
-- **#4481 / #4490 perf: 出荷設定からホスト名 `localhost` を排除** — Ruby 3.4+ の HEv2 により `/etc/hosts` に `::1 localhost` を持たないホストでは 1 接続 305ms。Redis DSN 3 箇所と nginx サンプルの `proxy_pass` 13 箇所を `127.0.0.1` 化。nginx 側は「暗黙 upstream 2 ピア → 負荷時に無条件 502」も同時に塞ぐ
-- **#4494 / #4482 perf: タグハンドラの重複評価と辞書の重複構築を削る** — `result.push(addition_tags:)` の短縮記法がメソッド呼び出しになる副作用で 1 投稿 3 回評価。`TaggingDictionary`（Redis GET + Marshal・725KB）は 1 投稿で 6 回構築されていた
-- **#4466 obs: `/health` に Ruby ランタイム情報（version / YJIT）** — YJIT は Rust の無い環境でビルド時に黙って外れる。既定では NG にせず `/runtime/require_yjit` で opt-in
-- **#4461 obs/並行性: 5.29.0 レビュー黄まとめ 4 件** — 保存の二重 alert 解消（`UserConfig#update!` 新設）、StartupNotificationWorker の rescue デッドマン化、compose RMW の fresh read 強制、ロック TTL 10s→30s
-- **#4410 security: リダイレクト経由 SSRF を per-hop ホスト検証で塞ぐ** — 初段だけ検証しても HTTParty がリダイレクトを追うため無意味だった。追従を切ると GAS（番組表・読み辞書の実体）が壊れるので、ginseng-core 1.15.29 に `host_validator` を入れて各ホップを検証。検証は再送処理の外
-- **#4483 fix: 番組表エディタの ✔ が表示されない** — 素の U+2714 が Linux の絵文字フォント環境で描画されない。Font Awesome へ置換。⚠ **Issue に書かれていた flex-shrink 説を検証せずに実装して外した**（MEMORY `feedback_verify-before-claiming-fixed`）
-- **#4509 fix: `RACK_ENV=production` で起動不能** — `json-schema` を Gemfile に書いておらず `Bundler.require` の対象外。ginseng-core 1.15.31 で `Environment.type` が ENV を先に見るようになり、`Ginseng::Config` の autoload 副作用が消えて顕在化。**ステージング検証で捕捉**
-- **ginseng-\* の open Issue 6 件を全消化** — core 1.15.31（`Logger#mask` の破壊的変更・`Environment.type` の ENV 無視・`RBENV_VERSION` の引き継ぎ）/ fediverse 1.8.26（nodeinfo の contact_account nil・numeric_ap_id の publicize）/ redis 2.0.5（`create_key` の破壊的変更）。Ruby 4 の frozen string で落ちる `String#nokogiri`・`URI.normalize_component` も是正
-- **テスト実行状況の可視化** — ginseng-core #488 で `disable?` のケースを pass ではなく omission として集計。**822 件中 304 件（37%）が実際には実行されていない**ことが判明（#4503）
-- **リリース前 5観点レビュー** — 真の赤 0。赤近い黄 2 件（StartupNotificationWorker の `disable?` 未短絡・保存失敗メッセージへの例外クラス名混入）をインライン是正。残りは #4506 / #4508 / #4511 として 5.31.0 へ
-- **ステージング検証（省略不可）**: dev24-27 全 4 台で 5.30.0・health 200・WebUI 200 を確認。さらに **#4461 の RMW / ロックを dev24 の実 DB + Redis で 9 項目検証**（この範囲は単体テストが実行されていないため実機で担保）
-- **本番デプロイ: 4 台完了**（2026-08-02、zugoga / shallu / sweep / gomander、全台 version 5.30.0 / health 200 / `yjit_enabled: true`）。あわせて **Postgres DSN の `localhost` を `127.0.0.1` 化**、**`/runtime/require_yjit: true` を全台に投入**、**gomander を `develop` 運用から `main` へ戻した**（lbock→gomander 移行の残件を解消）
-
-### 振り返り
-
-**ステージング検証が本番停止級のバグを捕まえた 2 例目**。#4509 は `rake test` 822 件も CI も緑のまま通過していた（どちらも `RACK_ENV` を立てないため）。1 例目は 5.28.0 の省略障害（MEMORY `project_5280-staging-skip-postmortem`）で、あちらは「省略したから起きた」、今回は「実施したから防げた」。
-
-**「守れているつもりの緑」を 2 つ潰した**。ひとつは #4503（822 件中 304 件が未実行なのに 100% passed と出ていた）。もうひとつは #4410 の作業中に既存テストが 1 件落ちた件で、これは **SSRF ガードが正しく効いた結果**だった（`https://dic.test/` は解決できず fail-closed）。差し替えを恒久化すると以後のテストでガードが効かなくなるため、当該テストだけ `ensure` で復元する形にした。
-
-**⚠ `require_yjit: true` は monit と組み合わさると再起動ループになる**。monit は `/mulukhiya/api/health` の 200 を 3 サイクル監視し、失敗すると 3 サービスを再起動する。YJIT 欠落は再起動で直らないため、Rust 無しで Ruby を作り直した瞬間にループへ入る。全台 YJIT 有効を確認したうえで投入している。
-
-## 次期マイルストーン: 5.33.0
-
-**土台テーマは「テストが実際に走っていない」の解消**で、#4503 → #4508 の順に扱う（5.32.0 から丸ごと繰り越し）。
-**#4503 / #4508 / #4492 とも着地し、土台テーマは完了**（#4492 は 2026-08-10 に PR #4557 をマージ）。
-2026-08-10 に **#4559 / #4560**（Codex 棚卸し由来）・**#4537**（5.31.0 レビューの受け皿）・**#4524**（SSRF）も着地。
-2026-08-11 に **#4534**（番組表の書き込みロック）と **#4567**（Codex 取り残し）が着地し、**実装項目は完了**。
-2026-08-12 のステージング適用後にモンキーテストを実施し、**#4534 / #4560 ともクローズ＝マイルストーンの open Issue はゼロ**（残る open はリリース PR #4554 のみ）。
-保留中の **#4558** はマイルストーン未割当のまま（ユーザー判断で着手保留。5.34.0 の候補）。
-GitHub マイルストーン作成済み（#631）。バージョンバンプは 2026-08-08 に実施。
-依存する ginseng-core は 1.15.34 → **1.16.2**（pooza/ginseng-core#499 / #503）。
-
-本番のバージョンは 5.32.0（3 台）と 5.32.1（zugoga）で不揃いのまま。5.33.0 で揃える。
-⚠ **この不揃いを「だからリリースを急ぐべき」の根拠に使わないこと**（2026-08-12 ユーザー明示: 「不揃いは特に気にしていません」）。
-5.32.1 は zugoga 限定のホットフィックスで、揃っていない状態そのものに実害は無い。**急ぐ理由が要るときは実害のあるものを挙げる。**
-
-**2026-08-11 時点の実測**: `rake test` **970 tests / 1326 assertions / 0 failures / 0 errors / 313 omissions**。
-4 PR ぶんでテストは 954 → 970 に増えたが **omission は 313 のまま**（新規 16 件はすべて実際に走っている）なので、
-CI の `omission_baseline`（mastodon 313 / misskey 302）は据え置きでよい。
-**2026-08-12 のレビュー是正後は 975 tests / 1335 assertions / 0 failures / 0 errors / 313 omissions**（新規 8 件も全数走っている）。
-
-**リリースまでに残る手順**: **本番 4 台のデプロイのみ**。手順 2〜5（5 観点レビュー・セキュリティ・harness・ステージング）は
-2026-08-12 に完了済み。手順の正本は「リリース運用 → 通常リリース手順」。
-
-### リリース前 5 観点レビュー（2026-08-12 実施・赤 2 件を是正）
-
-5 観点を独立したサブエージェントで並列に走らせ、指摘を合流させた。**重複を畳んで実質の赤は 4 件。**
-⚠ **セキュリティ観点と観測性観点が独立に同じ 2 件へ到達**した（ゼロアドレス・キャッシュ温めの競合）。裏付けとしては強い部類。
-
-| 観点 | 赤 | 黄 | 緑 |
-| --- | --- | --- | --- |
-| セキュリティ | 3 | 1 | 3 |
-| 並行性・ライフサイクル | 1 | 2 | 4 |
-| エラー処理・観測性 | 1 | 5 | 2 |
-| API 契約 | 1 | 2 | 3 |
-| スタイル・規約 | 0 | 3 | 3 |
-
-**本リリースで対応した赤 2 件**（どちらも今回の新規コード自身の穴）:
-
-- **#4574 内部アドレス判定がゼロアドレスを素通り**（PR #4580）— `private? / loopback? / link_local?` は `0.0.0.0` と `::` にすべて false を返す。**実測で `Net::HTTP#ipaddr = "0.0.0.0"` がループバックの待受へ 200 で到達**。⚠ **ブラインドではない**（各ホップの失敗が `errors` に積まれ `reportable?` が必ず true を返すので、`Connection refused` と `Bad response NNN` の差が投稿者へ戻る＝結果の見える内部ポートスキャン）。⚠ **#4524 が作った穴ではない**（v5.32.1 の `public?` も同じ 3 述語）。#4524 が変えたのは pinning で決定的な経路になった点で、**述語を書き直したのが 5.33.0 だから塞ぐならこのリリース**
-  - Codex P1（マージ前）で **RFC 8215 の local-use NAT64 prefix `64:ff9b:1::/48`** の漏れを指摘され取り込んだ。RFC 6146 の well-known prefix `64:ff9b::/96` とは**別レンジ**。⚠ この Issue 自体が「NAT64 のある環境で顕在化しうる」を理由にレンジを足しているので、片方だけ塞ぐのは筋が通らない
-- **#4575 読み経路のキャッシュ温めがロックの外**（PR #4581）— `load_from_yaml` が**読み経路のまま無条件 SET** を撃つ。**#4534 は書き手同士を直列化したが、書き手 × 読み手が残っていた**（「塞いだつもりで開いていた」の 4 度目）。`program` キャッシュに TTL が無く `load` はキャッシュを優先するので、以降すべての面が旧データを返し、次の編集が YAML まで巻き戻す。⚠ **窓はミリ秒ではない**（Redis 再起動直後は死んだソケットを掴んだ最初の 1 コマンドが必ず例外になり、リトライで 1 秒以上眠る＝**デプロイ直後の編集がいちばん危ない**）。読み経路だけ `SET NX` に分けた。⚠ **読み経路をロックに載せる方向は採らない**（読みは書きより桁違いに多く 409 が跳ね上がる）
-
-**既存の赤 2 件は別建て（#4576・5.34.0）**。`is_cat` の webfinger が無検証（リダイレクト未検証 + pinning 無し）と、webhook の `image_url` が **full-read SSRF**。⚠ **5.33.0 に積まなかった**のは、修正が全画像ハンドラと webfinger 経路に及び、**CDN への pinning は「複数 A レコードのフォールバックが効かない」既知のトレードオフを広い面へ適用する**ことになるため（harness 実走込みの独立サイクルが要る＝2026-08-12 ユーザー判断）。
-
-**黄・緑の受け皿は用途別に 3 本**: #4577（観測性 4 件）／ #4578（`views/*.slim` 16 本が未 lint）／ #4579（409 の恒久・一過性が判別できない）。
-
-#### ⚠ サブエージェントの報告をコードで検証せずに写して、危険な docs を書いた
-
-api.md に「Annict の staleness で載らなかったときは**再実行すれば解決する**」と書いたが、**従うとデータがずれる**（PR #4582 の Codex P1 で発覚、`20c872de` で是正）。
-
-`increment_episode` のロック内は **①話数 +1 → ②`annict_episode_id` を nil → ③`next_on` を 7 日前進 → ④`annict_applicable?` の判定 → ⑤`save`（無条件）** の順で、**ガードが閉じるのは ④ の「Annict メタデータを載せるか」だけ**。増分そのものは成功して保存済みなので、再実行すると**話数を飛ばして日付が 7 日ずれる**。正しくは `PUT /admin/program/entry/:key` で補う。
-
-**赤 4 件は実コードと実測で裏を取ったのに、黄 1 件を素通しした。**サブエージェントの結論は額面どおり受け取らない、が観点ごとに緩まないようにする。同じ誤りを写していた #4579 / #4577 にも訂正コメントを入れてある。
-
-### ステージング検証・2 回目（2026-08-12・レビュー是正後・**4 台とも緑**）
-
-赤 2 件の是正を含む `dd85ee7b` を dev24-27 へ再適用。**4 台とも version 5.33.0・health 200（全サブシステム OK）・
-WebUI 200・番組表エディタ 200**。⚠ **再起動後のプロセスが吐いたログに新しいエラー署名は無い**
-（生存 pid で絞って確認。残るのは GAS の HEAD 403 と #4573 の辞書エラーで、いずれも既存事象）。
-
-**是正 2 件が実機で効いていることを dev25 で直接確認した**（手順を通っただけで満足しない）:
-
-```text
---- #4574 ゼロアドレス ---
-  0.0.0.0              internal=true
-  ::                   internal=true
-  64:ff9b:1::7f00:1    internal=true
-  公開: 8.8.8.8 internal=false
---- #4575 setnx ---
-  1st=true 2nd=false value="v1"
-```
-
-### ⚠ 旧: ステージング検証・1 回目（2026-08-12・4 台とも緑・**レビュー是正前の記録**）
-
-`develop` の HEAD（`640ee959`）を dev24 美食丼 / dev25 キュアスタ！ / dev26 デルムリン丼（Mastodon）/ dev27 ダイスキー（Misskey）へ適用。
-**4 台とも version 5.33.0・`/mulukhiya/api/health` 200（redis / sidekiq / postgres / streaming すべて OK）・WebUI 200**、
-番組表エディタ（`/mulukhiya/app/program`）と `.ics`（`/mulukhiya/api/program.ics`）も 200。
-**再起動後のプロセスが吐いたログにエラーは 1 行も無い**（生存 pid で grep して確認。再起動前の pid が吐いた辞書取得エラーは 5.32.0 時点からの既存事象）。
-
-- ⚠ **`Gemfile.lock` の `BUNDLED WITH` が 4.0.18 に上がっている**（`640ee959`）のに 4 台の bundler は 4.0.17 だった。
-  **FreeBSD では bundler の自己インストール → 再 exec が `/bin/sh` へフォールバックして落ちる**（[[project_staging-app-deploy-runbook]] の既知の罠）ので、
-  `bundle install` の前に `gem install bundler -v 4.0.18` を明示した。**`bundle update` を含む回のデプロイでは毎回この確認が要る**
-- ⚠ **ssh 越しに `service mulukhiya-listener restart` を素で叩くとセッションが返ってこない**。
-  デーモンが ssh の stdout を握ったままになるため。`</dev/null >/dev/null 2>&1` を付けること（health は別セッションから叩けば確認できる）
-- dev24-26 は monit が `/mulukhiya/api/health` を 3 サイクル監視して 3 サービスを再起動する構成なので、
-  デプロイ中は `monit unmonitor mulukhiya` → 完了後 `monit monitor mulukhiya` で挟んだ。⚠ **`monit monitor` の反映は次サイクル**（直後の summary は `monitor pending` と出る）
-- dev27 の `yjit_enabled: false` は既知の欠落（pooza/chubo2#123）で退行ではない。dev24-26 は `yjit_enabled: true`
-
-**モンキーテスト待ち**: #4534（番組表の書き込みロック）と #4560（`warn` の JSON 化・マスキング）は
-ステージングで目視できるためクローズせず開けてある。確認項目は各 Issue のコメントが正本。
-
-### harness 実走ゲート（2026-08-12 再実走・**「新規の失敗ゼロ」で非ブロック化**）
-
-レビュー是正後の HEAD（`2c69bb31`）で両系を再実走。**両系 0 failures は満たせていない**が、
-**#4508 の前例（「既知集合と完全一致 = 新規の失敗ゼロ」で通す）に倣って非ブロック化した**（2026-08-12 ユーザー判断）。
-
-| 系 | 結果 |
-| --- | --- |
-| Mastodon（`tagging_dictionary` 空） | **1050 tests / 0 failures / 0 errors** / 152 omissions |
-| Mastodon（キャッシュ温） | 1050 tests / 1 failures（`RemoteTagHandlerTest`） |
-| Misskey（キャッシュ空・3 回） | 1053 tests / **1 failures**（`RemoteTagHandlerTest`）/ 0 errors / 141 omissions |
-
-**非ブロック化の根拠は A/B。**`tagging_dictionary` をクリアしたうえで**同一コミットを連続実行**して比較し、
-是正前 HEAD（`640ee959`）でも Misskey 2/2 で同じく落ちることを確認した（現行は 3/3）。**新規の失敗ではない。**
-受け皿は **#4584**（`キュアスタ!` が reject される・原因未特定）。
-
-#### ⚠ この日踏んだ落とし穴 2 つ（#4583 / #4584 として起票）
-
-- **`tagging_dictionary` が TTL 無し（実測 `TTL` = -1）で Redis に居座り、実行をまたいでもコミットを切り替えても残る。**
-  **ゲートの結果が「前に一度回したか」で変わる**（同一コミット・同一 harness で 0 failures → 1 failures）。
-  当面は **実走の前に `redis-cli -n 1 UNLINK tagging_dictionary`** を踏む。#4503 / #4559 と同じ「守れているつもりの緑」型 → **#4583**
-- ⚠ **A/B はコミットを交互に変えるだけでは足りない。**`DictionaryTagHandlerTest` を「5.33.0 の退行」と判断しかけた。
-  交互に 4 回回すと 2→1→2→1 ときれいに再現したが、**同一コミットを 2 回続けて**回すと 2→1 と揺れた。
-  **run 単位の状態依存とコミット差は、同一コミットの連続実行を入れないと区別できない。**
-
-### ⚠ 旧: harness 実走ゲート（2026-08-11・両系緑で通過・**レビュー是正前の記録**）
-
-同一 HEAD（`develop` = #4572 マージ後）で両系を実走。**判定基準（両系 0 failures / 0 errors、`TestHarness: controller=` が狙った系と一致）をいずれも満たす。**
-
-| 系 | 結果 | announce |
-| --- | --- | --- |
-| Mastodon（harness v4.6.5） | **1042 tests / 2079 assertions / 0 failures / 0 errors / 152 omissions** | `controller=mastodon url=http://localhost:3000` |
-| Misskey（harness 2026.7.0） | **1045 tests / 2112 assertions / 0 failures / 0 errors / 141 omissions** | `controller=misskey url=http://localhost:3000` |
-
-omission は両系とも 2026-08-09 の参考値（152 / 141）と**完全一致**。tests が参考値（1001 / 1004）より増えているのは #4534 系列で 16 件足したぶんとシード差。上流バージョンの昇格は伴わないので台帳（harness-verified-versions.yaml）は据え置き。
-
-#### ⚠ この日踏んだ落とし穴 3 つ（次回も踏む）
-
-- **両ハーネスは同時に起動できない。**Misskey ハーネスも `MISSKEY_PORT=3000` で Mastodon と衝突する。**片方を `teardown.sh` してからもう片方を `setup.sh`**（`setup.sh` は 1 系あたり 8〜9 分）。⚠ **`url=` は両系とも `localhost:3000` なので取り違えの判別に使えない。`controller=` の側を見ること**（#4559 のドキュメント例にある `:3001` は実態と違う）
-- ⚠ **系の分離に `env -i` を使うなら `LANG` を残す。**落とすと Ruby の外部エンコーディングが US-ASCII になり、**製品と無関係な `invalid byte sequence in US-ASCII` が 6 件（1 failures / 5 errors）出る**。退行と読み違えかけた。`env -i HOME PATH TERM LANG LC_ALL` で足りる（`MASTODON_count=0` を実走前に出して分離も確かめた）
-- ⚠ **Mastodon 実走中に出る `TestHarness: DB 接続に失敗したためスキップ: ... password authentication failed for user "u"` は正常。**`TestHarnessTest` が配線を検証するために**わざと偽 DSN（`postgres://u:p@…`）を差している**もので、環境の不備ではない。DB 依存テストは実際に走っている（omission が 313 → 152 に減っているのが証拠）
-
-### 着地済み: #4534 番組表の書き込みが無ロックの read-modify-write（2026-08-11）
-
-**5.32.0 で意図的に見送っていた最後の実装項目。**「実況が使う書き込み経路そのものにロックを入れる変更」なので、ニチアサ（次は 08-16）まで runway のあるタイミングで入れた。
-
-- `ProgramLockStorage` を新設。`ComposeTemplateLockStorage`（#4457 / #4460）と同型（`SET NX EX` + compare-and-delete + fail-open、TTL は**定数** 30 秒）。番組表はインスタンスに 1 つなので key も 1 つ
-- 編集 4 メソッドは `lock.synchronize` の内側で `fetcher.save` を直接呼ぶ。⚠ **公開 `save` 経由にすると自分のロックと衝突する**
-- **`save` もロックに載せた。**auto_update の pull（`ProgramUpdateWorker`）とエディタの編集は同じ YAML / Redis を触るので、別ロックにすると交差する
-- `ProgramUpdateWorker` は競合を **alert に上げず**次の周回へ送る（every 1m で追いつく。直列化が意図どおり働いた結果を毎分 Sentry に流すのは #4542 と同型）
-- ⚠ **ロックの正テストを `ProgramTest` に置かなかった。**あちらの `disable?` は `livecure?`（`var/program.yaml` が在るか `/program/urls` が設定されているか）で丸ごと倒れるので、番組表を持たない環境では**一度も走らない**（#4549 で `absolute_uri` をクラスメソッドへ出したのと同じ理由）。`ProgramWriteLockTest` として独立させた
-  - ⚠ **例外クラスだけでなくメッセージまで見る。**`auto_update` の 409 も `ConflictError` なので、クラスだけだと**ロックが無くても緑になる**
-  - ⚠ このテストは書き込みを 1 つも成功させない（全ケースがロック獲得の時点で倒れる）ので、`var/program.yaml` も Redis も触らない
-
-#### ⚠ 初版は Annict をロックの内側に置いていた（同日中に是正・PR #4571）
-
-**「話数の +1 とサブタイトルの解決は不可分だから」という理由で内側に置いたのは誤り**だった（PR #4569 の Codex P2）。
-
-- `/service/annict/timeout: 5` は **open と read の双方**に効くので、3 回で素直に **TTL(30 秒) に届く**。ロックが先に失効すると別の編集が獲得でき、そこへ元のリクエストが書き戻して**塞いだはずの lost update がそのまま戻る**
-- ⚠ **TTL を伸ばす手は採らない。**プロセスが死んだときに編集が止まる時間もそのまま伸びる
-- ⚠ **ロックを持っている区間にネットワーク I/O を入れない**、が一般則。Annict はロックの外で先に引き、**「引いた時点の話数と作品 ID」を持ち回ってロックの中で一致を確かめる**。判定は純関数 `annict_applicable?` に出し、`ProgramAnnictStalenessTest` で検証する
-  - ⚠ **話数だけでは足りない**（PR #4571 の Codex P2 → PR #4572）。`ProgramEntryUpdateContract` は `annict_work_id` の変更を許しているので、待っている間に作品を差し替えられると**話数は同じだが別作品**になり、旧作品のサブタイトルが載る。**照合は話数と作品 ID の両方**
-- ⚠ **存在チェックの正本はロックの中に残す。**外で `NotFoundError` を上げると、**ロック競合より先に 404 を返す**ようになり `ProgramWriteLockTest` が実際に落ちた
-- 付随: `persist` を潰して `fetcher.save` 直呼びにした。⚠ **`Metrics/ClassLength` の上限 200 行に合わせるための削りであって設計判断ではない。**この学びを踏まえ、PR #4572 で 201 行になった際は**同じ捻出をせず inline disable で明示**した。正しい直し方（参照系と編集系の分離）は **#4570**
-
-⚠ **この #4534 の系列は「塞いだつもりで開いていた」が 3 連続で出た**（TTL 超過 → 作品 ID 未照合）。**ロックや排他を入れる変更は、入れた直後の Codex 追撃まで込みで 1 セットと見る。**
-
-### 着地済み: #4567 route-not-found 以外の 404 を omit していた（2026-08-11）
-
-PR #4557 の Codex P2。**2026-08-10 の棚卸し（直近 8 PR 横断）でも取り残されていた**もので、同期のリアクション 0 走査で拾った。`endpoint_missing?` が `statusCode == 404` だけを見ていたため、ルートには届いたうえで参照先が無い 404 まで「エンドポイント未提供」として omit し、webhook のルーティング退行を飲みうる状態だった。
-
-⚠ **初版（PR #4568）の `message` 部分一致でも足りず、同日中に是正した**（PR #4568 の Codex P2 → PR #4571）。ハンドラが同じ Fastify 包絡で `Webhook <path> not found` を返すと path を含むので一致し、**ルートは在るのに omit する**。route-miss の文面ごと（`Route POST:<path> not found`）突き合わせる。`Webhook#command` は必ず POST なのでメソッド名も固定でよい。
-
-⚠ 文言が将来ずれた場合は omit されず **assert で赤くなる**方向に倒れる。実退行を飲むより検証条件のズレに気づけるほうを採った。
-
-### Codex レビューの棚卸し（2026-08-11）
-
-**⚠ 前日「直近 8 PR を横断で走査し全件処理した」と記録したのに、PR #4557 の P2 が 1 件リアクション 0 で残っていた。**同じセッション中に PR をマージし続けると、走査の後に着いたコメントがそのまま落ちる。さらに本日マージした PR #4568 / #4569 の**両方**にマージ直後 P2 が届いた（どちらも実質的な穴で、同セッション中に PR #4571 で消化）。
-
-**PR を出したセッションは、締める直前にもう一度リアクション 0 走査を回すこと。**「棚卸し済み」は次セッションへの免罪符にならない。
-
-### 着地済み: #4524 SSRF allowlist の DNS リバインディング（2026-08-10）
-
-**「名前で検証して名前で接続する」構造そのものを畳んだ。**`RemoteHost.public?` は解決結果を真偽値に潰していたので、権威 DNS を握った相手が検証時だけ公開 IP アドレスを返し、接続時に 127.0.0.1 を返せた（TOCTOU）。**#4410 のホップ検証も #4523 のプリフライト検証も、この構造がある限り素通りできる。**
-
-- `RemoteHost.allowed_address` を新設し、`validator` は**真偽値でなく接続先の IP アドレス** を返す。ginseng-core 1.16.0 が文字列を受けると `Net::HTTP#ipaddr=` で接続先を固定する（pooza/ginseng-core#503 / PR #504、`Ginseng::PinnedAddressAdapter`）
-- ⚠ **`ipaddr=` は接続先だけを差し替える。**`Host:` ヘッダと TLS の SNI・証明書検証はホスト名のままなので HTTPS の検証は壊れない
-- ⚠ **pinning はホップごとに付け替える**（リダイレクト先は別ホスト）
-- ⚠ **IPv4 があれば IPv4 を採る。**`getaddresses` は A と AAAA を混ぜて返すので素直に先頭を採ると IPv6 を掴む（#4464 で踏んだ `::1` の 305ms と同型）
-- **トレードオフ**: アドレスを 1 本に固定するので、**複数 A レコードのフォールバックは効かなくなる**。対象は管理者が設定した少数の URL なので許容した
-- ⚠ 拒否の戻りが **`false` → `nil`** に変わった。呼び出し元はいずれも真偽で判定しているので falsy であればよい
-
-**マージ後に Codex の P1 が 2 件届き、同日中に是正した（PR #4565 / pooza/ginseng-core#505、1.16.1）。どちらも「塞いだつもりで開いていた」型。**
-
-- **短縮 URL の展開だけ pinning を素通りしていた** — `ShortenedURLHandler#permitted_host?` が validator の戻り（IP アドレス）を捨て、`fetch_redirect` は名前で GET し直していた。⚠ **ここは `host_validator` に任せられない**（あちらは追従まで肩代わりして最終レスポンスだけ返すので展開先が取れない）。**追うのがこちらである以上、pinning もこちらの責務**
-- **プロキシ経由では pinning が効かない** — `Net::HTTP#connect` は `proxy?` のとき `@ipaddr` を見ずプロキシへ繋ぎ、平文なら絶対 URI・HTTPS なら CONNECT でホスト名を渡す。**名前を解決するのはプロキシ**なのでリバインディングは成立する。fail-closed にした。⚠ `Net::HTTP.new` の proxy 引数は既定が `:ENV` なので、`http_proxy` を置いた環境では**明示していなくても**該当する
-  - さらに P2 で「その拒否を `repeat` が 5 回叩き直す」（上流レスポンスの無い `GatewayError` は `source_status` が 502 = 一時障害と読まれる）ことが判明し、`Ginseng::PinningError` を新設して非再送に（pooza/ginseng-core#506、**1.16.2**）。⚠ **設定起因の失敗を再送で解決しようとしない**
-
-### 5.31.0 レビュー由来の受け皿 Issue
-
-5.32.0 で **#4535 / #4536 と #4537 の 1・4**、2026-08-10 に **#4537 の 2・3・5・6**（PR #4563）を消化した。残りは 1 本。
-
-- **#4534** 番組表書き込みの無ロック RMW（サーバー側ロック・size:M）。**5.32.0 では意図的に見送った**（実況が使う書き込み経路そのものにロックを入れる変更で、二度押しは #4533 でクライアント側が塞いである）
-- **#4537 の 2・3・5・6（着地）** — Spotify の `invalid_request` を運用側不備に分類（⚠ `Ginseng::AuthError` は **403**、401 ではない）／`webhook.url` を `available?` で nullable 化／効かない `silent_statuses: [413]` の撤去・透過を Hash 限定に・`source_body` のメモ化（ginseng-core 1.15.37）／`Mulukhiya::ForeignGatewayError` を新設し、**引用元（他人のサーバー）由来は #4480 の透過に乗せない**
-  - ⚠ **ForeignGatewayError は現状どの経路からもリクエスト層へ届かない**（呼び出し元がすべて degrade する）。「届いたときに透過されない」不変条件を型で担保するためのもの
-
-### Codex レビューの棚卸し（2026-08-10）
-
-直近マージ 8 PR を横断でリアクション 0 走査（[[feedback_codex-review-window-too-narrow]]）。**取り残し 8 件（5 PR ぶん）**があり、全件に返信 + リアクションを付けて処理した。受け皿は 3 本で、**うち 2 本は同日中に着地**。
-
-- **#4558 番組表の `next_on` に `Time` を手書きすると Redis キャッシュ往復で無効値になる（保留中）** — PR #4546 P1 / #4548 P2。**素の Ruby で再現済み。**`load_from_yaml` が coerce 前の生ハッシュを `update_cache` に渡すため、Redis には `"2026-08-08 18:00:00 +0900"` が入る。**1 回目（キャッシュミス）だけ正しく、2 回目以降は無効値**になって VEVENT が黙って消える。⚠ **キャッシュ層を挟むと上流の正規化が静かに外れる**のは #4549（`base_uri` の相対解決）と同型。あわせて `format_date` の無条件 `getutc` が明示オフセット付きの値を 1 日ずらす件（PR #4546 P2、`2026-08-08 00:30:00 +09:00` → 08-07）と、まとめコピーの見出しが `2026-02-31 (火)` と存在しない日付に曜日を付ける件（PR #4548 P2）も同 Issue へ
-  - ⚠ **本番が実際に踏んでいるかは未確認**（VPN が繋がらず `var/program.yaml` を見られなかった）。ユーザー判断で**着手を保留**している。修正自体は単体テストで閉じるので、本番確認を待たずに書ける
-- **#4559 リリースゲートの穴 2 件（着地・PR #4561）** — PR #4555 P1 / P2。①同じシェルで両系を source すると `MASTODON_*` が残り、**Misskey のつもりで Mastodon を 2 回走らせたまま「両系緑」と記録できる**（選択ルールは「手順（Misskey）」節にあるがゲートの節には無い）②omission 集計をパースできないと warning のまま success で、#4503 のラチェットが黙って無効化される
-  - **選択ルール自体は変えていない。**`TestHarness#announce` が run の頭で `TestHarness: controller=... url=...` を stderr に出すようにし、**取り違えに気づける手段を足す**方向で直した。ゲートの判定基準にも「この行が狙った系と一致していること」を追加
-  - 集計不能は `steps.test.outcome` で切り分けて fail closed。⚠ **テスト自体が落ちている run では追撃しない**（前段のステップが既に赤い）
-- **#4560 `logger.warn` がマスキング層を通らない + `unresolved_enclosures` が伸び続ける（着地・PR #4562）** — PR #4551 P1 は**却下（👎）**。`Ginseng::Logger < Syslog::Logger` なので `warn` は存在し `NoMethodError` にはならない。ただし `Ginseng::Logger` が上書きしているのは **`info` と `error` だけ**で、`warn` は `create_message` を通らず **JSON 化もマスキング（#4511 / #4533）もされない**（4 箇所、うち 1 つは URL を載せる）
-  - 直したのは ginseng-core 側（pooza/ginseng-core#499 → PR #500 / #501、**1.15.36**）。⚠ **呼び出し側を `info` に書き換えて回るのは対症療法**。severity は syslog の重要度として正当な使い分け
-  - ⚠ **初版（#500）は `message` を必須引数にしていて、ブロック形式 `logger.warn {expensive}` を `ArgumentError` で殺していた**（Codex P2）。#501 で省略可能引数 + ブロックへ戻し、severity 無効時はブロックを評価しない形に是正。**マージ直後に Codex が指摘 → 同セッションで是正**の流れが機能した例
-  - PR #4550 P2 側は `RSS20FeedRenderer#render` を新設して 1 レンダーぶんにスコープ。⚠ **テストは `RSS20FeedRendererTest` に置かない**（DBMS 無しでケースごと omit され一度も走らない。#4549 で `absolute_uri` をクラスメソッドにしたのと同じ理由）。親の `initialize` を呼ばないスタブで別クラスに置いた
-
-### マイルストーン未割当
-
-- **#4543 obs: Sentry の未トリアージ unresolved 16 件を棚卸しする（size:M）** — `is:unresolved` 27 件のうち **16 件がコメント 0 のまま滞留**していた。§5 の手順は**新規イシューだけを見る**構造なので、手順が入る前の分がそのまま残っている。Redis 接続系 174 件 / 上流 4xx・5xx 100 件 / 単発 2 件の 3 群に分けて群ごとに判断する。上流 4xx 群には #4542 と同型（クライアント起因なのに alert）が混ざっている可能性が高い
-- **syslog 側のノイズ棚卸し（未起票）** — zugoga の `base_uri undefined` のように `e.log` 止まりで Sentry に出ない大量ログがある。#4543 の対象外なので別建てが要る
-- **pooza/chubo2#166 ops: sweep の unattended-upgrades が itamae 管理外** — 2026-08-12 06:40 に systemd 更新の巻き添えで `redis-server` が再起動し、Sidekiq が Sentry へ 8 イベント（一過性・復旧済み・triage コメント済み）。⚠ **sweep は「再起動で PG が上がらない地雷」を抱えているのに `postgresql-16` が自動更新の射程内**なのが本題。モロヘイヤ側の作業は無い
-
-### 着地済み（2026-08-09）
-
-- **#4503 test: アカウント依存のテストが CI・手元で 1 件も走っていない** — **CI で走らせる方向は採らず、harness 実走をリリースゲートとして正式化する形で決着**した。CI には SNS の実サーバーも Mastodon の Postgres も無く、`config['/mastodon/url']` は `https://ci.example.com` のダミーなので、アカウント依存テストは**構造的に**走らない。3 点で着地:
-  - **報告の是正（済）**: pooza/ginseng-core#488 / #489 で `disable?` を omission 報告に。実測 **929 tests 中 313 件が omission**（それまでは pass に混ざっていた）
-  - **可視化とラチェット**: CI がジョブサマリに集計行と omission 件数を出し、`.github/workflows/test.yml` の `omission_baseline` を超えたら落ちる。⚠ **test-unit は 313 件 omission でも `100% passed` と出す**ので、集計行を読まないと気づけない
-  - **ゲートの明文化**: 通常リリース手順に「harness 実走（省略不可・両系 0 failures / 0 errors）」を追加。判定基準と切り分けは [test-harness.md](test-harness.md)「リリースゲートとしての実走」
-- **#4508 chore: sinatra 4.2.1 / rack-protection 4.2.1 / tilt 2.8.0 へ更新** — PR #4556。pin はモロヘイヤ側でなく **`pooza/ginseng-web` の gemspec** にあったので、そちらを `~>` から `>=` へ緩めるのが前提作業だった（pooza/ginseng-web#116 / 1.3.46。CVE-2024-21510 の下限 4.1.0 は保つ）
-  - ⚠ **起票時の前提が 1 つ違っていた。`mustermann 4.0.0` はこの更新では入らない**（sinatra 4.2.1 が `~>3.0` を要求する）。**メジャー跨ぎを含まない更新**だった
-  - **#4503 のゲートの初適用。**Mastodon（v4.6.5）1001 tests / 0 failures / 0 errors / 152 omissions ＝基準値と完全一致、Misskey（2026.7.0）1004 tests / 3 failures（当時の #4492 の既知集合と完全一致）/ 0 errors / 139 omissions。新規の失敗ゼロ
-  - 副産物: **ゲート文言「両系 0 failures」が #4492 のせいで満たせない**ことが露見した。直後に #4492 を解消したので例外は残っていない
-- **#4492 test: Misskey harness で恒常的に落ちる 3 件を解消** — PR #4557。**3 件のうち 1 件は harness 側の実バグ**で pooza/chubo2#161 / #162 で直した。これで **`project_harness-zero-error-goal`（両系エラー 0）を達成**
-  - ⚠ **`WebhookImageHandlerTest#test_handle_pre_webhook` は製品もテストも変更していない。**Misskey harness の `files` ボリュームが root 所有で、uid 991 の misskey が書けず drive アップロードが `EACCES` → 500 で全滅していた。**起票時の「Amazon の外部依存が原因」は誤り**（当該 URL は 200 を返していた）。harness が drive を一度も通していなかったので露見しなかった
-  - `SNSServiceTest#test_access_token` — Misskey の `access_token` 行は MiAuth / OAuth の認可時にしか作られず、harness が発行するのは**ユーザー固有トークン**なのでテーブルは 0 行。honest omit に。⚠ **Mastodon は Doorkeeper のトークン行を持つので対象外**にし、素通しさせている
-  - `WebhookTest#test_command` — omit ガードが HTML エラーページ前提だった。⚠ **Misskey harness は nginx を挟まない**ので Fastify が 404 の JSON 包絡を返し、ガードが素通りしていた
-- **#4516 / #4552 test/bug: harness 実走で常態化していた失敗 5 件をテスト側から解消** — PR #4553。5 件とも product の退行ではなく**検証側の前提ズレ**だったので、テスト側に寄せて **1001 tests / 0 failures / 0 errors / 152 omissions（100% passed）** にした
-  - `SNSServiceTest#test_info` — ⚠ **`metadata.maintainer` を出すのは Misskey だけ**。Mastodon はフォークの `pooza/mastodon` も `nodeName` / `nodeDescription` しか返さないので、**本番 3 台でも `maintainer_name` は nil**。harness 固有の欠落ではない（起票時の「harness に contact account を設定すれば直る」は誤り）。副次的に `MediaFeedRenderer` の RSS author は Mastodon で常に nil
-  - `MediaFeedRendererTest#test_to_s` — omit ガードを `#fetch` の描画条件と同じ順に並べ直した。`media_catalog?` が false なら entries は空のまま返る（既定 OFF・#4343）。**harness では依然 `<item>` の描画が検証されない**ので、通したければ harness 側で `media_catalog` を有効にする必要がある（chubo2#64 の続き）
-  - `ComposeTemplateContainerTest#test_write_reloads_user_config_inside_lock` — ⚠ **`Account#user_config` はメモ化される**。`TestCase#account` が返す同じインスタンスを渡すと、書き込みが成功していても最初に掴んだ空スナップショットを読む。読み直しは新しい account から行う
-  - `AttachmentTest#test_catalog` — ⚠ **製品側は直さない**。`:page` の既定値補完は API 境界の `MediaCatalogQueryService#normalize` が持っており（`cursor` 指定時は付けない、も含む）、モデル側にも足すと補完が 2 箇所に分かれる。起票時の「製品側で揃える」推奨は撤回
-  - `MediaMetadataStorageTest#test_push` — Amazon の実画像取得をやめ、`test/fixture/sample.jpg` を WebMock で返す。取得失敗時のネガティブキャッシュ（`{}`）が期待値と食い違って毎回ランダムに落ちていた
-
-### fedi-test-harness の検証状況
-
-**Mastodon v4.6.5 を 2026-08-09 に検証・verified 昇格**（pooza/chubo2#153 クローズ）。同一の mulukhiya HEAD を v4.6.5 / v4.6.4 でクリーン再構築して実走・比較し、**失敗集合の一致＝退行ゼロ**を確認した（1001 tests / 0 errors、両版で omission 完全一致）。詳細は [harness-verified-versions.yaml](harness-verified-versions.yaml) の 2026-08-09 節。
-
-⚠ **07-30 の 879 tests / 0 failures とは比較にならない。** #4503 の可視化と harness のトークン供給で実行本数が増え、これまで走っていなかったテストが初めてアサートしている。**「前回 0 failures だったのに増えた」を退行と読まないこと。**上記 5 件の解消で Mastodon 側は再び 0 failures / 0 errors になり、**#4492 の解消で Misskey 側も 0 failures / 0 errors**（1004 tests / 141 omissions）。両系エラー 0 の目標を達成した。
-
-### マイルストーン外の繰越（着手条件待ち）
-
-- **#4414 security: Spotify OAuth ハードニング（size:M）** — capsicum#570 復活と歩調を合わせる（全台 OFF のため単独では着手しない）
-- **#4428 test: fedi-test-harness で webhook 投稿経路をインプロセス検証する（size:M）** — chubo2#63 と対。chubo2 側の着地待ち
-
-## 次々期マイルストーン: 5.34.0
+## 次期マイルストーン: 5.34.0
 
 **テーマは「黙って壊れるのをやめる」。**#4573 / #4558 とも、**上流の正規化・検証がキャッシュ層や rescue で静かに外れ、機能が死んでも誰も気付かない**という同じ型（#4549 / #4560 と同族）。
-GitHub マイルストーン作成済み（#632）。**バージョンバンプは 5.33.0 のリリース後**（[[feedback_bump-version-first]]）。
+GitHub マイルストーン作成済み（#632）。バージョンバンプは 2026-08-12（5.33.0 リリース直後）に実施済み（[[feedback_bump-version-first]]）。
 
 - **#4573 obs/bug: リモート辞書が 200-with-HTML を掴むと黙って空になる（主軸・size:S）** — 2026-08-12 の 5.33.0 ステージング検証中に、ステージングのログから気付いて本番で確認したもの。GAS の `/exec` が失効すると **HTTP 200 のまま `text/html`** を返し、`RemoteDictionary#fetch` は `present?` しか見ていないので String が通る。`RelatedRemoteDictionary#parse` の `fetch.to_h` が `String#to_h` で倒れ、外側の rescue が `{}` を返して**辞書が空になる**
   - ⚠ **美食丼（shallu）は `related` 辞書 3 本とも死んでおり、関連語タグ付けが機能していない**（GAS 2 本が 200+HTML、`service.json` が 302→404。10 分周期で毎回全滅）。zugoga / gomander / sweep は 0 件
@@ -628,6 +617,665 @@ GitHub マイルストーン作成済み（#632）。**バージョンバンプ�
   - ⚠ **`PERMITTED_YAML_CLASSES` から `Time` を外す方向は採らない。**外すと #4537 が潰した「クォート忘れで番組表全体が読めなくなる」footgun が戻る
   - ⚠ **ゾーンレスの手書きは Psych が UTC で読む**（`18:00:00` と書くと `+0900` では翌日 03:00）。`format_date` の `getutc` はこれを戻すための処理なので、**項目 2「明示オフセットには効かせない」是正はこの UTC 前提を壊さない形で入れる**
   - 直し方は `load_from_yaml` で coerce 済みを `update_cache` に渡す側を推す（**項目 2 も同時に閉じる**）
+
+- **#4576 security: SSRF 掃討の取り残し 2 件（size:M）** — `is_cat` の webfinger が無検証（リダイレクト未検証 + pinning 無し）と、webhook の `image_url` が **full-read SSRF**。5.33.0 のリリース前レビューで赤に分類したが、**修正が全画像ハンドラと webfinger 経路に及ぶ**ため独立サイクルに分けた（2026-08-12 ユーザー判断）
+  - ⚠ **CDN への pinning は「複数 A レコードのフォールバックが効かない」既知のトレードオフ**（#4524）を、いまより広い面へ適用することになる。harness 実走込みで見る
+
+- **#4585 番組表: 「次回」ボタンを「話数 +1」と「日付 +1」に分離する（size:M・2026-08-15 着地）** — 2026-08-13 ユーザー要望。現行の ＋ は `episode` の +1 と `next_on` の +7 日を同時に行うため、①2 週以上放置したエントリは 1 回押しても過去日のまま ②話数だけ直したいときに日付が巻き込まれる ③**Annict が載らずに 200 が返ったとき、押し直すと話数が飛んだうえ日付が 7 日ずれる**（[[project_5330-release]] の footgun）
+  - ⚠ **日付側は +7 日ではなく +1 日**（2026-08-13 ユーザー判断）。**翌日放送であることがある**のと、**+1 日なら 7 回押して翌週も兼ねられる**ため。`NEXT_ON_INTERVAL_DAYS = 7` は用済みになるので消す。⚠ **7 のまま別名で残さない**（週次前提が別の場所へ生き延びる）
+  - ⚠ **連打が常用操作になる。**一覧のボタンは `:disabled='isBusy(key)'` なので素朴に作ると 7 往復待たされ、**ロック取得も 7 回**になる（#4534 の 409 が増える）。楽観更新か日数パラメータで往復を減らす方向で決める
+  - ⚠ **曜日ルールや RRULE は #4373 で却下済みなので持ち出さない**（[[project_program-ics-shelved]]）
+  - 契約変更だが **`.../episode/increment` を叩いているのは番組表エディタだけ**（capsicum は参照していない）。影響は WebUI と `docs/api.md` に閉じる
+
+- **#4351 perf: media_catalog を zugoga で段階的に再有効化（size:M）** — 2026-08-13 にユーザー要望で繰り入れ。**「メディアカタログの作業を何かしら含めたい」**が起点で、partial index 適用 → 効果計測 → overlay の順に進める一歩目。後続は #4352（shallu / gomander へ横展開）・#4393（sub-second 化）
+
+- **#4583 test/ci: harness ゲートの結果が「前に一度回したか」で変わる（size:M・2026-08-15 着地）** — `tagging_dictionary` が TTL 無しで Redis に居座る。**受け皿 5 件のうちこれだけ繰り入れた**のは、放置するとゲートの緑そのものが信用できなくなり、**次の回の判断材料が腐る**ため（2026-08-13 ユーザー確定）。詳細は下の「着地済み」節
+
+- **#4589 bug: ALT 編集の PUT が `media_ids` / `spoiler_text` / `sensitive` を送らない（size:M・2026-08-15 着地・PR #4590）** — capsicum#121 の着手前に経路を通しで読んで見つけたもの。⚠ **Mastodon の `UpdateStatusService` は「送らなかったパラメータ」を現状維持ではなく「空で更新」として扱う**（コントローラの `update_options` がハッシュリテラルなので `options.key?` が常に true）。そのため ALT を 1 つ直すだけで**投稿から添付が全部外れ、CW と閲覧注意フラグが消える**
+  - ⚠ **モロヘイヤ側だけ直しても届かない。**`ginseng-fediverse` の `flatten_media_attributes` が `status` と `media_attributes` しか通さないので、復元した 3 フィールドはリクエスト直前に捨てられる。pooza/ginseng-fediverse#245（1.8.27）と対で入れる（PR #4590 の Codex P1。**指摘が無ければ「直したのに直っていない」まま出ていた**）
+  - ⚠ **必須パラメータは purpose ごとに違う。**`tag` は本文だけを送り直す経路で添付を持たない投稿にも来るので、`media_attributes` を一律必須にすると本文だけのタグ書き換えが 422 になる（同 Codex P2）
+  - ⚠ **実害はまだ出ていない。**この経路を叩くクライアントが無く、capsicum#121 が着手前だったため。**先に塞ぐのが本件の趣旨**
+
+- **#4594 bug: 画像アップロードの 401 がアラート抑止をすり抜ける（size:S・2026-08-20 着地・PR #4595）** — 2026-08-17 に
+  キュアスタ！本番（gomander）で `POST /api/v1/media` の 401 が 25 分に 13 回、**すべて管理者へのアラートメール
+  （＋ Discord ＋ Sentry）として飛んだ**。発生源は Tencent Cloud の分散 IP からのボットで、無効トークンのまま連打していた
+  - ⚠ **モロヘイヤ側だけ読んでも辿り着けない**（#4589 と同型）。`ginseng-fediverse` の `MastodonService#upload` が上流の
+    `GatewayError` を `ValidateError` に詰め替えていたため、`rescue Ginseng::GatewayError` に引っかからず
+    `silent_statuses: [401]` に**一度も到達していなかった**。pooza/ginseng-fediverse#246 → #247（1.8.28）と対で入れる
+  - ⚠ **同じ理由で 413 の分岐も死んでいた。**「アップロードしたファイルがサーバーの上限サイズを超過しています。」は
+    **導入以来一度も出ていない**。クライアントに返るのも上流の 401 / 413 ではなく `ValidateError#status` の 422 だった
+  - ⚠ **Issue は open のまま残している。**効いていることの確認は**本番へ出た後**にしか取れない
+    （同じボットの 401 連打でアラートメールが飛ばず、syslog には残っていること）。5.34.0 デプロイ後に確認してクローズする
+  - 回帰テストは 2 段。`gateway_error_transparency.rb` に 4 本（401 抑止 / 413 文言 / **5xx は鳴らす** /
+    上流ステータス透過）と、**gem 境界の契約テスト** `test/unit/service/mastodon_upload_error_boundary.rb`。
+    ⚠ **後者が無いと `bundle update` で黙って戻る**（前者は gem を通らない）
+  - ボット自体の遮断はインフラ層（pooza/chubo2#118）。モロヘイヤ側は alert 条件だけを扱う
+
+- **#4598 bug: `Idempotency-Key` が上流へ転送されず、再送が二重投稿になる（size:M）** — 2026-08-19 に
+  `pooza/makoto2` の通しリハーサル（dev25）の相談から発見。`POST /api/:version/statuses`（プロキシ経路）と
+  `POST /mulukhiya/webhook/:digest`（Slack 互換）の両方でヘッダが落ちる。⚠ **クライアントが正しくキーを付けていても
+  モロヘイヤ経由では無効化される**ので、応答だけ失われたときの再送が投稿をもう 1 つ作る
+  - ⚠ **転送は `Idempotency-Key` だけの許可リストで行う。**`@headers` の丸投げは `Host` / `Content-Length` /
+    `Cookie` / `X-Mulukhiya` まで混ざる
+
+- **#4599 feat: Slack 互換 webhook でリクエストごとの公開範囲を受け付ける（size:S）** — `Webhook#post` は既に
+  「来れば尊重する」形なのに、`SlackWebhookPayload#values` が `visibility` を落としている。
+  ⚠ **`Webhook#command` が出す curl サンプルには `visibility` が入っている**＝**効くように見えて効かない**状態
+
+- **#4601 chore: RuboCop 設定と規約の正本を ginseng-style へ寄せる（size:S・2026-08-20 着地・PR #4602・Issue クローズ済み）** —
+  新設した [pooza/ginseng-style](https://github.com/pooza/ginseng-style) を `inherit_gem` し、`.rubocop.yml` に残るのは
+  `bin/diag` の除外・`TargetRubyVersion`・Sequel 系（正本が持たないプラグイン）だけになった。
+  docs 側もコーディング規約・表記規約・重み定義を ginseng-style の `docs/` へ委譲
+  - ⚠ **`Minitest/RefutePathExists` の固有緩和も落とした**（`b77dd308`）。これは**モロヘイヤ固有ではなく
+    test-unit を使う全プロジェクト共通**の問題で（minitest は `assert_path_exists`、test-unit は `assert_path_exist` の単数形）、
+    `rubocop-minitest` が**存在しないメソッドへ自動修正する 4 cop**（`AssertPathExists` / `RefutePathExists` /
+    `AssertOutput` / `AssertSilent`）を正本側でまとめて無効化した（pooza/ginseng-style#11 / #12）
+  - ⚠ **この申し送りは PR 本体のコメントに置かれていた**（投稿者は Codex ではなく `pooza`＝別セッション）。
+    同期の初回で落としたので §4 に手順として足してある
+
+- **#4616 chore/security: ginseng-core を更新し、ログのマスクが外れる穴を塞ぐ（size:S・2026-08-21 繰り入れ）** —
+  ⚠⚠ **🔴 依頼（ginseng-core#518）より重かった。**「不正なバイト列でログ 1 行が消える」ではなく、
+  `Logger#mask_url` の `ArgumentError` が `create_message` の rescue まで飛んで**素の src が返る＝
+  `mask_fields` も `mask_query_params` も効かない**状態だった。⚠ **`Controller#before` は受信 params を
+  そのまま `logger.info` に載せる**ので、**外から壊れたバイト列を 1 つ混ぜるだけでその行のマスクを外せる**
+  ＝ #4511（[[project_log-credential-exposure]]）で塞いだものがこの経路で戻っていた
+  - ⚠ **本番で開いている実害なので繰り入れた**（2026-08-21 ユーザー判断）。⚠ **cert タスク（#4617）と
+    `max_bytes`（#4612）は同じ `bundle update` に乗るが、5.34.0 には含めない**
+  - `bundle update ginseng-core` ＋ `Gemfile.lock` のコミット。⚠ **取り込み後に `Controller#before` 側の
+    回避策を畳めるか見る**（gem 側で塞いだため）
+
+⚠ **#4621 は 5.34.0 から外し、5.35.0 へ送った**（2026-08-22 ユーザー判断）。下の「5.35.0」節を参照。
+5.34.0 に載るのは `bundle update ginseng-fediverse` 1.8.29 と Purpose ヘッダの件までで、
+**ALT 編集は通らないまま**。⚠ **リリースノートで「ALT 編集が直った」と書かないこと。**
+
+**確定スコープの重み合計は 24**（M 3 × 6 + S 1 × 6）。目安の 20〜25 の上寄りで、**これ以上の追加は次リリースへ送る**。
+⚠ **メンテナンスリリースを連続させない**というユーザーの意向（2026-08-13）を受けて、**主軸をメディアカタログと番組表に置き、
+検査由来の受け皿は #4583 の 1 本に絞った**。残り 4 件は次リリース以降へ送る。
+なお #4589 / #4594 は**バグとして後から繰り入れた**（受け皿の枠ではない）。#4598 / #4599 / #4601 は 2026-08-18〜19 の追加。
+
+### Codex レビューの棚卸し（2026-08-16）
+
+**PR #4587 / #4588 の P2 を PR #4591 で消化した。**どちらも「直した機能が黙って効かなくなる」型で、5.34.0 のテーマそのもの。
+
+- **#4583 (PR #4587) 署名が「畳む前」と「畳んだ後」で割れていた** — `RemoteDictionary.create` が `type` の既定値
+  (`multi_field`) と旧称 (`relative` → `related`) を**プロセス共有の設定ハッシュへ直接埋めて**いた。
+  `handler_config(:dics)` が返すのは設定の実体そのものなので、`refresh` する側（`fetch` 後＝畳んだ後）と
+  起動直後の `load_cache`（畳む前）で指紋が食い違う。⚠ **`type` を省略した dic が 1 本でもあると、
+  新しい Puma プロセスが毎回キャッシュを捨てて全辞書を同期取得する**＝ #4583 で TTL と署名を入れた意味が
+  その分だけ失われていた。`type` の解決を非破壊の `RemoteDictionary.type` へ出し、署名は `canonical_sources`
+  から取る。⚠ **dics の並び順は保つ**（取り込み順でもあるため、並べ替えは別物として扱う）
+- **#4585 (PR #4588) 600ms の debounce 窓が書き込みの穴だった** — 窓の間は `busy[key]` がまだ立たないので、
+  その隙に**編集フォームが開けて古い `next_on` を写し取り、保存で押したはずの ＋ を黙って書き戻す**。
+  `isLocked`（実リクエスト中）と `isBusy`（＋ 保留分も含む書き込みバリア）に分け、日付 ＋ だけ `isLocked` を見る
+  （ここまでバリアに含めると 1 クリック 1 往復へ戻る）。`openEdit` は保留分を先に送り切って再読込みを待つ
+
+⚠ **`views/program.slim` は #4578 のため `rake lint` の対象外。**develop 版と slim-lint の結果を突き合わせて
+新規指摘ゼロを確認した（既存の LineLength のみ）。
+
+### 着地済み: #4583 タグ辞書キャッシュに署名と TTL を入れる（2026-08-15・PR #4587）
+
+芯は 2 つあり、**実害が大きいのは 2 のほう**だった。
+
+1. `tagging_dictionary` が **TTL 無しの素の SET** で、実行と実行のあいだで消えない
+2. キャッシュが **「どの `dics` 設定から作られたか」を持たない**ので、別の設定で温めたキャッシュを次のプロセスがそのまま読む
+
+`DictionaryTagHandlerTest#setup` は `dics` を 5 件（うち 1 件は `strict: true`）へ差し替えて `refresh` する。
+その回のキャッシュが `RemoteTagHandler#search_remote_tags` の reject 3 条件
+（`short?` / `local_tags.member?` / `strict_key?`）に効く。**3 条件とも同じ辞書を読んでいる。**
+
+入れたもの:
+
+- キャッシュ本体を `version` / `signature` / `generated_at` / `entries` の envelope に包む。署名は `dics` 設定の指紋で、署名違い・バージョン違い・旧形式は「無いもの」として作り直す
+- `setex` で TTL（既定 3600 秒・`/handler/dictionary_tag/cache/ttl`）
+- **全ソースが空を返した回は、生きているキャッシュを空へ潰さない。**⚠ `RemoteDictionary` のサブクラスは失敗を握って `{}` を返すので、**例外の有無では検出できない**（結果が空かどうかで判定する）。⚠ fail-open 自体は残す（#4573 と同じ理由）
+- キャッシュ未充填で `alert` しない。TTL を入れた以上、失効は日常的に起きる
+- `refresh` のたびに世代（`signature` / `generated_at` / `entries` / `ttl`）をログへ出す
+- **スイートのロード時にキャッシュを捨てる**（`TestCase.invalidate_shared_caches`）。⚠ **「実走の前に手で `UNLINK` する」を手順書に書くだけでは弱い**（#4503 の教訓）
+
+⚠ **回帰テストは `TaggingDictionaryCacheTest` として別クラスに置いた。**`Handler.create(:dictionary_tag)` が
+Sequel のモデルを触るため、既存の `TaggingDictionaryTest` は **DB の無い環境でクラスごと omission** になり、
+ゲートを守れない。キャッシュの世代・署名・TTL は辞書ソースの設定だけで決まるので、辞書ソースを返すだけの
+ダブルを差し込んで常に実走させている。
+
+⚠ **`RemoteTagHandlerTest` の `キュアスタ!` が 3 条件のどれで落ちているかは未特定のまま**（#4584 の担当）。
+本件の着地で A/B の再現性が担保されたので、着手できる状態になった。
+
+検証: `rake test` 978 → **988 tests / 0 failures / 0 errors / 313 omissions**（omissions は前後で不変・新規 10 件はすべて実走）。
+`rake lint` 通過。CI は mastodon / misskey とも緑。
+
+### 着地済み: #4585 「次回」を「話数 +1」と「日付 +1」に分離（2026-08-15・PR #4588）
+
+| ボタン | 動き | エンドポイント |
+| --- | --- | --- |
+| 話数 ＋ | `episode` のみ +1（Annict のサブタイトル解決は従来どおり） | `POST .../episode/increment`（**日付を触らなくなった**） |
+| 日付 ＋ | `next_on` のみ **+1 日** | `POST .../next_on/advance`（新設） |
+
+`NEXT_ON_INTERVAL_DAYS = 7` は削除した（⚠ **7 を別名で残していない**）。
+`increment_episode` から日付の前進が外れたので、**Annict が載らずに 200 が返ったときの巻き戻し量が半分**になる。
+
+⚠ **`days` は 1〜366 の整数のみ・範囲外と非整数は 422。**素の `to_i` に倒すと `'abc'` が 0 日になり、
+「押したのに進まない」理由が分からなくなる。**クライアント起因なので alert しない**（#4542 と同型）。
+
+⚠ **WebUI は連打を 600ms で畳んで 1 リクエストにする**（`days` に日数を載せる）。1 クリック 1 リクエストだと
+7 往復待たされたうえ #4534 のロックも 7 回取る。⚠ **`entry.next_on` の実体は触らない** ——
+一覧の並びが `next_on` 昇順（#4540）なので、実体を進めると**連打の途中で行が動き、2 回目のクリックが別の行に当たる**。
+
+⚠ **CI の omission baseline を 313→318 / 302→307 へ上げた。**ゲートを緩めたのではなく、
+**CI で実行しようがないテストが 5 件増えた分**（`ProgramTest` は `livecure?` が false だとクラスごと omission になり、
+CI には `var/program.yaml` も `/program/urls` も無いので常に false）。
+
+⚠ **ローカルで `ProgramTest` を実走させるには `var/program.yaml` を一時的に置く**（無いと 40 件超がまるごと omission）。
+これで見つかった**既存の赤 2 件**（本 PR 由来ではない）:
+
+- `test_data_coerces_unquoted_yaml_timestamp` — `Time` が Redis キャッシュ往復で `"2026-08-08T23:30:00.000Z"` になる。**#4558 そのもの**（5.34.0 スコープ内・未着手）
+- `test_auto_update_default_true` — `/program/auto_update` 未設定だと `auto_update?` が `ConfigError` を上げる（「既定 true」が実装されていない）。⚠ **既定値は `config/application.yaml` にあるので通常は踏まない**
+
+`test_increment_episode_does_not_create_next_on` も develop で落ちていた（`coerce_scalars` が `next_on` を必ず
+materialize するのでキーは常に存在する）。**値を見るアサーションへ直した**。
+
+⚠ **`views/program.slim` は #4578 のため `rake lint` の対象外。**個別に `slim-lint` を掛けて確認すること。
+
+### 着地済み（マイルストーン外）: デーモンの `/health` が「触れなかった」を「死んでいる」と断定しない（2026-08-15・PR #4592）
+
+ginseng-core 1.17.0（pooza/ginseng-core#509 / #510 / #511）への追随。**3 件とも「例外を安全側でない値・順序に
+読み替える」同型**で、Issue は立てずに gem 追随として直接入れた。
+
+- `Process.alive?` は `Errno::EPERM`（プロセスは存在するが**シグナルを送る権限が無い**）でも false を返す。
+  `listener_daemon.rb` / `sidekiq_daemon.rb` の `/health` はこれを `PID '...' was dead` と報告していた
+  ＝ **原因を誤って伝えていた**。1.17.0 の `Process.alive_state`（`:alive` / `:dead` / `:unknown`）で分岐する
+- ⚠ **`:unknown` も NG のままにする。**デーモンは `/health` を返すプロセスと同じユーザーで動くので、
+  触れない＝ pid が再利用されて他人のプロセスになっている＝うちのデーモンは動いていない。
+  **変えるのは「なぜ NG なのか」の説明だけ**（[[project_5310-release]] の `pgrep -f mulukhiya` の取りこぼしと同じ筋）
+- gem を上げるだけで効く分に `Daemon#run_stop` の順序バグ（`remove_pid` → `Process.kill` だったため、`EPERM` で
+  **プロセスは生きたまま pid ファイルだけ消え**、次の start が 2 本目を立てていた）が含まれる
+
+### 5.34.0 の実装状況（2026-08-21 時点）
+
+**スコープの実装は #4351（Gate 2 の flip）を除いて全て develop へマージ済み。**
+**次にやるのはリリース前レビュー → ステージング検証。**
+
+| PR | Issue | 主眼 |
+| --- | --- | --- |
+| #4620 | #4616 (S) | ginseng-core 1.19.0。壊れたバイト列でログのマスクが外れる穴を塞ぐ |
+| #4605 | #4599 (S) | Slack 互換 webhook の公開範囲をリクエストごとに受ける |
+| #4607 | #4558 (S) | `next_on` を「書いたとおりの日付」で読む |
+| #4609 | #4573 (S) | リモート辞書の 200-with-HTML を黙って飲まない |
+| #4610 | #4598 (M) | `Idempotency-Key` を上流へ中継する |
+| #4611 | #4576 (M) | SSRF 掃討の取り残し 2 件 |
+| #4613 | #4393 | media_catalog を LATERAL merge へ（#4351 Gate 2 の前提） |
+| #4614 | #4351 | `/health` に接続プールの使用状況を出す |
+| #4608 | #4606 | `inherit_mode` を足して継承した `Exclude` を取り戻す |
+
+⚠ **Issue はどれも open のまま。**`Fixes #NNNN` を書いても **base が `develop` なので GitHub は閉じない**
+（デフォルトブランチへのマージでしか閉じない）。リリース後に、モンキーテスト可否で分類して畳む。
+
+判断が要った点（詳細は各 PR 本文）:
+
+- **#4558 は Issue の推奨案では直らない。**⚠ **`Time` に materialize した後ではゾーンレスと明示
+  オフセットを区別できない**（実測でどちらも `utc? == false` / `utc_offset == 32400` の同じ
+  オブジェクト）。**AST 上で `next_on` を `YYYY-MM-DD` の String へ差し替える**方式にしたところ、
+  項目 1（Redis 往復で無効値）も同時に消えた。⚠ 直すのは `format_date` ではなく `parse_yaml`
+- **#4573 は Sentry へ escalation しない。**10 分周期なので `alert` に載せると 1 ソースあたり
+  日 144 件のメール・Discord になる（#4594 と同型）。`logger.error` ＋ 世代ログの `empty_sources`
+  で「何本中何本が死んでいるか」を 1 行で読めるようにし、判断は #4577 へコメントで残した
+- **#4576 は pinning の段階適用を採らなかった。**Issue は「ナウプレのサムネイル取得にも効くので
+  CDN が壊れうる」としていたが、⚠ **`Handler#upload` の呼び出し元は `WebhookImageHandler`
+  1 本だけ**で、ナウプレ系は `upload_remote_resource` を通らないことを全呼び出し元の確認で裏取り
+  した。**fedi-test-harness（Mastodon）実走で 1104 tests / 0 failures / 0 errors / 157 omissions**
+- テストはすべて**両マトリクスで実走する場所**に置いた。⚠ `SlackWebhookPayloadTest`（Slack 未設定で
+  omission）・`ProgramTest`（`livecure?` が false で omission）に相乗りしない
+- **#4616 は gem 更新なので、判断が要ったのは「何を持ち込まないか」。**`bundle update` には
+  timeout（#4593）・`max_bytes`（#4612）・cert タスク（#4617）・`format: uri` 厳格化も乗ってくるが、
+  **こちら側の載せ替え作業は 5.34.0 でやらない**（2026-08-21 ユーザー判断）。⚠ **gem の挙動が変わることと、
+  こちらが載せ替えることは別**として扱う
+  - ⚠ **`ListenerTest#test_root_cert_file` の是正は退行対応ではなく、地雷が外れた分。**
+    `Faye::WebSocket::SslVerifier` は値があると `cert_store.add_file` を呼ぶので**存在しないパスで落ちる**。
+    旧 gem が `ENV['SSL_CERT_FILE']` に無い `cert/cacert.pem` を立てており、**Listener がそれを掴む
+    唯一の経路**だった（#4586）。1.19.0 は立てないので nil ＝ システムの CA ストアに倒れる
+- ⚠ **CI の omission baseline は 318 / 307 → 321 / 310 になった**（#4613）。ゲートを緩めたのではなく、
+  **DB を持たない CI では `AttachmentTest` がクラスごと omission になる**ため、そこへ足した 3 件が
+  そのまま乗る分。**それ以外の PR では baseline を動かしていない**
+
+### #4351 / #4393 の決着（2026-08-20・zugoga 本番実測）
+
+**sub-second 化は B 案（ローカルアカウント駆動の LATERAL merge）で決着し、PR #4613 で着地した。**
+計測の全文は [#4323 のコメント](https://github.com/pooza/mulukhiya-toot-proxy/issues/4323#issuecomment-5349297730)。
+
+| パターン | 現行 | 本実装 |
+| --- | --- | --- |
+| page1 | 26,415ms | **56.7ms** |
+| only_person | 25,998ms | **6.5ms** |
+| cursor | 23,234ms | **5.7ms** |
+| rule つき | 8,900ms | **837ms** |
+| rule ヒット無し | 2,244ms | **14.0ms** |
+
+- ⚠ **現行のベースラインは劣化していた**（Gate 1 当時の「約 10s」→ 23〜26s）。「10s だから Gate 2 保留」の
+  前提はさらに厳しい側に振れていた
+- ⚠ **A 案は棄却。**速さ（1,593ms）ではなく、照合で **44 行の取りこぼし**が出たのが決め手
+- ⚠ **フィルタは LATERAL の内側・内側 LIMIT は `limit + offset`。**本番でわざと誤り版を作って照合したところ
+  **page2 で 14 行取りこぼした**。正しい版は page1 / only_person / rule / page2 とも差分 0 行
+- **追加 index は不要**（Mastodon 本体の `index_media_attachments_on_account_id_and_status_id` で成立）。
+  ローカルアカウントは **19 件**
+- worker の DB 占有が **30 分ごと 150 秒 → 0.2 秒**。⚠ ここが 2026-05-19 の枯渇の温床だった
+
+**Gate 2 の進め方（2026-08-20 ユーザー確定）**:
+
+1. **順序は「5.34.0 リリース → zugoga デプロイ → flip」。**⚠ 新クエリはコードなので先行 flip はできない
+2. **ステージング（dev26）を挟む。**⚠ ただし**性能検証ではなく機構の確認**
+   （flip が効く・`/feed/media` が 200・worker がキャッシュを載せる・新規エラーが出ない）。
+   ⚠ **dev26 で有意な性能計測はできない**（本番と桁違いでプランが変わる。[[feedback_staging-data-scarcity]]）
+3. **rollback は `/health` の `postgres.pool.waiting` が 0 を超えた状態が数分続いたら**（overlay を false へ戻すだけ）。
+   ⚠ `allocated` が `max` に張り付くのは正常なので、それを理由に戻さない
+   - ⚠ **この指標は「Puma 1 プロセスの Sequel プール」しか見ていない**（2026-08-21 の Codex 指摘 ＝ #4618）。
+     2026-05-19 に枯れたのは **pgbouncer（全プロセス・Mastodon 本体と共有）**で、重い SQL を流すのは
+     別プロセスの Sidekiq。**flip 中は pgbouncer の `SHOW POOLS`（`cl_waiting`）も人が直接見る**
+   - ⚠ **`/health` は `SELECT 1` の後にプールを読むので、有限のスパイクは取りこぼす。**
+     「waiting が 0 だった」を「詰まらなかった」の証拠にしない
+
+### 2026-08-20 セッション同期の記録
+
+- **Sentry**: 未コメントの新規 3 件を精査した。
+  - **MULUKHIYA-TOOT-PROXY-2K（UploadError 401・28 件）** — #4594 そのもの。PR #4595 が CI 緑で着地待ち
+  - **MULUKHIYA-TOOT-PROXY-2J（Webhook not found・3 件・shallu）** — **#4603 として起票**。
+    存在しない digest への `POST /webhook/:digest` が `e.alert` 固定で Sentry に上がる。
+    ⚠ **同じ例外が `get '/:digest'` では `e.log` で静か**という非対称。#4542 / #4594 と同型
+  - **MULUKHIYA-TOOT-PROXY-1X（CustomFeed command failed）** — 最新イベント（2026-08-18）も
+    `server_name=mulukhiya` / `release=5.26.0` ＝ **姉妹サーバー管理人のモロヘイヤ**の系統で pooza 側の作業は無い。
+    chubo2#41 系統（zugoga のデプロイで bundle install 未走）は 2026-07-17 を最後に静穏
+- **Dependabot** 0 件。**Codex** は open / 直近マージ 25 本を横断してリアクション 0 の指摘ゼロ（[[feedback_codex-review-window-too-narrow]] の広めの窓で確認）
+- ⚠ **同期の初回で PR #4602 の申し送りコメントを落とした。**`pulls/{number}/comments` は行コメントしか返さず、
+  PR 本体のコメント（`issues/{number}/comments`）を見ていなかったため。**投稿者は Codex ではなく `pooza`**
+  （ginseng-style 側を触っていた別セッションの申し送り）。§4 に手順として追記した。
+  内容は「正本側 pooza/ginseng-style#11 / #12 で **test-unit に無いアサーションへ自動修正する 4 cop**
+  （`AssertPathExists` / `RefutePathExists` / `AssertOutput` / `AssertSilent`）をまとめて無効化したので、
+  モロヘイヤ側の `Minitest/RefutePathExists` の固有緩和は落とせる」。b77dd308 で消化（rubocop 471 files / no offenses）
+- **chubo2** は差分なし。**Issue 棚卸し（§6-2）は最終 2026-07-31 で 30 日未経過**なのでスキップ（次回は 2026-08-30 以降）
+- **harness の upstream チェック（§8）** — 下の「fedi-test-harness の検証状況」に反映
+
+### 2026-08-21 セッション同期の記録
+
+- **Mastodon 4.7.0 が stable リリース（2026-08-20）＝ 本番 3 台・ステージング 3 台へ適用済み（2026-08-21）。**
+  インフラ側の記録は pooza/chubo2 の `docs/infra-history.md` / `docs/infra-note.md` が正本（[[project_mastodon-upgrade-runbook]]）。
+  **モロヘイヤ側は同日に harness を stable で実走し、`verified` を v4.7.0 へ昇格した**（全緑）。
+  下の「fedi-test-harness の検証状況」参照
+- **Codex**: 前回同期の後に付いた **3 件**を消化（PR #4614 の P1 / P2、PR #4613 の P2）。いずれも妥当と判断し、
+  返信 ＋ 👍 のうえ **#4618 / #4619 で受けた**。⚠ **どちらも「ゲートや rollback 信号が、見たいはずのものを
+  取りこぼす」型**で 5.34.0 のテーマ（黙って壊れるのをやめる）そのもの
+- **Sentry** 新規なし（最終確認 2026-08-18 の 3 件はいずれも 08-20 にトリアージ済み）。**Dependabot** 0 件
+- **ginseng-core が動いた。**依頼していた 4 件（#518 / #514 / #526 / #528）と #512 が `main` へ着地し、
+  **向こうから取り込み依頼が 2 本来ている（#4616 / #4617）**。⚠ `Gemfile.lock` の revision は
+  `ab02f5e`（旧）のままで **`bundle update ginseng-core` は未実施**
+- **chubo2** は差分なし（`git fetch` 済み・infra 側の 4.7.0 記録は取り込み済み）。
+  **Issue 棚卸し（§6-2）は最終 2026-07-31 で 30 日未経過**なのでスキップ（次回は 2026-08-30 以降）
+- **#4616 を 5.34.0 へ繰り入れた**（本番で開いている実害のため。#4617 / #4612 は次リリース以降）。
+  重み合計 23 → 24
+- **harness を v4.7.0 stable で実走し `verified` を昇格**（下の節）。⚠ **踏んだ罠は無し**
+  （`update-version.sh` → `reset.sh` がそのまま通った。08-16 に踏んだポート 3000 衝突は
+  pooza/chubo2#178 の修正が効いていて再発しなかった）
+
+### 2026-08-22 セッション同期の記録
+
+- **#4621（ALT 編集の PUT が 500）の原因を特定した。**⚠ **ステージング実機は要らない**（Rack の
+  パース挙動で手元で再現できる）。`ginseng-fediverse` の `flatten_media_attributes` が
+  `media_attributes[0][id]=...` と**数字の添字**で form-urlencode していたのが原因で、
+  この形は Rack / Rails 側で **`fields_for` 形式の Hash `{"0" => {...}}`** に解釈され**配列にならない**。
+  Mastodon の `UpdateStatusService` は `(@options[:media_attributes] || []).each` と回すので、
+  Hash を each した `["0", {...}]`（Array）が渡り `attributes[:id]` で
+  `TypeError: no implicit conversion of Symbol into Integer` ＝ 500
+  - ⚠ **#245 は入っているのに崩れていた**＝ **#245 の平坦化そのものが誤り**。
+    「gem 側の修正が着地した」は「正しく直っている」ではない
+  - **pooza/ginseng-fediverse#253** を出した（form-urlencoded をやめて **JSON で送る**）。
+    ⚠ **空添字 `media_attributes[][id]` でも配列にはなるが採らなかった**。「同じキーが再出現したら
+    次の要素」という Rack の暗黙のグルーピングに依存し、要素ごとのキーの並びで壊れうるため
+  - ⚠ **Content-Type の明示が要る。**ginseng-core の `create_body` は Content-Type が
+    `application/json` のときだけ `to_json` する。無指定だと HTTParty が Hash を form-urlencode し、
+    そこでも数字の添字（`HashConversions#to_params`）になって**同じ 500 に戻る**
+  - **#253 は同日 03:26Z に着地し v1.8.29 としてリリース済み。PR #4622 で完結した**
+    （`bundle update ginseng-fediverse` ＋ 内部 fetch と上流への PUT に `X-Mulukhiya-Purpose` を
+    出さない ＋ **gem 境界の契約テスト**）
+  - ⚠ **境界テストを別に置いた**（`test/unit/service/mastodon_status_update_boundary.rb`）。
+    `alt_edit_body` は**モロヘイヤが組んだ Hash** しか見ないので gem 側が形を崩しても捕まえられない。
+    #4589 / #4594 と同じ「`bundle update` で黙って戻る」類。**旧 revision へ戻すと 4 件とも落ちる**
+    ことを確認済み
+  - ⚠ **ステージング（dev24）での実地確認が未了。**capsicum と同じ PUT を投げて 200 と ALT 反映を
+    見るところまでがクローズ条件
+- **Codex** は open #4604 ＋直近マージ 8 本を横断して未消化ゼロ。**PR 本体コメントの申し送りも無し**。
+  **Dependabot** 0 件
+- **Sentry** 新規 1 件 **MULUKHIYA-TOOT-PROXY-2M**（`AnnictPollingWorker` の
+  `RedisClient::CannotConnectError`・単発）をトリアージ。⚠ `server_name=instance-20220704-2044` /
+  `release=5.31.0` ＝ **姉妹サーバー管理人（Oracle 無料枠）のモロヘイヤ**で pooza 本番 4 台ではない。
+  Redis 再起動時の既知パターンで、#4543 の Redis 接続系の群に合流させた（コメント記録済み）
+- **chubo2** は差分なし。**Issue 棚卸し（§6-2）は最終 2026-07-31 で 30 日未経過**なのでスキップ
+  （次回は 2026-08-30 以降）。**harness の upstream チェック（§8）は `last_checked` 2026-08-21 で
+  1 日**なのでスキップ（次回は 2026-08-25 以降）
+
+#### ginseng-\* のピンのずれ（2026-08-22 判定）
+
+⚠ **8 本すべてずれていたが、7 本は取り込まない（③ 見送り）。**次の同期で同じ調査をしないために残す。
+
+- **ginseng-fediverse / piefed / postgres / redis / web / youtube** — 差分は **CI・RuboCop 設定・
+  テスト土台のみ**で、モロヘイヤが触る面（`HTTP` / `Logger` / `Controller` / `TagContainer` /
+  `Environment`）に当たらない → **③ 見送り**と判定した
+- **ginseng-style** — docs 中心（`inherit_gem` の Include / Exclude が置換になる件・Codex 走査の
+  ワンライナー是正・ブランチ規約）。lint の挙動しか変わらない → **② 次のマイルストーンで**
+- ⚠ **③ / ② と判定した 6 本は、同日の「通常リリース手順」3.（`Gemfile.lock` のルーチン最新化・
+  `57631310`）で結局すべて乗った。**差分は上のとおり読んだうえで無害と確認済みなので問題は無いが、
+  **「見送り」判定はリリース前のルーチン更新までしか保たない**。判定するときはそのつもりで
+  （`bundle update` 引数なしを避ける必要があるのは、**赤が出たときの切り分け**が要る取り込みだけ）
+- **ginseng-fediverse は #253 の着地で 1.8.29（`0129fa5e`）へ、ginseng-core は v1.19.0（`4a029e9c`）へ**
+  個別に取り込み済み
+- **ginseng-core** — 当初は「`cert:*` の CA ストア検証・`run_stop` の pid・`cacert.pem` の週次 PR 化＝
+  **#4617 の範囲**なので ② 次リリース以降」と判定した。⚠ **その後 v1.19.0（同日 03:49Z）が出て
+  🔴 #527 が乗ったので ① へ切り替えた**（2026-08-22 ユーザー判断・PR #4622 に `57b73dc8` で取り込み済み）
+  - 🔴 **#527 リダイレクト追従で別オリジンへ資格情報を渡していた** — `Authorization` / `Cookie` が
+    リダイレクト先へそのまま送られ、初段の query / body も撃ち直されていた。
+    ⚠ **`host_validator` では塞げない**（「公開ホストか」しか見ないので、**リダイレクト先が公開ホスト
+    でありさえすれば通る**）。#4576 / #4524 で固めた SSRF 面と同じ層
+  - ⚠ **モロヘイヤでの実害は小さい**（資格情報を付けて叩く先は自前の Mastodon / Misskey で、
+    辞書・番組表・メディアの外部取得は `Authorization` を持たない）。**急ぐ理由としては使わない**
+    （[[feedback_no-false-urgency]]）。取り込んだのは「`bundle update` 一発で、同じブランチで
+    テストを回している最中だった」から
+  - ⚠ **cert タスクの受け取り（#4617）は含めていない。**`Ginseng.load_tasks` と
+    `cert/cacert.pem` をコミットするかの判断が要るため、次リリース以降のまま
+  - ⚠ **v1.15.26 以降タグが打たれていなかった**ので v1.19.0 は 20 件まとめての回。
+    **「リリースが出た」＝「差分が小さい」ではない**
+
+
+### ステージング検証（2026-08-22・**4 台とも緑**）
+
+`develop` の HEAD（`03efc95d`）を dev24 美食丼 / dev25 キュアスタ！ / dev26 デルムリン丼（Mastodon）/
+dev27 ダイスキー（Misskey）へ適用。**4 台とも version 5.34.0・`/mulukhiya/api/health` 200
+（redis / sidekiq / postgres / streaming / ruby すべて OK）・`yjit_enabled: true`・
+WebUI 200（`/mulukhiya/` / `app/media` / `app/config` / `app/program`）**。
+
+**再起動後の生存 pid が吐いたログに新規のエラー署名は無い**（dev24 / dev25 は 0 件）。
+⚠ **dev26 / dev27 の 1 件は `/program.ics` を叩いた私の足跡**で、非 livecure サーバーの
+期待動作（`raise NotFoundError unless livecure?` の log のみ）。**退行ではない。**
+
+- **#4351 Gate 2 の前提が 4 台で見えた** — `/health` の `postgres.pool`
+  （dev24 / 25 / 27 は `max: 10`、dev26 は `max: 16`）
+- ⚠ **dev27 の `yjit_enabled` は `true`**（pooza/chubo2#123 の欠落は解消済み）
+
+#### 実機で中身を 1 つ確認した（手順を通っただけで満足しない）
+
+**#4616 の本丸＝「壊れたバイト列でマスクが外れない」を dev25 で確認し、Issue をクローズした。**
+
+```json
+{"request":{"method":"POST","path":"/mulukhiya/webhook/0000...","params":{
+  "access_token":"[FILTERED]","i":"[FILTERED]","text":"[FILTERED]",
+  "url":"https://example.com/?access_token=[FILTERED]&s=%3Fho"},
+  "remote":"127.0.0.1"},"_encoding_error":true}
+```
+
+⚠ **`access_token` / `i` / クエリ内の token とも `[FILTERED]`**、壊れたバイト列だけが `%3Fho` へ、
+`_encoding_error: true` つき、行全体が妥当な UTF-8。
+
+- ⚠ **JSON ボディでは検証できない。**不正なバイト列を含むと `JSON.parse` が倒れ、
+  `Controller#before` は Sinatra の `params`（JSON では空）へ倒れるので**ログに何も出ない**。
+  **form-urlencoded で送ること**
+- ⚠ **marker 文字列を grep で探す設計にしない。**`text` は `SCRUBBED_LOG_PARAMS` に入っており
+  `[FILTERED]` になるので、**marker が出てこないのが正しい**（最初これで「ログが出ていない」と誤読した）
+
+#### 検証できなかったもの
+
+- ⚠ **#4623 / #4625（ALT 編集・`tag` purpose）は実地で確認できない。**上流 PUT が #4621 の 405 で
+  届かないため。**5.35.0 で #4621 が直ってから、この 2 件も併せて実機確認する**
+- ⚠ **dev26 は nginx が #4474 修正前のまま**（pooza/chubo2#188）。外部からの PUT が常に 405 で、
+  vhost に `if ($http_x_mulukhiya_purpose != '')` も残っている。**dev26 で ALT 編集経路の
+  実機確認を取らないこと**
+
+### harness 実走ゲート（2026-08-22・**「新規の失敗ゼロ」で通過**）
+
+両系を**別シェル**で実走（#4559 の取り違え対策。`controller=` と `url=` の両方で確認）。
+
+| 系 | harness | 結果 |
+| --- | --- | --- |
+| Mastodon（v4.7.0） | `controller=mastodon url=http://localhost:3000` | **1184 tests / 2299 assertions / 1 failures / 0 errors / 159 omissions** |
+| Misskey（2026.7.0） | `controller=misskey url=http://localhost:3001` | **1187 tests / 2289 assertions / 1 failures / 0 errors / 146 omissions** |
+
+**失敗は両系とも `RemoteTagHandlerTest#test_handle_pre_toot` の 1 件だけ**＝ **#4584**。
+⚠ **新規の失敗はゼロ**で、リリース前レビューの赤 4 件の是正による退行も無い。
+**「新規の失敗ゼロ」で非ブロック化して通した**（2026-08-22 ユーザー判断。5.33.0 と同じ扱い）。
+
+⚠ **ただし今回は放置で終わらせず、#4584 を 5.35.0 へ割り当てた**（同ユーザー判断）。
+[[project_harness-zero-error-goal]] の「両系エラー 0」へ戻すため。
+
+- omissions は参考値（2026-08-09 の 152 / 141）から 159 / 146 へ微増。**テスト総数が
+  1001 → 1184 に増えている**ぶんの範囲で、前提が壊れて実行されなくなった類ではない
+- ⚠ **実走中に出る `DB 接続に失敗したためスキップ: ... user "u"` は意図したテストの出力。**
+  `test_apply_wires_info_token_and_postgres_dsn` が `postgres://u:p@...` という偽 DSN で
+  失敗経路を検証している。ENV は `setup` / `teardown` で退避・復元されるので後続へ漏れない。
+  **退行と読み違えないこと**
+- ⚠ **判定基準の「既知例外は無い」は、この時点で実態と食い違っている**（docs/test-harness.md）。
+  #4584 が着地したら記述を戻す
+
+### リリース前 5 観点レビュー（2026-08-22 実施・赤 4 件を是正）
+
+対象は `v5.33.0..develop`（64 コミット / 60 ファイル / +3648 -558）。**赤 4 件・黄 11 件・緑 6 件。**
+
+⚠ **赤のうち 2 件は本リリースで入った退行だった。**レビューを回さなければ、
+**#4589 と #4599 という「今回直したもの」自身が新しい穴を開けたまま出ていた**。
+
+**赤 4 件は PR #4627 で是正**（Issue は #4623 / #4624 / #4625 / #4626）:
+
+- **#4623 ALT 編集が「本文なし + CW あり」の投稿の本文を CW 文言で上書きする（🔴 退行）** —
+  Mastodon の `update_immediate_attributes!` は本文が blank のとき
+  `@options.delete(:spoiler_text)` を**本文へ昇格**させる。⚠ **そのとき `delete` されるので
+  次の行の `key?(:spoiler_text)` が false になり CW も残る**（本文と CW に同じ文言が並ぶ）。
+  本文が空なら `spoiler_text` を**キーごと送らない**ことで両立させた
+- **#4624 webhook の未知 `visibility` が既定でなく `public` へ倒れる（🔴 退行）** —
+  gem の `visibility_name` は未知の名前を **`public` へ丸める**ので、#4599 で足した素通しにより
+  ⚠ **`private` 設定の webhook が綴り誤りや Misskey 語彙（`home`）ひとつで公開投稿**になった。
+  ⚠ **判断を `visibility_for` へ寄せた**（`post` に式を残すと、配線を戻されても
+  `requested_visibility` 単体のテストが緑のまま＝ #4583 / #4619 と同型）
+- **#4625 `tag` purpose の PUT が添付・CW・閲覧注意・アンケートを消す** — **既存**。
+  #4589 は ALT 編集側しか直していなかった。復元を `restored_body` へ括り出して両経路で共有。
+  ⚠ **`status` だけは呼び出し側のものを使い、省略時は復元した本文へ倒す**（素朴に `.compact` すると
+  本文まで空になる）。⚠ **`poll` も復元する**（`expires_in` は**残り秒数**。期限切れには触らない）
+- **#4626 `MediaFile.download` が固定パスへ非アトミックに書く** — **既存**。URL の sha256 由来の
+  固定名 ＋ `File.write` の O_TRUNC で、同一 URL の同時取得が**読み出し中のファイルを切り詰める**。
+  一時ファイル ＋ `rename` へ（形は `ProgramFetcher#write_yaml` と同じ）
+
+⚠ **既存の赤 2 件（#4625 / #4626）も 5.34.0 で直した**（2026-08-22 ユーザー判断）。
+5.33.0 で #4576 を次リリースへ送ったのとは逆の判断で、**どちらも小さく、ステージング検証は
+どうせ 1 回回すから**というのが理由。
+
+**黄・緑は受け皿 8 件へ**（下の「マイルストーン未割当」）。
+
+#### レビューの効き方について
+
+⚠ **5 観点のうち赤を出したのは 3 観点で、観点ごとに別のものを捕まえた。**
+セキュリティが #4624 / #4625、API 契約が #4623、並行性が #4626。
+**スタイルと観測性は赤 0 件**（ただし黄・緑は両方から出た）。単一のレビューでは
+**4 件のうち 1 件しか出なかった**ことになる。
+
+⚠ **サブエージェントが作業ツリーの HEAD を detach させた。**観測性の担当が
+`git checkout origin/develop` で過去版を読みに行き、その窓でこちらが積んだ 2 コミットが
+detached HEAD 上に乗った。⚠ **`git push` は成功扱いになる**（動いていないブランチ ref を
+押すだけ）ので「push 済み」と誤報告した。**レビュー指示には「git の状態も変えるな」を明記し、
+過去版は `git show <rev>:<path>` で読ませること。**
+
+### マイルストーン未割当
+
+**5.33.0 のリリース前レビュー・harness ゲート由来の受け皿**（2026-08-12 起票）。
+**#4583 だけ 5.34.0 へ繰り入れ、残り 4 件は次リリース以降へ送ることで確定**（2026-08-13 ユーザー判断）:
+
+- **#4577 obs: 5.33.0 レビュー由来の観測性の穴 4 件（size:M）** — 番組表全滅が無音・ロック fail-open が不可視・Annict staleness が無音・Spotify の誤分類
+- **#4578 test/ci: `rake lint` の slim-lint が `views/` 直下 16 本を一度も検査していない（size:S）** — dash に globstar が無いため。#4503 と同型の「守れているつもりの緑」
+- **#4579 API 契約: 409 の「恒久／一過性」がクライアントから判別できない（size:M）** — 機械可読コード・`Retry-After`・increment の 3 通り
+- **#4584 test: harness で `RemoteTagHandlerTest` の `キュアスタ!` タグが reject される（size:M）** — 両系で発生。**5.33.0 の退行ではない**（同一コミット連続実行で A/B 済み）。⚠ **3 つある reject 条件のどれが効いているかは未特定**。⚠ **#4583 を先に片付けないと A/B の再現性が担保できない**ので、5.34.0 で #4583 が着地してから着手する → **2026-08-15 に #4583 が着地したので着手可能**
+
+その他:
+
+- **#4543 obs: Sentry の未トリアージ unresolved 16 件を棚卸しする（size:M）** — `is:unresolved` 27 件のうち **16 件がコメント 0 のまま滞留**していた。§5 の手順は**新規イシューだけを見る**構造なので、手順が入る前の分がそのまま残っている。Redis 接続系 174 件 / 上流 4xx・5xx 100 件 / 単発 2 件の 3 群に分けて群ごとに判断する。上流 4xx 群には #4542 と同型（クライアント起因なのに alert）が混ざっている可能性が高い
+- **#4603 obs: 存在しない digest への webhook POST が 404 なのに Sentry へ alert される（size:S）** — 2026-08-20 の
+  セッション同期で Sentry から拾ったもの（MULUKHIYA-TOOT-PROXY-2J）。`post '/:digest'` の rescue が `e.alert` 固定。
+  ⚠ **同じ `verify_webhook!` を通す `get '/:digest'` は `e.log`** で、GET と POST で扱いが割れている。
+  #4543 の「上流 4xx 群に #4542 と同型が混ざっている」という見立てが、**上流由来ではなく自前の 404 で**当たった形
+- **syslog 側のノイズ棚卸し（未起票）** — zugoga の `base_uri undefined` のように `e.log` 止まりで Sentry に出ない大量ログがある。#4543 の対象外なので別建てが要る
+**5.34.0 のリリース前 5 観点レビュー由来の受け皿（2026-08-22 起票・黄 11 / 緑 6 を 8 本に集約）**:
+
+- **#4628 obs: タグ辞書の観測性とキャッシュ運用の穴 5 件（size:M）** — ⚠ **全滅 alert が TTL 失効後は
+  永久に沈黙する**（`discardable?` が `cache.present?` を見るため）／⚠ **Sidekiq が 1 時間落ちると
+  失効し、投稿経路のサンダリングハードに化ける**（単一フライト無し）／`setex` 直後の読み戻し／
+  世代ログの分母と分子が別勘定／`Marshal.load` が署名検証より先
+- **#4629 obs: 番組表編集 4 本のクライアント起因 403/404 が `e.alert` に落ちる（size:S）** —
+  ⚠ **#4594 / #4603 と同型が 3 系統目**。同じファイルの `handle_annict_write_error` が逆の方針を
+  明記しているのに漏れている。共通ヘルパへ寄せるほうが再発しない
+- **#4630 security: ログの秘匿の穴 2 件（size:S）** — ⚠ **`mask_url` は `\A` アンカー**なので
+  **例外メッセージに埋めた URL は素通し**（5.34.0 で新設した 3 箇所）／`scrub_log_params` が
+  **`blocks` / `attachments` の入れ子を素通し**＝ ⚠ **送り方で秘匿の効き方が変わる**
+- **#4631 obs: ALT 編集の内部 fetch 失敗がクライアントの 404 に潰れる（size:S）** —
+  ⚠ **ALT 編集が全ユーザーで壊れていても syslog 1 行しか出ない**。#4621 で切り分けを遅らせた構造
+- **#4632 bug: `/media` のページ送りが境界で 1 件飛ばす（size:S）** — `limit + 1` を offset の
+  基準にも使っている。⚠ **WebUI の無限スクロールでそのまま欠落する**
+- **#4633 bug: webhook の添付が黙って落ちる 2 件（size:S）** — 上限超過が **200 のまま画像だけ無い
+  投稿**になる／添付上限の check-then-act で **6 枚積んで 422**
+- **#4634 docs: api.md の追随漏れと廃止語の残存 5 件（size:S）** — `/health` の `pool`／
+  `Idempotency-Key` 節が PUT 経路と食い違う／`direct` の宛先／⚠ 廃止語「インスタンス」が
+  ユーザー可視の 2 箇所
+- **#4635 refactor/test: 構造改善 8 件（size:M）** — ⚠ **`forwarded_headers` のテストが自己充足**
+  （ゲートを書き換えても緑）／`handler_config` を通さない唯一の箇所／`mastodon_type?` でなく
+  文字列比較（#4566 で効く）／⚠ **`/health` が pid ファイル破損を OK と報告する**
+  （`to_i` が 0 → `kill(0, 0)` が成功）ほか
+
+**5.34.0 の Codex レビュー由来の受け皿（2026-08-21 起票）**:
+
+- **#4618 obs: `/health` のプール指標が Puma プロセスローカルで、pgbouncer と Sidekiq 側の逼迫を取りこぼす（size:M）** —
+  PR #4614 の Codex P1 / P2。⚠ **2026-05-19 に実際に枯れたのは pgbouncer（全プロセス・Mastodon 本体と共有）**で、
+  重い SQL を流すのは別プロセスの `MediaCatalogUpdateWorker`。`/health` が読むのは**そのリクエストを処理した
+  Puma プロセスの Sequel プール 1 つ**なので、どちらも直接は見えない
+  - ⚠ **完全に盲目ではない**（pgbouncer が詰まれば滞留が延びて同プロセスの他スレッドが待つので `waiting` は
+    遅れて上がる）。**症状の代理としては効くが、flip の影響を最初に検知するには遅い・粗い**
+  - ⚠ **P2（`SELECT 1` の前にスナップショットを取る）は P1 と独立に入れられる。**現行は health 自身が
+    待ち行列に並び、**前の待ちが捌けてから `num_waiting` を読む**ので有限のスパイクを取りこぼす
+  - **Gate 2 は「`/health` の `waiting` ＋ flip 中は pgbouncer の `SHOW POOLS` を人が直接見る」で回す**
+- **#4619 test: catalog の `only_person` subset 検証が truncate したベースラインと比較していて偽陽性になりうる（size:S）** —
+  PR #4613 の Codex P2。`all_ids` は「絞り込み無しの最新 10 件」で母集合ではないため、⚠ **最新 10 件に Person 以外が
+  1 件でも混ざると `only_person` 側はより古い Person で 10 件を埋め、SQL が正しいのに落ちる**。
+  いま緑なのはデータの並びがたまたま Person で埋まっているからにすぎない（#4583 と同型）。
+  ⚠ **DB を持たない CI ではクラスごと omission** なので、赤は harness 実走でしか出ない
+
+**ginseng-core からの取り込み依頼（2026-08-20〜21・向こうが着地させた分）**。⚠ **`Gemfile.lock` は
+まだ旧 revision（`ab02f5e`）で、`bundle update ginseng-core` は未実施**:
+
+- **#4616 は 5.34.0 へ繰り入れた**（2026-08-21 ユーザー判断・上のスコープ節）。**本番で開いている実害**のため。
+  ⚠ 併せて #514（`/http/timeout/seconds` が効いていなかった＝ #4593）・#526 / #534（`max_bytes` ＝ #4612）・
+  #528 / #533（`host_validator` の使い回し）も `main` に入っており、**同じ `bundle update` に乗ってくる**。
+  ⚠ **乗ってくることと、こちら側の載せ替え作業を 5.34.0 でやることは別**
+- **#4617 chore: ginseng-core の cert タスクを受け取る（size:S）** — `cert:update` / `cert:check` を gem が配るようになった
+  （`Ginseng.load_tasks` の 1 行）。#4586 の受け皿。⚠ **急がない**（上流側で「存在しないパスは `SSL_CERT_FILE` に
+  立てない」が入ったので**現状は無害**）。⚠ **`cert/cacert.pem` をコミットするかは判断が要る**
+  （向こうの推奨は「コミットせずデプロイ時に `rake cert:update`」＝更新の当番を増やさない）
+- **#4612 security: `MediaFile.download` の受信バイト上限が「読み切ってから」しか効かない（size:S）** —
+  #4576（PR #4611）の Codex P1 の受け皿。⚠ **gem 側の `max_bytes` が着地したので着手可能になった**
+  （起票時は「gem 側の対応待ち」だった）。`bundle update` と同じサイクルで載せ替える
+
+**設定検証・入口の堅牢化まわり（2026-08-15〜19 起票・いずれも未スコープ）**。⚠ **`ginseng-*` 側と対になっているものが多い**
+（[[feedback_fix-may-not-reach-through-ginseng]]）。まとめて 1 サイクルにするか個別に散らすかは次期マイルストーン確定時に決める:
+
+- **#4596 bug: config 検証の strict が構造的に発火しない（size:S）** — `Mulukhiya.validate_config` の `raise` を
+  **同じメソッドの `rescue => e` が必ず受ける**（`ConfigError < Ginseng::Error < StandardError`）。
+  ⚠ **`strict` を有効にしても起動は止まらない**＝守っているつもりの検証。[[feedback_fail-open-guard-footgun]] の実例
+- **#4597 bug: schema の `format` が 1 つも検証していない（size:M）** — `uri` 以外（regex 6 / hostname 2 / email 1）は
+  **json-schema 6 に検証実装が無く素通し**。⚠ **`validate_formats: true` を渡しても変わらない**（フラグの問題ではない）。
+  ⚠ `config/schema/base.yaml` の `format: ^/` は **format 名ですらない**
+- **#4600 bug: 不正な UTF-8 バイト列を含むリクエストが 500 + Sentry になる（size:M）** — 入口で 400 に落とす。
+  ⚠ **`JSON.parse` は不正 UTF-8 を弾かない。**リクエストログが通り抜けているのは `SCRUBBED_LOG_PARAMS` で
+  `[FILTERED]` に置換されるからで、**偶然の防波堤**。対は pooza/ginseng-core#518 / pooza/ginseng-fediverse#248
+- **#4593 perf/bug: HTTP タイムアウトが未設定（size:S）** — `/http/timeout/seconds` が無く、`Ginseng::HTTP` 側も
+  `get` / `post` / `put` / `delete` に `timeout:` を渡していない（pooza/ginseng-core#514）＝**両側とも未設定で実効 60 秒**。
+  `retry.limit: 3` と合わせて最悪 180 秒級が**同期の投稿経路にぶら下がる**。⚠ **実測はまだ無い**（設定が効いていない事実の記録）。
+  #4573 が「黙って空になる」なら、こちらは「黙って遅くなる」
+- **#4586 bug: Listener の `root_cert_file` が `SSL_CERT_FILE` にフォールバックし、存在しないパスを渡しうる（security）** —
+  対は pooza/ginseng-core#512（利用アプリに cert タスクが無い）・#515（cacert.pem に更新の当番が無い）
+
+**ginseng-style（2026-08-19 新設）**。Ruby の書き方・テスト方針・表記規約・RuboCop 設定の正本を切り出した gem リポジトリ。
+モロヘイヤ側の取り込みが #4601 / PR #4602。⚠ **今後「書き方」の指示が出たら正本は ginseng-style の `docs/`**。
+⚠ **ginseng-\* 自体の残件はこのリポジトリの管轄外**（§6 のとおり専任セッションがある）。こちらは
+`inherit_gem` の追随と、送った Issue / PR の結果待ちだけを持つ。
+
+- **pooza/chubo2#166 ops: sweep の unattended-upgrades が itamae 管理外** — 2026-08-12 06:40 に systemd 更新の巻き添えで `redis-server` が再起動し、Sidekiq が Sentry へ 8 イベント（一過性・復旧済み・triage コメント済み）。⚠ **sweep は「再起動で PG が上がらない地雷」を抱えているのに `postgresql-16` が自動更新の射程内**なのが本題。モロヘイヤ側の作業は無い
+
+### fedi-test-harness の検証状況
+
+**Mastodon v4.7.0 stable を 2026-08-21 に実走・`verified` 昇格**（本番 3 台・ステージング 3 台への適用と同日。
+**本番と検証済み版が揃った**）。**1156 tests / 2250 assertions / 0 failures / 0 errors / 159 omissions
+（100% passed、332 秒）**。
+
+- **DB 直読み層は個別にも実走**: account 34 / status 27 / postgres 10 は **omission 0 で全緑**、
+  attachment は 20 tests / 0 failures / **2 omissions**
+- ⚠ **attachment の omission 2 件を 4.7 の影響と読まない。**#4613 で足したページ送りのテストが
+  **ページ 2 を作れるだけの media を harness が seed していない**ため（pooza/chubo2#64）。
+  08-16 の「attachment 17 tests / omission 0」との差は**モロヘイヤ側でテストが増えた分**
+- ⚠ **rc.1 → stable の差分は harness の観点では空だった**（49 files / 24 commits・**マイグレーションなし・
+  DB スキーマ変更なし・シリアライザ変更なし**。Ruby 側は `ActivityPub::ProcessAccountService` +3-1 と
+  admin 系の文言のみ）。**見込みで昇格させず回し直した結果、08-16 の rc.1 全緑がそのまま再現した**
+- Misskey は stable 2026.7.0 据え置き。2026.8.0-alpha.0 は prerelease なので**方針どおり動かない**。
+  ⚠ **今回は Mastodon 側だけの実走**なので、[[project_harness-zero-error-goal]]（両系エラー 0）の
+  未達（#4584）は解消していない
+
+**Mastodon v4.7.0-rc.1 を 2026-08-16 に実走済み**（RC なので `verified` は昇格させない）。
+**1086 tests / 2157 assertions / 0 failures / 0 errors / 157 omissions（100% passed）**、
+DB 直読み層（account / status / attachment / postgres）も **omission 0 で全緑**。
+4.6.6 → 4.7.0-rc.1 でモロヘイヤに当たりうる 3 点（`accounts.uri` の nullable 化 + UNIQUE 張り替え、
+`account_summaries` の実テーブル化、`AccountSerializer` の `pretty_username`）は**実コードでもすべて空振り**。
+⚠ **`statuses` テーブルは 4.6.6 から無変更**（nullable になるのは `keypairs.uri`）。
+⚠ **tests / omissions の増減を Mastodon 版の影響と読まない**（母数はモロヘイヤ側の開発で動く）。詳細は台帳の 2026-08-16 節。
+⚠ **ポート 3000 の衝突と、失敗した proxy コンテナが `exited` で残って `up -d` を繰り返しても復旧しない罠**を踏んだ
+（`docker compose rm -sf proxy` で解決）。pooza/chubo2#178 で修正済み＝**両ハーネスの同時起動が可能になった**（[test-harness.md](test-harness.md)）。
+
+以下は現 `verified` の記録。**Mastodon v4.6.6 を 2026-08-14 に検証・verified 昇格**（pooza/chubo2#169 でピンも bump）。
+**本番 3 台・ステージング 3 台へは 2026-08-14 にユーザーが適用済み**で、harness 検証は後追い。
+実走は **1050 tests / 2101 assertions / 0 failures / 0 errors / 152 omissions（100% passed）**＝退行ゼロ
+（omission は v4.6.5 と同数）。⚠ **実走前に `redis-cli -n 1 UNLINK tagging_dictionary` を踏んでいる**（#4583。**2026-08-15 着地済みなので次回以降は不要**）。
+4.6.5 → 4.6.6 は **マイグレーション無し・依存無変更・シリアライザ無変更**で、モロヘイヤが叩く REST にも
+直読みするスキーマにも掛からない。⚠ **harness の `update-version.sh` がシークレット無しの `.env` を作る不具合**
+（後続の `setup.sh` が `db:prepare` で落ちる）を踏んだ。pooza/chubo2#168 として修正済み。
+
+以下は 1 つ前の昇格（v4.6.5）の記録。**Mastodon v4.6.5 を 2026-08-09 に検証・verified 昇格**（pooza/chubo2#153 クローズ）。同一の mulukhiya HEAD を v4.6.5 / v4.6.4 でクリーン再構築して実走・比較し、**失敗集合の一致＝退行ゼロ**を確認した（1001 tests / 0 errors、両版で omission 完全一致）。詳細は [harness-verified-versions.yaml](harness-verified-versions.yaml) の 2026-08-09 節。
+
+⚠ **07-30 の 879 tests / 0 failures とは比較にならない。** #4503 の可視化と harness のトークン供給で実行本数が増え、これまで走っていなかったテストが初めてアサートしている。**「前回 0 failures だったのに増えた」を退行と読まないこと。**上記 5 件の解消で Mastodon 側は再び 0 failures / 0 errors になり、**#4492 の解消で Misskey 側も 0 failures / 0 errors**（1004 tests / 141 omissions）。両系エラー 0 の目標を一度達成した。
+
+⚠ **2026-08-12 の再実走で Misskey 側が 1 failures に戻っている**（`RemoteTagHandlerTest`・#4584）。**5.33.0 の退行ではない**ことは同一コミットの連続実行で確かめてあり、「新規の失敗ゼロ」でリリースを通した。`project_harness-zero-error-goal` は**未達に戻った状態**なので、#4584 / #4583 を消化するまで「両系エラー 0」と書かないこと。
+
+### マイルストーン外の繰越（着手条件待ち）
+
+- **#4414 security: Spotify OAuth ハードニング（size:M）** — capsicum#570 復活と歩調を合わせる（全台 OFF のため単独では着手しない）
+- **#4428 test: fedi-test-harness で webhook 投稿経路をインプロセス検証する（size:M）** — chubo2#63 と対。chubo2 側の着地待ち
+
+## 次々期マイルストーン: 5.35.0
+
+**主軸は #4621（ALT 編集の完遂）。**GitHub マイルストーン作成済み（#633）。
+⚠ **バージョンバンプはまだ**（5.34.0 が進行中のため。着手時に実施する＝[[feedback_bump-version-first]]）。
+
+- **#4621 bug: ALT 編集の PUT が Mastodon で 500 → 405（主軸・size:S・2026-08-22 に 5.34.0 から繰越）** —
+  capsicum#121 の前提。**同じ経路で 2 回続けて別の欠陥を踏んだ**もので、5.34.0 では**上流 PUT が
+  405 のまま**着地させられなかった
+  - ⚠⚠ **「急ぎではないから送った」ではない。**⚠ **急ぎ**（capsicum 側で issue が挙がってから
+    **数か月未解決**）。送った理由は **5.34.0 の枠に収めるのを諦めた**ことだけで、着地に
+    pooza/ginseng-fediverse#254 のマージが要り、**もう一度 ginseng 側をせっつくのは避ける**という
+    判断をしたため（2026-08-22 ユーザー明示）。**優先度は下げていない**
+  - **欠陥 1（着地済み・5.34.0 に載る）**: `flatten_media_attributes` が `media_attributes[0][id]=...` と
+    **数字の添字**で form-urlencode していた。Rack / Rails 側で `fields_for` 形式の Hash になり配列にならず、
+    Mastodon が `TypeError` ＝ **500**。pooza/ginseng-fediverse#253（1.8.29）で JSON 化して解決
+  - **欠陥 2（未着地・#254 待ち）**: **`update_status` だけが `create_headers` を通していない**。
+    そのため**モロヘイヤ自身の PUT が `X-Mulukhiya` を名乗らず**、nginx の map のキーが
+    `PUT::media_update`（**:3008 へループ**）か `PUT::`（**reject → 405**）になる。
+    ⚠ `fetch_status` / `fetch_status_source` は通しているので 200 で返り、
+    **「補完は成功するのに PUT だけ落ちる」**という非対称になる
+  - ⚠ **本番でも同じ 405 のはず。**本番 3 台の map も Purpose を含む 3 要素キー。
+    #4474 を 2026-08-05 に直した時点では capsicum#121 が未実装で**誰も通していなかった**ため
+    表に出ていなかっただけ。**ステージング固有の話ではない**
+  - **残作業**: #254 マージ → `bundle update ginseng-fediverse`（1.8.30）→ dev24 再デプロイ →
+    capsicum と同じ PUT で **200 と ALT 反映**を確認 → クローズ
+  - ⚠ **検証用の投稿は dev24 に残してある**（`117137204800272266`・visibility=direct・
+    CW ＋閲覧注意＋添付 1・ALT は「変更前の説明」のまま）。
+    ⚠ **トークンは revoke 済み**なので再検証時は作り直す（`test` アカウントで
+    `Doorkeeper::AccessToken` を発行 → 使用後 revoke）
+  - **関連して起票**: pooza/chubo2#188（ステージング 3 台の nginx 断片が本番と乖離。
+    ⚠ **dev26 は #4474 修正前のままで外部 PUT が常に 405**・3 台とも map が `localhost`）
+
 
 ## 投稿レイテンシ調査の記録（#4464・2026-08-02 完了）
 
@@ -1000,6 +1648,14 @@ Issue #4233 の APIController 段階的リファクタは「1〜2 マイルス�
   3. **返信済み・リアクション済み** → 完了。報告不要
 - 判定方法: `gh api repos/pooza/mulukhiya-toot-proxy/pulls/{number}/comments --jq` で全コメントを取得し、Codex コメントの `id` に対する `in_reply_to_id` を持つ返信の有無、および Codex コメントへのリアクション（`reactions`）を確認する
 
+⚠ **`pulls/{number}/comments` は行に紐づくレビューコメントしか返さない。**PR 本体のコメントは
+`gh api repos/pooza/mulukhiya-toot-proxy/issues/{number}/comments` で別に取る。**open PR も対象に含めること。**
+
+- 他リポジトリ（`ginseng-*` / chubo2）の作業をしている**別セッションが、こちらの PR へ申し送りを置く**ことがある。
+  投稿者は Codex ではなく `pooza` なので、bot だけを見ていると丸ごと落ちる
+- 2026-08-20 の同期で実際に落とした: PR #4602 に「正本側（pooza/ginseng-style#11 / #12）で 4 cop を無効化したので
+  `Minitest/RefutePathExists` の固有緩和を落とせる」という申し送りが 08-19 から置かれていた（b77dd308 で消化）
+
 ### 5. Sentry の新規イシュー確認
 
 - `sentry-cli issues list` で未解決イシューを確認する（`~/.sentryclirc` に認証トークンとデフォルトプロジェクトが設定済み）
@@ -1011,20 +1667,69 @@ Issue #4233 の APIController 段階的リファクタは「1〜2 マイルス�
 
 ### 6. 外部リポジトリの同期確認（chubo2 / ginseng-*）
 
-対象は `pooza/chubo2`（インフラ）と `pooza/ginseng-*` 7 リポジトリ（モロヘイヤが依存する自作 gem 群）。
+対象は `pooza/chubo2`（インフラ）と `pooza/ginseng-*`（モロヘイヤが依存する自作 gem 群）。
+
+⚠ **ginseng-\* には専任のセッションがある**（2026-08-20 ユーザー明示）。**こちらが当番のように「担当」しない。**
+向こうの open Issue を棚卸ししたり、こちらのマイルストーンへ引き取ったりしない。
+
+⚠⚠ **ただし「Issue を投げて待つ」だけにしない（2026-08-20 ユーザー指示）。**
+**ginseng への修正・提案は、なるべく**たたき台を PR として**出す。**Issue だけ出すと、向こうは
+「依頼元が PR を出す」と読んで `waiting:pr` で止まる（pooza/ginseng-core#526 で実際に起きた）。
+判断・作り直しは向こうに委ねたうえで、動くコードとテストを添える。
+
+- **やること**: たたき台 PR の作成、送った Issue / PR の状況確認、リリースされた gem の
+  `bundle update` 追随、申し送りコメントの消化（§4 の PR 本体コメント）
+- **やらないこと**: ginseng-\* の open Issue の生死判定・優先度付け・こちらのマイルストーンへの取り込み
+- **たたき台 PR の作法**（pooza/ginseng-core#533 / #534 の形）:
+  - ⚠ **他セッションのチェックアウトを奪わない。**`~/repos/ginseng-*` は向こうが別ブランチを
+    開いていることがあるので、`git worktree add` で隔離した作業ツリーを使う
+  - ⚠ **既存の赤と比較して出す。**ginseng-core は実通信・ローカル環境依存で
+    **5 failures / 12 errors が常態**（pooza/ginseng-core#508）。「新規の赤ゼロ」を
+    main との対比で示す
+  - ⚠ **修正前の main で新テストが落ちることを確認**してから出す（回帰テストとして機能するか）
+  - 設計判断は「変えて構わない」と明示する。向こうの gem の設計はあちらのもの
+- ⚠ **モロヘイヤ側だけ直しても gem が値を捨てて届かないことがある**（#4589 / #4594 で 2 回踏んだ）。
+  その場合は「gem へ Issue/PR → 向こうで着地 → `bundle update` → 本体 PR」の順で、**依頼側として**回す
 
 #### 6-1. 毎セッション
 
 - `cd ~/repos/chubo2 && git fetch origin` + `git log HEAD..origin/main --oneline` でリモートとの差分を確認
 - `docs/infra-note.md` に変更があれば MEMORY.md のインフラセクションに反映が必要か判断
-- `gh issue list --state open` で open Issue の変動を確認（chubo2 / ginseng-* とも）
+- chubo2 の `gh issue list --state open` で open Issue の変動を確認
+- ginseng-\* は**こちらが送った Issue / PR の進捗**と、**下の「ピンのずれ」**だけ見る（一覧の棚卸しはしない）
+
+##### ginseng-\* のピンのずれを見る（2026-08-21 追加）
+
+⚠⚠ **ginseng-\* は依頼が無くても自走で更新される**（2026-08-21 ユーザー明示）。
+`Gemfile.lock` は git gem の **revision 固定**なので、**向こうが直しても `bundle update` するまで
+こちらには 1 バイトも届かない**。「Issue が close された」は**取り込み済みを意味しない**。
+
+```sh
+# ロック済み revision と各リポジトリの main HEAD を突き合わせる
+ruby -e 'File.read("Gemfile.lock").scan(%r{github\.com/pooza/(ginseng-\w+)\.git\s+revision: (\h+)}) {|n,r|
+  head = `gh api repos/pooza/#{n}/commits/main --jq .sha`.strip
+  puts "#{n}\t#{head.start_with?(r) ? "同一" : "ずれ #{r[0,8]} -> #{head[0,8]}"}" }'
+```
+
+- **ずれていたら「何が変わったか」を読む**: `gh api repos/pooza/ginseng-X/compare/<locked>...main --jq '.commits[].commit.message'`。
+  ⚠ **モロヘイヤが触る面**（`HTTP` / `Logger` / `Controller` / `TagContainer` / `Environment`）に
+  当たるかで判断する
+- **判断は 3 択**: ① すぐ取り込む（実害がある・依頼した修正の着地）② 次のマイルストーンで取り込む
+  ③ 見送る。**②③ は理由を台帳に 1 行残す**（次の同期で同じ調査をしないため）
+- ⚠ **`bundle update`（引数なし）は 8 本まとめて動く。**依頼した修正の取り込みは
+  **`bundle update <gem>` と gem 単位で**行う（赤が出たときの切り分けができなくなる）
+- ⚠ **取り込んだら `rake lint` と `rake test` を必ず通す。**「向こうが直した」は
+  「こちらで動く」ではない。逆向き（gem がこちらの値を捨てる）で 2 回踏んでいる（#4589 / #4594）
+- ⚠ **`Gemfile.lock` のルーチン最新化とは別物として扱う。**ルーチンは PR 不要（[[feedback_gemfile-lock-routine]]）
+  だが、**自走更新が混じるようになったので差分を読まずに上げない**
 
 #### 6-2. 30 日ごとの棚卸し
 
 chubo2 の [docs/infra-note.md](https://github.com/pooza/chubo2/blob/main/docs/infra-note.md) 冒頭にある
 「最終棚卸し」の日付を見る。**当日から 30 日以上経過していれば**以下を実行（経過していなければスキップ）。
 
-- 各リポジトリの open Issue を 1 件ずつ、**コード・コミット・実機と突き合わせて**生死を判定する
+- **対象は chubo2（インフラ）のみ。**⚠ **ginseng-\* は専任セッションの持ち物なので棚卸ししない**（上の注記）
+- chubo2 の open Issue を 1 件ずつ、**コード・コミット・実機と突き合わせて**生死を判定する
 - **一覧を眺めるだけでは不十分。** 2026-07-31 の初回棚卸しでは 30 件中 6 件が「既に終わっている」
   または「対象が消滅している」状態で、最古は 5 か月放置されていた（#4488）。実装が chubo-core 側の
   コミットで着地していると、タイトルからは終わっているか分からない
@@ -1236,21 +1941,14 @@ capsicum 側で先行運用しており、v1.18 のレビューでは 5 観点�
 
 5観点並列レビュー導入（5.19.0〜）以降、レビュー由来の小粒 Issue（仕様補足・docs 修正・単発バリデーション）が大量に発生するようになり、件数では実態を反映しなくなった。**サイズラベル + 重み予算**で管理する。
 
-#### サイズラベル
+#### サイズラベルと重み予算
 
-| ラベル | 想定差分 | 重み |
-| --- | --- | --- |
-| `size:S` | 50 行未満 / 単発バリデーション・小バグ修正・docs 修正 | 1 |
-| `size:M` | 50〜200 行 / 新メソッド・リファクタ単位・契約変更 | 3 |
-| `size:L` | 200 行超 / 新エンドポイント・スキーマ変更・複数ファイル横断 | 8 |
+⚠ **正本は [pooza/ginseng-style](https://github.com/pooza/ginseng-style) の `docs/workflow.md`**（`size:S` = 1 / `size:M` = 3 / `size:L` = 8、1 マイルストーンの目安 20〜25 重み）。
 
-新規 Issue 起票時にいずれかを付ける。既存 Issue にも遡及付与する。
+モロヘイヤ固有の補足:
 
-#### 重み予算
-
-- 1 マイルストーンの目安: **20〜25 重み**（従来「10 件前後」と接続する感覚値。M を基準に S が混在する想定）
+- 目安の 20〜25 は、従来「10 件前後」と接続する感覚値（M を基準に S が混在する想定）
 - 上限を超えそうな Issue は次のマイナーバージョンへ送る（緑送り扱い）
-- 計画書は作成せず、Issue ＋ マイルストーン ＋ 重み合計で管理する
 
 #### 主軸宣言（任意）
 
@@ -1435,12 +2133,17 @@ SSH経由で操作可能。接続情報は `~/.ssh/config` で管理（リポジ
 
 ## コーディング規約
 
-- rubocop, slim_lint, erb_lint に準拠
-- 機能追加・バグ修正には対応するテストを書くこと（CIで実行可能な範囲で。DB依存・外部API依存のテストは無理に書かなくてよい）
-- テスト: test-unit (Mulukhiya::TestCase 基底クラス)
-- モック: WebMock (`require 'webmock/test_unit'` でtest-unitと統合済み。デフォルトはネット許可、モック使用テストで `WebMock.disable_net_connect!` を明示呼出)
-- 設定アクセス: `config['/path/to/key']` (Ginsengのスラッシュ記法)
-- ハンドラー設定: `handler_config(:key)` (5.0でシンボル記法に統一完了、ネストはYAML構造で表現)
+⚠ **Ruby の書き方・テストの基本方針・表記規約の正本は [pooza/ginseng-style](https://github.com/pooza/ginseng-style) の `docs/`。** RuboCop 設定も同リポジトリの `config/rubocop.yml` を `inherit_gem` している（モロヘイヤの `.rubocop.yml` には固有の差分だけがある）。以下はモロヘイヤ固有の項目だけを置く。
+
+- `docs/ruby.md` — 暗黙の return を使わない／論理的 2 スペース／`return` に多行チェインを繋がない理由／`disable?` パターン／文字列のエンコーディング
+- `docs/writing.md` — 用語・パスとキーの書き方・⚠ マーカーの使い方
+- `docs/workflow.md` — Issue 駆動・ブランチ・サイズラベルと重み予算・`ginseng-*` の変更手順
+
+### モロヘイヤ固有
+
+- slim_lint, erb_lint にも準拠する（`rake lint` に含まれる）
+- テストの基底クラスは `Mulukhiya::TestCase`
+- ハンドラー設定: `handler_config(:key)`（5.0でシンボル記法に統一完了、ネストはYAML構造で表現）
 
 ### テスト作成ガイド
 
@@ -1485,17 +2188,10 @@ CIでは `config/local.yaml` に `controller: mastodon|misskey` のみ設定さ�
 
 ### RuboCopに含まれない個人規約
 
-以下はユーザーから都度指示される。指示があり次第ここに追記する。
-
-- メソッド末尾でも `return` を省略しない（暗黙のreturnを使わない）
-- インデントは常に2スペース。見栄えのための位置揃え（代入の右辺にcase/if式を置いて深くインデントする等）は使わない。`x = case ...` ではなく、各分岐内で個別に代入する
+⚠ **正本は [pooza/ginseng-style](https://github.com/pooza/ginseng-style) の `docs/ruby.md`。** 新しい指示が出たらそちらへ追記する（モロヘイヤだけの話ではないため）。
 
 ### ドキュメント表記規約
 
-- **設定ファイルのパス**: ディレクトリを含めて表記する（`local.yaml` → `config/local.yaml`）
-- **設定キーの参照**: Ginseng のスラッシュ記法で表記する（`service:` や `sidekiq.auth.user` ではなく `/service`、`/sidekiq/auth/user`）
-- **サーバーの呼称**: 「インスタンス」ではなく「サーバー」を使う
-- **UI の呼称**: 「UI」ではなく「WebUI」を使う
-- **IP の表記**: 単独で使わず「IP アドレス」と表記する。**理由: 「IP」はプロトコルの名前であって、アドレスを指す語ではない。**略した結果べつの概念を指してしまう省略は避ける（JavaScript を Java と呼んではいけないのと同じ）。⚠ **文書では例外なく守る。**コード内のコメントは目を瞑るが、揃えられるなら揃える
+⚠ **正本は [pooza/ginseng-style](https://github.com/pooza/ginseng-style) の `docs/writing.md`**（用語・パスとキーの書き方・⚠ マーカーの使い方・クロスリポジトリの Issue 参照）。以下はモロヘイヤ固有の呼称だけを置く。
+
 - **ボットの呼称**: 英名（`info_bot` 等）ではなく日本語の役割名（「お知らせボット」等）を使う
-- **ファイル参照**: サンプルファイルやテンプレート等への参照はマークダウンリンクにする

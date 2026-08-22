@@ -1014,6 +1014,27 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    post '/admin/program/entry/:key/next_on/advance' do
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.livecure?
+      entry = Program.instance.advance_next_on(params[:key], days: params[:days])
+      @renderer.message = {key: params[:key], entry:}
+      return @renderer.to_s
+    rescue => e
+      # 409 (auto_update? 有効時 / 書き込みロック競合 #4534) と 422 (days が不正)
+      # はいずれも期待動作。⚠ **クライアント起因を alert に上げない** (#4542 と同型)。
+      if e.is_a?(Ginseng::ConflictError)
+        Logger.new.info(program_entry: {event: 'conflict', key: params[:key], message: e.message})
+      elsif e.is_a?(Ginseng::ValidateError)
+        Logger.new.info(program_entry: {event: 'invalid', key: params[:key], message: e.message})
+      else
+        e.alert
+      end
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     get '/admin/handler/list' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
       @renderer.message = Handler.all.map do |handler|
@@ -1182,28 +1203,42 @@ module Mulukhiya
       })
     end
 
+    # webfinger → actor の 2 段取得 (#4198)。**外部から与えられた acct のホストへ
+    # モロヘイヤが接続する**経路なので、SSRF ガードは 2 重に要る (#4576):
+    #
+    #   1. 取得前の事前判定 (RemoteHost.validate!) — 拒否をここで確定させる
+    #   2. 取得中の各ホップ検証 + pinning (host_validator)
+    #
+    # ⚠ **事前判定だけでは足りない。**host_validator を渡さないと Ginseng::HTTP は
+    # 素の HTTParty 経路へ落ち、**既定でリダイレクトを追従する**（limit 5）。
+    # 攻撃者のホストが `302 Location: http://127.0.0.1:9200/` を返せば、
+    # 検証済みホストの裏から内部サービスへ到達できる (#4410 と同じ形)。
+    # ⚠ **pinning が無いと名前を二度引くことになる。**検証時だけ公開アドレスを
+    # 返し、接続時に 127.0.0.1 を返す DNS リバインディングが通る (#4524)。
+    #
+    # ⚠ **拒否は nil ではなくログを残して nil。**呼び出し元は acct ごとに nil を
+    # 「判定不能」として返すので、黙って nil にすると攻撃の試行が一切見えない。
     def fetch_actor(http, acct)
-      return nil unless valid_remote_host?(acct.host)
+      RemoteHost.validate!(acct.host)
       url = "https://#{acct.host}/.well-known/webfinger?resource=acct:#{acct}"
       webfinger = fetch_json(http, url, 'application/jrd+json')
       actor_uri = webfinger['links']&.find do |l|
         l['type'] == 'application/activity+json'
       end&.dig('href')
       return nil unless actor_uri
-      actor_host = Ginseng::URI.parse(actor_uri)&.host
-      return nil unless valid_remote_host?(actor_host)
+      RemoteHost.validate!(Ginseng::URI.parse(actor_uri)&.host.to_s)
       return fetch_json(http, actor_uri, 'application/activity+json')
-    rescue
+    rescue => e
+      e.log(acct: acct.to_s)
       return nil
     end
 
     def fetch_json(http, url, accept)
-      response = http.get(url, {headers: {'Accept' => accept}}).parsed_response
+      response = http.get(url, {
+        headers: {'Accept' => accept},
+        host_validator: RemoteHost.validator,
+      }).parsed_response
       return response.is_a?(String) ? JSON.parse(response) : response
-    end
-
-    def valid_remote_host?(host)
-      return RemoteHost.public?(host)
     end
   end
 end

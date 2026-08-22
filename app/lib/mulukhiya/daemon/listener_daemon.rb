@@ -2,6 +2,7 @@ module Mulukhiya
   class ListenerDaemon < Ginseng::Daemon
     include Package
     include SNSMethods
+    extend DaemonHealthMethods
 
     def start(args = [])
       save_config
@@ -29,8 +30,7 @@ module Mulukhiya
     def self.health
       pid_path = File.join(Environment.dir, 'tmp/pids/ListenerDaemon.pid')
       if File.exist?(pid_path)
-        pid = File.read(pid_path).to_i
-        raise "PID '#{pid}' was dead" unless Process.alive?(pid)
+        assert_pid_alive!(File.read(pid_path).to_i)
       else
         unless system('pgrep', '-f', 'listener_daemon.rb',
           out: File::NULL, err: File::NULL)
