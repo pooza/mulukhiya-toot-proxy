@@ -1,26 +1,44 @@
 module Mulukhiya
   # ALT 編集の可否フラグ (#4636)。
   #
-  # ⚠ **モロヘイヤの版番号では決まらない。**刺している ginseng-fediverse が
-  # 1.8.30 未満だと、モロヘイヤ自身の上流 PUT が `X-Mulukhiya` を名乗らず
-  # nginx の map に弾かれて 405 になる (#4621)。ゲートが**実際にブロックする**
-  # ことを正面から確かめる。
+  # 通るには 2 つの前提が要り、**どちらもモロヘイヤの版番号では判定できない**:
+  # nginx の map が是正済みか (#4474・サーバーごとに乖離する) と、刺している
+  # ginseng-fediverse が 1.8.30 以降か (#4621)。どちらのゲートも**実際に
+  # ブロックする**ことを正面から確かめる。
   class ControllerMediaUpdateTest < TestCase
+    CAPABILITY_PATH = '/mastodon/capabilities/media_update'.freeze
+
     def test_blocked_by_old_fediverse
-      with_fediverse_version('1.8.29') do
-        assert_false(MastodonController.media_update?)
+      with_capability(true) do
+        with_fediverse_version('1.8.29') do
+          assert_false(MastodonController.media_update?)
+        end
       end
     end
 
-    def test_enabled_by_fixed_fediverse
-      with_fediverse_version('1.8.30') do
-        assert_true(MastodonController.media_update?)
+    # nginx の経路が未是正のサーバー (pooza/chubo2#188) は、gem が新しくても
+    # 上流 PUT が 405 になる。opt-in が無ければ名乗らない。
+    def test_blocked_without_capability
+      with_capability(false) do
+        with_fediverse_version('1.8.30') do
+          assert_false(MastodonController.media_update?)
+        end
+      end
+    end
+
+    def test_enabled_by_capability_and_fixed_fediverse
+      with_capability(true) do
+        with_fediverse_version('1.8.30') do
+          assert_true(MastodonController.media_update?)
+        end
       end
     end
 
     def test_enabled_by_newer_fediverse
-      with_fediverse_version('1.9.0') do
-        assert_true(MastodonController.media_update?)
+      with_capability(true) do
+        with_fediverse_version('1.9.0') do
+          assert_true(MastodonController.media_update?)
+        end
       end
     end
 
@@ -34,12 +52,27 @@ module Mulukhiya
 
     # gem が読み込まれていない構成では「分からない」を false へ倒す。
     def test_false_without_fediverse_gem
-      with_fediverse_spec(nil) do
-        assert_false(MastodonController.media_update?)
+      with_capability(true) do
+        with_fediverse_spec(nil) do
+          assert_false(MastodonController.media_update?)
+        end
       end
     end
 
+    # 既定は fail-closed。サーバーごとに local.yaml で opt-in する。
+    def test_capability_defaults_to_false
+      assert_false(config[CAPABILITY_PATH])
+    end
+
     private
+
+    def with_capability(value)
+      original = config[CAPABILITY_PATH]
+      config[CAPABILITY_PATH] = value
+      yield
+    ensure
+      config[CAPABILITY_PATH] = original
+    end
 
     def with_fediverse_version(version, &)
       with_fediverse_spec(Struct.new(:version).new(Gem::Version.new(version)), &)

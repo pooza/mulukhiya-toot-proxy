@@ -1225,16 +1225,25 @@ capsicum が ALT 編集の導線を出してよいかの判定フラグ。**モ�
 （同じ `5.34.0` でも刺している ginseng-fediverse のピン次第で動いたり動かなかったりし、
 capsicum 側からは観測できない）ため、**gem の版を実行時に見るゲート**にした。
 
-- `ControllerMethods::MEDIA_UPDATE_FEDIVERSE_VERSION`（`1.8.30`）と
-  `Gem.loaded_specs['ginseng-fediverse'].version` を比較する。定数化＋
-  「**実際にブロックする**」正テスト（1.8.29 → false）は [[feedback_fail-open-guard-footgun]] の形
+- 前提は **2 つ**あり、**どちらもモロヘイヤの版番号では判定できない**:
+  1. **nginx の経路**（map が Purpose を含む 3 要素キーへ是正済みか・#4474）。モロヘイヤからは
+     観測できないので `/mastodon/capabilities/media_update` の **opt-in** として受ける。
+     ⚠ **既定は `false`**（未是正のサーバーが実在する＝ pooza/chubo2#188。Codex P2 の指摘で
+     `true` 既定から是正した。「gem を上げただけで動くと名乗る」のは fail-closed に反する）
+  2. **gem の版**。`ControllerMethods::MEDIA_UPDATE_FEDIVERSE_VERSION`（`1.8.30`）と
+     `Gem.loaded_specs['ginseng-fediverse'].version` を比較する
+- 定数化＋「**実際にブロックする**」正テスト（1.8.29 → false / opt-in なし → false）は
+  [[feedback_fail-open-guard-footgun]] の形
 - ⚠ **Misskey は常に false。**ALT 編集の経路（`PUT /api/:version/statuses/:id`）は
   `MastodonController` にしか無いので capability を置いていない
 - ⚠ **「分からない」は false へ倒す。**フラグ欠落・古い gem・gem 未ロードのいずれも false。
   壊れる側の代償が「投稿から添付が全部外れ CW も消える」（#4589）ため
-- ⚠ **現行ピン（1.8.29）では false のまま出る。**#254 が着地して
-  `bundle update ginseng-fediverse` した時点で true へ変わる＝ **#4621 のクローズと同時**。
-  リリース前に値を確認すること（false のまま出荷すると capsicum は導線を出さない）
+- ⚠ **現行ピン（1.8.29）＋ opt-in なしで false のまま出る。**true にするには
+  **① #254 の着地 → `bundle update ginseng-fediverse` と ② 各サーバーの `local.yaml` へ
+  `/mastodon/capabilities/media_update: true`** の両方が要る。②は nginx の map を
+  確認してから（本番 3 台は 2026-08-05 に是正済み・ステージング 3 台は未是正）
+- ⚠ **デプロイ手順に ② が要る。**Mastodon 3 台（shallu / zugoga / gomander）が対象。
+  vulcan は Misskey なので対象外。false のまま出荷すると capsicum は導線を出さない
 
 ### 2026-08-23 セッション同期の記録
 

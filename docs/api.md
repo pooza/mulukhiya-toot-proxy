@@ -113,7 +113,7 @@ SNS 本体への転送が失敗した場合、SNS が返したステータスコ
 | `features.word_suggest`（`/word_suggest/urls` 設定時に有効） | `/word/suggest` |
 | `features.nowplaying_resolver`（常時 `true`） | `/nowplaying/resolve` |
 | `features.compose_templates`（常時 `true`。#4457 未デプロイのバージョンではキー自体が欠落し capsicum は false 判定して導線を出さない） | `/compose/templates`（GET/POST/PUT/DELETE） |
-| `features.media_update`（Mastodon かつ ginseng-fediverse 1.8.30 以降が刺さっているときだけ `true`。ALT 編集が実際に通るかの判定。⚠ **モロヘイヤの版番号では代用できない**） | `PUT /api/:version/statuses/:id`（`X-Mulukhiya-Purpose: media_update`） |
+| `features.media_update`（Mastodon ＋ `/mastodon/capabilities/media_update` の opt-in ＋ ginseng-fediverse 1.8.30 以降。既定は `false`。⚠ **モロヘイヤの版番号では代用できない**） | `PUT /api/:version/statuses/:id`（`X-Mulukhiya-Purpose: media_update`） |
 | `features.spotify_enabled`（`/service/spotify/oauth/user_oauth_enabled` + 資格情報設定時に有効） | `/spotify/oauth_uri`, `/spotify/auth`, `/spotify/currently_playing` |
 | `features.spotify_linked`（当該ユーザーが Spotify 連携済みか） | `/spotify/currently_playing` |
 
@@ -370,9 +370,12 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
 
 **`features.media_update`**: 投稿済みメディアの ALT 編集（`PUT /api/:version/statuses/:id` に `X-Mulukhiya-Purpose: media_update` を添えて送る経路）が、**この構成で実際に通るか**（#4636）。capsicum は本フラグで ALT 編集の導線を出し分ける（pooza/capsicum#999）。
 
-⚠ **モロヘイヤの版番号では判定できない。**通るかどうかは刺している ginseng-fediverse の版で決まるため、同じ `5.34.0` でもピン次第で動いたり動かなかったりする。1.8.29 までは `update_status` だけが `create_headers` を通しておらず、モロヘイヤ自身の上流 PUT が `X-Mulukhiya` を名乗らないため nginx の map に弾かれて **405** になる（#4621、pooza/ginseng-fediverse#254 で是正・1.8.30）。
+⚠ **モロヘイヤの版番号では判定できない。**前提が 2 つあり、どちらもサーバーごとに変わる:
 
-⚠ **「分からない」は false 側へ倒す。**フラグが欠落しているバージョン・Misskey・古い gem では `false` になる。壊れる側の代償が「投稿から添付が全部外れ CW も消える」（#4589）なので、判定できない構成では導線を出させない。
+1. **nginx の経路**（`$status_put_backend` map が Purpose を含む 3 要素キーへ是正済みか・#4474）。モロヘイヤからは観測できないため、`config/local.yaml` の `/mastodon/capabilities/media_update` による**明示的な opt-in** として受ける。**既定は `false`**（未是正のサーバーが実在する＝ pooza/chubo2#188）
+2. **刺している ginseng-fediverse の版**。1.8.29 までは `update_status` だけが `create_headers` を通しておらず、モロヘイヤ自身の上流 PUT が `X-Mulukhiya` を名乗らないため、1. が是正済みでも map のキーが `PUT::` に落ちて **405** になる（#4621、pooza/ginseng-fediverse#254 で是正・1.8.30）
+
+⚠ **「分からない」は false 側へ倒す。**フラグが欠落しているバージョン・Misskey・opt-in なし・古い gem のいずれも `false`。壊れる側の代償が「投稿から添付が全部外れ CW も消える」（#4589）なので、判定できない構成では導線を出させない。
 
 #### GET /mulukhiya/api/emoji/palettes
 

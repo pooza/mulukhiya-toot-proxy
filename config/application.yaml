@@ -341,7 +341,7 @@ mastodon:
     video_codecs:
       - h264
   capabilities:
-    media_update: true
+    media_update: false
     repost: true
     streaming: true
   data:
