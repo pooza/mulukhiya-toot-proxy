@@ -49,14 +49,14 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-piefed.git
-  revision: 56208ffd262652788eb0a3d2ff8e34df410d0b0f
+  revision: 4c09c50c42344c89bf9ad5d034916ef0b6ba9904
   branch: main
   specs:
     ginseng-piefed (0.1.1)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
-  revision: d888c0d84cfafc1946dc0525968a9c6eab7cada7
+  revision: ecc7a8fb9902dad91e99892aad2862930aad4a54
   branch: main
   specs:
     ginseng-postgres (1.3.17)
@@ -65,7 +65,7 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-redis.git
-  revision: ce1d0bf17380f9e7a563745bfe635c233a121904
+  revision: 6e0f74efd3a3ae2b65ff4d7639c33c74cb29ecca
   branch: main
   specs:
     ginseng-redis (2.0.5)
@@ -73,7 +73,7 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-style.git
-  revision: 2474936f5598640c9cf8464f71195c2bb03e4309
+  revision: 956e0a68e74da44e9d94cac40b4039fc3a38052f
   branch: main
   specs:
     ginseng-style (1.0.0)
@@ -84,7 +84,7 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: 7f0afdc237786e96e7f847e052bb76246a317bf2
+  revision: a79343178426449195e0edc38a06cbc090c2c500
   branch: main
   specs:
     ginseng-web (1.3.46)
@@ -100,7 +100,7 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-youtube.git
-  revision: 453a25139a2de765c6f9ad03d450f5053bddfcba
+  revision: 44e3a53434236b7064c4e0454965d5eec78ed0ca
   branch: main
   specs:
     ginseng-youtube (2.0.1)
@@ -329,14 +329,14 @@ GEM
     pg (1.6.3-aarch64-linux)
     pg (1.6.3-arm64-darwin)
     pg (1.6.3-x86_64-linux)
-    power_assert (3.0.1)
+    power_assert (3.1.0)
     prism (1.9.0)
     public_suffix (7.0.5)
     puma (8.0.2)
       nio4r (~> 2.0)
     raabro (1.5.0)
     racc (1.8.1)
-    rack (3.2.6)
+    rack (3.2.7)
     rack-protection (4.2.1)
       base64 (>= 0.1.0)
       logger (>= 1.6.0)
@@ -422,7 +422,7 @@ GEM
     sequel (5.107.0)
       bigdecimal
     set (1.1.3)
-    sidekiq (8.1.6)
+    sidekiq (8.1.7)
       connection_pool (>= 3.0.0)
       json (>= 2.16.0)
       logger (>= 1.7.0)
@@ -441,7 +441,7 @@ GEM
     slim (5.2.2)
       temple (~> 0.10.0)
       tilt (>= 2.1.0)
-    slim_lint (0.36.0)
+    slim_lint (0.37.0)
       rexml (~> 3.2)
       rubocop (>= 1.0, < 2.0)
       slim (>= 3.0, < 6.0)
@@ -450,11 +450,11 @@ GEM
       version_gem (~> 1.1, >= 1.1.14)
     syslog (0.4.0)
       logger
-    temple (0.10.6)
+    temple (0.10.7)
     test-unit (3.7.8)
       power_assert
     thor (1.5.0)
-    tilt (2.8.0)
+    tilt (2.9.0)
     time (0.4.2)
       date
     timecop (0.9.11)
@@ -467,7 +467,7 @@ GEM
     uri (1.1.1)
     useragent (0.16.11)
     version_gem (1.1.15)
-    webmock (3.26.2)
+    webmock (3.26.3)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
