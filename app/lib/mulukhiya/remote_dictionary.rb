@@ -24,11 +24,17 @@ module Mulukhiya
     def fetch
       response = @http.get(uri)
       parsed = response.parsed_response
-      raise Ginseng::GatewayError, "empty response (#{uri})" unless parsed.present?
+      # ⚠⚠ **URI を例外メッセージへ埋めない (#4630)。**`Ginseng::Logger#mask_url` は
+      # `URL_PATTERN` を `\A` アンカーで見るので、マスクが効くのは
+      # **値そのものが URL である文字列**だけ。文中に埋めると
+      # `?access_token=` 付きの辞書 URL がそのまま syslog に残る。
+      # ⚠ 同じ URL を `log_invalid_schema` の `url:` では `[FILTERED]` にしているのに
+      # 例外メッセージ側だけ平文、という非対称になっていた。
+      # URI はサブクラスの `e.log(dic: uri.to_s)`（マスクが効く）側に任せる。
+      raise Ginseng::GatewayError, 'empty response' unless parsed.present?
       return parsed if valid_schema?(parsed)
       log_invalid_schema(response, parsed)
-      raise Ginseng::GatewayError,
-        "unexpected response type '#{parsed.class.name}' (#{uri})"
+      raise Ginseng::GatewayError, "unexpected response type '#{parsed.class.name}'"
     end
 
     # サブクラスが `parse` で前提にしている型。
