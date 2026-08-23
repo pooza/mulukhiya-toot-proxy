@@ -1,5 +1,5 @@
 label: PieFedブックマーク
-description: PieFedインスタンスにブックマークを作成します
+description: PieFedサーバーにブックマークを作成します
 properties:
   disabled:
     type: boolean
