@@ -934,13 +934,7 @@ module Mulukhiya
       @renderer.message = {key:, entry:}
       return @renderer.to_s
     rescue => e
-      if e.is_a?(Ginseng::ConflictError)
-        # 409 (auto_update? 有効時 / 重複キー / 書き込みロック競合 #4534) は
-        # 期待動作のため Sentry alert 不要
-        Logger.new.info(program_entry: {event: 'conflict', key: params[:key], message: e.message})
-      else
-        e.alert
-      end
+      handle_program_entry_error(e, params[:key])
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -962,13 +956,7 @@ module Mulukhiya
       @renderer.message = {key: params[:key], entry:}
       return @renderer.to_s
     rescue => e
-      if e.is_a?(Ginseng::ConflictError)
-        # 409 (auto_update? 有効時 / 書き込みロック競合 #4534) は期待動作のため
-        # Sentry alert 不要
-        Logger.new.info(program_entry: {event: 'conflict', key: params[:key], message: e.message})
-      else
-        e.alert
-      end
+      handle_program_entry_error(e, params[:key])
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -982,13 +970,7 @@ module Mulukhiya
       @renderer.message = {key: params[:key], entry:}
       return @renderer.to_s
     rescue => e
-      if e.is_a?(Ginseng::ConflictError)
-        # 409 (auto_update? 有効時 / 書き込みロック競合 #4534) は期待動作のため
-        # Sentry alert 不要
-        Logger.new.info(program_entry: {event: 'conflict', key: params[:key], message: e.message})
-      else
-        e.alert
-      end
+      handle_program_entry_error(e, params[:key])
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -1002,13 +984,7 @@ module Mulukhiya
       @renderer.message = {key: params[:key], entry:}
       return @renderer.to_s
     rescue => e
-      if e.is_a?(Ginseng::ConflictError)
-        # 409 (auto_update? 有効時 / 書き込みロック競合 #4534) は期待動作のため
-        # Sentry alert 不要
-        Logger.new.info(program_entry: {event: 'conflict', key: params[:key], message: e.message})
-      else
-        e.alert
-      end
+      handle_program_entry_error(e, params[:key])
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -1021,15 +997,7 @@ module Mulukhiya
       @renderer.message = {key: params[:key], entry:}
       return @renderer.to_s
     rescue => e
-      # 409 (auto_update? 有効時 / 書き込みロック競合 #4534) と 422 (days が不正)
-      # はいずれも期待動作。⚠ **クライアント起因を alert に上げない** (#4542 と同型)。
-      if e.is_a?(Ginseng::ConflictError)
-        Logger.new.info(program_entry: {event: 'conflict', key: params[:key], message: e.message})
-      elsif e.is_a?(Ginseng::ValidateError)
-        Logger.new.info(program_entry: {event: 'invalid', key: params[:key], message: e.message})
-      else
-        e.alert
-      end
+      handle_program_entry_error(e, params[:key])
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -1231,6 +1199,31 @@ module Mulukhiya
     rescue => e
       e.log(acct: acct.to_s)
       return nil
+    end
+
+    # 番組表編集 5 本の rescue (#4629)。
+    #
+    # ⚠⚠ **`AuthError` と `NotFoundError` が `else` へ落ちて alert していた。**
+    # 無効トークン・非管理者トークンで叩かれるたびに Sentry イベントと管理者への
+    # アラートメールが飛ぶ形で、#4594 でボットの 401 連打が実際にメール化したのと
+    # 同じ。非 livecure サーバーへの誤アクセスも 404 で毎回鳴っていた。
+    #
+    # ⚠ **同じ rescue が 5 本に複写されていたのが取りこぼしの原因**なので、
+    # クラスを足すのではなくヘルパへ寄せた。判定の本体は `report_error`
+    # （ステータスで見るので新しい 4xx を投げても漏れない）。
+    #
+    # 409 / 422 だけ構造化ログを残すのは、期待動作として頻度を追いたいため。
+    def handle_program_entry_error(error, key)
+      case error
+      when Ginseng::ConflictError
+        # 409 (auto_update? 有効時 / 重複キー / 書き込みロック競合 #4534)
+        Logger.new.info(program_entry: {event: 'conflict', key:, message: error.message})
+      when Ginseng::ValidateError
+        # 422 (days が不正 等)
+        Logger.new.info(program_entry: {event: 'invalid', key:, message: error.message})
+      else
+        report_error(error)
+      end
     end
 
     def fetch_json(http, url, accept)

@@ -2,6 +2,93 @@
 
 CLAUDE.md から分離した過去のリリースノート。直近リリースは [CLAUDE.md](../CLAUDE.md) を参照。
 
+## リリース済み: 5.31.0（2026-08-07）
+
+重篤な不具合の解消を主軸に、capsicum の後続タスクと番組表機能を束ねた回。
+優先順は「**重篤な不具合 → capsicum の後続タスクがあるもの → 番組表関連**」で消化した。
+依存する ginseng-core も 1.15.31 → 1.15.34 へ（pooza/ginseng-core#495 / #498）。
+
+### 1. 重篤な不具合（主軸）
+
+- **#4474 nginx が `X-Mulukhiya-Purpose` 付きの PUT を 405 で弾く** — 本番 3 台で capsicum からの ALT 編集が不通だった。2026-08-05 に本番 3 台 + ステージングで復旧。サンプル vhost（#4475）・docs（#4517）も着地
+- **#4511 security/obs: listener が streaming URL をアクセストークン付きで平文ログに書く（size:M）** — ginseng-core 1.15.32 + `config/application.yaml` の `/logger/mask_query_params`（#4518）。**リリース前レビューで「Misskey はボディのキー `i` で渡す＝主たる載り場所が空いていた」ことが判明**し、`Controller::SCRUBBED_LOG_PARAMS` を追加（#4533）
+- **#4506 並行性: `disable?` を持つ定期 worker 7 本が perform で短絡していない** — #4519。sidekiq-scheduler は `perform_async` を介さず `Sidekiq::Client.push` を直接叩くため gate を通らない
+- **#4487 bug: トークン未設定のアカウントでも webhook URL が生成される（size:S）** — #4522、Codex P2（壊れた行で走査が止まる）を #4525 で追加是正
+- **#4523 security: リモート取得の HEAD プリフライトが SSRF allowlist を通っていない** — #4528 + pooza/ginseng-core#495（1.15.33）。#4410 で GET は塞いだが、**その 1 行上の HEAD が素通り**していた。Codex レビューの取り残しから発見（[[feedback_codex-review-window-too-narrow]]）
+
+インフラ側の対の課題として **pooza/chubo2#131**（pgbouncer の `max_client_conn` / `default_pool_size` が未管理・既定 100 のまま）がある。
+2026-08-02 06:09 JST に `FeedUpdateWorker` が `no more connections allowed (max_client_conn)` で全滅した実績があり、**ニチアサ窓の約 2.5 時間前**だった。
+モロヘイヤ側からはサブプロセス（`bin/*.rb` 19 本）の接続バーストが疑わしいので、chubo2 の調査と突き合わせる。
+
+### 2. capsicum の後続タスク
+
+- **#4491 docs/api.md に `POST /mulukhiya/api/status/tags` のレスポンス仕様を明記する** — #4521（capsicum#909 のブロック解除）。Codex P2（**他人の投稿は 404 ではなく 403**）を #4525 で追加是正
+- **#4480 refactor: 上流エラー包絡を捨てず透過する（size:M）** — 第 1 層 pooza/ginseng-core#498（`GatewayError#response` / `#source_body`）+ 第 2・3 層 #4527。棚卸し 5 件すべて回収。**⚠ `APIController`（モロヘイヤ独自 API）の rescue は scope 外で未着手**なので Issue は open のまま
+  - 🔴 **本リリース最大の破壊的変更**: ゲートウェイエラーの `error` の型が **Misskey ではオブジェクト、Mastodon では文字列**になる
+
+### 3. 番組表関連
+
+- **#4373 番組表エントリに「次回放送日」を持たせ iCalendar を正しい日に出す** — #4529。**仕様を起票時の `frequency` + `weekday` から `next_on`（次回放送日）1 フィールドへ変更した。**
+  - ⚠ **曜日ルールは却下済み・再提案しない。** fail-open で、更新を忘れると**古い話数のまま毎週誤発火する**。価値が話数である以上それは鳴らないより悪い。`next_on` は fail-closed で黙り、エディタの警告バッジで気づける
+  - デルムリン丼の公式再放送が終了し、durable な対象はキュアスタ！のウィークリー 1 枠。**この機能は実質キュアスタ！のためのもの**
+  - `var/program.yaml` の YAML footgun 2 件（無クォート日付の `Psych::DisallowedClass`、`20:30` の 60 進数解釈）も同時に塗りつぶした
+  - 詳細は MEMORY `project_program-ics-shelved`
+- **#4484 番組表エディタの一覧表に「有効」トグルボタンを付ける（size:S）** — #4526
+
+### リリース前 5 観点レビュー（2026-08-06 実施・是正済み）
+
+**赤 4 件・是正は #4533。** `rake lint` 全緑、`rake test` 873 件 0 failures / 0 errors。
+
+- **🔴 Misskey のアクセストークンが request ログに平文で残る** — `i` は Misskey が**ボディのキー**で渡すが、`/logger/mask_query_params` は URL のクエリにしか効かない。#4511 はクエリ側しか塞いでおらず、トークンの主たる載り場所が空いていた。**dev27 のログで実在を確認**。`Controller::SCRUBBED_LOG_PARAMS` に `i` / `access_token` を追加。⚠ **これを止めない限り、デプロイ後のログ掃除は掃除した端から再汚染される**
+- **🔴 `docs/api.md` が #4480 / #4491 に追随していない 3 件** — ①ゲートウェイエラーの `error` が **Misskey ではオブジェクト、Mastodon では文字列**になる（5.31.0 最大の破壊的変更なのに未記載）②`favorites/create` の冪等丸めが `ALREADY_FAVORITED` 限定に変わった ③`/status/tags` は docs が「上流のステータス」なのに実装は常に 502 だった（実装を `source_status` へ揃えた）
+- **不正な `next_on` の fail-closed 化** — `Date::Error` を握って**毎日扱い**へ倒れていた。曜日ルールを却下した理由がそのまま当たり、しかも毎日鳴る。エディタの stale 判定も素の文字列比較で、`2026-02-31` を「過去日（通知は止まっています）」と表示しながら実際は毎日発火していた（表示と挙動が真逆）。過去日と不正値を別バッジに分離
+- **番組表エディタの二度押し防止** — 「次回」の二度押しは話数 +2・`next_on` +14 日で**その週の VEVENT が消える**。送信中は ＋ / トグル / 削除を `disabled` に
+
+黄・緑の送り先: **#4534**（番組表書き込みの無ロック RMW・サーバー側ロック）/ **#4535**（`ShortenedURLHandler` の SSRF、pre-existing・#4523 と同型）/ **#4536**（`disable_gate` テストの盲点）/ **#4537**（緑まとめ）。
+
+### Codex レビューの棚卸し（2026-08-07）
+
+直近 15 PR を横断でリアクション 0 走査（[[feedback_codex-review-window-too-narrow]]）。取り残し 4 件のうち 3 件を処理済み。
+
+- **#4527 P1 / #4528 P1（`Gemfile.lock` が ginseng-core 1.15.32 のまま）** — lock は既に **1.15.34** なので解消済み。👍 を付けて処理済みに
+- **#4538 P2（`toLocaleDateString('en-CA')` が ISO を保証しない）** — #4539 で是正。`M/D/YYYY` へ落ちると `isStaleNextOn` の字句比較が逆転し、未来日を「過去日」と誤表示する（`2027-01-01` < `8/6/2026`）。`Intl.DateTimeFormat#formatToParts` で明示的に組む
+- **#4527 P2（`ClippingWorker#create_body` が上流の `GatewayError` を握り潰す）** — **2026-08-07 に却下（👎）**。詳細は 5.32.0 節
+
+### ステージング検証（省略不可・2 回実施）
+
+**1 回目（2026-08-06）**: dev24-27 全 4 台で develop=5.31.0・health 200・外部 HTTPS 200。実機で機械的に潰した項目:
+
+- **#4373** — dev25 で `RACK_ENV=production` 実行し、`next_on` 未設定＝当日 20:00 / 未来日＝その日 / **過去日＝出力されない**を確認
+- **#4480** — dev27 で `favorites/create` に不正 noteId → **`{"error":{"code":"NO_SUCH_NOTE",...}}` が 400 で透過**。同じ経路で **#4381 の過剰な丸めが直っている**ことも確認（以前は 200 + `{}` で成功と偽っていた）
+- **#4511** — dev24-27 のログに生トークン 0 件
+- **#4487** — dev25 で `Webhook.all` が全て `available?`、nil / 空白トークンを `ConfigError` で拒否
+
+**2 回目（2026-08-07・レビュー修正 #4533 / #4539 込み）**: 1 回目はレビュー前の develop に対するものなので代わりにならない。4 台を `51d96f47` へ更新し、sidekiq → puma → listener の順に再起動（`Gemfile` 無差分のため再 bundle 不要）。
+
+- 4 台とも health 200・version 5.31.0・外部 HTTPS 200
+- **#4511 の再確認** — 4 台とも生トークン 0 件。listener は `?access_token=[FILTERED]`、request ログは `params: {"access_token":"[FILTERED]"}`。**dev27 で `/api/notes/create` を実投稿し、ボディの `i` が `"i":"[FILTERED]"` になることを確認**（レビューで見つけた赤の実機実証）
+- **#4539** — dev25 の `/mulukhiya/app/program` が 200 で、`formatToParts` を含む新 JS が配信されている
+- ⚠ dev27 は `yjit_available: false` のまま（既知・pooza/chubo2#123）
+
+### 本番デプロイ（2026-08-07・4 台完了）
+
+shallu / zugoga / sweep / gomander、全台 version 5.31.0 / health 200 / `yjit_enabled: true` / 外部 HTTPS で version 確認済み。monit も 3 台とも OK に復帰。Ruby は 4 台とも 4.0.6 で据え置き（`rbenv install` 不要）。
+
+**#4511 のログ掃除も同日に完了。**デプロイで書き足しが止まったことを確認したうえで、残っていた生トークンを `[FILTERED]` へ置換した。
+
+| ホスト | 掃除前 | 掃除後 |
+| --- | --- | --- |
+| shallu | 5 箇所（live） | 0 |
+| zugoga | 2 箇所（live） | 0 |
+| gomander | 3 箇所（live + `.0.gz`） | 0 |
+| **sweep** | **386 箇所（live + `.1`〜`.7.gz`）** | 0 |
+
+### 振り返り
+
+**sweep の 386 箇所は「掃除済み」と思っていたものが残っていた**。2026-08-05 の #4511 掃除は listener の `access_token=` を対象にしており、**Misskey が使う `"i":"` は 3 台の Mastodon には存在しないパターン**だったので、ダイスキーだけ桁違いに残っていた。しかもその中身は**利用者本人のトークン**（`/api/notes/reactions/create` の body）で、エージェントのボットトークンより深刻だった。MEMORY `project_log-credential-exposure` が「`access_token=` だけで grep しない」と警告していた通りのことが、警告を書いた本人の掃除でもう一度起きている。
+
+**リリース前レビューがこれを捕まえた**。`i` がボディで来るという指摘（🔴）が無ければ、デプロイ後の掃除は「掃除した端から再汚染される」状態で回っていた。ステージング検証が本番停止級を捕まえた 5.30.0 の #4509 と合わせて、**レビュー → ステージング → 本番の 3 段が 2 リリース続けて実際に仕事をしている**。
+
 ## リリース済み: 5.30.0（2026-08-02）
 
 性能・観測性・セキュリティのハードニング回。新機能の追加はない。**主軸 #4464 のゴール（ニチアサ実況の数秒をハンドラ単位で説明できる状態）を達成し、その実測から出た修正をまとめて出荷した**回でもある。

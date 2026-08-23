@@ -42,10 +42,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 0129fa5ec6e129ba7bdd89c10ba4b706d680c313
+  revision: c283c52195497fbc27c4274ded2359430c3f0c08
   branch: main
   specs:
-    ginseng-fediverse (1.8.29)
+    ginseng-fediverse (1.8.30)
 
 GIT
   remote: https://github.com/pooza/ginseng-piefed.git
@@ -73,10 +73,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-style.git
-  revision: 956e0a68e74da44e9d94cac40b4039fc3a38052f
-  branch: main
+  revision: 0c9ddb19d902d675504fc2d6ed258e590901073f
+  tag: v1.1.4
   specs:
-    ginseng-style (1.0.0)
+    ginseng-style (1.1.4)
       rubocop
       rubocop-minitest
       rubocop-performance

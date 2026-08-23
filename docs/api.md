@@ -113,6 +113,7 @@ SNS 本体への転送が失敗した場合、SNS が返したステータスコ
 | `features.word_suggest`（`/word_suggest/urls` 設定時に有効） | `/word/suggest` |
 | `features.nowplaying_resolver`（常時 `true`） | `/nowplaying/resolve` |
 | `features.compose_templates`（常時 `true`。#4457 未デプロイのバージョンではキー自体が欠落し capsicum は false 判定して導線を出さない） | `/compose/templates`（GET/POST/PUT/DELETE） |
+| `features.media_update`（Mastodon ＋ `/mastodon/capabilities/media_update` の opt-in ＋ ginseng-fediverse 1.8.30 以降。既定は `false`。⚠ **モロヘイヤの版番号では代用できない**） | `PUT /api/:version/statuses/:id`（`X-Mulukhiya-Purpose: media_update`） |
 | `features.spotify_enabled`（`/service/spotify/oauth/user_oauth_enabled` + 資格情報設定時に有効） | `/spotify/oauth_uri`, `/spotify/auth`, `/spotify/currently_playing` |
 | `features.spotify_linked`（当該ユーザーが Spotify 連携済みか） | `/spotify/currently_playing` |
 
@@ -221,6 +222,14 @@ SNS における「発言の責任」の観点から、本文の自由な編集�
 - 対象は `POST /api/v{version}/statuses`（プロキシ経路）と `POST /mulukhiya/webhook/{digest}`（Slack 互換 webhook）
 - ⚠ **モロヘイヤは自分では生成しない。**付いてこなければ付けずに転送する（本文から自動生成すると、実況の意図的な連投が畳まれて投稿が消える）
 - ⚠ **中継するのはこのヘッダだけ。**`Host` / `Cookie` / `Authorization` 等は転送しない
+  - ⚠⚠ **これは #4598 で新設した「中継枠」の話であって、全経路の話ではない。**
+    `PUT /api/v{version}/statuses/{id}`（ALT 編集・タグ書き換え）は**従来どおり受信ヘッダを
+    ほぼそのまま上流へ引き継ぐ**。v5.33.0 から変わっていない挙動なので、
+    **この節の断り書きを PUT 経路にも当てはめないこと**
+  - ⚠ **ただし PUT 経路でも `Cookie` は届かない。**`upstream_headers` が外すのは
+    `X-Mulukhiya-Purpose` だけだが、その後段の `MastodonService#create_headers` が
+    **大文字小文字を問わず `Cookie` を落とす**。`Authorization` は**届く**（クライアントの
+    トークンで上流を叩くため）ので、**「Cookie も Authorization も届かない」と読まないこと**
 - ハンドラで本文が書き換わっても影響しない。キーが一致すれば上流は既存の投稿を返す
 
 ⚠ **上流の畳み込みは TTL 1 時間・アカウント単位**（Mastodon の `PostStatusService` が
@@ -297,7 +306,7 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
 {
   "package": {
     "authors": ["Author Name"],
-    "description": "各種ActivityPub対応インスタンスへの投稿に対して、内容の更新等を行うプロキシ。",
+    "description": "各種ActivityPub対応サーバーへの投稿に対して、内容の更新等を行うプロキシ。",
     "email": ["author@example.com"],
     "license": "MIT",
     "url": "https://github.com/pooza/mulukhiya-toot-proxy",
@@ -316,6 +325,7 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
       "color": "#6364FF"
     },
     "capabilities": {
+      "media_update": true,
       "repost": true,
       "streaming": true
     },
@@ -327,6 +337,7 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
       "announcement_push": false,
       "feed": true,
       "media_catalog": false,
+      "media_update": true,
       "program_editable": true,
       "webhook": true
     },
@@ -364,6 +375,15 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
 **`features.nowplaying_resolver`**: ナウプレ enrich プロキシ（`POST /nowplaying/resolve`）の利用可否（#4382）。iTunes Search API が資格情報不要で常時利用可能なため恒常的に `true`。capsicum はこのフラグを見てナウプレ投稿時に URL 補完（enrich）を試みるか判定する。enrich なしでもクライアント整形のみで投稿は成立するため、フラグが無い旧サーバーでも degrade して動作する。プロバイダ既定は `/nowplaying/resolve/default_provider`（既定 `apple_music`）。
 
 **`features.announcement_push`**: お知らせ push 配信機能（capsicum-relay へのお知らせ通知連動）の現在のオン/オフ状態。`config/local.yaml` の `/features/announcement_push` で設定する（既定 `false`）。capsicum 側は本フラグを参照して「お知らせ通知を受け取る」設定 UI を有効化するか判定する（#4354、capsicum-relay#14）。フラグが `false` のサーバーで `GET /announcement/list`（下記）は引き続き応答するが、capsicum-relay 側の push 配信パイプラインが組まれていない。
+
+**`features.media_update`**: 投稿済みメディアの ALT 編集（`PUT /api/:version/statuses/:id` に `X-Mulukhiya-Purpose: media_update` を添えて送る経路）が、**この構成で実際に通るか**（#4636）。capsicum は本フラグで ALT 編集の導線を出し分ける（pooza/capsicum#999）。
+
+⚠ **モロヘイヤの版番号では判定できない。**前提が 2 つあり、どちらもサーバーごとに変わる:
+
+1. **nginx の経路**（`$status_put_backend` map が Purpose を含む 3 要素キーへ是正済みか・#4474）。モロヘイヤからは観測できないため、`config/local.yaml` の `/mastodon/capabilities/media_update` による**明示的な opt-in** として受ける。**既定は `false`**（未是正のサーバーが実在する＝ pooza/chubo2#188）
+2. **刺している ginseng-fediverse の版**。1.8.29 までは `update_status` だけが `create_headers` を通しておらず、モロヘイヤ自身の上流 PUT が `X-Mulukhiya` を名乗らないため、1. が是正済みでも map のキーが `PUT::` に落ちて **405** になる（#4621、pooza/ginseng-fediverse#254 で是正・1.8.30）
+
+⚠ **「分からない」は false 側へ倒す。**フラグが欠落しているバージョン・Misskey・opt-in なし・古い gem のいずれも `false`。壊れる側の代償が「投稿から添付が全部外れ CW も消える」（#4589）なので、判定できない構成では導線を出させない。
 
 #### GET /mulukhiya/api/emoji/palettes
 
@@ -484,11 +504,23 @@ Web Push サブスクリプションを解除する。
   "redis": {"status": "OK"},
   "sidekiq": {"status": "OK"},
   "streaming": {"status": "OK"},
-  "postgres": {"status": "OK"},
+  "postgres": {"status": "OK", "pool": {"max": 10, "allocated": 1, "waiting": 0}},
   "ruby": {"version": "4.0.6", "yjit_available": true, "yjit_enabled": true, "status": "OK"},
   "status": 200
 }
 ```
+
+**`postgres.pool` は接続プールの使用状況** (5.34.0〜、#4614)。`#4351` Gate 2 の overlay flip を
+戻すかどうかの信号として使う。
+
+| キー | 意味 |
+|------|------|
+| `max` | プールの上限接続数 |
+| `allocated` | 確保済みの接続数。⚠ **`max` に張り付いていても正常**（作った接続を使い回す設計） |
+| `waiting` | 接続の空きを待っているスレッド数。**これが本命の指標で、0 を超えたらプールが要求に足りていない** |
+
+⚠ **この値は Puma プロセスローカル**（#4618）。pgbouncer 側と Sidekiq 側の逼迫は映らないので、
+**1 プロセスの `waiting` が 0 でも全体が健全とは限らない**。
 
 **`ruby` は構成乖離の検知用** (#4466)。YJIT は Rust の無い環境ではビルド時に黙って外れ、エラーにならないまま 24〜25% 遅いサーバーが出来上がるため、能力を可視化する。
 
@@ -501,7 +533,8 @@ Web Push サブスクリプションを解除する。
   "redis": {"status": "OK"},
   "sidekiq": {"status": "OK"},
   "streaming": {"status": "OK"},
-  "postgres": {"status": "WARN", "reason": "pool_exhausted", "error": "..."},
+  "postgres": {"status": "WARN", "reason": "pool_exhausted", "error": "...",
+               "pool": {"max": 10, "allocated": 10, "waiting": 3}},
   "status": 200
 }
 ```
@@ -1357,7 +1390,7 @@ Slack 互換のペイロードを投稿に変換する。`text` / `blocks` / `at
 | `text` | string | 必須 | 本文。Slack のリンク記法 `<url\|label>` は Markdown リンクへ変換される |
 | `spoiler_text` | string | 任意 | CW（`blocks` を使う場合は `header` ブロックが優先） |
 | `blocks` | array | 任意 | Slack Block Kit。`header` / `section` / `context` / `rich_text` / `image` を解釈 |
-| `attachments` | array | 任意 | Slack legacy attachments。`image_url` / `thumb_url` は添付画像として取り込む |
+| `attachments` | array | 任意 | Slack legacy attachments。`image_url` / `thumb_url` は添付画像として取り込む。**1 ファイル 32MiB まで**（`/media/download/max_bytes`） |
 | `visibility` | string | 任意 | この投稿の公開範囲（5.34.0〜、#4599） |
 
 `visibility` を省略すると、アカウント設定（WebUI「Slack互換webhook」セクション、`/webhook/visibility`）の
@@ -1374,6 +1407,11 @@ webhook が綴り誤りや Misskey 語彙（`home` 等）ひとつで公開投�
 | `unlisted` | `unlisted` | `home` |
 | `private` | `private` | `followers` |
 | `direct` | `direct` | `specified` |
+
+⚠⚠ **`direct` は宛先を指定できないので、実質「自分だけ」の投稿になる。**この経路は
+Misskey の `visibleUserIds` を一切設定しない（Mastodon 側も宛先なしの `direct` は同じ結果）。
+**誰にも届かない投稿が黙って積まれる**ので、通知目的で使わないこと。⚠ 他の `direct` 経路
+（投稿結果通知・メンション可視性）は宛先を必ず添えており、**ここだけ非対称**。
 
 ⚠ **SNS 側の呼称（`home` / `followers` / `specified`）でも指定できる**が、`public` / `unlisted` /
 `private` / `direct` の 4 語は**両系で同じ意味に解決される**ので、こちらを使うほうが移植性が高い。

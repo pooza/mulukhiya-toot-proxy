@@ -44,13 +44,27 @@ module Mulukhiya
         return false
       end
 
+      # ⚠ **OFFSET は「ページ幅」で計算する (#4632)。**`has_next` を見るために
+      # 取得件数へ +1 しているので、その `limit` を OFFSET の基準にも使うと
+      # **ページごとに 1 件抜ける**（既定の 100 件なら page=2 が 101 件目から
+      # 始まり、100 件目がどのページにも出ない）。取得件数とページ幅は
+      # 別のキーで渡す。
+      def self.catalog_offset(params)
+        return 0 if params[:cursor]
+        return 0 unless params[:page]
+        return (params[:page] - 1) * params[:limit]
+      end
+
       def self.catalog(params = {})
         params[:limit] ||= config['/webui/media/catalog/limit']
         unless params[:rule] || params[:skip_cache]
           cached = catalog_from_cache(params)
           return cached if cached
         end
-        rows = Postgres.exec(:media_catalog, params.merge(limit: params[:limit] + 1))
+        rows = Postgres.exec(:media_catalog, params.merge(
+          limit: params[:limit] + 1,
+          offset: catalog_offset(params),
+        ))
         has_next = rows.size > params[:limit]
         page_rows = rows.first(params[:limit])
         items = build_catalog_items(page_rows)

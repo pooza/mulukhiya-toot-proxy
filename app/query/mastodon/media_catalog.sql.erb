@@ -27,7 +27,9 @@
     only_person 25,998ms → 6.5ms / rule つき 8,900ms → 837ms /
     rule ヒット無し 2,244ms → 14.0ms（いずれも照合の差分 0 行）
 -%>
-<% offset = params[:cursor] ? 0 : (params[:page] ? ((params[:page] - 1) * params[:limit]) : 0) %>
+<%# offset は呼び出し側が「ページ幅」で計算して渡す。ここで params[:limit] から
+    導出すると has_next 用の +1 が混ざり、ページごとに 1 件抜ける (#4632)。 -%>
+<% offset = params[:offset].to_i %>
 SELECT
   picked.id,
   picked.name,
