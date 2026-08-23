@@ -1508,6 +1508,29 @@ scan(Shift_JIS)      Encoding::CompatibilityError  変換されて通る
 - ⚠ **health は起動直後に一度 `sidekiq: NG` の 503 を返す。**`curl --retry` で吸収する。
   一発目だけ見て「壊れた」と判断しない
 
+
+#### ⚠⚠ デプロイから `bundle install` を落とすと listener だけが死ぬ（2026-08-23）
+
+2 回目のステージング反映で `git pull` → 再起動だけを回し、**`bundle install` を落とした**。
+直前に `ginseng-style` が v1.1.4 へ上がっていたため、
+
+```
+Bundler::GitError: https://github.com/pooza/ginseng-style.git (at v1.1.4@0c9ddb1)
+is not yet checked out. Run `bundle install` first.
+```
+
+で **listener だけが起動に失敗**し、`/health` が `streaming: {"error":"PID '...' was dead"}` の 503 になった。
+
+- ⚠⚠ **`|| true` が失敗を握り潰した。**`sudo service <name> restart ... || true` は #4478 の
+  「戻ってこない」対策として付けていたが、**起動失敗も同時に飲む**。`|| echo "(NG)"` にして
+  少なくとも痕跡を残すこと
+- ⚠ **puma と sidekiq は生き残るので気づきにくい。**両者は既存プロセスが動き続け、
+  listener だけが落ちる。**`/health` の `streaming` を見るまで分からない**
+- ⚠ **`ginseng-style` は development group だが、`Bundler.setup` は group を問わず
+  materialize する**ので、実行時に効かない gem でも未取得なら起動が止まる
+- **恒久策**: デプロイ手順から `bundle install` を省略しない。`Gemfile.lock` が動いていない
+  確信があっても、**他セッションが上げていることがある**（今回がまさにそれ）
+
 #### dev26 の nginx を dev24/25 と同一にした（chubo2#188 の一部）
 
 **dev26 だけ `$status_put_backend` が 2 要素キーのままで、さらに `if ($http_x_mulukhiya_purpose != '')`
