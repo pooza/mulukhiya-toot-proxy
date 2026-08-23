@@ -64,6 +64,53 @@ module Mulukhiya
     end
   end
 
+  # 引き当ての失敗を「未知の digest」の 404 に化かさない (#4603 の Codex P1)。
+  #
+  # ⚠⚠ **`Webhook.create` は全例外を握って nil を返す。**それを
+  # `verify_webhook!` が 404 に変換するので、alert 抑止を入れると
+  # **DB 障害で全 webhook が落ちている状態が無音になる**。
+  class WebhookLookupFailureTest < TestCase
+    class LookupError < StandardError; end
+
+    # 従来どおり nil へ倒れる（他の呼び出し元の互換）。
+    def test_create_still_swallows
+      with_failing_lookup do
+        assert_nil(Webhook.create('deadbeef'))
+      end
+    end
+
+    # ⚠ **こちらが本命。**引き当ての失敗はそのまま上がるので、
+    # 呼び側は「そんな digest は無い」と区別できる。
+    def test_create_bang_propagates
+      with_failing_lookup do
+        assert_raise(LookupError) {Webhook.create!('deadbeef')}
+      end
+    end
+
+    # ⚠ 上がってきた例外は `status` を持たないので、`report_error` は alert 側へ倒す。
+    def test_lookup_failure_is_alerted
+      error = LookupError.new('connection refused')
+      calls = []
+      error.define_singleton_method(:alert) {calls << :alert}
+      error.define_singleton_method(:log) {calls << :log}
+
+      MisskeyController.new!.report_error(error)
+
+      assert_equal([:alert], calls)
+    end
+
+    private
+
+    def with_failing_lookup
+      Webhook.singleton_class.alias_method(:__orig_find_token_by_digest, :find_token_by_digest)
+      Webhook.define_singleton_method(:find_token_by_digest) {|_| raise LookupError, 'connection refused'}
+      yield
+    ensure
+      Webhook.singleton_class.alias_method(:find_token_by_digest, :__orig_find_token_by_digest)
+      Webhook.singleton_class.remove_method(:__orig_find_token_by_digest)
+    end
+  end
+
   # 番組表編集 5 本の rescue (#4629)。
   class ProgramEntryErrorHandlingTest < TestCase
     def setup

@@ -35,7 +35,9 @@ module Mulukhiya
       # (#4603)。同じ `verify_webhook!` を通す `get '/:digest'` は `e.log` なので、
       # **同じ例外が GET なら静か・POST なら alert** という非対称になっていた。
       report_error(e)
-      @renderer.status = e.status
+      # ⚠ **`e.status` を直に呼ばない。**引き当ての失敗 (`Sequel::DatabaseConnectionError`
+      # 等) は `status` を持たないので、rescue 自身が `NoMethodError` で落ちる。
+      @renderer.status = e.respond_to?(:status) ? e.status : 500
       @renderer.message = {error: e.message}
       return @renderer.to_s
     end
@@ -45,14 +47,20 @@ module Mulukhiya
       @renderer.message = {message: 'OK'}
       return @renderer.to_s
     rescue => e
-      e.log
-      @renderer.status = e.status
+      # ⚠ **POST と同じ判定にする** (#4603)。従来は一律 `e.log` で、未知の digest も
+      # DB 障害も等しく無音だった。ここも `report_error` に寄せると、4xx は静かなまま
+      # **引き当ての失敗だけが alert される**。
+      report_error(e)
+      @renderer.status = e.respond_to?(:status) ? e.status : 500
       @renderer.message = {error: e.message}
       return @renderer.to_s
     end
 
     def webhook
-      @webhook ||= Webhook.create(params[:digest])
+      # ⚠ **`create` ではなく `create!`** (#4603 の Codex P1)。`create` は DB 障害も
+      # 握って nil を返すので、`verify_webhook!` がそれを 404 に変換してしまい、
+      # **全 webhook が落ちている状態が「未知の digest」として無音になる**。
+      @webhook ||= Webhook.create!(params[:digest])
       return @webhook
     end
 
