@@ -71,7 +71,7 @@ module Mulukhiya
       }])
       attachment = scrubbed['attachments'][0]
 
-      %w[pretext author_name title text footer].each do |key|
+      ['pretext', 'author_name', 'title', 'text', 'footer'].each do |key|
         assert_equal('[FILTERED]', attachment[key], "#{key} が伏せられていない")
       end
       assert_equal('[FILTERED]', attachment['fields'][0]['value'])
