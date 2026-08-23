@@ -222,6 +222,10 @@ SNS における「発言の責任」の観点から、本文の自由な編集�
 - 対象は `POST /api/v{version}/statuses`（プロキシ経路）と `POST /mulukhiya/webhook/{digest}`（Slack 互換 webhook）
 - ⚠ **モロヘイヤは自分では生成しない。**付いてこなければ付けずに転送する（本文から自動生成すると、実況の意図的な連投が畳まれて投稿が消える）
 - ⚠ **中継するのはこのヘッダだけ。**`Host` / `Cookie` / `Authorization` 等は転送しない
+  - ⚠⚠ **これは #4598 で新設した「中継枠」の話であって、全経路の話ではない。**
+    `PUT /api/v{version}/statuses/{id}`（ALT 編集・タグ書き換え）は**従来どおり受信ヘッダを
+    ほぼそのまま上流へ引き継ぐ**（除くのは `X-Mulukhiya-Purpose` だけ）。v5.33.0 から
+    変わっていない挙動なので、**この節の断り書きを PUT 経路にも当てはめないこと**
 - ハンドラで本文が書き換わっても影響しない。キーが一致すれば上流は既存の投稿を返す
 
 ⚠ **上流の畳み込みは TTL 1 時間・アカウント単位**（Mastodon の `PostStatusService` が
@@ -298,7 +302,7 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
 {
   "package": {
     "authors": ["Author Name"],
-    "description": "各種ActivityPub対応インスタンスへの投稿に対して、内容の更新等を行うプロキシ。",
+    "description": "各種ActivityPub対応サーバーへの投稿に対して、内容の更新等を行うプロキシ。",
     "email": ["author@example.com"],
     "license": "MIT",
     "url": "https://github.com/pooza/mulukhiya-toot-proxy",
@@ -496,11 +500,23 @@ Web Push サブスクリプションを解除する。
   "redis": {"status": "OK"},
   "sidekiq": {"status": "OK"},
   "streaming": {"status": "OK"},
-  "postgres": {"status": "OK"},
+  "postgres": {"status": "OK", "pool": {"max": 10, "allocated": 1, "waiting": 0}},
   "ruby": {"version": "4.0.6", "yjit_available": true, "yjit_enabled": true, "status": "OK"},
   "status": 200
 }
 ```
+
+**`postgres.pool` は接続プールの使用状況** (5.34.0〜、#4614)。`#4351` Gate 2 の overlay flip を
+戻すかどうかの信号として使う。
+
+| キー | 意味 |
+|------|------|
+| `max` | プールの上限接続数 |
+| `allocated` | 確保済みの接続数。⚠ **`max` に張り付いていても正常**（作った接続を使い回す設計） |
+| `waiting` | 接続の空きを待っているスレッド数。**これが本命の指標で、0 を超えたらプールが要求に足りていない** |
+
+⚠ **この値は Puma プロセスローカル**（#4618）。pgbouncer 側と Sidekiq 側の逼迫は映らないので、
+**1 プロセスの `waiting` が 0 でも全体が健全とは限らない**。
 
 **`ruby` は構成乖離の検知用** (#4466)。YJIT は Rust の無い環境ではビルド時に黙って外れ、エラーにならないまま 24〜25% 遅いサーバーが出来上がるため、能力を可視化する。
 
@@ -513,7 +529,8 @@ Web Push サブスクリプションを解除する。
   "redis": {"status": "OK"},
   "sidekiq": {"status": "OK"},
   "streaming": {"status": "OK"},
-  "postgres": {"status": "WARN", "reason": "pool_exhausted", "error": "..."},
+  "postgres": {"status": "WARN", "reason": "pool_exhausted", "error": "...",
+               "pool": {"max": 10, "allocated": 10, "waiting": 3}},
   "status": 200
 }
 ```
@@ -1369,7 +1386,7 @@ Slack 互換のペイロードを投稿に変換する。`text` / `blocks` / `at
 | `text` | string | 必須 | 本文。Slack のリンク記法 `<url\|label>` は Markdown リンクへ変換される |
 | `spoiler_text` | string | 任意 | CW（`blocks` を使う場合は `header` ブロックが優先） |
 | `blocks` | array | 任意 | Slack Block Kit。`header` / `section` / `context` / `rich_text` / `image` を解釈 |
-| `attachments` | array | 任意 | Slack legacy attachments。`image_url` / `thumb_url` は添付画像として取り込む |
+| `attachments` | array | 任意 | Slack legacy attachments。`image_url` / `thumb_url` は添付画像として取り込む。**1 ファイル 32MiB まで**（`/media/download/max_bytes`） |
 | `visibility` | string | 任意 | この投稿の公開範囲（5.34.0〜、#4599） |
 
 `visibility` を省略すると、アカウント設定（WebUI「Slack互換webhook」セクション、`/webhook/visibility`）の
@@ -1386,6 +1403,11 @@ webhook が綴り誤りや Misskey 語彙（`home` 等）ひとつで公開投�
 | `unlisted` | `unlisted` | `home` |
 | `private` | `private` | `followers` |
 | `direct` | `direct` | `specified` |
+
+⚠⚠ **`direct` は宛先を指定できないので、実質「自分だけ」の投稿になる。**この経路は
+Misskey の `visibleUserIds` を一切設定しない（Mastodon 側も宛先なしの `direct` は同じ結果）。
+**誰にも届かない投稿が黙って積まれる**ので、通知目的で使わないこと。⚠ 他の `direct` 経路
+（投稿結果通知・メンション可視性）は宛先を必ず添えており、**ここだけ非対称**。
 
 ⚠ **SNS 側の呼称（`home` / `followers` / `specified`）でも指定できる**が、`public` / `unlisted` /
 `private` / `direct` の 4 語は**両系で同じ意味に解決される**ので、こちらを使うほうが移植性が高い。
