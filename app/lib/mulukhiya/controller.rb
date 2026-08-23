@@ -124,6 +124,29 @@ module Mulukhiya
       raise Ginseng::AuthError, 'Token integrity check failed'
     end
 
+    # クライアント起因の失敗を Sentry alert に上げない共通判定
+    # (#4542 / #4594 / #4603 / #4629)。
+    #
+    # ⚠⚠ **例外クラスの列挙で判定しない。**同じ方針が 3 系統で別々に書かれ、
+    # そのたびに取りこぼした——#4603 は `NotFoundError`、#4629 は `AuthError` と
+    # `NotFoundError` が `else` へ落ちて alert していた。**ステータスで判定する**ので、
+    # 新しい 4xx を投げても漏れない。
+    #
+    # ⚠ **抑止するのは Sentry だけ。syslog には必ず残す**（`handle_gateway_error` と
+    # 同じ設計）。完全に無音だと「webhook が全滅している」ような事故の頻度・偏りを
+    # 追えなくなる。
+    #
+    # ⚠ **`status` を持たない例外は alert 側へ倒す。**素の `StandardError`
+    # （`NoMethodError` 等）はモロヘイヤ自身のバグなので、黙らせてはいけない。
+    def report_error(error)
+      client_error?(error) ? error.log : error.alert
+    end
+
+    def client_error?(error)
+      return false unless error.respond_to?(:status)
+      return error.status.to_i.between?(400, 499)
+    end
+
     # 上流のエラー包絡をそのままクライアントへ返す (#4480)。
     #
     # モロヘイヤはプロキシなので、上流が返した理由——Misskey の

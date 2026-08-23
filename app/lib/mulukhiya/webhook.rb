@@ -122,13 +122,22 @@ module Mulukhiya
       }.to_json.sha256
     end
 
+    # ⚠⚠ **引き当ての失敗を握り潰す。**呼び側が「そんな digest は無い」と
+    # 区別できないので、**404 に化かしてはいけない経路は `create!` を使う**
+    # (#4603 の Codex P1)。DB 障害で全 webhook が落ちている状態を 4xx として
+    # 扱うと、クライアント起因の alert 抑止に乗って**無音**になる。
     def self.create(key)
-      return new(key) if key.is_a?(UserConfig)
-      token = find_token_by_digest(key)
-      return token&.account&.webhook
+      return create!(key)
     rescue => e
       e.log(key: key.to_s)
       return nil
+    end
+
+    # 引き当てに失敗したら例外をそのまま上げる。**戻り値の nil は
+    # 「そんな digest は無い」だけを意味する。**
+    def self.create!(key)
+      return new(key) if key.is_a?(UserConfig)
+      return find_token_by_digest(key)&.account&.webhook
     end
 
     # トークンを持たないアカウントの「幽霊 webhook」は列挙しない (#4487)。
