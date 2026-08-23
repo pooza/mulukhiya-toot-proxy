@@ -7,26 +7,7 @@ module Mulukhiya
 
     attr_reader :sns, :reporter
 
-    # 投稿本文系フィールドを info ログに平文で残さない (#4394)。処理には素の
-    # @params を使うため、ログ用の複製だけ top-level の該当キーをマスクする。
-    SCRUBBED_LOG_PARAMS = [
-      'status', 'text', 'body', 'comment', 'spoiler_text', 'cw',
-      'q', 'title', 'artist', 'album', # word/suggest・nowplaying のユーザー入力 (#4394)
-      # ⚠ Slack legacy attachments の本文系 (#4630)。`SlackWebhookPayload#format_attachment`
-      #   が **すべて投稿本文へ組み立てる**ので、`text` だけ伏せても残りが平文で残る。
-      #   `title` は上の行で既に対象。`fields[].value` はキー名が `value`。
-      'pretext', 'author_name', 'value', 'footer',
-      'code', # OAuth 認可コード (spotify/auth・annict/auth)。短命だが資格情報なので伏せる
-      # ⚠ アクセストークン本体。`i` は Misskey がボディで渡す（MisskeyController#token
-      #   のフォールバック）。/logger/mask_query_params は URL のクエリにしか効かない
-      #   ので、ボディ側はここで落とす。両方揃って #4511 の掃討が完成する。
-      'i', 'access_token'
-    ].freeze
-
-    # `scrub_log_params` が潜る深さの上限 (#4630)。Block Kit の
-    # `blocks[].text.text` で 4、`attachments[].blocks[].text.text` で 6 なので、
-    # 実用形には十分な余裕がある。
-    MAX_LOG_SCRUB_DEPTH = 12
+    include LogScrubber
 
     # 上流へそのまま中継してよい受信ヘッダ (#4598)。
     #
@@ -145,8 +126,11 @@ module Mulukhiya
     # 同じ設計）。完全に無音だと「webhook が全滅している」ような事故の頻度・偏りを
     # 追えなくなる。
     #
-    # ⚠ **`status` を持たない例外は alert 側へ倒す。**素の `StandardError`
-    # （`NoMethodError` 等）はモロヘイヤ自身のバグなので、黙らせてはいけない。
+    # ⚠ **素の `StandardError` は alert 側へ倒れる。**ginseng-core の refine が
+    # `StandardError#status` に **500** を定義しているので、`NoMethodError` や
+    # `Sequel::DatabaseConnectionError` は 4xx に当たらず alert される。
+    # モロヘイヤ自身のバグを黙らせてはいけないので、これが正しい既定。
+    # `respond_to?` のガードは refine が外れたときの保険で、通常は到達しない。
     def report_error(error)
       client_error?(error) ? error.log : error.alert
     end
@@ -233,41 +217,6 @@ module Mulukhiya
     end
 
     private
-
-    # ⚠⚠ **入れ子まで走査する (#4630)。**従来は `scrubbed.key?(key)` の
-    # **トップレベル走査だけ**だったが、Slack 互換 webhook が実際に使う
-    # Block Kit の本文は `blocks` / `attachments` の入れ子の中にある。
-    #
-    #   {"blocks":[{"type":"section","text":{"text":"（本文）"}}]}
-    #
-    # ⚠ **同じ本文を `text` で送れば `[FILTERED]` になるのに、`blocks` で送ると
-    # 平文で syslog に残る**＝送り方で秘匿の効き方が変わっていた。#4394 が
-    # 「投稿本文系フィールドを平文で残さない」ために入れた対策の抜け。
-    # gem 側の `Logger#mask` はキー名で落とすが、`/logger/mask_fields` は
-    # 資格情報の名前だけなので本文系はそちらでも落ちない。
-    def scrub_log_params(params)
-      return scrub_log_value(params.deep_dup, 0)
-    end
-
-    # ⚠ **深さで打ち切る。**外部から渡る JSON なので、際限なく潜ると
-    # スタックを掘り尽くせる。打ち切りは**残す側ではなく落とす側**へ倒す
-    # （読めない深さのものを平文で通すより、伏せて出すほうが安全）。
-    def scrub_log_value(value, depth)
-      return '[FILTERED]' if depth > MAX_LOG_SCRUB_DEPTH
-      case value
-      when Hash
-        value.each_key do |key|
-          value[key] = if SCRUBBED_LOG_PARAMS.include?(key.to_s)
-            '[FILTERED]'
-          else
-            scrub_log_value(value[key], depth + 1)
-          end
-        end
-      when Array
-        value.map! {|v| scrub_log_value(v, depth + 1)}
-      end
-      return value
-    end
 
     def default_renderer_class
       return Ginseng::Web::JSONRenderer
