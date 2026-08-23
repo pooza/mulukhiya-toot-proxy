@@ -204,7 +204,11 @@ module Mulukhiya
     def restored_body(id)
       headers = upstream_headers
       source = fetch_internal(:fetch_status_source, id, headers)
-      status = fetch_internal(:fetch_status, id, headers)
+      # ⚠ **2 本目は `paired: true`。**1 本目が通ったのに 2 本目だけ落ちるのは、
+      # クライアント起因ではありえない（投稿が無いならどちらも 404、トークンが
+      # 切れているならどちらも 401 になる）。**この非対称そのものが #4621 の
+      # 症状**だったので、片落ちは内部の失敗として扱う。
+      status = fetch_internal(:fetch_status, id, headers, paired: true)
       reject_poll!(status)
       return sanitize_spoiler({
         status: source['text'].to_s,
@@ -216,13 +220,30 @@ module Mulukhiya
 
     # 内部読みの失敗をクライアントの更新失敗と区別する (#4631)。
     #
-    # ⚠ **ここを素の `GatewayError` のまま流すと、上流の 404 が
-    # 「その投稿は無い」としてクライアントへ返り、しかも
-    # `STATUS_UPDATE_SILENT_STATUSES` の抑止に乗って Sentry にも出ない。**
-    def fetch_internal(method, id, headers)
+    # ⚠ **素の `GatewayError` のまま流すと、上流の 404 が「その投稿は無い」として
+    # クライアントへ返り、しかも `STATUS_UPDATE_SILENT_STATUSES` の抑止に乗って
+    # Sentry にも出ない。**
+    #
+    # ⚠⚠ **だからといって内部読みの失敗を一律に内部エラー扱いしてはいけない。**
+    # 「投稿が消えている」「リモートの投稿」「トークンが切れている」は
+    # **本当にクライアント起因の 4xx** で、ここは日常的に通る。一律に付け替えると
+    # 古い投稿を編集しようとしただけで 502 と Sentry イベントが出る。
+    # **クライアント起因ではありえない失敗だけ**を付け替える。
+    def fetch_internal(method, id, headers, paired: false)
       return sns.public_send(method, id, {headers:})
     rescue Ginseng::GatewayError => e
-      raise InternalGatewayError.wrap(e, method)
+      raise InternalGatewayError.wrap(e, method) if paired || internal_failure?(e)
+      raise
+    end
+
+    # クライアント起因ではありえない失敗か (#4631)。
+    #
+    # 4xx は上のとおり日常的に起きるので、**それ自体では内部の失敗と判定できない**。
+    # 逆に 5xx・接続失敗（`source_status` が取れない）は上流かモロヘイヤの問題で、
+    # クライアントの操作では作れない。
+    def internal_failure?(error)
+      return true unless error.source_status.to_i.between?(400, 499)
+      return false
     end
 
     # ⚠⚠ **アンケートを持つ投稿は編集させない (#4625)。**
