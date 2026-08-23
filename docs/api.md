@@ -224,8 +224,12 @@ SNS における「発言の責任」の観点から、本文の自由な編集�
 - ⚠ **中継するのはこのヘッダだけ。**`Host` / `Cookie` / `Authorization` 等は転送しない
   - ⚠⚠ **これは #4598 で新設した「中継枠」の話であって、全経路の話ではない。**
     `PUT /api/v{version}/statuses/{id}`（ALT 編集・タグ書き換え）は**従来どおり受信ヘッダを
-    ほぼそのまま上流へ引き継ぐ**（除くのは `X-Mulukhiya-Purpose` だけ）。v5.33.0 から
-    変わっていない挙動なので、**この節の断り書きを PUT 経路にも当てはめないこと**
+    ほぼそのまま上流へ引き継ぐ**。v5.33.0 から変わっていない挙動なので、
+    **この節の断り書きを PUT 経路にも当てはめないこと**
+  - ⚠ **ただし PUT 経路でも `Cookie` は届かない。**`upstream_headers` が外すのは
+    `X-Mulukhiya-Purpose` だけだが、その後段の `MastodonService#create_headers` が
+    **大文字小文字を問わず `Cookie` を落とす**。`Authorization` は**届く**（クライアントの
+    トークンで上流を叩くため）ので、**「Cookie も Authorization も届かない」と読まないこと**
 - ハンドラで本文が書き換わっても影響しない。キーが一致すれば上流は既存の投稿を返す
 
 ⚠ **上流の畳み込みは TTL 1 時間・アカウント単位**（Mastodon の `PostStatusService` が
