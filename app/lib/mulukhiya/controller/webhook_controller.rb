@@ -10,6 +10,9 @@ module Mulukhiya
       @renderer.message = reporter.to_h
       return @renderer.to_s
     rescue => e
+      # ⚠ **ここは `report_error` に寄せない (#4603)。**主な失敗は署名検証
+      # (`AuthError`) と設定不備 (`ServiceUnavailableError`) で、**署名不一致を
+      # 黙らせたくない**。4xx でも alert するのが正しい。
       e.alert
       @renderer.status = e.respond_to?(:status) ? e.status : 500
       @renderer.message = {error: e.message}
@@ -28,7 +31,10 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
-      e.alert
+      # ⚠ **消された・打ち間違えた webhook URL を叩かれただけ**で 404 になる
+      # (#4603)。同じ `verify_webhook!` を通す `get '/:digest'` は `e.log` なので、
+      # **同じ例外が GET なら静か・POST なら alert** という非対称になっていた。
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
