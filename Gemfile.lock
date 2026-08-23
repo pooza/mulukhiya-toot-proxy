@@ -73,10 +73,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-style.git
-  revision: 956e0a68e74da44e9d94cac40b4039fc3a38052f
-  branch: main
+  revision: fd65197dbb08ef209e2c54734b4a80b72481da58
+  tag: v1.1.0
   specs:
-    ginseng-style (1.0.0)
+    ginseng-style (1.1.0)
       rubocop
       rubocop-minitest
       rubocop-performance
