@@ -1,5 +1,7 @@
 module Mulukhiya
   class WebhookImageHandler < Handler
+    include LogScrubber
+
     def disable?
       return true unless controller_class.webhook?
       return true unless sns.account&.webhook
@@ -20,30 +22,64 @@ module Mulukhiya
       queue = Queue.new
       (payload['attachments'] || []).each {|v| queue.push(v)}
       slots = create_slots(payload)
-      workers = [Parallel.processor_count, queue.size].min
-      Array.new(workers) {Thread.new {consume(queue, payload, slots)}}.each(&:join)
+      run_workers(queue, payload, slots)
+      drain(queue)
     end
 
     private
 
-    # ⚠⚠ **候補を「配る」のではなく「取りに行く」形にする (#4633・Codex P2)。**
-    # `Parallel.each` で候補を配ると、**枠切れで skip した候補は二度と戻らない**。
-    # 先に枠を取る実装と組み合わせると、先頭の候補が枠を全部押さえ→そのうち 1 本が
-    # 失敗して枠を返しても、**skip 済みの後続を拾う者がいない**＝空いた枠が
-    # 使われないまま、有効な添付が黙って落ちる（候補 5・枠 4・先頭で 1 失敗なら 3 枚）。
+    # ⚠⚠ **`Parallel.each` をやめた代償を自分で払う。**あちらが面倒を見ていた
+    # 2 つが、素の `Thread.new` では落ちる:
     #
-    # 取りに行く形なら、**失敗して枠を返したワーカーがそのまま次の候補に使う**。
+    # 1. **HTTP 計装**（`HandlerProfile`）はスレッドローカルで、`ParallelProbe` が
+    #    `Parallel` にしか prepend されていない。引き継がないと webhook 添付の
+    #    ダウンロード + アップロードが丸ごと `http_count: 0` になる
+    # 2. **ワーカーの後始末**。`Parallel.each(in_threads:)` は `ensure` で
+    #    `threads.each(&:kill)` していた。無いと、join が例外で打ち切られたときに
+    #    走り続けたスレッドが**応答を組み立てた後**に `push` して孤児メディアを作る
+    def run_workers(queue, payload, slots)
+      counter = Thread.current[HandlerProfile::HTTP_KEY]
+      workers = [Parallel.processor_count, queue.size].min
+      threads = Array.new(workers) do
+        Thread.new do
+          Thread.current[HandlerProfile::HTTP_KEY] = counter if counter
+          consume(queue, payload, slots)
+        end
+      end
+      threads.each(&:join)
+    ensure
+      threads&.each(&:kill)
+    end
+
+    # ⚠⚠ **枠を取ってから候補を取り出す。**逆順（取り出してから枠を取る）だと、
+    # 候補を握ったまま枠が取れずに降りる窓ができ、その間に別のワーカーが失敗して
+    # 枠を返し終了すると、**その候補は誰にも拾われず黙って消える**。
+    # 枠を先に取れば、失敗したワーカーは**自分が返した枠を自分で取り直す**ので
+    # 候補の受け渡し自体が無くなる。
+    #
+    # ⚠ 候補を「配る」形（`Parallel.each`）に戻さないこと。枠切れで skip した候補が
+    # 二度と戻らず、空いた枠が使われないまま有効な添付が落ちる (#4633・Codex P2)。
     def consume(queue, payload, slots)
       loop do
-        break unless attachment = pop_attachment(queue)
-        next unless uri = parse_image_uri(attachment)
-        unless reserve_slot(slots)
-          # ⚠ **取り出したまま降りない。**別のワーカーが失敗して枠を返したときに
-          # 拾える候補が消える。戻してから降りる。
-          queue.push(attachment)
+        break unless reserve_slot(slots)
+        unless attachment = pop_attachment(queue)
+          slots.increment
           break
         end
+        unless uri = parse_image_uri(attachment)
+          slots.increment
+          next
+        end
         upload_attachment(payload, uri, slots, attachment)
+      end
+    end
+
+    # ⚠ **枠切れで残った候補も「落ちた」として残す (#4633)。**従来は完全に無音で、
+    # 6 枚送って 4 枚しか付かなくても送信側にも運用者にも何も出なかった。
+    # 取得失敗と上限超過だけ記録して枠切れを黙らせるのは、この Issue の趣旨に反する。
+    def drain(queue)
+      while attachment = pop_attachment(queue)
+        record_drop('SlotExhausted', 'max media attachments exceeded', attachment)
       end
     end
 
@@ -54,7 +90,7 @@ module Mulukhiya
     end
 
     # ⚠ **`image_url` を持たない添付は正常。**Slack legacy attachments は
-    # 本文だけのものが普通にあるので、落ちた扱いにしない（枠も取らない）。
+    # 本文だけのものが普通にあるので、落ちた扱いにしない。
     def parse_image_uri(attachment)
       return Ginseng::URI.parse(attachment['image_url'])
     rescue => e
@@ -65,11 +101,21 @@ module Mulukhiya
     # ⚠⚠ **握り潰しても黙って消さない (#4633)。**「1 枚落ちても投稿は通す」設計
     # 自体は正しいが、上限超過 (`/media/download/max_bytes`) も取得失敗も
     # **200 と作成済み投稿 ID が返るだけ**で、送信側は成功と区別できなかった。
-    # ⚠ `attachment` ごと渡すのは、`image_url` が値そのものとして
-    # `Logger#mask_url` に当たり `[FILTERED]` になるため (#4630)。
     def drop_attachment(error, attachment)
-      logger.error(error: 'webhook attachment dropped', reason: error.class.to_s, attachment:)
-      errors.push(class: error.class.to_s, message: error.message, attachment:)
+      record_drop(error.class.to_s, error.message, attachment)
+    end
+
+    # ⚠⚠ **添付を丸ごと出さない (#4630)。**Slack legacy attachments の
+    # `title` / `text` / `pretext` / `footer` / `author_name` / `fields[].value` は
+    # **すべて投稿本文になる**ので、素で渡すと同じリリースで塞いだ穴を開け直す。
+    # ⚠ **gem 側の `mask_url` は当てにならない。**あれは URL のクエリパラメータの
+    # 値しか伏せないので、`image_url` 全体も本文も素通しする。
+    # ⚠ `errors` 側も同じものを通す。`Reporter` が `summary` 経由で `logger.info`
+    # へ流すため、片方だけ伏せても意味がない。
+    def record_drop(reason, message, attachment)
+      scrubbed = scrub_log_params(attachment)
+      logger.error(error: 'webhook attachment dropped', reason:, attachment: scrubbed)
+      errors.push(class: reason, message:, attachment: scrubbed)
     end
 
     def create_slots(payload)

@@ -1141,31 +1141,6 @@ module Mulukhiya
     # する (#4346)。未認証・未連携等ユーザー入力起因の 403/404 は alert spam を避け log
     # のみ (#4265)。kind は :annict_record / :annict_review、id_label/id_value は
     # episode_id / work_id の文脈。
-    # 番組表編集 5 本の rescue (#4629)。
-    #
-    # ⚠⚠ **`AuthError` と `NotFoundError` が `else` へ落ちて alert していた。**
-    # 無効トークン・非管理者トークンで叩かれるたびに Sentry イベントと管理者への
-    # アラートメールが飛ぶ形で、#4594 でボットの 401 連打が実際にメール化したのと
-    # 同じ。非 livecure サーバーへの誤アクセスも 404 で毎回鳴っていた。
-    #
-    # ⚠ **同じ rescue が 5 本に複写されていたのが取りこぼしの原因**なので、
-    # クラスを足すのではなくヘルパへ寄せた。判定の本体は `report_error`
-    # （ステータスで見るので新しい 4xx を投げても漏れない）。
-    #
-    # 409 / 422 だけ構造化ログを残すのは、期待動作として頻度を追いたいため。
-    def handle_program_entry_error(error, key)
-      case error
-      when Ginseng::ConflictError
-        # 409 (auto_update? 有効時 / 重複キー / 書き込みロック競合 #4534)
-        Logger.new.info(program_entry: {event: 'conflict', key:, message: error.message})
-      when Ginseng::ValidateError
-        # 422 (days が不正 等)
-        Logger.new.info(program_entry: {event: 'invalid', key:, message: error.message})
-      else
-        report_error(error)
-      end
-    end
-
     def handle_annict_write_error(error, kind:, lock:, id_label:, id_value:)
       if error.is_a?(Ginseng::ConflictError)
         handle_annict_conflict(error, kind:, lock:, id_label:, id_value:)
@@ -1224,6 +1199,31 @@ module Mulukhiya
     rescue => e
       e.log(acct: acct.to_s)
       return nil
+    end
+
+    # 番組表編集 5 本の rescue (#4629)。
+    #
+    # ⚠⚠ **`AuthError` と `NotFoundError` が `else` へ落ちて alert していた。**
+    # 無効トークン・非管理者トークンで叩かれるたびに Sentry イベントと管理者への
+    # アラートメールが飛ぶ形で、#4594 でボットの 401 連打が実際にメール化したのと
+    # 同じ。非 livecure サーバーへの誤アクセスも 404 で毎回鳴っていた。
+    #
+    # ⚠ **同じ rescue が 5 本に複写されていたのが取りこぼしの原因**なので、
+    # クラスを足すのではなくヘルパへ寄せた。判定の本体は `report_error`
+    # （ステータスで見るので新しい 4xx を投げても漏れない）。
+    #
+    # 409 / 422 だけ構造化ログを残すのは、期待動作として頻度を追いたいため。
+    def handle_program_entry_error(error, key)
+      case error
+      when Ginseng::ConflictError
+        # 409 (auto_update? 有効時 / 重複キー / 書き込みロック競合 #4534)
+        Logger.new.info(program_entry: {event: 'conflict', key:, message: error.message})
+      when Ginseng::ValidateError
+        # 422 (days が不正 等)
+        Logger.new.info(program_entry: {event: 'invalid', key:, message: error.message})
+      else
+        report_error(error)
+      end
     end
 
     def fetch_json(http, url, accept)

@@ -96,6 +96,42 @@ module Mulukhiya
       assert_equal(0, handler.dropped.count)
     end
 
+    # ⚠⚠ **枠切れで落ちた添付も記録する (#4630 / #4633)。**従来は完全に無音で、
+    # 6 枚送って 4 枚しか付かなくても送信側にも運用者にも何も出なかった。
+    def test_slot_exhausted_candidates_are_recorded
+      handler = build_handler
+      payload = {'media' => Concurrent::Array.new}
+      queue = Queue.new
+      6.times {|i| queue.push({'image_url' => "https://example.com/#{i}.png"})}
+
+      handler.send(:run_workers, queue, payload, Concurrent::AtomicFixnum.new(4))
+      handler.send(:drain, queue)
+
+      assert_equal(4, payload['media'].count)
+      assert_equal(2, handler.dropped.count)
+      assert_equal(['SlotExhausted'], handler.dropped.map {|v| v[:reason]}.uniq)
+    end
+
+    # ⚠⚠ **落とした添付の本文をログに平文で残さない (#4630)。**
+    # `title` / `text` / `pretext` / `footer` / `author_name` / `fields[].value` は
+    # すべて投稿本文になる。⚠ gem 側の `mask_url` では落ちない。
+    def test_dropped_attachment_body_is_scrubbed
+      handler = build_handler
+      queue = Queue.new
+      queue.push({
+        'image_url' => 'https://example.com/x.png',
+        'title' => '見出し', 'text' => '本文', 'pretext' => '前置き',
+        'footer' => '脚注', 'author_name' => '著者',
+        'fields' => [{'title' => '項目', 'value' => '値'}]
+      })
+
+      handler.send(:drain, queue)
+      dumped = handler.dropped.first[:attachment].to_json
+
+      assert_not_match(/見出し|本文|前置き|脚注|著者|項目|値/, dumped)
+      assert_match(%r{https://example\.com/x\.png}, dumped)
+    end
+
     private
 
     # `consume` を実インスタンスで動かすためのダブル。
@@ -124,8 +160,8 @@ module Mulukhiya
         return uri.to_s
       end
 
-      def drop_attachment(_error, attachment)
-        @dropped.push(attachment)
+      def record_drop(reason, _message, attachment)
+        @dropped.push(reason:, attachment: scrub_log_params(attachment))
       end
     end
 

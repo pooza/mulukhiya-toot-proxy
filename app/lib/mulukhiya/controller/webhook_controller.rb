@@ -1,7 +1,7 @@
 module Mulukhiya
   class WebhookController < Controller
     post '/admin' do
-      raise Ginseng::ServiceUnavailableError, 'Info agent not configured' unless info_agent_service
+      raise ServiceUnavailableError, 'Info agent not configured' unless info_agent_service
       verify_admin_webhook!(@body)
       admin_payload = JSON.parse(@body)
       event = detect_admin_event(admin_payload)
@@ -11,7 +11,7 @@ module Mulukhiya
       return @renderer.to_s
     rescue => e
       # ⚠ **ここは `report_error` に寄せない (#4603)。**主な失敗は署名検証
-      # (`AuthError`) と設定不備 (`ServiceUnavailableError`) で、**署名不一致を
+      # (`AuthError`) と設定不備 (`ServiceUnavailableError`・503) で、**署名不一致を
       # 黙らせたくない**。4xx でも alert するのが正しい。
       e.alert
       @renderer.status = e.respond_to?(:status) ? e.status : 500
@@ -35,8 +35,10 @@ module Mulukhiya
       # (#4603)。同じ `verify_webhook!` を通す `get '/:digest'` は `e.log` なので、
       # **同じ例外が GET なら静か・POST なら alert** という非対称になっていた。
       report_error(e)
-      # ⚠ **`e.status` を直に呼ばない。**引き当ての失敗 (`Sequel::DatabaseConnectionError`
-      # 等) は `status` を持たないので、rescue 自身が `NoMethodError` で落ちる。
+      # ⚠ **`status` を持たない例外はここには来ない。**ginseng-core の refine が
+      # `StandardError#status` に 500 を定義しているため、引き当ての失敗
+      # (`Sequel::DatabaseConnectionError` 等) も 500 を返す＝ `report_error` の
+      # alert 側へ倒れる。`respond_to?` は refine が外れたときの保険。
       @renderer.status = e.respond_to?(:status) ? e.status : 500
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -72,9 +74,7 @@ module Mulukhiya
     private
 
     def verify_webhook!
-      unless controller_class.webhook?
-        raise Ginseng::ServiceUnavailableError, 'Webhook is not enabled'
-      end
+      raise ServiceUnavailableError, 'Webhook is not enabled' unless controller_class.webhook?
       return if webhook
       raise Ginseng::NotFoundError,
         "Webhook not found (digest: #{params[:digest][0, 12]}...)"
