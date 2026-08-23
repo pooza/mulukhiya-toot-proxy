@@ -1193,7 +1193,7 @@ shallu / gomander / sweep は 5.32.0 のままで、**本番のバージョン�
 
 | Issue | 状態 | 主眼 |
 | --- | --- | --- |
-| #4621 (S) | 🔓 **待ち条件が外れた**（#254 着地・1.8.30） | ALT 編集の PUT が Mastodon で 405（主軸） |
+| #4621 (S) | ✅ **クローズ済み**（2026-08-23・実 PUT で 200 と ALT 反映を確認） | ALT 編集の PUT が Mastodon で 405（主軸） |
 | #4636 | ✅ PR #4637（2026-08-23 マージ） | `features.media_update` を `/about` に足す |
 | #4584 (M) | ✅ **再現しなくなった**（2026-08-23・クローズ候補） | harness で `RemoteTagHandlerTest` の キュアスタ! タグが reject される |
 
@@ -1357,6 +1357,50 @@ harness フル実走（Mastodon）も **1192 tests / 0 failures / 0 errors**。
   **§8 harness の upstream チェック**は `last_checked` 2026-08-21 で 2 日のためスキップ（次回は 2026-08-25 以降）
 
 
+
+
+### 着地済み: #4621 ALT 編集の完遂（2026-08-23・クローズ）
+
+**dev24 に対し capsicum と同じ外部 https 経路で実 PUT を投げ、200 と ALT 反映を確認してクローズした。**
+
+| | 結果 |
+| --- | --- |
+| ALT | ✅ 更新された |
+| 添付 | ✅ **1 件のまま**（#4589 の「全部外れる」退行なし） |
+| CW / 閲覧注意 | ✅ 保持 |
+
+- 欠陥 1（500）＝ `media_attributes` の JSON 化・pooza/ginseng-fediverse#253（1.8.29・5.34.0 で着地）
+- 欠陥 2（405）＝ `update_status` だけ `create_headers` を通していない・#254（1.8.30・PR #4643）
+- ⚠ **検証用トークンは revoke ＋ Doorkeeper アプリごと destroy 済み**、一時ファイルも削除済み。
+  **トークンをセッションの出力に出さない**（リモート内の 0600 ファイルに置いて使い、最後に消す）
+
+### 着地済み: #4642 TagContainer の上書きが UTF-8 検査を迂回（2026-08-23・PR #4644）
+
+⚠⚠ **gem を上げただけでは届かない形の実例。**1.8.30 が `TagContainer` の入口に検査を入れたのに、
+**こちらが `self.scan` を上書きしていて基底を呼んでいなかった**ため、**タグ抽出の主経路が
+丸ごとガードを迂回していた**。
+
+```
+                     修正前                        修正後
+scan(不正バイト列)   ArgumentError                 Ginseng::ValidateError
+new([不正バイト列])  ArgumentError                 Ginseng::ValidateError
+scan(Shift_JIS)      Encoding::CompatibilityError  変換されて通る
+```
+
+- **上書きは基底から `to_utf8` を抜いただけの同一実装**だったので削除した。`new` はレシーバの
+  クラスを指すため挙動は変わらない
+- `initialize` も `super` の前に `sub` を掛けており、`sub` は不正バイト列で `ArgumentError` を
+  上げるので基底の `add` の検査へ届く前に落ちていた。先に `to_utf8` を通す
+- ⚠ **`filter_map` の `.presence` は残す。**空白だけの語を落とすのはこちら固有で、
+  基底の `normalize` は空白を残す
+- ⚠⚠ **テストは DB を要求しない位置に置いた。**隣の `TagContainerTest` は
+  `Environment.dbms_class&.config?` で**丸ごと omit される**ので、そちらに書くと一度も走らない
+  （#4632 で踏んだカバレッジの穴と同型）
+- ⚠⚠ **omit されている 4 件は dev24（DB あり）で実走できる。**`ruby bin/test.rb tag_container` が
+  **8 tests / 0 omissions** で緑。**上書き削除が通常のタグ抽出を壊していないことは、ここで初めて
+  確認できた**。ローカルの緑だけで判断していたら分からなかった
+- **クローズしていない**。通常のタグ抽出はモンキーテスト可能なので、実投稿での確認待ち
+  （[[feedback_issue-close-by-monkey-test]]）
 
 ### ステージング 4 台へのデプロイ（2026-08-23・#4621 / #4636）
 
