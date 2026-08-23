@@ -17,17 +17,50 @@ module Mulukhiya
     def handle_pre_webhook(payload, params = {})
       payload.deep_stringify_keys!
       payload[attachment_field] = Concurrent::Array.new(payload[attachment_field] || [])
+      queue = Queue.new
+      (payload['attachments'] || []).each {|v| queue.push(v)}
       slots = create_slots(payload)
-      Parallel.each(payload['attachments'] || [], in_threads: Parallel.processor_count) do |a|
-        next unless uri = Ginseng::URI.parse(a['image_url'])
-        next unless reserve_slot(slots)
-        upload_attachment(payload, uri, slots)
-      rescue => e
-        drop_attachment(e, a)
-      end
+      workers = [Parallel.processor_count, queue.size].min
+      Array.new(workers) {Thread.new {consume(queue, payload, slots)}}.each(&:join)
     end
 
     private
+
+    # ⚠⚠ **候補を「配る」のではなく「取りに行く」形にする (#4633・Codex P2)。**
+    # `Parallel.each` で候補を配ると、**枠切れで skip した候補は二度と戻らない**。
+    # 先に枠を取る実装と組み合わせると、先頭の候補が枠を全部押さえ→そのうち 1 本が
+    # 失敗して枠を返しても、**skip 済みの後続を拾う者がいない**＝空いた枠が
+    # 使われないまま、有効な添付が黙って落ちる（候補 5・枠 4・先頭で 1 失敗なら 3 枚）。
+    #
+    # 取りに行く形なら、**失敗して枠を返したワーカーがそのまま次の候補に使う**。
+    def consume(queue, payload, slots)
+      loop do
+        break unless attachment = pop_attachment(queue)
+        next unless uri = parse_image_uri(attachment)
+        unless reserve_slot(slots)
+          # ⚠ **取り出したまま降りない。**別のワーカーが失敗して枠を返したときに
+          # 拾える候補が消える。戻してから降りる。
+          queue.push(attachment)
+          break
+        end
+        upload_attachment(payload, uri, slots, attachment)
+      end
+    end
+
+    def pop_attachment(queue)
+      return queue.pop(true)
+    rescue ThreadError
+      return nil
+    end
+
+    # ⚠ **`image_url` を持たない添付は正常。**Slack legacy attachments は
+    # 本文だけのものが普通にあるので、落ちた扱いにしない（枠も取らない）。
+    def parse_image_uri(attachment)
+      return Ginseng::URI.parse(attachment['image_url'])
+    rescue => e
+      drop_attachment(e, attachment)
+      return nil
+    end
 
     # ⚠⚠ **握り潰しても黙って消さない (#4633)。**「1 枚落ちても投稿は通す」設計
     # 自体は正しいが、上限超過 (`/media/download/max_bytes`) も取得失敗も
@@ -64,12 +97,13 @@ module Mulukhiya
 
     # ⚠ **失敗したら枠を返す。**返さないと、取得に失敗しただけで後続の添付が
     # 枠切れで落ちる（従来は枠を先に取らないので起きなかった退行）。
-    def upload_attachment(payload, uri, slots)
+    # 返した枠は `consume` のループが次の候補に使う。
+    def upload_attachment(payload, uri, slots, attachment)
       payload[attachment_field].push(upload(uri))
       result.push(source_url: uri.to_s)
-    rescue
+    rescue => e
       slots.increment
-      raise
+      drop_attachment(e, attachment)
     end
   end
 end
