@@ -64,6 +64,20 @@ module Mulukhiya
       assert_false(config[CAPABILITY_PATH])
     end
 
+    # ⚠ 上のケースはどれも `Gem.loaded_specs` を差し替えて見ているので、
+    # **実際のピンが要件を満たしているかは 1 件も見ていない**。ここだけは
+    # 差し替えずに実物を見る。ピンが 1.8.30 未満へ戻ると (#4621 の取り込みが
+    # 巻き戻ると) ALT 編集は本番で 405 に戻るので、退行として落とす。
+    def test_pinned_fediverse_satisfies_gate
+      spec = Gem.loaded_specs['ginseng-fediverse']
+
+      assert_not_nil(spec)
+      assert_true(
+        spec.version >= ControllerMethods::MEDIA_UPDATE_FEDIVERSE_VERSION,
+        "ginseng-fediverse #{spec.version} < #{ControllerMethods::MEDIA_UPDATE_FEDIVERSE_VERSION}",
+      )
+    end
+
     private
 
     def with_capability(value)

@@ -1235,7 +1235,14 @@ shallu / gomander / sweep は 5.32.0 のままで、**本番のバージョン�
     表に出ていなかっただけ。**ステージング固有の話ではない**
   - ⚠ **2026-08-23（2 回目の同期）で pooza/ginseng-fediverse#254 のマージを確認した。**
     `main` は **1.8.30**＝`MEDIA_UPDATE_FEDIVERSE_VERSION` と同値。**残るのはこちら側の取り込みと実機確認だけ**
-  - **残作業**: ~~#254 マージ~~ → `bundle update ginseng-fediverse`（1.8.30）→ dev24 再デプロイ →
+  - **`bundle update ginseng-fediverse`（1.8.29 → 1.8.30）は 2026-08-23 に取り込み済み**（PR #4643）。
+    `rake lint` / `rake test`（1121 tests・0 failures・0 errors）とも緑。
+    ⚠ **取り込んだだけでは `/about` の `media_update` は false のまま**（capability の既定が
+    fail-closed なので、サーバーごとの opt-in が要る）。**「gem を上げた＝動く」ではない**
+  - ⚠ **既存のゲートのテストは 8 件とも `Gem.loaded_specs` を差し替えて見ており、
+    「実際のピンが要件を満たしているか」を 1 件も見ていなかった。**差し替えないケースを 1 件足した
+    （`test_pinned_fediverse_satisfies_gate`）。ゲート定数を 99.0.0 にすると落ちることを確認済み
+  - **残作業**: ~~#254 マージ~~ → ~~`bundle update ginseng-fediverse`（1.8.30）~~ → dev24 再デプロイ →
     capsicum と同じ PUT で **200 と ALT 反映**を確認 → クローズ
   - ⚠ **検証用の投稿は dev24 に残してある**（`117137204800272266`・visibility=direct・
     CW ＋閲覧注意＋添付 1・ALT は「変更前の説明」のまま）。
