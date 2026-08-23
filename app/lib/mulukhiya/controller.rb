@@ -19,6 +19,11 @@ module Mulukhiya
       'i', 'access_token'
     ].freeze
 
+    # `scrub_log_params` が潜る深さの上限 (#4630)。Block Kit の
+    # `blocks[].text.text` で 4、`attachments[].blocks[].text.text` で 6 なので、
+    # 実用形には十分な余裕がある。
+    MAX_LOG_SCRUB_DEPTH = 12
+
     # 上流へそのまま中継してよい受信ヘッダ (#4598)。
     #
     # ⚠ **`@headers` の丸投げはしない。**`Host` / `Content-Length` / `Cookie` /
@@ -225,12 +230,39 @@ module Mulukhiya
 
     private
 
+    # ⚠⚠ **入れ子まで走査する (#4630)。**従来は `scrubbed.key?(key)` の
+    # **トップレベル走査だけ**だったが、Slack 互換 webhook が実際に使う
+    # Block Kit の本文は `blocks` / `attachments` の入れ子の中にある。
+    #
+    #   {"blocks":[{"type":"section","text":{"text":"（本文）"}}]}
+    #
+    # ⚠ **同じ本文を `text` で送れば `[FILTERED]` になるのに、`blocks` で送ると
+    # 平文で syslog に残る**＝送り方で秘匿の効き方が変わっていた。#4394 が
+    # 「投稿本文系フィールドを平文で残さない」ために入れた対策の抜け。
+    # gem 側の `Logger#mask` はキー名で落とすが、`/logger/mask_fields` は
+    # 資格情報の名前だけなので本文系はそちらでも落ちない。
     def scrub_log_params(params)
-      scrubbed = params.deep_dup
-      SCRUBBED_LOG_PARAMS.each do |key|
-        scrubbed[key] = '[FILTERED]' if scrubbed.key?(key)
+      return scrub_log_value(params.deep_dup, 0)
+    end
+
+    # ⚠ **深さで打ち切る。**外部から渡る JSON なので、際限なく潜ると
+    # スタックを掘り尽くせる。打ち切りは**残す側ではなく落とす側**へ倒す
+    # （読めない深さのものを平文で通すより、伏せて出すほうが安全）。
+    def scrub_log_value(value, depth)
+      return '[FILTERED]' if depth > MAX_LOG_SCRUB_DEPTH
+      case value
+      when Hash
+        value.each_key do |key|
+          value[key] = if SCRUBBED_LOG_PARAMS.include?(key.to_s)
+            '[FILTERED]'
+          else
+            scrub_log_value(value[key], depth + 1)
+          end
+        end
+      when Array
+        value.map! {|v| scrub_log_value(v, depth + 1)}
       end
-      return scrubbed
+      return value
     end
 
     def default_renderer_class
