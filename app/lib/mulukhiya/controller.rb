@@ -12,6 +12,10 @@ module Mulukhiya
     SCRUBBED_LOG_PARAMS = [
       'status', 'text', 'body', 'comment', 'spoiler_text', 'cw',
       'q', 'title', 'artist', 'album', # word/suggest・nowplaying のユーザー入力 (#4394)
+      # ⚠ Slack legacy attachments の本文系 (#4630)。`SlackWebhookPayload#format_attachment`
+      #   が **すべて投稿本文へ組み立てる**ので、`text` だけ伏せても残りが平文で残る。
+      #   `title` は上の行で既に対象。`fields[].value` はキー名が `value`。
+      'pretext', 'author_name', 'value', 'footer',
       'code', # OAuth 認可コード (spotify/auth・annict/auth)。短命だが資格情報なので伏せる
       # ⚠ アクセストークン本体。`i` は Misskey がボディで渡す（MisskeyController#token
       #   のフォールバック）。/logger/mask_query_params は URL のクエリにしか効かない

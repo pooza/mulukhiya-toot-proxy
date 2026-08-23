@@ -56,6 +56,28 @@ module Mulukhiya
       assert_equal('https://example.com/a.png', scrubbed['attachments'][0]['image_url'])
     end
 
+    # ⚠⚠ **legacy attachments は `text` 以外も投稿本文になる (#4630・Codex P1)。**
+    # `SlackWebhookPayload#format_attachment` が pretext / author_name / title /
+    # text / fields[].value / footer を**すべて本文へ組み立てる**ので、`text` だけ
+    # 伏せても残りが平文で残る。
+    def test_scrubs_legacy_attachment_body_fields
+      scrubbed = scrub('attachments' => [{
+        'pretext' => '前置き',
+        'author_name' => '著者',
+        'title' => '見出し',
+        'text' => '本文',
+        'fields' => [{'title' => '項目', 'value' => '値'}],
+        'footer' => '脚注',
+      }])
+      attachment = scrubbed['attachments'][0]
+
+      %w[pretext author_name title text footer].each do |key|
+        assert_equal('[FILTERED]', attachment[key], "#{key} が伏せられていない")
+      end
+      assert_equal('[FILTERED]', attachment['fields'][0]['value'])
+      assert_equal('[FILTERED]', attachment['fields'][0]['title'])
+    end
+
     # 入れ子の資格情報も落とす。
     def test_scrubs_nested_token
       scrubbed = scrub('payload' => {'inner' => {'access_token' => 'SECRET'}})
