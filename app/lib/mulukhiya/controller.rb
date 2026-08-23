@@ -166,8 +166,13 @@ module Mulukhiya
     # エラーコード（Misskey の `error.code`）で、ユーザー起因の失敗まで
     # Sentry イベントを立てないための口。
     def handle_gateway_error(error, silent_statuses: [401], silent_codes: [])
-      silent = silent_statuses.include?(error.source_status) ||
-        silent_codes.include?(upstream_error_code(error))
+      # ⚠⚠ **内部読みの失敗は無条件に alert する (#4631)。**モロヘイヤ自身の
+      # `fetch_status` 等が落ちているのはクライアント起因ではないので、
+      # `silent_statuses` に 404 が入っていても抑止してはいけない。
+      # 抑止すると「ALT 編集が全ユーザーで壊れている」が syslog 1 行に消える。
+      silent = !error.is_a?(InternalGatewayError) &&
+        (silent_statuses.include?(error.source_status) ||
+          silent_codes.include?(upstream_error_code(error)))
       # ⚠ 抑止するのは Sentry だけ。silent でも syslog には残す。完全に無音だと
       # 「上流の仕様変更で全投稿が弾かれる」ような事故の頻度・偏りを追えない。
       silent ? error.log : error.alert
@@ -175,7 +180,12 @@ module Mulukhiya
       # サーバー由来 (ForeignGatewayError) は、ステータスもボディも返さず 502 +
       # 自前の文言に倒す。他人のサーバーの応答を返すと、クライアントからは
       # 「モロヘイヤの上流がそう言っている」ように読めてしまう。
-      if error.is_a?(ForeignGatewayError)
+      #
+      # ⚠⚠ **内部読みの失敗 (InternalGatewayError) も同じ扱い (#4631)。**
+      # 上流の 404 をそのまま返すと、クライアントには「その投稿は無い」と読める。
+      # 実際に無いのではなく**モロヘイヤ側の読みが失敗した**ので、502 + 自前の
+      # 文言に倒して**取り違えを防ぐ**。
+      if error.is_a?(ForeignGatewayError) || error.is_a?(InternalGatewayError)
         @renderer.message = {error: error.message}
         return @renderer.status = error.status
       end
