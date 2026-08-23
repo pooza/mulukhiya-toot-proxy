@@ -1373,6 +1373,12 @@ harness フル実走（Mastodon）も **1192 tests / 0 failures / 0 errors**。
 - 欠陥 2（405）＝ `update_status` だけ `create_headers` を通していない・#254（1.8.30・PR #4643）
 - ⚠ **検証用トークンは revoke ＋ Doorkeeper アプリごと destroy 済み**、一時ファイルも削除済み。
   **トークンをセッションの出力に出さない**（リモート内の 0600 ファイルに置いて使い、最後に消す）
+- 🔴 **モンキーテスト用に dev24 へ別のトークンが生きている**（2026-08-23 設置）。
+  `~mastodon/alt_try.sh` ＋ `~mastodon/.alt_try_token`（0600）／`~mastodon/.alt_try_ids`。
+  Doorkeeper アプリ名は `alt-try`。**#4642 / #4621 のモンキーテストが済んだら revoke ＋ destroy する**
+  （`app.access_tokens.each(&:revoke)` → `app.destroy!` → 3 ファイル削除）。
+  ⚠ **ALT 編集は Mastodon の WebUI からは試せない**（`X-Mulukhiya-Purpose` を付けないので
+  nginx が #4474 の設計どおり 405 で弾く）。capsicum かこのスクリプトを使う
 
 ### 着地済み: #4642 TagContainer の上書きが UTF-8 検査を迂回（2026-08-23・PR #4644）
 
