@@ -1242,7 +1242,9 @@ shallu / gomander / sweep は 5.32.0 のままで、**本番のバージョン�
   - ⚠ **既存のゲートのテストは 8 件とも `Gem.loaded_specs` を差し替えて見ており、
     「実際のピンが要件を満たしているか」を 1 件も見ていなかった。**差し替えないケースを 1 件足した
     （`test_pinned_fediverse_satisfies_gate`）。ゲート定数を 99.0.0 にすると落ちることを確認済み
-  - **残作業**: ~~#254 マージ~~ → ~~`bundle update ginseng-fediverse`（1.8.30）~~ → dev24 再デプロイ →
+  - **ステージング 4 台へのデプロイは 2026-08-23 に完了**（下の専用節を参照）。**dev24 / dev25 / dev26 とも
+    `/about` の `features.media_update` が `true`**。⚠ **残るのは capsicum と同じ実 PUT の確認だけ**
+  - **残作業**: ~~#254 マージ~~ → ~~`bundle update ginseng-fediverse`（1.8.30）~~ → ~~dev24 再デプロイ~~ →
     capsicum と同じ PUT で **200 と ALT 反映**を確認 → クローズ
   - ⚠ **検証用の投稿は dev24 に残してある**（`117137204800272266`・visibility=direct・
     CW ＋閲覧注意＋添付 1・ALT は「変更前の説明」のまま）。
@@ -1354,6 +1356,47 @@ harness フル実走（Mastodon）も **1192 tests / 0 failures / 0 errors**。
 - **§6-2 chubo2 Issue 棚卸し**は最終 2026-07-31 で 30 日未経過のためスキップ（次回は 2026-08-30 以降）。
   **§8 harness の upstream チェック**は `last_checked` 2026-08-21 で 2 日のためスキップ（次回は 2026-08-25 以降）
 
+
+
+### ステージング 4 台へのデプロイ（2026-08-23・#4621 / #4636）
+
+**dev24-27 のすべてを develop `40081211`（5.35.0・ginseng-fediverse 1.8.30）へ揃えた。**
+
+| | HEAD | fediverse | health | `features.media_update` |
+| --- | --- | --- | --- | --- |
+| dev24 美食丼 | `40081211` | 1.8.30 | 200 | **true** |
+| dev25 キュアスタ！ | `40081211` | 1.8.30 | 200 | **true** |
+| dev26 デルムリン丼 | `40081211` | 1.8.30 | 200 | **true**（nginx 是正後） |
+| dev27 ダイスキー | `40081211` | 1.8.30 | 200 | false（Misskey・仕様どおり） |
+
+⚠⚠ **ステージングのデプロイは 2026-08-23 からこちらが代行する**（ユーザー明示）。
+⚠ **ただし「マージしてください」は依然マージだけ。**言葉どおりに切り分ける。
+
+- ⚠ **許可ルールは `Bash(timeout 590 ssh devNN.b-shock.local 'set -e *)` が 4 台ぶん要る。**
+  **読み取りだけの ssh は auto モードで通るので、「SSH が通る＝デプロイできる」と早合点しない**
+- ⚠ **#4478（FreeBSD の rc スクリプトが SSH 越しの restart で戻ってこない）は未修正。**
+  `sudo service <name> restart < /dev/null > /dev/null 2>&1` と**呼び出し側で fd を切れば回避できる**。
+  3 台とも 3 サービスを 1 周で再起動できた
+- ⚠ **`config/local.yaml` の `mastodon:` は既存ブロックなので、`capabilities:` を追記する形にする**
+  （別ブロックで足すと YAML のキー重複になる）。`awk` で `^mastodon:$` の直後へ差し込み、
+  **`YAML.load_file` で構文を確かめてから**再起動した
+- ⚠ **health は起動直後に一度 `sidekiq: NG` の 503 を返す。**`curl --retry` で吸収する。
+  一発目だけ見て「壊れた」と判断しない
+
+#### dev26 の nginx を dev24/25 と同一にした（chubo2#188 の一部）
+
+**dev26 だけ `$status_put_backend` が 2 要素キーのままで、さらに `if ($http_x_mulukhiya_purpose != '')`
+の段が location に残っていた**＝ #4474 未是正。map ファイルを dev24 と**同一内容（md5 一致）**に置き換え、
+location の `if` 3 行を落とした。
+
+- **是正後は dev24 と同一挙動**: `Host` 付き `PUT /api/v1/statuses/1` が
+  **Purpose あり → 422**（モロヘイヤに到達）／**Purpose なし → 405**（reject）
+- ⚠ **dev24 / dev25 は最初から是正済みだった。**chubo2#188 の「3 台とも `localhost` のまま」は
+  **少なくとも dev24/25 には当てはまらない**（両台とも `127.0.0.1`・3 要素キー）。
+  **Issue の記述を実機の正典にしない**（[[project_lbock-not-chubo2-managed]] と同じ轍）
+- ⚠ **「是正前は 405 だった」を実測していない。**map の形から構造的に 3008 へ到達し得なかった、
+  までが言えること。**測っていないものを測ったように書かない**
+- 両ファイルとも `.bak.20260823` を残してある
 
 ### 2026-08-23 セッション同期の記録（2 回目）
 
