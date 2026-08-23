@@ -203,8 +203,8 @@ module Mulukhiya
     # `fetch_status` から取る（リクエストが 1 本増える）。
     def restored_body(id)
       headers = upstream_headers
-      source = sns.fetch_status_source(id, {headers:})
-      status = sns.fetch_status(id, {headers:})
+      source = fetch_internal(:fetch_status_source, id, headers)
+      status = fetch_internal(:fetch_status, id, headers)
       reject_poll!(status)
       return sanitize_spoiler({
         status: source['text'].to_s,
@@ -212,6 +212,17 @@ module Mulukhiya
         sensitive: status['sensitive'] ? true : false,
         media_ids: Array(status['media_attachments']).map {|v| v['id']},
       })
+    end
+
+    # 内部読みの失敗をクライアントの更新失敗と区別する (#4631)。
+    #
+    # ⚠ **ここを素の `GatewayError` のまま流すと、上流の 404 が
+    # 「その投稿は無い」としてクライアントへ返り、しかも
+    # `STATUS_UPDATE_SILENT_STATUSES` の抑止に乗って Sentry にも出ない。**
+    def fetch_internal(method, id, headers)
+      return sns.public_send(method, id, {headers:})
+    rescue Ginseng::GatewayError => e
+      raise InternalGatewayError.wrap(e, method)
     end
 
     # ⚠⚠ **アンケートを持つ投稿は編集させない (#4625)。**
