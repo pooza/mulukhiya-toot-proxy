@@ -1267,10 +1267,18 @@ DB 直読み層（account / status / attachment / postgres）も **omission 0 �
 | #4649 (M) | webhook で落ちた添付を送信側へ返す（#4633 の残り） | |
 | #4658 (bug) | shallu の related 辞書 2 本が **Rhino ランタイム廃止**で死亡（V8 へ移行 + 再デプロイ） | ⚠ **着手条件待ち**（GAS 側はユーザー作業） |
 | #4659 (bug) | 辞書ソースの上流 GAS が**間欠 404** を返し、痩せた辞書でキャッシュを上書きしている | ⚠ **キュアスタ！のニチアサに直結** |
-| #4618 (M) | `/health` のプール指標が pgbouncer と Sidekiq 側の逼迫を取りこぼす（#4639 の rollback 信号） | **P2 は PR #4660 で着地。P1 が残り** |
+| #4618 (M) | `/health` のプール指標が pgbouncer と Sidekiq 側の逼迫を取りこぼす（#4639 の rollback 信号） | **P2 は PR #4660 でマージ済み（2026-08-28）。P1 が残り** |
 
 ⚠ **#4658 は 5.36.0 のスコープに入っているが、こちらでは動かせない。**GAS の V8 移行と再デプロイが
 先で、新 URL が出たら名前付きパス経由で config へ反映する。**リリースのブロッカーにしない**。
+
+#### マイルストーン未割当だが 5.36.0 に入りうるもの（2026-08-28 時点）
+
+| Issue | なぜ今か |
+| --- | --- |
+| #4663 | `ginseng-style` セッションからの引き継ぎ。**rack / sinatra の版の制約をこちらへ移す**。⚠ **①（`token_mismatch` の実測）は 2026-08-28 に完了・0 件**。残るのは ②（`Gemfile` で自分で宣言）と ③（同時アクセスの回帰テスト） |
+| #4612 | ⚠ **「gem 側の対応待ち」という前提が既に崩れていた**（下記）。security ラベル |
+
 
 ### media_catalog track の現在地（2026-08-27 更新）
 
@@ -1283,6 +1291,114 @@ zugoga 本番の実測は **page1 295ms / only_person 6.5ms / cursor 3.1ms**（�
 （upstream の書き込み経路に触るのは index の比でない摩擦）。
 ⚠ **B 案では追加 index は不要**（本体の `index_media_attachments_on_account_id_and_status_id` で成立）
 ＝ #4353 の恒久化対象は増えない。
+
+### 2026-08-28 セッション同期の記録
+
+- **ブランチ**: `develop`。⚠⚠ **開始時点で `origin/develop` の CI が赤だった**（下記）
+- **Dependabot**: open アラート 0 件
+- **open PR**: 2 件。#4660（#4618 の P2）は**本日マージ**、#4661 は 5.36.0 のドラフト
+- **Codex**: 直近 12 マージ PR ＋ open PR を横断走査。**未消化なし**（リアクション付与済み）
+- **harness upstream チェック**: `last_checked` が 08-27 で **1 日しか経っていないのでスキップ**（既定 4 日）
+- **chubo2**: `origin/main` と差分なし。open Issue は 27 件（前回 26 件から #205 が増）。
+  最終 Issue 棚卸しは 2026-07-31 で **28 日経過＝ 30 日未満なのでスキップ**（次は 08-30 以降）
+- **辞書台帳**: 再生成してコミット（chubo2 `84e4169`）。🔴 は前回と同じ 3 件で変化なし。
+  ⚠ 🟡 間欠（#4659）は本日ぶん標本 47 回で 2 件（前回は 85 回中 14 件）。
+  **日をまたぐ前の途中経過なので「直った」と読まない**
+
+#### 🔴 develop の CI が 4 日間赤のまま滞留していた（2026-08-28 是正）
+
+**2026-08-23 13:01 の run を最後に、develop の CI は 08-27 の 5 本を含めてすべて赤だった。**
+
+- 原因は **rubocop 1.90.0 が追加した `Style/DirectiveScope`**。単一の文を囲む
+  `disable` / `enable` の対を検出するようになり、`config.rb` と `annict_service.rb` の 2 箇所が引っかかった
+- ⚠⚠ **`Gemfile.lock` で rubocop を固定していても効かない。**CI の bundle install ステップは
+  `bundle exec rake bundle:update` を回すので、**毎回その時点の最新へ解決し直す**
+  （ログに `Fetching rubocop 1.90.0 (was 1.89.0)` が出ている）。**lock は CI の lint に対しては素通し**
+- 🔴 **気づかれなかった理由**: 08-27 のコミットは**全部 docs だった**。コードを触っていないので
+  「自分の変更のせい」の疑いが立たず、**誰も run を見なかった**。PR #4660 の赤も同じ原因だったが、
+  PR の中身と結びつけられずマージが止まっていた
+- 是正は `9cbb46d9`（`# rubocop:disable-next` へ書き換え・lock の rubocop も 1.90.0 へ）。
+  ⚠ **`disable-next` は 1.90.0 で入った書式**なので、lock を上げずに書式だけ変えると逆に壊れる
+
+⚠ **教訓: docs だけのコミットでも push 後に CI を見る。**上流の gem が勝手に上がる造りなので、
+**こちらが何も変えていない日にこそ赤くなる。**
+
+#### ginseng-\* 8 本を取り込んだ（2026-08-28・ピンのずれ 0）
+
+**2026-08-27 の「整理が落ち着くまで待つ」判断は、待つ理由が消えたので解除した。**
+`ginseng-style` セッションが **8/8 の出荷を完了**している（#4663）。
+
+| gem | 版 | 中身 |
+| --- | --- | --- |
+| ginseng-core | 1.19.0 → **1.23.0** | Masking 5 件・HTTP 4 件・Logger 2 件 |
+| ginseng-fediverse | 1.8.30 → **1.8.31** | `TagContainer.to_utf8` が妥当な UTF-8 の ASCII-8BIT を弾かない |
+| ginseng-web | 1.3.46 → **2.0.0** | `Ginseng::Web::Sinatra` 削除の出荷 ＋ 事故構成タグ（`v1.4.0`〜`v1.4.4`）の追い越し |
+| ginseng-postgres | 1.3.17 → **2.0.0** | 実行時の変更なし（タグ運びのみ） |
+| ginseng-youtube | 2.0.1 → **3.0.0** | 同上 |
+| ginseng-redis / piefed | 版は据え置き | 同上（revision のみ追随） |
+| ginseng-style | v1.1.4 → **v1.1.10** | RuboCop 設定。⚠ **タグ → SHA 固定へ**（pooza/ginseng-style#75。タグは付け替えられる） |
+
+- **gem 単位で `bundle update` し、そのつど `rake lint` / `rake test`**（1165 tests, 0 failures, 0 errors, 322 omissions）
+- ⚠ **`ginseng-web` の major は公開クラスの削除だが、モロヘイヤは `Ginseng::Web::Sinatra` を参照していない**
+  （Controller は `Sinatra::Base` 直継承）。⚠⚠ **rack / sinatra の依存の床は 1 文字も変わっていない**
+- 併せて **#4617（gem が配る `cert:update` / `cert:check` の受け取り）をクローズ**。
+  `Rakefile` に `Ginseng.load_tasks(environment: Mulukhiya::Environment)` を 1 行。
+  ⚠ **`cert/cacert.pem` は持たない**（上流の推奨。更新の当番が増える）。`cert/` は .gitignore へ
+
+#### rack 3.2 事故の制約をこちらへ引き取る（#4663・2026-08-28）
+
+⚠ **`sinatra` / `rack` / `rack-session` / `tilt` の版は、いま `ginseng-web` の gemspec が決めている。**
+モロヘイヤはこの 4 つを自分の `Gemfile` で宣言していない（`puma '~> 8.0'` だけ自前）。
+⚠⚠ **ところが `ginseng-web` の `lib/` はこの 4 つを一行も使っていない**（`Ginseng::Web::Sinatra` を消した時点で理由が消えた）。
+
+- **上限固定は実在した**（2026-01-24 に `sinatra ~>4.1.0` / `rack ~>3.1.14`）が、**2026-08-09 の #4508 で外れた**。
+  🔴 **外れた原因は、上限の由来がどこにも書かれていなかったこと。**gemspec のコメントは
+  一貫して `# CVE-2024-21510`＝**下限の理由**で、上限（2025-10 の事故）の理由は無かった。
+  **記録されていた理由だけが保存され、記録されていなかった理由が落ちた**
+- ⚠ **advisory はこの事故を知らない**（原因未特定で CVE になっていない）。
+  `sinatra 4.2.0` は CVE-2025-61921 の修正版だが、**事故の版そのもの**
+
+🎯 **① `token_mismatch` は本番 4 台で 0 件（2026-08-28 実測）。**
+4 台とも `sinatra 4.2.1` / `rack 3.2.7`。`/var/log/mulukhiya-toot-proxy.log` のローテート済み
+全世代（各 9 世代）＋ `/var/log/messages` を走査して **0**。
+
+- ⚠ **`/var/log/messages` に 1 件ヒットするのは走査に使った `sudo` 自身の監査行**。自作自演なので 0 と読む
+- **窓は 2026-08-19〜08-28 の 9 日間で、08-23（日）のニチアサ実況を含む**（＝年間で最も同時アクセスが多い時間帯）
+- ⚠ sinatra 4.2.1 は 5.33.0（08-12 デプロイ）から本番に居るので、**08-12〜08-18 はログが流れて確かめられない**
+- ⚠ **Sentry の 0 は根拠として弱い。**クライアント起因の 4xx は alert に上げない造り（#4603 / #4629）
+- 🔴 **「再発していない」の実測にはなるが「4.2 系が安全」の証明ではない。**
+  事故は 2 週間かけて顕在化した。**③ の同時アクセス回帰テストは要る**
+
+残り: ②（`Gemfile` で 4 つを自分で宣言 → マージ → `ginseng-web` から削除の順。あちらは `3.0.0` になる）と
+③（`verify_token_integrity!` は `app/` にしかなく `test/` に無い。2026-02 の 500 req × 2 並列は手動の一回きり）。
+
+#### #4612 の「gem 側の対応待ち」は既に崩れていた（2026-08-28）
+
+⚠⚠ **`Ginseng::HTTP#get` の `max_bytes` はもうある。**pooza/ginseng-core#526 は
+`waiting:pr` を付けたままクローズされたが、**実装は #538 として別に着地していた**。
+⚠ **本日の 1.23.0 で入ったのではなく、1.19.0（＝ #4616 を取り込んだ 2026-08-20）の時点で既にあった。**
+
+- `MediaFile.download` は依然として二段構え（HEAD の `Content-Length` → 受信後の `body.bytesize`）で、
+  `HTTP.new.get` に `max_bytes:` を渡していない
+- ⚠ [media_file.rb:253](../app/lib/mulukhiya/media_file.rb#L253) の `max_bytes:` は**ログのフィールド名**。grep が引っかかるので紛らわしい
+- ⚠ 載せ替えるときは **pinning（`request_validating_hops`）と両立することを webmock で確かめる**。
+  gem 側は分岐が別経路なので、渡し忘れると黙って無効化される
+
+#### Sentry 1X の内訳を取り直した（2026-08-28）
+
+⚠ **直近 10 イベントは少なくとも 4 系統に分かれていて、過去コメントの系統（gem stub 欠損 / chubo2#41）は 1 件も入っていない。**
+
+| 日時 (UTC) | server | 中身 |
+| --- | --- | --- |
+| 08-27 21:15 | zugoga | `bin/dqdai-official.rb` の `Net::ReadTimeout`（上流フィード無応答） |
+| 08-25 22:08 / 08-18 22:09 | **`mulukhiya`** | exit 1024。シェルの `ignored null byte in input` ＋ `jq` の parse error |
+| 08-03 22:29 | **`mulukhiya`** | exit 1024。`jq` の parse error のみ |
+| 08-01 / 07-27 ×3 | zugoga | `bin/toei.rb` の `PG::Connection::Pollable#polling_connect_or_reset` |
+| 07-22 ×3 | zugoga | `bin/tanpre_movie.rb` の `Ginseng::HTTP#get` |
+
+- ⚠ **chubo2#41 を本イシューの代表として読まない。**あの系統は 2026-05-12 を最後に再発していない
+- ⚠ **`server_name=mulukhiya` は本番 4 台のいずれでもない。**発生元の特定は次の同期へ持ち越し
+- ⚠ 本文の `bin/*.rb` は **git 管理外**（[[project_mulukhiya-git-external-files]]）なので、リポジトリ側から原因を追えない
 
 ### 2026-08-27 セッション同期の記録
 
@@ -1377,6 +1493,8 @@ zugoga 本番の実測は **page1 295ms / only_person 6.5ms / cursor 3.1ms**（�
   対応していないだけで、後続の `GET` は 302 → 200 で成功している。**これを障害と読まない**
 
 #### ginseng-\* ピンのずれの判断（2026-08-27）
+
+> ⚠ **この判断は 2026-08-28 に解除済み**（8 本とも取り込み・ピンのずれ 0）。以下は当日の記録として残す。
 
 ⚠⚠ **8 本すべてずれているが、取り込まない。整理が落ち着くまで待つ（2026-08-27 ユーザー判断）。**
 **ginseng-style を導入してから ginseng 系 gem が活発に整理されている最中で、いま取り込むと二度手間になる。**
@@ -2229,6 +2347,14 @@ GitHub Actions (`.github/workflows/test.yml`):
 - 個別テスト実行: `bin/test.rb ケース名`
 - 依存: ffmpeg, libidn11-dev, libvips-dev
 
+⚠⚠ **`Gemfile.lock` は CI の lint を縛らない。**bundle install ステップが
+`bundle exec rake bundle:update` を回すので、**毎回その時点の最新へ解決し直す**。
+🔴 **rubocop の新版が新しい cop を持ってくると、こちらが 1 行も変えていない日に CI が赤くなる**
+（2026-08-25 前後に 1.90.0 が `Style/DirectiveScope` を追加し、develop が 4 日間赤のまま滞留した）。
+
+⚠ **docs だけのコミットでも push 後に run を見ること。**コードを触っていない日は
+「自分の変更のせい」の疑いが立たないので、**赤が誰にも見られずに積み上がる。**
+
 ### CI の緑が意味しないこと（#4503）
 
 CI には SNS の実サーバーも Mastodon の Postgres も無い。`Ginseng::TestCase#run_test` は
@@ -2403,6 +2529,19 @@ rack 3.2 + Sinatra 4.2 で「異なるアカウントの投稿として送信さ
 診断スクリプト: `bin/diag/concurrent_token_test.rb`。
 詳細は [postmortem-2025-10-rack32.md](archive/postmortem-2025-10-rack32.md) を参照。
 
+⚠⚠ **上限固定（`sinatra ~>4.1.0` / `rack ~>3.1.14`）は 2026-08-09 の #4508 で外れている。**
+🔴 **外れた原因は、上限の由来が `ginseng-web` の gemspec に書かれていなかったこと**（コメントは
+一貫して下限の理由である `# CVE-2024-21510` だった）。⚠ **advisory はこの事故を知らない**
+（原因未特定で CVE になっていない）。**advisory だけで床を決めない。**
+
+- **本番 4 台は `sinatra 4.2.1` / `rack 3.2.7`。**⚠ **`token_mismatch` は 2026-08-28 の実測で 0 件**
+  （ログ保持 9 日ぶん・08-23 のニチアサ実況を含む）。**「再発していない」であって「起きない」ではない**
+- **版の制約を `ginseng-web` からこちらへ移す作業が #4663。**⚠ `ginseng-web` の `lib/` は
+  `sinatra` / `rack` / `rack-session` / `tilt` を一行も使っていないのに、gemspec だけが宣言を持っている
+- ⚠⚠ **この 4 つと `puma` を触るときは、系列をまたぐなら「下限を上げるだけ」でも同時アクセステストを通す。**
+  🔴 **事故のときの指定がまさに `sinatra >=4.2.0` だった**
+- ⚠ `verify_token_integrity!` は `app/` にしかなく `test/` に無い。**あれは本番の防御策であって回帰テストではない**（#4663 の ③）
+
 ### 認証トークンの復号パターン
 
 ユーザー由来の OAuth トークンは「平文」と「暗号化済み（`.encrypt`）」の両形式で入って来うる:
@@ -2439,9 +2578,12 @@ daemon-spawn gem は廃止済み（#4098）。`Ginseng::Daemon` はスタンド�
 
 ### ginseng-web
 
-- `Ginseng::Web::Sinatra` ラッパークラスは廃止済み（v1.3.45）
+- `Ginseng::Web::Sinatra` ラッパークラスは廃止済み（v1.3.45。**削除の出荷は 2.0.0**）
 - Controller は `Sinatra::Base` を直接継承
-- rack >= 3.1.14 / Sinatra ~> 4.1.0
+- **現行は 2.0.0**（2026-08-28 取り込み）。⚠ major の理由は公開クラスの削除と、
+  **事故構成 `rack >=3.2.3` + `sinatra >=4.2.0` を要求する打ち捨てられたタグ（`v1.4.0`〜`v1.4.4`）の追い越し**
+- gemspec の宣言は `rack >=3.1.14` / `rack-session >=2.1.1` / `sinatra >=4.1.0` / `tilt >=2.1.0` / `puma >=6.4.3`
+  （**すべて下限のみ・上限なし**）。⚠ **これらは `lib/` で一行も使われていない。**引き取りは #4663
 - デフォルトブランチ: main（2026-02-22にstableからリネーム済み。他のginseng-*も全てmainに統一済み）
 
 ### 番組表システム（Program）
