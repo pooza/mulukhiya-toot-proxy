@@ -1255,23 +1255,34 @@ DB 直読み層（account / status / attachment / postgres）も **omission 0 �
 
 ## 開発中: 5.36.0
 
-**スコープ未確定。**マイルストーン未作成・バージョンバンプ未実施。
+**スコープ確定（2026-08-27）。**[マイルストーン 5.36.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/634)
+作成済み・8 件割り当て済み・`config/application.yaml` は 5.36.0 へバンプ済み（`dbc4cd9d`）。
 
-⚠ **着手時にまず `config/application.yaml` の `/mulukhiya/version` をバンプする**
-（開発中バージョンを常に識別可能にするため）。⚠ **スコープが固まったら GitHub
-マイルストーンを作って割り当てる**（docs 記載だけでは未確定扱い）。
+| Issue | 主眼 | 状態 |
+| --- | --- | --- |
+| #4654 (M) | 最上位 `error` ブロックと読み系 rescue が `report_error` に寄っていない（**4 系統目**・約 25 箇所） | |
+| #4655 (S) | webhook digest がリクエストパスとして毎回 syslog に平文で残る | |
+| #4656 (S) | `api.md` の追随漏れ 4 件（`media_update` は 404 にならない / 502 の新パターン ほか） | |
+| #4657 (M) | 構造改善 6 件（`paired` の 429/401 / エラー型の複写 / `catalog_offset` の複写 ほか） | |
+| #4649 (M) | webhook で落ちた添付を送信側へ返す（#4633 の残り） | |
+| #4658 (bug) | shallu の related 辞書 2 本が **Rhino ランタイム廃止**で死亡（V8 へ移行 + 再デプロイ） | ⚠ **着手条件待ち**（GAS 側はユーザー作業） |
+| #4659 (bug) | 辞書ソースの上流 GAS が**間欠 404** を返し、痩せた辞書でキャッシュを上書きしている | ⚠ **キュアスタ！のニチアサに直結** |
+| #4618 (M) | `/health` のプール指標が pgbouncer と Sidekiq 側の逼迫を取りこぼす（#4639 の rollback 信号） | **P2 は PR #4660 で着地。P1 が残り** |
 
-5.35.0 のリリース前レビューから繰り越した受け皿:
+⚠ **#4658 は 5.36.0 のスコープに入っているが、こちらでは動かせない。**GAS の V8 移行と再デプロイが
+先で、新 URL が出たら名前付きパス経由で config へ反映する。**リリースのブロッカーにしない**。
 
-| Issue | 主眼 |
-| --- | --- |
-| #4654 (M) | 最上位 `error` ブロックと読み系 rescue が `report_error` に寄っていない（**4 系統目**・約 25 箇所） |
-| #4655 (S) | webhook digest がリクエストパスとして毎回 syslog に平文で残る |
-| #4656 (S) | `api.md` の追随漏れ 4 件（`media_update` は 404 にならない / 502 の新パターン ほか） |
-| #4657 (M) | 構造改善 6 件（`paired` の 429/401 / エラー型の複写 / `catalog_offset` の複写 ほか） |
-| #4649 (M) | webhook で落ちた添付を送信側へ返す（#4633 の残り） |
-| #4658 (bug) | shallu の related 辞書 2 本（GAS `/exec`）が失効したまま（#4573 が運用側へ送った分の受け皿） |
-| #4659 (bug) | 辞書ソースの上流 GAS が**間欠 404** を返し、痩せた辞書でキャッシュを上書きしている |
+### media_catalog track の現在地（2026-08-27 更新）
+
+**#4393 はクローズした。**完了条件 2 つ（cursor 経路が秒以下 / Gate 2 を go に切り替えられる状態）を
+どちらも満たしている。B 案（ローカルアカウント駆動の LATERAL merge）は `08630d64` で develop に着地済みで、
+zugoga 本番の実測は **page1 295ms / only_person 6.5ms / cursor 3.1ms**（いずれも 26,000ms 級から）。
+
+⚠ **残るのは #4639（overlay flip の実施）だけ。**その rollback 信号が #4618。
+⚠ **案 1（`media_attachments` に locality 列を足す非正規化）は却下済み・再提案しない**
+（upstream の書き込み経路に触るのは index の比でない摩擦）。
+⚠ **B 案では追加 index は不要**（本体の `index_media_attachments_on_account_id_and_status_id` で成立）
+＝ #4353 の恒久化対象は増えない。
 
 ### 2026-08-27 セッション同期の記録
 
