@@ -1270,6 +1270,68 @@ DB 直読み層（account / status / attachment / postgres）も **omission 0 �
 | #4656 (S) | `api.md` の追随漏れ 4 件（`media_update` は 404 にならない / 502 の新パターン ほか） |
 | #4657 (M) | 構造改善 6 件（`paired` の 429/401 / エラー型の複写 / `catalog_offset` の複写 ほか） |
 | #4649 (M) | webhook で落ちた添付を送信側へ返す（#4633 の残り） |
+| #4658 (bug) | shallu の related 辞書 2 本（GAS `/exec`）が失効したまま（#4573 が運用側へ送った分の受け皿） |
+
+### 2026-08-27 セッション同期の記録
+
+- **ブランチ**: `develop`、`origin/develop` と同一・未コミット無し。5.35.0 リリース済みで 5.36.0 は未バンプ
+- **Dependabot**: open アラート 0 件
+- **open PR**: 0 件。**Codex は全件消化済み**（返信＋リアクション）。⚠ **直近 35 マージ PR を横断で
+  リアクション 0 走査したところ、PR #4622 の P1 が 1 件だけ素通しだった。**返信（＝却下・指摘は初回
+  コミットのスナップショットを見ていた）は 08-23 に置かれていたが 👎 が付いておらず、次の同期でも
+  未消化と判定される状態だった。この同期で 👎 を付与して閉じた（[[feedback_codex-review-window-too-narrow]] のとおり）
+- **Sentry**: 新規 5 件。**2 系統に分かれ、片方は実事象・未是正だった**
+  - **MULUKHIYA-TOOT-PROXY-2V / 2T / 2S / 2R**（vulcan・2026-08-26T22:11〜22:19Z ＝ **08-27 07:11 JST**）
+    — ダイスキー本番 53 分停止の巻き添え（Redis 接続拒否 ×3 ＋ Misskey ReadTimeout ×1）。
+    原因は chubo の logrotate global `create 640 root adm` が非 root デーモンのログを殺す地雷で、
+    **モロヘイヤ側は被害者**。是正・記録とも chubo2 側で完了済み（pooza/chubo2#202）。triage コメント済み
+  - **MULUKHIYA-TOOT-PROXY-2Q**（shallu・7 件・08-24〜08-26）— `tagging dictionary fetch returned nothing`。
+    ⚠ **実事象。#4573 が「運用側の是正で別途対応」としてスコープ外へ送ったまま、受け皿 Issue が
+    起票されずにクローズされていた**（[[feedback_defer-requires-followup-issue]] の抜け）。**#4658 として起票**
+- **⚠ shallu の related 辞書は 08-22 以降ずっと 2/3 が死んでいる**（実測）。当日の refresh 73 回すべてが
+  `empty_sources: 2` で断続ではなく恒常。本番 4 台の比較で **壊れているのは shallu だけ**:
+
+  | ホスト | sources | empty | entries |
+  | --- | --- | --- | --- |
+  | shallu | 3 | **2** | **83** |
+  | zugoga | 5 | 0 | 1828 |
+  | vulcan | 5 | 0 | 1828 |
+  | gomander | 10 | 0 | 3957 |
+
+  失効した 2 本は shallu からも手元からも **HTTP 200 + `text/html`** を返すので、経路ではなく
+  GAS デプロイ側。**関連語タグ付けは美食丼で今も機能していない**（83 entries は残る 1 本ぶん）。
+  ⚠ **#4573 の検知そのものは意図どおり動いている。**鳴っている中身が未是正なだけ
+- **harness upstream チェック**（`last_checked` を 2026-08-27 へ更新）: Mastodon は v4.7.0 stable のままで
+  `verified` と同一・新しい RC 無し。Misskey も 2026.7.0 stable のままで 2026.8.0-alpha.0 から進んでいない。**両系とも対応不要**
+- **chubo2**: `origin/main` と差分なし。open Issue は 26 件（前回 24 件から #200 / #204 が増）。
+  `docs/infra-note.md` の**最終 Issue 棚卸しは 2026-07-31 で 27 日経過**＝ 30 日未満なのでスキップ（次は 08-30 以降）。
+  最終ドキュメント棚卸しは 08-23 で直近
+- **ginseng-\* のピン**: ⚠ **8 本すべてずれている**（前回 08-23 の同期でも 8 本ずれ・7 本見送り）。判断は下の台帳
+
+#### ginseng-\* ピンのずれの判断（2026-08-27）
+
+⚠ **8 本すべてずれているが、この同期では取り込まない（② 次のマイルストーンで取り込む）。**
+5.36.0 のスコープが未確定でバージョンバンプもしていないため、`bundle update` は
+スコープ確定と同じサイクルに乗せる。**次の同期で同じ調査をしないために内訳を残す。**
+
+- **ginseng-core `1.19.0` → `1.23.0`（②・優先度は高い）** — ⚠ **モロヘイヤが触る面に当たるものが多い**:
+  - `Masking`: **#580 URL のパスに埋まった資格情報**・**#582 文字列の途中に埋まった URL**・
+    #587 不正バイト列で `ArgumentError`・#591 ASCII 非互換エンコーディング・#592 マスクのリストが
+    `Config#reload` に追随しない。⚠ **[[project_log-credential-exposure]] と同じトラックの続き**で、
+    #4616 で取り込んだ 1.19.0 より後に 5 本積み上がっている
+  - `HTTP`: #568 別オリジンへのリダイレクトで `basic_auth` / `digest_auth` を落とす・#576 `cookies:` も同様・
+    #569 `post` / `put` / `delete` / `upload` でも `host_validator` を効かせる・#569 `Location` 付きの 304 を追わない。
+    ⚠ **#4524（SSRF allowlist）と同じ面**
+  - `Logger`: #499 の残り（`info` / `error` もブロック形式を受ける）・raise していない例外でバックトレース展開が落ちる
+- **ginseng-fediverse `1.8.30` → `1.8.31`（②）** — `TagContainer.to_utf8` が **中身が妥当な UTF-8 の
+  ASCII-8BIT を弾いていた**のを是正（pooza/makoto2#171）。⚠ **#4642 / PR #4644 で入れた
+  「上書きが検査を迂回する」の直後の面**なので、取り込み時は本体側のテストと突き合わせる
+- **ginseng-web / postgres / redis / youtube / piefed / style（③ 見送り）** — 中身は
+  `ginseng-style` のタグ固定（`main` 参照 → `v1.1.x`）と CI matrix の Ruby 版揃え、
+  タグを打つ workflow の追加のみ。**実行時の挙動は変わらない**
+- ⚠ **ginseng-style 側が 2026-08-27 に「4 gem に計 8 版ぶんの出荷が滞留」を実測して
+  タグ打ちを composite action 化している**（pooza/ginseng-style#65）。向こうのセッションが
+  動いている最中なので、`bundle update` はそれが落ち着いてからでよい
 
 ## リリース済み: 5.33.0（2026-08-12）
 
