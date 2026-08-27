@@ -8,10 +8,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 4a029e9c4d4c14f82c86c3836db830c3144a0e98
+  revision: 87cd033fb39faf35bb6202c2a3cd2559c6b677eb
   branch: main
   specs:
-    ginseng-core (1.19.0)
+    ginseng-core (1.23.0)
       activesupport (>= 7.0.7.1)
       addressable (>= 2.9.0)
       cgi (>= 0.4.2)
@@ -42,30 +42,30 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: c283c52195497fbc27c4274ded2359430c3f0c08
+  revision: bd2d558e22d41842f76a8dd7226f048c9d079651
   branch: main
   specs:
-    ginseng-fediverse (1.8.30)
+    ginseng-fediverse (1.8.31)
 
 GIT
   remote: https://github.com/pooza/ginseng-piefed.git
-  revision: 4c09c50c42344c89bf9ad5d034916ef0b6ba9904
+  revision: e70e384bc308f86078cd09a459c95449ba63ee8b
   branch: main
   specs:
     ginseng-piefed (0.1.1)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
-  revision: ecc7a8fb9902dad91e99892aad2862930aad4a54
+  revision: cfda28fa13b887ce550fa0e876de5847016fcbe1
   branch: main
   specs:
-    ginseng-postgres (1.3.17)
+    ginseng-postgres (2.0.0)
       pg
       sequel
 
 GIT
   remote: https://github.com/pooza/ginseng-redis.git
-  revision: 6e0f74efd3a3ae2b65ff4d7639c33c74cb29ecca
+  revision: 292093c12365c3e7ee27858e34a1d44fe5e98da0
   branch: main
   specs:
     ginseng-redis (2.0.5)
@@ -73,10 +73,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-style.git
-  revision: 0c9ddb19d902d675504fc2d6ed258e590901073f
-  tag: v1.1.4
+  revision: e5917622d069be324c6879c2a1d2522069d48d2c
+  ref: e5917622d069be324c6879c2a1d2522069d48d2c
   specs:
-    ginseng-style (1.1.4)
+    ginseng-style (1.1.10)
       rubocop
       rubocop-minitest
       rubocop-performance
@@ -84,10 +84,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: a79343178426449195e0edc38a06cbc090c2c500
+  revision: 9814f164d64658c94923c55b0e8a920b6c798960
   branch: main
   specs:
-    ginseng-web (1.3.46)
+    ginseng-web (2.0.0)
       erb
       puma (>= 6.4.3)
       rack (>= 3.1.14)
@@ -100,10 +100,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-youtube.git
-  revision: 44e3a53434236b7064c4e0454965d5eec78ed0ca
+  revision: 4e68124c97581897e53b27b394ab22af8c6255ca
   branch: main
   specs:
-    ginseng-youtube (2.0.1)
+    ginseng-youtube (3.0.0)
 
 GIT
   remote: https://github.com/pooza/rspotify.git
@@ -286,7 +286,7 @@ GEM
       net-protocol
     net-pop (0.1.2)
       net-protocol
-    net-protocol (0.2.2)
+    net-protocol (0.3.0)
       timeout
     net-smtp (0.5.1)
       net-protocol
@@ -372,8 +372,8 @@ GEM
     ricecream (0.2.1)
     rss (0.3.3)
       rexml
-    rubocop (1.89.0)
-      json (~> 2.3)
+    rubocop (1.90.0)
+      json (>= 2.3)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.1.0)
       parallel (>= 1.10)
