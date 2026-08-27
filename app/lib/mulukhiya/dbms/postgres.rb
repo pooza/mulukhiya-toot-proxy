@@ -42,12 +42,20 @@ module Mulukhiya
       return Ginseng::Postgres::DSN.parse(config['/postgres/dsn']) rescue nil
     end
 
+    # ⚠⚠ **プールの観測は `SELECT 1` より先に取る (#4618)。**
+    # `SELECT 1` 自身がプールから接続を借りるので、詰まっているときは
+    # **health のリクエストが待ち行列に並ぶ**。並び終えてから読むと
+    # **自分の前の待ちが捌けた後の値**になり、有限のスパイクを丸ごと取りこぼす。
+    # 「詰まりに近づいている」を見るための指標なのに、**近づいている瞬間だけ見えない**
+    # という逆立ちが起きていた。
     def self.health
       return {status: 'OK', skipped: true} unless config?
+
+      snapshot = pool
       instance.connection.fetch('SELECT 1 AS ok').first
-      return {status: 'OK'}.merge(pool)
+      return {status: 'OK'}.merge(snapshot)
     rescue Sequel::PoolTimeout => e
-      return {error: e.message, status: 'WARN', reason: 'pool_exhausted'}.merge(pool)
+      return {error: e.message, status: 'WARN', reason: 'pool_exhausted'}.merge(snapshot || pool)
     rescue => e
       return {error: e.message, status: 'NG'}
     end
