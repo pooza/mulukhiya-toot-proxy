@@ -2073,6 +2073,17 @@ Issue #4233 の APIController 段階的リファクタは「1〜2 マイルス�
 - `docs/infra-note.md` に変更があれば MEMORY.md のインフラセクションに反映が必要か判断
 - chubo2 の `gh issue list --state open` で open Issue の変動を確認
 - ginseng-\* は**こちらが送った Issue / PR の進捗**と、**下の「ピンのずれ」**だけ見る（一覧の棚卸しはしない）
+- **辞書エンドポイントの台帳を回す**（2026-08-27 追加・pooza/chubo2#205）:
+
+  ```sh
+  cd ~/repos/chubo2 && ruby tools/dictionary-registry.rb shallu zugoga gomander vulcan --write
+  ```
+
+  差分が出たら読む。⚠ **見るのは 🔴 の 2 つだけでよい** — **🔴 直書き**（設定が
+  `script.google.com` を直接引いている＝**台帳から辿れないので腐っても気づけない**）と
+  **🔴 死亡**（ログ上ずっと空）。**#4658 はこの 2 つが重なった状態**で 2 週間以上
+  気づかれなかった。🟡 間欠は #4659 の既知（毎回出る）、⚪ 取得のみは読み辞書の
+  正常な姿なので**異常と読まない**
 
 ##### ginseng-\* のピンのずれを見る（2026-08-21 追加）
 
