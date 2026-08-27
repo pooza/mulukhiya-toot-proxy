@@ -16,3 +16,7 @@ var/*.yaml
 
 # ローカル Redis ダンプ
 dump.rdb
+
+# rake cert:update が置く CA バンドル。⚠ **コミットしない**（更新の当番が増える。
+# 上流も pooza/ginseng-core#515 で当番不在になった）。無い状態は無害 (#4617)
+cert/
