@@ -1485,7 +1485,17 @@ Slack 互換のペイロードを投稿に変換する。`text` / `blocks` / `at
 
 数えるなら**送った画像 URL の本数**（`blocks[].type == "image"` ＋ 各 attachment の
 `image_url` / `thumb_url`）と、**応答の添付配列**を突き合わせること。
-⚠ **応答のキーは SNS で違う** — Mastodon は `media_attachments`、Misskey は `files`。
+
+⚠⚠ **応答は SNS 本体の投稿 API のものをそのまま返す**（モロヘイヤ独自のラップは無い）ので、
+**添付配列の場所が SNS 種別で違う。**
+
+| controller | 添付配列のパス |
+|---|---|
+| Mastodon | `media_attachments` |
+| Misskey | 🔴 **`createdNote.files`**（トップレベルの `files` ではない） |
+
+🔴 **Misskey は `{"createdNote": {...}}` で 1 枚ラップされている。**トップレベルの `files` を
+読むと**常に見つからず、「全部落ちた」と誤判定する**。
 
 `visibility` を省略すると、アカウント設定（WebUI「Slack互換webhook」セクション、`/webhook/visibility`）の
 既定が使われる。**未知の値も同じくアカウント設定の既定へ倒れる**（エラーにはせず、syslog に
