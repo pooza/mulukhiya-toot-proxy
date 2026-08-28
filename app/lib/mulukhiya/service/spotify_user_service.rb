@@ -153,7 +153,7 @@ module Mulukhiya
       # **こちらの client_id/secret の設定ミス**で、ユーザーが何度再連携しても
       # 直らない。ユーザーのせいにせず GatewayError のまま上げて Sentry に
       # 出す (#4480)。上流の error は OAuth 2.0 の `{"error": "..."}` 形式。
-      raise unless e.source_status&.between?(400, 499)
+      raise unless HTTPStatus.client_error?(e.source_status)
       body = e.source_body
       raise if body.is_a?(Hash) && OPERATOR_FAULT_OAUTH_ERRORS.include?(body['error'])
       raise Ginseng::AuthError, 'Spotify re-authentication required'

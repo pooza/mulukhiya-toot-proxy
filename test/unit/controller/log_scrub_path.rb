@@ -119,8 +119,8 @@ module Mulukhiya
       assert_nil(scrub(nil))
     end
 
-    # ⚠ **クラスメソッドからも使う。**`Webhook.create` の rescue は key（＝digest）を
-    # ログへ出す。
+    # ⚠ **クラスメソッドからも引ける**ことを押さえる。digest をログへ出す経路が
+    # クラス側に生えたときに、素の値が漏れないため。
     def test_webhook_class_scrubs_digest
       assert_equal('a1b2c3d4a1b2...', Webhook.scrub_log_digest(DIGEST))
     end
