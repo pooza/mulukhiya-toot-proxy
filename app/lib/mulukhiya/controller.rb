@@ -153,9 +153,11 @@ module Mulukhiya
       client_error?(error) ? error.log : error.alert
     end
 
+    # ⚠ 見るのは `status`（モロヘイヤがクライアントへ返す値）。上流の
+    # `source_status` ではない——`handle_gateway_error` が別に扱う。
     def client_error?(error)
       return false unless error.respond_to?(:status)
-      return error.status.to_i.between?(400, 499)
+      return HTTPStatus.client_error?(error.status)
     end
 
     # 上流のエラー包絡をそのままクライアントへ返す (#4480)。
@@ -177,11 +179,12 @@ module Mulukhiya
     # エラーコード（Misskey の `error.code`）で、ユーザー起因の失敗まで
     # Sentry イベントを立てないための口。
     def handle_gateway_error(error, silent_statuses: [401], silent_codes: [])
-      # ⚠⚠ **内部読みの失敗は無条件に alert する (#4631)。**モロヘイヤ自身の
-      # `fetch_status` 等が落ちているのはクライアント起因ではないので、
-      # `silent_statuses` に 404 が入っていても抑止してはいけない。
-      # 抑止すると「ALT 編集が全ユーザーで壊れている」が syslog 1 行に消える。
-      silent = !error.is_a?(InternalGatewayError) &&
+      # ⚠⚠ **抑止を無条件に外す型がある (#4631)。**モロヘイヤ自身の `fetch_status`
+      # 等が落ちているのはクライアント起因ではないので、`silent_statuses` に 404 が
+      # 入っていても抑止してはいけない。抑止すると「ALT 編集が全ユーザーで
+      # 壊れている」が syslog 1 行に消える。
+      # ⚠ 判定はクラスの列挙ではなくマーカーメソッドで行う (#4657)。
+      silent = !never_silent?(error) &&
         (silent_statuses.include?(error.source_status) ||
           silent_codes.include?(upstream_error_code(error)))
       # ⚠ 抑止するのは Sentry だけ。silent でも syslog には残す。完全に無音だと
@@ -196,7 +199,8 @@ module Mulukhiya
       # 上流の 404 をそのまま返すと、クライアントには「その投稿は無い」と読める。
       # 実際に無いのではなく**モロヘイヤ側の読みが失敗した**ので、502 + 自前の
       # 文言に倒して**取り違えを防ぐ**。
-      if error.is_a?(ForeignGatewayError) || error.is_a?(InternalGatewayError)
+      # ⚠ 由来が増えても `WrappedGatewayError` を継げば自動で拒まれる (#4657)。
+      if error.is_a?(WrappedGatewayError)
         @renderer.message = {error: error.message}
         return @renderer.status = error.status
       end
@@ -205,6 +209,13 @@ module Mulukhiya
       body = error.source_body
       @renderer.message = body.is_a?(Hash) ? body : {error: error.message}
       return @renderer.status = error.source_status
+    end
+
+    # ⚠ 素の `Ginseng::GatewayError` は `never_silent?` を持たない。
+    # `respond_to?` で見るのは、包み直していない上流エラーを既定（抑止しうる）
+    # 側へ倒すため。
+    def never_silent?(error)
+      return error.respond_to?(:never_silent?) && error.never_silent?
     end
 
     # 上流の `{"error": {"code": "..."}}` から code を取る。取れなければ nil。

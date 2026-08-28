@@ -5,6 +5,7 @@ inflections:
   css_renderer: CSSRenderer
   ffmpeg_command_builder: FFmpegCommandBuilder
   http: HTTP
+  http_status: HTTPStatus
   itunes_album_uri: ItunesAlbumURI
   itunes_song_uri: ItunesSongURI
   itunes_track_uri: ItunesTrackURI

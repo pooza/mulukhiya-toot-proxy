@@ -128,17 +128,12 @@ module Mulukhiya
     # 区別できないので、**404 に化かしてはいけない経路は `create!` を使う**
     # (#4603 の Codex P1)。DB 障害で全 webhook が落ちている状態を 4xx として
     # 扱うと、クライアント起因の alert 抑止に乗って**無音**になる。
-    def self.create(key)
-      return create!(key)
-    rescue => e
-      # ⚠ **key は digest（＝資格情報）で来うる (#4655)。**そのまま出すと
-      # 引き当てが失敗するたびに完全な鍵が syslog に残る。
-      e.log(key: scrub_log_digest(key.to_s))
-      return nil
-    end
-
     # 引き当てに失敗したら例外をそのまま上げる。**戻り値の nil は
     # 「そんな digest は無い」だけを意味する。**
+    #
+    # ⚠⚠ **全例外を握って nil を返す `create` は削除した (#4657)。**#4603 で
+    # `create!` へ移した時点で app 側の呼び出し元は無くなっていたが、
+    # **DB 障害を「未知の digest」の 404 に化かす fail-open** がそのまま残っていた。
     def self.create!(key)
       return new(key) if key.is_a?(UserConfig)
       return find_token_by_digest(key)&.account&.webhook
@@ -159,7 +154,7 @@ module Mulukhiya
     #
     # webhook_digest は空トークンで ConfigError を投げる (#4487)。valid? は
     # `to_s.empty?` しか見ないので、空白だけのトークン行はここまで到達する。
-    # 例外がループの外へ出ると Webhook.create の rescue が nil を返し、
+    # 例外がループの外へ出ると引き当て全体が落ち、
     # **その行より後ろにある正しい webhook URL が「見つからない」ことになる**。
     # 壊れた行は次へ送るだけにして、走査自体は最後まで続ける (#4487 / PR #4522)。
     # ⚠ ただし黙ってスキップもしない。DB 断や /crypt/salt の設定崩れは全行を
