@@ -41,7 +41,7 @@ module Mulukhiya
       response['Location'] = redirect_url
       return ''
     rescue => e
-      e.alert
+      report_error(e)
       @renderer = SlimRenderer.new
       @renderer.template = 'token_error'
       @renderer[:error] = e.message
