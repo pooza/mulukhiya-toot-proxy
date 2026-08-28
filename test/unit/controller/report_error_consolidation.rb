@@ -82,16 +82,21 @@ module Mulukhiya
   class ControllerRescueConsolidationTest < TestCase
     # 現地に理由が書いてある唯一の例外 (#4603)。署名検証の失敗 (`AuthError`) を
     # 黙らせたくないので、4xx でも alert するのが正しい。
-    ALLOWED = {'webhook_controller.rb' => ['e.alert']}.freeze
+    #
+    # ⚠⚠ **ファイル単位で許すと同じファイルの他ルートまで素通しになる**（Codex P2）。
+    # `webhook_controller.rb` には `post '/:digest'` / `get '/:digest'` も居て、
+    # そちらが `e.alert` に戻されても気づけなくなる。**ルート単位で固定する。**
+    ALLOWED = {'webhook_controller.rb' => {"post '/admin'" => 'e.alert'}}.freeze
 
     DIRECT_CALL = /\A(e\.log|e\.alert|e\.status < 500 \? e\.log : e\.alert)\z/
 
     def test_no_direct_log_or_alert_in_bare_rescue
       offenders = controller_sources.flat_map do |path|
-        bare_rescue_bodies(path).filter_map do |lineno, body|
+        name = File.basename(path)
+        bare_rescues(path).filter_map do |scope, lineno, body|
           next unless DIRECT_CALL.match?(body)
-          next if ALLOWED[File.basename(path)]&.include?(body)
-          "#{File.basename(path)}:#{lineno} #{body}"
+          next if ALLOWED.dig(name, scope) == body
+          "#{name}:#{lineno} (#{scope}) #{body}"
         end
       end
 
@@ -101,9 +106,24 @@ module Mulukhiya
     # ⚠ **allowlist が腐らないようにする。**#4603 の意図した例外が消えたら
     # allowlist ごと落とす。
     def test_allowlist_is_still_live
-      bodies = bare_rescue_bodies("#{Environment.dir}/app/lib/mulukhiya/controller/webhook_controller.rb")
+      ALLOWED.each do |name, routes|
+        found = bare_rescues("#{Environment.dir}/app/lib/mulukhiya/controller/#{name}")
+          .to_h {|scope, _lineno, body| [scope, body]}
 
-      assert_include(bodies.map(&:last), 'e.alert')
+        routes.each do |scope, body|
+          assert_equal(body, found[scope], "#{name} の #{scope} は allowlist と一致するべき")
+        end
+      end
+    end
+
+    # ⚠ allowlist に入れていない同居ルートが本当に検査対象になっているか。
+    # **これが無いと「ルート単位に絞った」という主張自体が検証されない。**
+    def test_sibling_routes_are_still_inspected
+      scopes = bare_rescues("#{Environment.dir}/app/lib/mulukhiya/controller/webhook_controller.rb")
+        .map(&:first)
+
+      assert_include(scopes, "post '/:digest'")
+      assert_include(scopes, "get '/:digest'")
     end
 
     private
@@ -113,17 +133,33 @@ module Mulukhiya
       return ["#{dir}/controller.rb"] + Dir.glob("#{dir}/controller/*.rb")
     end
 
-    # 素の `rescue => e` の本体先頭（コメント・空行は飛ばす）を [行番号, 本文] で返す。
+    # 素の `rescue => e` を [囲みスコープ, 行番号, 本体先頭] で返す。
     # ⚠ 型付きの `rescue Ginseng::GatewayError => e` は対象外。上流の 4xx をそのまま
     # 透過する等、ステータスでは決められない判断が現地にある。
-    def bare_rescue_bodies(path)
+    def bare_rescues(path)
       lines = File.readlines(path)
       return lines.each_with_index.filter_map do |line, i|
         next unless /^\s*rescue\s*=>\s*e\s*$/.match?(line)
-        body = lines[(i + 1)..].find {|l| l.strip.present? && !l.strip.start_with?('#')}
+        rest = lines[(i + 1)..]
+        body = rest.find {|l| l.strip.present? && !l.strip.start_with?('#')}
         next unless body
-        [lines[(i + 1)..].index(body) + i + 2, body.strip]
+        [scope_of(lines, i), rest.index(body) + i + 2, body.strip]
       end
+    end
+
+    # 直近の Sinatra ルートまたは `def` / ブロック名。⚠ **ルートを跨いで遡らない**よう、
+    # どちらか先に当たったほうで止める。
+    def scope_of(lines, index)
+      i = index
+      until i.negative?
+        case lines[i]
+        when /^\s*(get|post|put|delete|patch) (['"])(.+?)\2 do$/ then return "#{::Regexp.last_match(1)} '#{::Regexp.last_match(3)}'"
+        when /^\s*def (\S+)/ then return "def #{::Regexp.last_match(1)}"
+        when /^\s*(before|after|error|not_found) do/ then return "#{::Regexp.last_match(1)} block"
+        end
+        i -= 1
+      end
+      return '(toplevel)'
     end
   end
 end
