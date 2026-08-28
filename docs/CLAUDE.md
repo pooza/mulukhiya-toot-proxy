@@ -2575,6 +2575,19 @@ Controller 層での注意:
 
 **Ruby 構文の落とし穴**: `return X rescue Y` を `def ... rescue ... end` のメソッド末尾 rescue と併用すると、`return` が発火せず次行にフォールスルーする（`return X; rescue Y` と解釈される）。必ず `plain = X rescue Y; return plain` か `return (X rescue Y)` と書くこと。5.19.1 の初版修正で実際に踏んだ罠で、[LineAlertHandler#token](app/lib/mulukhiya/handler/line_alert_handler.rb#L17-L19) のように外側 rescue がない関数では同じ書き方が動くため気づきにくい。
 
+### Webhook digest は資格情報（#4655）
+
+`POST /mulukhiya/webhook/<digest>` は **digest だけで投稿権限が通る**（`verify_webhook!` 以外に認証が無い）。
+⚠⚠ **したがってパスをログへ出すと、webhook を 1 回使うたびに完全な鍵が syslog に残る。**
+
+- 既存の掃討はどれも当たらない — `Ginseng::Logger#mask_url` は `\A<scheme>://` に一致する**値**にしか
+  効かず、`SCRUBBED_LOG_PARAMS` は**パラメータのキー**しか見ず、nginx 側のパターン（#4511 の
+  `access_token=` / `"i":"` / `[?&]i=`）にも当たらない
+- 対策は `LogScrubber#scrub_log_path`。⚠ **マウント位置ではなく digest の形（64 桁の 16 進）で判定する。**
+  webhook のパスは `config/route.yaml` で変えられるので、**接頭辞で切ると設定変更で黙って秘匿が外れる**
+- ⚠ **`not_found` のボディだけは丸めない。**あれはログではなく**要求した本人へ返す値**で、
+  丸めても秘匿にならず 404 のボディ（api.md の契約）が変わるだけ
+
 ### Webhook digest の安定性
 
 `Webhook.create_digest` は Webhook URL の一部となる digest を生成する。入力は SNS の URI、OAuth トークン、`/crypt/salt`（フォールバック: `/crypt/password`）の3要素。

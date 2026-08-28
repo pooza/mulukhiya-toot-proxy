@@ -27,6 +27,26 @@ module Mulukhiya
       'i', 'access_token'
     ].freeze
 
+    # ⚠⚠ **webhook の digest は資格情報そのもの (#4655)。**
+    # `POST /mulukhiya/webhook/<digest>` は **digest だけで投稿権限が通る**
+    # （`verify_webhook!` 以外に認証が無い）。⚠ **既存の掃討はどれも当たらない** —
+    # `Ginseng::Logger#mask_url` は `\A<scheme>://` に一致する**値**にしか効かず、
+    # `SCRUBBED_LOG_PARAMS` は**パラメータのキー**しか見ず、nginx 側のパターン
+    # （#4511 の `access_token=` / `"i":"` / `[?&]i=`）にも当たらない。
+    # **webhook を 1 回使うたびに完全な鍵が syslog に残っていた。**
+    #
+    # ⚠⚠ **マウント位置ではなく digest の形で判定する。**webhook のパスは
+    # `config/route.yaml` で変えられるし、テストでは各 Controller が root に載る。
+    # **接頭辞で切ると、設定を変えた瞬間に黙って秘匿が外れる**（fail-open）。
+    # `Webhook.create_digest` は `String#sha256`＝ **64 桁の 16 進**なので、
+    # 経路上でこの形を持つのは digest だけ。
+    WEBHOOK_DIGEST_PATTERN = /\A[0-9a-f]{64}\z/i
+
+    # digest として残す先頭の文字数。⚠ `verify_webhook!` のエラーメッセージ
+    # （`"Webhook not found (digest: #{params[:digest][0, 12]}...)"`）と揃える。
+    # **同じ digest がログとエラーで別の形に見えると突き合わせられない。**
+    LOG_DIGEST_PREFIX_LENGTH = 12
+
     # `scrub_log_params` が潜る深さの上限 (#4630)。Block Kit の
     # `blocks[].text.text` で 4、`attachments[].blocks[].text.text` で 6 なので、
     # 実用形には十分な余裕がある。
@@ -41,6 +61,23 @@ module Mulukhiya
     # 平文で syslog に残る**＝送り方で秘匿の効き方が変わっていた。
     def scrub_log_params(params)
       return scrub_log_value(params.deep_dup, 0)
+    end
+
+    # パスに埋まった webhook の digest を丸める (#4655)。
+    #
+    # ⚠ **パスの構造は仮定しない。**セグメントに割って、digest の形をしたものだけを
+    # 丸める。前後にどんなセグメントが付いていても効く。
+    def scrub_log_path(path)
+      return path unless path.is_a?(String)
+      return path.split('/', -1).map {|segment| scrub_log_digest(segment)}.join('/')
+    end
+
+    # digest 単体を丸める。⚠ **digest でない値は 1 バイトも変えない**
+    # （ログが役に立たなくなる）。
+    def scrub_log_digest(value)
+      return value unless value.is_a?(String)
+      return value unless value.match?(WEBHOOK_DIGEST_PATTERN)
+      return "#{value[0, LOG_DIGEST_PREFIX_LENGTH]}..."
     end
 
     # ⚠ **深さで打ち切る。**外部から渡る JSON なので、際限なく潜ると
