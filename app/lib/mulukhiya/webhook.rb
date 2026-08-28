@@ -2,6 +2,8 @@ module Mulukhiya
   class Webhook
     include Package
     include SNSMethods
+    # ⚠ クラスメソッド (`self.create`) から digest を丸めるので `extend` (#4655)。
+    extend LogScrubber
 
     attr_reader :sns, :reporter
 
@@ -129,7 +131,9 @@ module Mulukhiya
     def self.create(key)
       return create!(key)
     rescue => e
-      e.log(key: key.to_s)
+      # ⚠ **key は digest（＝資格情報）で来うる (#4655)。**そのまま出すと
+      # 引き当てが失敗するたびに完全な鍵が syslog に残る。
+      e.log(key: scrub_log_digest(key.to_s))
       return nil
     end
 

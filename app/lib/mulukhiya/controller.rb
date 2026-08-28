@@ -31,7 +31,9 @@ module Mulukhiya
       end
       logger.info(request: {
         method: request.request_method,
-        path: request.path,
+        # ⚠ **パスも秘匿の対象 (#4655)。**webhook の digest はそれ 1 つで
+        # 投稿権限が通るので、パスをそのまま出すと使うたびに鍵がログに残る。
+        path: scrub_log_path(request.path),
         params: scrub_log_params(@params),
         remote: request.ip,
       })
@@ -51,6 +53,9 @@ module Mulukhiya
     not_found do
       @renderer = default_renderer_class.new
       @renderer.status = 404
+      # ⚠ **ここは `scrub_log_path` を通さない (#4655)。**これはログではなく
+      # **要求した本人へ返すボディ**で、パスは相手が送ってきた値そのもの。
+      # 丸めても秘匿にはならず、404 のボディ（api.md の契約）が変わるだけ。
       @renderer.message = Ginseng::NotFoundError.new("Resource #{request.path} not found.").to_h
       return @renderer.to_s
     end
@@ -64,7 +69,7 @@ module Mulukhiya
       else
         @renderer.status = 500
         @renderer.message = {error: 'Internal Server Error'}
-        e.log(path: request.path)
+        e.log(path: scrub_log_path(request.path))
         Sentry.capture_exception(e) rescue nil if Sentry.initialized?
       end
       return @renderer.to_s
@@ -109,7 +114,7 @@ module Mulukhiya
         event: 'token_mismatch',
         expected: expected.first(8),
         actual: sns.token&.first(8),
-        path: request.path,
+        path: scrub_log_path(request.path),
       )
       raise Ginseng::AuthError, 'Token integrity check failed'
     end
@@ -212,7 +217,7 @@ module Mulukhiya
         event: 'account_mismatch_detected',
         expected_account: sns.account&.id,
         posted_as: posted_id,
-        path: request.path,
+        path: scrub_log_path(request.path),
       )
     end
 
