@@ -10,6 +10,8 @@ module Mulukhiya
     # `Webhook.create_digest` は `String#sha256` ＝ 64 桁の 16 進。
     DIGEST = ('a1b2c3d4' * 8).freeze
     DIGEST_PATTERN = /#{DIGEST}/o
+    # ⚠ 3 バイト文字の途中で切れたバイト列（`logger_mask_boundary.rb` と同じ形）。
+    BROKEN = "\xFF".dup.force_encoding(Encoding::UTF_8).freeze
 
     def setup
       @controller = MisskeyController.new!
@@ -73,6 +75,30 @@ module Mulukhiya
     # ⚠ **解けない値でも落とさない。**ログ行そのものが消えるほうが困る。
     def test_tolerates_broken_escape
       assert_equal('/x/%zz', scrub('/x/%zz'))
+    end
+
+    # ⚠⚠ **不正なバイト列で例外を上げない（PR #4666 の Codex P2）。**
+    # `String#match?` も `String#split` も不正な UTF-8 で `ArgumentError` を上げる。
+    # ⚠ ここは `Controller#before` のログ行を組む途中なので、上げると
+    # **request ログが丸ごと消え、`before` の rescue に落ちて `@sns` 未設定のまま
+    # 経路が進む**（malformed な URL 1 本で 500 にできた）。
+    # ⚠ **[[project_log-credential-exposure]] と同型**（gem 側でも `mask_urls_in` が
+    # 同じ理由でマスクごと外れていた。pooza/ginseng-core#587）。
+    def test_tolerates_invalid_byte_sequence
+      # `%FF` は `unescape_path` が **例外なしで不正な UTF-8 を返す**（rescue では捕まらない）。
+      assert_equal('/x/%FF', scrub('/x/%FF'))
+      assert_equal("/x/#{BROKEN}", scrub("/x/#{BROKEN}"))
+    end
+
+    # ⚠ **壊れたバイトが混ざっても、digest の秘匿は効き続けること。**
+    # 素通しに倒すと「1 バイト混ぜればマスクを外せる」に戻る。
+    def test_scrubs_digest_next_to_invalid_byte_sequence
+      # ⚠ 検査する側も不正なバイト列で `ArgumentError` を上げるので、
+      #   **アサーションの直前だけ** `String#scrub` を通す（本体の戻り値は生のまま）。
+      scrubbed = scrub("/mulukhiya/webhook/#{BROKEN}/#{DIGEST}").scrub
+
+      assert_not_match(DIGEST_PATTERN, scrubbed)
+      assert_match(/a1b2c3d4a1b2\.\.\./, scrubbed)
     end
 
     # digest でないパスは 1 バイトも変えない（ログが役に立たなくなる）。

@@ -67,9 +67,18 @@ module Mulukhiya
     #
     # ⚠ **パスの構造は仮定しない。**セグメントに割って、digest の形をしたものだけを
     # 丸める。前後にどんなセグメントが付いていても効く。
+    #
+    # ⚠⚠ **区切りはバイト単位で見る (PR #4666 の Codex P2)。**`request.path` は
+    # `PATH_INFO` そのもので、**不正な UTF-8 バイト列を含みうる**。`String#split` は
+    # それだけで `ArgumentError` を上げるので、**壊れたバイトが 1 つあるだけで
+    # request ログが消え、`before` の rescue に落ちて経路が壊れる**。
+    # `/` は ASCII なのでバイト単位で割っても壊れない。
     def scrub_log_path(path)
       return path unless path.is_a?(String)
-      return path.split('/', -1).map {|segment| scrub_log_digest(segment)}.join('/')
+      segments = path.b.split('/', -1).map do |segment|
+        scrub_log_digest(segment.force_encoding(path.encoding))
+      end
+      return segments.join('/').force_encoding(path.encoding)
     end
 
     # digest 単体を丸める。⚠ **digest でない値は 1 バイトも変えない**
@@ -85,6 +94,18 @@ module Mulukhiya
     # となり、**可逆な形の完全な鍵がそのまま syslog に残っていた**（実測で確認）。
     def scrub_log_digest(value)
       return value unless value.is_a?(String)
+      # ⚠⚠ **壊れたバイト列で例外を上げない (#4655・PR #4666 の Codex P2)。**
+      # `String#match?` は不正な UTF-8 で `ArgumentError` を上げる。ここは
+      # `Controller#before` のログ行を組む途中なので、**上げると request ログが
+      # 丸ごと消えるうえ、`before` の rescue に落ちて `@sns` が未設定のまま
+      # 経路が進む**（malformed な URL 1 本で 500 にできた）。
+      # ⚠ **これは [[project_log-credential-exposure]] と同型**（gem 側でも
+      # `mask_urls_in` が同じ理由でマスクごと外れていた。pooza/ginseng-core#587）。
+      #
+      # ⚠ 素通ししても鍵は漏れない。**64 桁の 16 進はすべて ASCII** なので、
+      # 不正なバイト列を含むセグメントは digest ではありえず、
+      # `Webhook.create!` も引き当てられない。
+      return value unless value.valid_encoding?
       return "#{value[0, LOG_DIGEST_PREFIX_LENGTH]}..." if value.match?(WEBHOOK_DIGEST_PATTERN)
       decoded = unescape_log_segment(value)
       return value unless decoded.match?(WEBHOOK_DIGEST_PATTERN)
@@ -96,8 +117,12 @@ module Mulukhiya
     # ⚠ **デコードできなくても落とさない。**ここで例外を上げるとログ行そのものが
     # 消える。⚠ 解けない値は Sinatra 側でも解けない＝ `Webhook.create!` が
     # 引き当てられないので、**その形で有効な鍵が漏れることはない**。
+    #
+    # ⚠⚠ **`%FF` のようなバイトは `unescape_path` が「例外なしで不正な UTF-8」を
+    # 返す。**rescue では捕まらないので、**戻す前に妥当性を見る**こと。
     def unescape_log_segment(value)
-      return Rack::Utils.unescape_path(value)
+      decoded = Rack::Utils.unescape_path(value)
+      return decoded.valid_encoding? ? decoded : value
     rescue StandardError
       return value
     end
