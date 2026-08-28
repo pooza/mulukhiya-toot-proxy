@@ -44,6 +44,37 @@ module Mulukhiya
       assert_not_match(DIGEST_PATTERN, scrub("/some/where/#{DIGEST}/extra"))
     end
 
+    # ⚠⚠ **パーセントエンコードを解いてからも見る（PR #4664 の Codex P1）。**
+    # `request.path` は生のままで、Sinatra の `params[:digest]` だけがデコード済み。
+    # `%61` を 1 文字混ぜるだけで **引き当ては成功するのにログには丸ごと残る**
+    # という抜け道が開いていた（実測で確認済み）。
+    def test_scrubs_percent_encoded_digest
+      encoded = "%61#{DIGEST[1..]}"
+      scrubbed = scrub("/mulukhiya/webhook/#{encoded}")
+
+      assert_not_match(/#{DIGEST[1, 32]}/o, scrubbed)
+      assert_equal('/mulukhiya/webhook/a1b2c3d4a1b2...', scrubbed)
+    end
+
+    # ⚠ **エンコードの有無で見え方が変わらないこと。**残す 12 文字はデコード後のもので、
+    # `verify_webhook!` のエラーメッセージ（`params[:digest]` 由来）と揃う。
+    def test_encoded_and_raw_digests_render_identically
+      assert_equal(
+        scrub("/mulukhiya/webhook/#{DIGEST}"),
+        scrub("/mulukhiya/webhook/%61#{DIGEST[1..]}"),
+      )
+    end
+
+    # ⚠ **普通のエスケープを壊さない。**デコード後が digest でなければ生のまま返す。
+    def test_keeps_ordinary_escaped_segments
+      assert_equal('/x/%E3%81%82', scrub('/x/%E3%81%82'))
+    end
+
+    # ⚠ **解けない値でも落とさない。**ログ行そのものが消えるほうが困る。
+    def test_tolerates_broken_escape
+      assert_equal('/x/%zz', scrub('/x/%zz'))
+    end
+
     # digest でないパスは 1 バイトも変えない（ログが役に立たなくなる）。
     def test_keeps_other_paths
       ['/mulukhiya/api/v1/statuses/123', '/nodeinfo/2.0', '/', ''].each do |path|

@@ -74,10 +74,32 @@ module Mulukhiya
 
     # digest 単体を丸める。⚠ **digest でない値は 1 バイトも変えない**
     # （ログが役に立たなくなる）。
+    #
+    # ⚠⚠ **パーセントエンコードを解いてからも見る (#4655・PR #4664 の Codex P1)。**
+    # `request.path` は**生のまま**（`PATH_INFO` そのもの）で、Sinatra の
+    # `params[:digest]` だけがデコード済み。つまり `%61` を 1 文字混ぜるだけで
+    #
+    #   - `Webhook.create!` は**デコード後の正しい digest で引き当てに成功**する
+    #   - ⚠ ログに載る `request.path` は `%61…` のままで 64 桁の 16 進に一致しない
+    #
+    # となり、**可逆な形の完全な鍵がそのまま syslog に残っていた**（実測で確認）。
     def scrub_log_digest(value)
       return value unless value.is_a?(String)
-      return value unless value.match?(WEBHOOK_DIGEST_PATTERN)
-      return "#{value[0, LOG_DIGEST_PREFIX_LENGTH]}..."
+      return "#{value[0, LOG_DIGEST_PREFIX_LENGTH]}..." if value.match?(WEBHOOK_DIGEST_PATTERN)
+      decoded = unescape_log_segment(value)
+      return value unless decoded.match?(WEBHOOK_DIGEST_PATTERN)
+      # ⚠ **残す 12 文字はデコード後のもの。**`verify_webhook!` のエラーメッセージは
+      # `params[:digest]`（デコード済み）から作るので、生の側を切ると突き合わせられない。
+      return "#{decoded[0, LOG_DIGEST_PREFIX_LENGTH]}..."
+    end
+
+    # ⚠ **デコードできなくても落とさない。**ここで例外を上げるとログ行そのものが
+    # 消える。⚠ 解けない値は Sinatra 側でも解けない＝ `Webhook.create!` が
+    # 引き当てられないので、**その形で有効な鍵が漏れることはない**。
+    def unescape_log_segment(value)
+      return Rack::Utils.unescape_path(value)
+    rescue StandardError
+      return value
     end
 
     # ⚠ **深さで打ち切る。**外部から渡る JSON なので、際限なく潜ると
