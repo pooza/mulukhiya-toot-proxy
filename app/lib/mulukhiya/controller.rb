@@ -201,7 +201,9 @@ module Mulukhiya
       # 文言に倒して**取り違えを防ぐ**。
       # ⚠ 由来が増えても `WrappedGatewayError` を継げば自動で拒まれる (#4657)。
       if error.is_a?(WrappedGatewayError)
-        @renderer.message = {error: error.message}
+        # ⚠ **クライアントへ返すのは `client_message` (#4657)。**`message` には
+        # 内部メソッド名と上流ステータスが入る型がある（ログ側には残る）。
+        @renderer.message = {error: error.client_message}
         return @renderer.status = error.status
       end
       # ⚠ 透過するのは Hash のときだけ。`source_body` は JSON の配列も返しうるが、

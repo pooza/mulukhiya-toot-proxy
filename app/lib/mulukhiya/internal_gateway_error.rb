@@ -35,5 +35,22 @@ module Mulukhiya
     def never_silent?
       return true
     end
+
+    # ⚠⚠ **内部メソッド名と上流ステータスを外へ出さない (#4657)。**従来は
+    # `{"error":"internal fetch failed (fetch_status): Bad response 404"}` を
+    # そのまま返していた。`handle_gateway_error` は別の分岐で
+    # 「モロヘイヤ内部の例外メッセージを混ぜてはいけない（内部情報の露出）」と
+    # 明記しており、方針が揃っていなかった。
+    #
+    # ⚠ **ラベルと上流のメッセージは `message` に残る**ので、`e.alert` /
+    # `e.log` から失われることはない。**クライアントに渡す面だけを絞る。**
+    # ⚠ **文言は従来どおり小文字のまま。**api.md が「`internal fetch failed` を
+    # 『その投稿は無い』と読まないこと」と書いており、クライアントが目印として
+    # 使いうる。**落とすのは括弧の中身（ラベルと上流ステータス）だけ。**
+    CLIENT_MESSAGE = 'internal fetch failed'.freeze
+
+    def client_message
+      return CLIENT_MESSAGE
+    end
   end
 end

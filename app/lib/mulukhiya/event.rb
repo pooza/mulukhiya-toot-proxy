@@ -93,6 +93,14 @@ module Mulukhiya
         handler.send(method, payload, params)
       end
       return if thread.join(handler.timeout)
+      # ⚠⚠ **タイムアウトしたスレッドは止める (#4657)。**従来は `errors` へ積むだけで
+      # **ワーカーは走り続けていた**。`webhook_image` の timeout は 10 秒だが、
+      # 超えたハンドラが `Webhook#post` の `sns.post` より後に `push` すると
+      # **上限は守れているのに投稿に載らない添付**が出る。
+      #
+      # ⚠ 放置とどちらが安全かではない。**放置は「もう送った payload へ後から書く」**
+      # なので、途中で止めるほうが状態の壊れ方は小さい。
+      thread.kill
       handler.errors.push(message: 'timeout', timeout: "#{handler.timeout}s")
     end
 
