@@ -1260,7 +1260,7 @@ DB 直読み層（account / status / attachment / postgres）も **omission 0 �
 
 | Issue | 主眼 | 状態 |
 | --- | --- | --- |
-| #4654 (M) | 最上位 `error` ブロックと読み系 rescue が `report_error` に寄っていない（**4 系統目**・約 25 箇所） | |
+| #4654 (M) | 最上位 `error` ブロックと読み系 rescue が `report_error` に寄っていない（**4 系統目**・約 25 箇所） | ✅ **着地（2026-08-28）**・PR #4670・**57 箇所** |
 | #4655 (S) | webhook digest がリクエストパスとして毎回 syslog に平文で残る | ✅ **着地（2026-08-28）**・PR #4664 / #4666 / #4668 |
 | #4656 (S) | `api.md` の追随漏れ 4 件（`media_update` は 404 にならない / 502 の新パターン ほか） | ✅ **着地（2026-08-28）**・PR #4665 / #4667 / #4669 |
 | #4657 (M) | 構造改善 6 件（`paired` の 429/401 / エラー型の複写 / `catalog_offset` の複写 ほか） | |
@@ -1447,6 +1447,93 @@ zugoga 本番の実測は **page1 295ms / only_person 6.5ms / cursor 3.1ms**（�
 - ⚠ **chubo2#41 を本イシューの代表として読まない。**あの系統は 2026-05-12 を最後に再発していない
 - ⚠ **`server_name=mulukhiya` は本番 4 台のいずれでもない。**発生元の特定は次の同期へ持ち越し
 - ⚠ 本文の `bin/*.rb` は **git 管理外**（[[project_mulukhiya-git-external-files]]）なので、リポジトリ側から原因を追えない
+
+### 2026-08-28 セッション同期の記録（2 回目）
+
+- **ブランチ**: `develop` は `origin/develop` と同一・未コミット無し。**CI は 5 本とも緑**
+  （午前の `9cbb46d9` で `Style/DirectiveScope` を是正した効果が続いている）
+- **Dependabot**: open アラート 0 件
+- **open PR**: 1 件（#4661 = 5.36.0 のリリースドラフト）。#4660 は午前にマージ済み
+- **Codex**: 直近 12 マージ PR ＋ open PR を横断走査。**未消化なし**（全件リアクション付与済み）
+- **Sentry**: **新規なし。**最新イベントは 1X の 08-27 21:15Z で、午前の同期で内訳を取り直した分と同一
+- **harness upstream チェック**: `last_checked` が 08-27 で **1 日しか経っていないのでスキップ**
+- **chubo2**: `origin/main` と差分なし。open Issue 27 件（午前と同数）。Issue 棚卸しは 08-30 以降
+- **辞書台帳**: 再生成してコミット（chubo2 `0915223`）。🔴 は**前回と同じ 3 件で変化なし**
+
+#### ginseng-\* のピンのずれ（2026-08-28 2 回目の判定）
+
+| gem | 判定 |
+| --- | --- |
+| `ginseng-style` `e5917622` → `6e2dcce9` | **③ 見送る。**差分は `docs/workflow.md` **1 ファイル +22/−1 のみ**（「Codex の指摘を後回しにするときの行き先」の運用文書）。⚠ **RuboCop 設定は 1 バイトも動いていない**ので、こちらの lint に影響しない |
+| 他 7 本 | 同一 |
+
+⚠ 午前に取り込んだ 8 本のうち `ginseng-style` だけが **SHA 固定**（タグは付け替えられるため。
+pooza/ginseng-style#75）。**docs だけの前進で SHA を上げると、差分を読んだ痕跡だけが残って
+lint の挙動は変わらない**ので、次にコード面の変更が入るまで据え置く。
+
+#### 辞書台帳の 2 回目の生成で拾ったもの（#4659）
+
+- 🟡 間欠の標本が **47 回 → 141〜142 回**まで伸びた。件数は 1〜2 件で横ばい
+- 🔴 **`precure.ml/api/dic/v1/dic.json` は、この実行の実測で上流 GAS が `404 text/html` を返した。**
+  台帳の「上流」列に 404 が出たのは初めてで、**#4659 の間欠 404 を probe が直接踏んだ形**
+- ⚠⚠ **台帳そのものの整備はユーザーが進める。**こちらは生成と差分の報告まで（08-28 明示）
+
+### 着地済み: #4654 コントローラ層の rescue を `report_error` に寄せる（2026-08-28・PR #4670）
+
+**同じ「4xx を Sentry alert に上げない」判定の 4 系統目**（#4542 / #4594 / #4603 / #4629 の続き）。
+**57 箇所**を `report_error` 1 本へ寄せた。
+
+| 対象 | 従来 | 向き |
+| --- | --- | --- |
+| 最上位 `error` ブロック | 無条件 `e.alert` | 静か |
+| `before` ブロックの `e.log` | Redis / Postgres 障害が**完全に無音** | うるさく |
+| 読み系 bare `e.log` 41 箇所 | `/media` が全滅しても Sentry に出ない | うるさく |
+| `e.status < 500 ? e.log : e.alert` 4 本 | 意味は同じ・複写だけ | 変化なし |
+| `/program.ics` のクラス列挙 | `if e.is_a?(NotFoundError)` | ほぼ変化なし |
+| 認証・書き込み系 bare `e.alert` 10 箇所 | 4xx でも alert | **静か** |
+
+⚠ **「静かになる」向きの変更は 10 ルートだけ**（`/config/update` / `/mastodon/auth` /
+`/misskey/auth` / `/annict/oauth_uri` / `/annict/auth` / `/spotify/oauth_uri` / `/spotify/auth`
+(POST/DELETE) / `/spotify/currently_playing` / ui の `/oauth/callback`）。
+いずれも冒頭が `raise NotFoundError unless <feature>?` と `raise AuthError unless sns.account` で、
+**#4603 / #4629 が名指しした 2 クラスがそのまま alert に落ちていた**。Spotify は全台 OFF（#570）
+なので、capsicum が `/spotify/oauth_uri` を叩けば 404 が毎回 Sentry に立つ形だった。
+
+⚠ **代わりに失うのは「OAuth のトークン交換が全ユーザーで壊れた」の即時検知。**
+それは `AuthError`（401）＝ #4629 が明示的に「alert しない」と決めたクラスなので、
+**ステータスで判定する**という既定の方針に揃えた。方針を変えるなら現地に理由を書いて
+allowlist へ入れる。
+
+#### 例外は 1 つだけ
+
+`WebhookController` の `post /admin` は `e.alert` のまま（署名不一致を黙らせない・#4603）。
+**構造テストの allowlist に入れ、その `e.alert` が現存することも別テストで確かめている**
+（allowlist が腐って形骸化しないため）。
+型付きの `rescue Ginseng::GatewayError => e` / `rescue Ginseng::AuthError => e` 4 箇所は対象外
+（上流の 4xx を 502 に潰さない等、ステータスでは決められない判断が現地にある）。
+
+#### Codex P2: allowlist はファイル単位で切らない
+
+⚠⚠ **構造テストの allowlist を `webhook_controller.rb` というファイル単位で持っていた。**
+同じファイルに `post '/:digest'` / `get '/:digest'` が同居しているので、
+**そちらが `e.alert` に戻されてもテストが通る**＝「`post '/admin'` だけが例外」という
+テスト自身の主張を検査していなかった。`4fbb2464` で `{ファイル => {ルート => 本体}}` に絞った。
+
+🎯 **allowlist を作ったら「許した対象の隣」が本当に検査されるかを別テストで押さえる。**
+allowlist は書いた瞬間から検査範囲を削るので、**削りすぎに気づく仕掛けが同時に要る**。
+
+⚠ **退行を実際に作って確認した。**`post '/:digest'` を `e.alert` に戻すと
+`webhook_controller.rb:37 (post '/:digest') e.alert` で落ちる（修正前は通っていた）。
+**「テストを直した」で終わらせず、直したテストが落ちることまで見る。**
+
+#### テストで踏んだ 2 つの罠
+
+- ⚠ **Sinatra の `raise_errors` / `show_exceptions` は環境で既定が変わる。**true だと
+  **`error` ブロックへ入る前に例外を投げ直す**ので、テストでは両方を明示的に落とさないと
+  「error ブロックのふるまい」を確かめたつもりで何も踏んでいない
+- ⚠⚠ **Rack 3 では `rack.input` が任意**で、rack-test は省略する。省略すると `before` の
+  `request.body.read` が `NoMethodError` で落ち、**before ブロックごと飛ぶ**
+  （本番の Puma は必ず入れるのでテスト固有）。`e.log` に握られるので**気づきにくい**
 
 ### 2026-08-27 セッション同期の記録
 
