@@ -495,6 +495,16 @@ parser:
       visibility: visibility
 postgres:
   dsn: null
+  # pgbouncer の待ち行列を /health に載せるか (#4618)。
+  # auto = dsn のポートが 5432 以外なら pgbouncer が挟まっているとみなす。
+  # ⚠⚠ **null を既定値にしないこと。**Ginseng の config は null を「キーが無い」と
+  # 同じに扱って ConfigError を上げる。三値は文字列で表す。
+  # ⚠ 素の PostgreSQL へ pgbouncer ユーザーで入りに行くと、認証失敗が /health を
+  # 叩くたびに PostgreSQL のログへ溜まる。true 固定にするのは pgbouncer が
+  # 5432 で待っている構成に限ること。
+  pgbouncer:
+    enable: auto
+    timeout: 2
   pool:
     size: 10
     timeout: 5
