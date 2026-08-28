@@ -2591,6 +2591,13 @@ Controller 層での注意:
   🔴 **`request.path` は生のまま（`PATH_INFO` そのもの）で、Sinatra の `params[:digest]` だけが
   デコード済み。**`%61` を 1 文字混ぜるだけで**引き当ては成功するのにログには丸ごと残る**
   という抜け道が開いていた（実測で確認）。**「パスから来る値」を扱うときは常にこの非対称を疑う**
+- ⚠⚠ **不正なバイト列で例外を上げない**（PR #4666 の Codex P2）。`String#match?` も
+  `String#split` も不正な UTF-8 で `ArgumentError` を上げる。🔴 **`Controller#before` の
+  ログ行を組む途中なので、上げると request ログが丸ごと消え、`before` の rescue に落ちて
+  `@sns` 未設定のまま経路が進む**（malformed な URL 1 本で 500 にできた）。
+  ⚠ **[[project_log-credential-exposure]] と同型**（gem 側でも `mask_urls_in` が同じ理由で
+  マスクごと外れていた。pooza/ginseng-core#587）。区切りは `path.b.split('/')` と
+  **バイト単位で見る**（`/` は ASCII なので壊れない）
 
 ### Webhook digest の安定性
 
