@@ -563,7 +563,17 @@ Web Push サブスクリプションを解除する。
   "redis": {"status": "OK"},
   "sidekiq": {"status": "OK"},
   "streaming": {"status": "OK"},
-  "postgres": {"status": "OK", "pool": {"max": 10, "allocated": 1, "waiting": 0}},
+  "postgres": {
+    "status": "OK",
+    "pool": {"max": 10, "allocated": 1, "waiting": 0},
+    "pgbouncer": {
+      "database": "mastodon",
+      "cl_active": 12, "cl_waiting": 0, "maxwait": 0,
+      "sv_active": 0, "sv_idle": 1,
+      "clients_used": 13, "clients_max": 500,
+      "total_wait_time_us": 29082533
+    }
+  },
   "ruby": {"version": "4.0.6", "yjit_available": true, "yjit_enabled": true, "status": "OK"},
   "status": 200
 }
@@ -578,8 +588,45 @@ Web Push サブスクリプションを解除する。
 | `allocated` | 確保済みの接続数。⚠ **`max` に張り付いていても正常**（作った接続を使い回す設計） |
 | `waiting` | 接続の空きを待っているスレッド数。**これが本命の指標で、0 を超えたらプールが要求に足りていない** |
 
-⚠ **この値は Puma プロセスローカル**（#4618）。pgbouncer 側と Sidekiq 側の逼迫は映らないので、
-**1 プロセスの `waiting` が 0 でも全体が健全とは限らない**。
+⚠ **この値は Puma プロセスローカル**（#4618）。**1 プロセスの `waiting` が 0 でも全体が健全とは
+限らない**ので、共有資源のほうは `postgres.pgbouncer` を見る。
+
+**`postgres.pgbouncer` は pgbouncer の待ち行列** (5.36.0〜、#4618)。⚠⚠ **`pool` と違い、
+Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#4351` Gate 2 の overlay flip を
+戻すかどうかの信号としては**こちらが本命**。重い SQL を流す `MediaCatalogUpdateWorker` は
+別プロセス＝別プールなので、`pool` には出ない。
+
+| キー | 意味 |
+|------|------|
+| `database` | 引き当てたプール（アプリの DSN と同じ database / user の行） |
+| `cl_active` | サーバー接続を持っているクライアント数 |
+| `cl_waiting` | **サーバー接続を待っているクライアント数。これが本命** |
+| `maxwait` | **いまキューの先頭に居るクライアント**が待った秒数 |
+| `sv_active` / `sv_idle` | 使用中／待機中のサーバー接続数 |
+| `clients_used` | **箱全体**のクライアント数（全プール合計） |
+| `clients_max` | `max_client_conn`。⚠ **2026-08-02 の gomander も 2026-08-08 の shallu も、枯れたのはプールごとの待ちではなくここ** |
+| `total_wait_time_us` | 起動からの**累計**待ち時間（マイクロ秒・単調増加）。`SHOW STATS` の `total_wait_time` |
+
+⚠⚠ **`cl_waiting` と `maxwait` は「いまキューに居る人」の値でしかない。**pgbouncer は `maxwait` を
+"How long the first (oldest) client in the queue has waited" と定義しており、
+**キューが捌けば両方 0 に戻る**。⚠ **スクレイプの合間に起きて終わった詰まりは、この 2 つには残らない。**
+
+🎯 **有限のスパイクを拾いたいなら `total_wait_time_us` の差分を取る。**単調増加のカウンタなので、
+**前回のスクレイプとの差が 0 より大きければ、その間に待ちが発生した**と分かる。#4639 の flip の
+前後を比べるならこちら。⚠ **pgbouncer を再起動すると 0 に戻る**ので、負の差分は「再起動した」と読むこと。
+
+🔴 **`pgbouncer` は無いことのほうが多い。**⚠ **欠けていても異常ではない。**
+
+| 状況 | `pgbouncer` |
+|------|-------------|
+| DSN が 5432（pgbouncer を経由していない） | ⚠ **キーごと無い**（本番では vulcan がこれ） |
+| `/postgres/pgbouncer/enable` が `false` | ⚠ **キーごと無い** |
+| admin コンソールへ繋がらない | `{"error": "..."}` のみ。⚠ **`status` は動かない**（下記） |
+| プールの行がまだ無い（誰も繋いでいない） | `{"absent": true}` ＋ `clients_*`。⚠ **0 とは違う** |
+
+⚠⚠ **pgbouncer の観測は `status` を動かさない。**pgbouncer の停止と `max_client_conn` 枯渇は
+接続失敗からは区別できず、`status` を倒すと再起動のたびに health が揺れて信号として使えなくなる。
+**`pgbouncer.error` があっても `status` は `OK` のまま**なので、監視側はエラーの有無を別に見ること。
 
 🔴 **`pool` も `waiting` も欠けることがある**（#4656）。⚠ **欠落は「正常」でも「異常」でもない**ので、
 監視側が直に読むと `nil` を掴む。
