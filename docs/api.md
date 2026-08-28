@@ -88,6 +88,24 @@ SNS 本体への転送が失敗した場合、SNS が返したステータスコ
 - **上流ボディが JSON の配列**（`{"error": ...}` を期待するクライアントが読めないため透過しない）
 - **413（アップロード上限超過）** — 透過せずモロヘイヤの文言を返す。上流（nginx）が HTML を返すことが多く、そのまま出しても利用者に伝わらないため
 - **引用元（他人のサーバー）の取得失敗** — 502 + モロヘイヤの文言に倒れる。透過するのは**モロヘイヤ自身の上流**が返したものだけで、引用 URL の先のサーバーのステータス・ボディは返さない
+- **モロヘイヤ自身の内部読みの失敗** — 5.35.0（#4631）から。⚠ **クライアントの操作対象が無いのではない。**下記参照
+
+**⚠ 内部読みの失敗による 502**（5.35.0〜、#4631）:
+
+`PUT /api/{version}/statuses/{id}` は、送らなかったパラメータを Mastodon が「空で更新」と
+扱うため、**リクエスト処理中にモロヘイヤ自身が 2 本の内部 GET**（`/statuses/{id}/source` と
+`/statuses/{id}`）を投げて現在値を復元する（#4589）。⚠ **その内部読みが失敗したときの応答**は
+
+```json
+{"error": "internal fetch failed (fetch_status): Bad response 404"}
+```
+
+で、**HTTP ステータスは 502**。ラベルは `fetch_status_source` / `fetch_status` のいずれか。
+
+🔴 **これを「その投稿は無い」と読まないこと。**以前は上流の 404 をそのまま透過していたため、
+**クライアントからはユーザーの操作ミスに見え、かつ 401 / 404 の alert 抑止に乗って
+Sentry にも上がらなかった**（ALT 編集が全ユーザーで壊れていても観測面に何も出ない状態）。
+いまは**必ず alert される**ので、この 502 を見たらサーバー側の問題として報告してよい。
 
 **⚠ 上流が 404 を返した場合は透過が効かない。** Sinatra の `not_found` ハンドラが
 ボディを差し替えるため、`{"package":"ginseng-core","class":"Ginseng::NotFoundError",...}`
@@ -97,6 +115,20 @@ SNS 本体への転送が失敗した場合、SNS が返したステータスコ
 
 一部のエンドポイントは `config/application.yaml` の capabilities / features / data 設定に依存する。
 無効な機能のエンドポイントにアクセスした場合は 404 を返す。
+
+⚠ **404 にならない例外が 2 つある。**
+
+| フラグ | `false` のときの実際の応答 |
+|--------|--------------------------|
+| `features.media_catalog` | **503**（下の表を参照。「機能未提供」の 404 と「現在 OFF」を区別するため） |
+| `features.media_update` | 🔴 **エンドポイントを一切ゲートしていない。**`false` でも `PUT` は通常どおり処理される |
+
+🔴 **`features.media_update` はディスカバリ専用のフラグ**（#4656）。モロヘイヤは
+このフラグでルートを塞がないので、**`false` のまま `PUT` を送ると通ってしまう構成があり得る**。
+実際に失敗する構成では **nginx が 405 を返し、リクエストはモロヘイヤに到達しない**
+（`$status_put_backend` map が Purpose を含むキーへ是正されていない場合。#4474 / pooza/chubo2#188）。
+⚠ **クライアントは「404 でないから使える」と判断しないこと。**導線の出し分けは
+`features.media_update` を見て決める。
 
 主要なフラグ（Mastodon / Misskey 共通で `true`）:
 
@@ -113,7 +145,7 @@ SNS 本体への転送が失敗した場合、SNS が返したステータスコ
 | `features.word_suggest`（`/word_suggest/urls` 設定時に有効） | `/word/suggest` |
 | `features.nowplaying_resolver`（常時 `true`） | `/nowplaying/resolve` |
 | `features.compose_templates`（常時 `true`。#4457 未デプロイのバージョンではキー自体が欠落し capsicum は false 判定して導線を出さない） | `/compose/templates`（GET/POST/PUT/DELETE） |
-| `features.media_update`（Mastodon ＋ `/mastodon/capabilities/media_update` の opt-in ＋ ginseng-fediverse 1.8.30 以降。既定は `false`。⚠ **モロヘイヤの版番号では代用できない**） | `PUT /api/:version/statuses/:id`（`X-Mulukhiya-Purpose: media_update`） |
+| `features.media_update`（Mastodon ＋ `/mastodon/capabilities/media_update` の opt-in ＋ ginseng-fediverse 1.8.30 以降。既定は `false`。⚠ **モロヘイヤの版番号では代用できない**。⚠⚠ **ゲートには使われていない**——上の注記を参照） | `PUT /api/:version/statuses/:id`（`X-Mulukhiya-Purpose: media_update`） |
 | `features.spotify_enabled`（`/service/spotify/oauth/user_oauth_enabled` + 資格情報設定時に有効） | `/spotify/oauth_uri`, `/spotify/auth`, `/spotify/currently_playing` |
 | `features.spotify_linked`（当該ユーザーが Spotify 連携済みか） | `/spotify/currently_playing` |
 
@@ -385,6 +417,16 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
 
 ⚠ **「分からない」は false 側へ倒す。**フラグが欠落しているバージョン・Misskey・opt-in なし・古い gem のいずれも `false`。壊れる側の代償が「投稿から添付が全部外れ CW も消える」（#4589）なので、判定できない構成では導線を出させない。
 
+🔴 **`capabilities.media_update` を導線の判定に使わないこと**（#4656）。`config.capabilities` は
+`/{controller}/capabilities` を**そのまま出しているだけ**（`sub_hash` の素通し）で、
+⚠ **`local.yaml` で `true` にすれば、刺している ginseng-fediverse が 1.8.29 でも
+`capabilities.media_update: true` が出る**。一方 `features.media_update` は gem の版も見る。
+
+| キー | 意味 | 導線の判定に使えるか |
+|------|------|--------------------|
+| `capabilities.media_update` | **運用者が opt-in したか**（設定の生値） | ❌ 使えない |
+| `features.media_update` | **この構成で実際に通るか**（opt-in ＋ gem の版） | ✅ こちらを見る |
+
 #### GET /mulukhiya/api/emoji/palettes
 
 認証済みユーザーの Misskey 絵文字パレットを取得する。
@@ -521,6 +563,17 @@ Web Push サブスクリプションを解除する。
 
 ⚠ **この値は Puma プロセスローカル**（#4618）。pgbouncer 側と Sidekiq 側の逼迫は映らないので、
 **1 プロセスの `waiting` が 0 でも全体が健全とは限らない**。
+
+🔴 **`pool` も `waiting` も欠けることがある**（#4656）。⚠ **欠落は「正常」でも「異常」でもない**ので、
+監視側が直に読むと `nil` を掴む。
+
+| 状況 | 応答 |
+|------|------|
+| DB 未設定（`/postgres/dsn` なし） | `{"status": "OK", "skipped": true}`。⚠ **`pool` ごと無い** |
+| 接続不能・観測が取れない | `{"status": "NG", "error": "..."}`。⚠ **`pool` ごと無い** |
+| `num_waiting` を持たないプール実装 | `pool` はあるが ⚠ **`waiting` キーだけ無い**（`.compact` で落ちる） |
+
+クライアント・監視は `postgres.pool&.waiting` の形で読み、**欠けていたら「観測できていない」として扱う**こと。
 
 **`ruby` は構成乖離の検知用** (#4466)。YJIT は Rust の無い環境ではビルド時に黙って外れ、エラーにならないまま 24〜25% 遅いサーバーが出来上がるため、能力を可視化する。
 
@@ -1390,8 +1443,16 @@ Slack 互換のペイロードを投稿に変換する。`text` / `blocks` / `at
 | `text` | string | 必須 | 本文。Slack のリンク記法 `<url\|label>` は Markdown リンクへ変換される |
 | `spoiler_text` | string | 任意 | CW（`blocks` を使う場合は `header` ブロックが優先） |
 | `blocks` | array | 任意 | Slack Block Kit。`header` / `section` / `context` / `rich_text` / `image` を解釈 |
-| `attachments` | array | 任意 | Slack legacy attachments。`image_url` / `thumb_url` は添付画像として取り込む。**1 ファイル 32MiB まで**（`/media/download/max_bytes`） |
+| `attachments` | array | 任意 | Slack legacy attachments。`image_url` / `thumb_url` は添付画像として取り込む。**1 ファイル 32MiB まで**（`/media/download/max_bytes`）。⚠ **超過分は黙って落ちる**——下記 |
 | `visibility` | string | 任意 | この投稿の公開範囲（5.34.0〜、#4599） |
+
+🔴 **上限を超えた添付・取得に失敗した添付は、その 1 枚だけが落ちて投稿は成立する**（#4656）。
+**応答は 200 と作成済み投稿のオブジェクト**で、⚠⚠ **送信側から成功と区別する手段は現状ない。**
+
+- 落ちた添付は syslog に `webhook attachment dropped` として残る（サーバー側からは見える）
+- 「1 枚落ちても投稿は通す」という設計自体は意図どおり。**通知が丸ごと消えるより良い**という判断
+- ⚠ **送信側へ返す口は #4649 で用意する予定。**それまでは、投稿された `media_attachments` の
+  件数を送った `attachments` の件数と突き合わせるしかない
 
 `visibility` を省略すると、アカウント設定（WebUI「Slack互換webhook」セクション、`/webhook/visibility`）の
 既定が使われる。**未知の値も同じくアカウント設定の既定へ倒れる**（エラーにはせず、syslog に
