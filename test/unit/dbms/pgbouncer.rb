@@ -43,7 +43,7 @@ module Mulukhiya
     class FakeAdmin
       attr_reader :closed, :queries
 
-      def initialize(pools: nil, used_clients: 13, max_client_conn: 500)
+      def initialize(pools: nil, used_clients: 13, max_client_conn: 500, total_wait_time: 29_082_533)
         @pools = pools || [
           # ⚠ **自分の行より先に別の行が来る。**先頭を拾う実装だと取り違える。
           {'database' => 'other', 'user' => 'other', 'cl_active' => '99', 'cl_waiting' => '99',
@@ -55,6 +55,7 @@ module Mulukhiya
         ]
         @used_clients = used_clients
         @max_client_conn = max_client_conn
+        @total_wait_time = total_wait_time
         @queries = []
       end
 
@@ -66,6 +67,9 @@ module Mulukhiya
           {'list' => 'used_clients', 'items' => @used_clients.to_s}]
         when 'SHOW CONFIG' then return [{'key' => 'admin_users', 'value' => 'pgbouncer'},
           {'key' => 'max_client_conn', 'value' => @max_client_conn.to_s}]
+        # ⚠ SHOW STATS の行は database 単位で user 列を持たない。
+        when 'SHOW STATS' then return [{'database' => 'other', 'total_wait_time' => '99'},
+          {'database' => 'mastodon', 'total_wait_time' => @total_wait_time.to_s}]
         end
         raise "unexpected query: #{sql}"
       end
@@ -126,6 +130,7 @@ module Mulukhiya
         maxwait: 7,
         clients_used: 13,
         clients_max: 500,
+        total_wait_time_us: 29_082_533,
       }, health[:pgbouncer])
     end
 
@@ -169,6 +174,33 @@ module Mulukhiya
       end
 
       assert_equal('no more connections allowed (max_client_conn)', health.dig(:pgbouncer, :error))
+    end
+
+    # ⚠⚠ **`cl_waiting` / `maxwait` は「いまキューに居る人」の値でしかない**
+    # （PR #4671 の Codex P2）。pgbouncer の man は `maxwait` を "How long the first
+    # (oldest) client in the queue has waited" と定義しており、**キューが捌けば
+    # 両方 0 に戻る**。スクレイプの合間に起きて終わった詰まりが見えるのは、
+    # 起動からの累計（単調増加）である `total_wait_time` のほうだけ。
+    def test_finished_congestion_survives_in_the_cumulative_counter
+      drained = FakeAdmin.new(
+        pools: [{'database' => 'mastodon', 'user' => 'mastodon', 'cl_active' => '3',
+                 'cl_waiting' => '0', 'sv_active' => '0', 'sv_idle' => '1', 'maxwait' => '0'}],
+        total_wait_time: 1_500_000,
+      )
+      health = with_admin(drained) {Pgbouncer.health}
+
+      # 瞬間値はどちらも 0 ＝ ここだけ見ると「詰まっていない」
+      assert_equal(0, health.dig(:pgbouncer, :cl_waiting))
+      assert_equal(0, health.dig(:pgbouncer, :maxwait))
+      # 累計には残る。前回のスクレイプとの差分で「待ちが発生した」と分かる
+      assert_equal(1_500_000, health.dig(:pgbouncer, :total_wait_time_us))
+    end
+
+    # ⚠ SHOW STATS も自分の database の行を選ぶ。
+    def test_cumulative_counter_picks_our_own_database
+      health = with_admin(FakeAdmin.new) {Pgbouncer.health}
+
+      refute_equal(99, health.dig(:pgbouncer, :total_wait_time_us))
     end
 
     def test_connection_is_closed

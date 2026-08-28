@@ -570,7 +570,8 @@ Web Push サブスクリプションを解除する。
       "database": "mastodon",
       "cl_active": 12, "cl_waiting": 0, "maxwait": 0,
       "sv_active": 0, "sv_idle": 1,
-      "clients_used": 13, "clients_max": 500
+      "clients_used": 13, "clients_max": 500,
+      "total_wait_time_us": 29082533
     }
   },
   "ruby": {"version": "4.0.6", "yjit_available": true, "yjit_enabled": true, "status": "OK"},
@@ -600,10 +601,19 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 | `database` | 引き当てたプール（アプリの DSN と同じ database / user の行） |
 | `cl_active` | サーバー接続を持っているクライアント数 |
 | `cl_waiting` | **サーバー接続を待っているクライアント数。これが本命** |
-| `maxwait` | 待ちの最長秒数。⚠ 瞬間値の `cl_waiting` が 0 に戻っていても直前の詰まりが残る |
+| `maxwait` | **いまキューの先頭に居るクライアント**が待った秒数 |
 | `sv_active` / `sv_idle` | 使用中／待機中のサーバー接続数 |
 | `clients_used` | **箱全体**のクライアント数（全プール合計） |
 | `clients_max` | `max_client_conn`。⚠ **2026-08-02 の gomander も 2026-08-08 の shallu も、枯れたのはプールごとの待ちではなくここ** |
+| `total_wait_time_us` | 起動からの**累計**待ち時間（マイクロ秒・単調増加）。`SHOW STATS` の `total_wait_time` |
+
+⚠⚠ **`cl_waiting` と `maxwait` は「いまキューに居る人」の値でしかない。**pgbouncer は `maxwait` を
+"How long the first (oldest) client in the queue has waited" と定義しており、
+**キューが捌けば両方 0 に戻る**。⚠ **スクレイプの合間に起きて終わった詰まりは、この 2 つには残らない。**
+
+🎯 **有限のスパイクを拾いたいなら `total_wait_time_us` の差分を取る。**単調増加のカウンタなので、
+**前回のスクレイプとの差が 0 より大きければ、その間に待ちが発生した**と分かる。#4639 の flip の
+前後を比べるならこちら。⚠ **pgbouncer を再起動すると 0 に戻る**ので、負の差分は「再起動した」と読むこと。
 
 🔴 **`pgbouncer` は無いことのほうが多い。**⚠ **欠けていても異常ではない。**
 

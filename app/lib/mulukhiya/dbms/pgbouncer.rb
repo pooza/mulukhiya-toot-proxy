@@ -33,8 +33,12 @@ module Mulukhiya
 
     # `SHOW POOLS` から読む列。⚠ **`cl_waiting` が本命**——サーバー接続を待って
     # ブロックしているクライアント数で、これが 0 を超えたらプールが要求に足りていない。
-    # `maxwait` は待ちの最長秒数で、瞬間値の `cl_waiting` が 0 に戻っていても
-    # 直前の詰まりが残る。
+    #
+    # ⚠⚠ **`cl_waiting` も `maxwait` も「いまキューに居る人」の値でしかない。**
+    # pgbouncer の man は `maxwait` を "How long the first (oldest) client in the
+    # queue has waited" と定義しており、**キューが捌けば両方 0 に戻る**。
+    # スクレイプの合間に起きて終わった詰まりは、この 2 つには残らない
+    # （PR #4671 の Codex P2）。**残るのは `SHOW STATS` の `total_wait_time` のほう。**
     POOL_FIELDS = ['cl_active', 'cl_waiting', 'sv_active', 'sv_idle', 'maxwait'].freeze
 
     class << self
@@ -80,6 +84,7 @@ module Mulukhiya
           # **0 と「不明」は違う**ので、行が無いときは値を載せない。
           **(pool ? POOL_FIELDS.to_h {|k| [k.to_sym, pool[k].to_i]} : {absent: true}),
           **clients(connection),
+          **cumulative(connection),
         }
       ensure
         connection&.close
@@ -114,6 +119,21 @@ module Mulukhiya
           clients_used: used && used['items'].to_i,
           clients_max: max && max['value'].to_i,
         }.compact
+      end
+
+      # ⚠⚠ **スクレイプの合間に起きて終わった詰まりは、これでしか見えない。**
+      # `cl_waiting` / `maxwait` は現在キューに居るクライアントの値なので、
+      # **有限のスパイクは 2 回のスクレイプの間に消える**。`total_wait_time` は
+      # 起動からの累計（マイクロ秒）＝単調増加なので、**差分を取れば「前回から
+      # 今回までに待ちが発生したか」が分かる**。#4639 の flip の前後で比べるならこちら。
+      #
+      # ⚠ **pgbouncer を再起動すると 0 に戻る。**差分を取る側はカウンタの巻き戻りを
+      # 扱うこと（負の差分は「再起動した」と読む）。
+      # ⚠ `SHOW STATS` の行は database 単位で、user 列を持たない。
+      def cumulative(connection)
+        row = connection.exec('SHOW STATS').find {|r| r['database'] == dsn.dbname}
+        return {} unless row
+        return {total_wait_time_us: row['total_wait_time'].to_i}
       end
 
       def dsn
