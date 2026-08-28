@@ -41,7 +41,10 @@ module Mulukhiya
       @sns = sns_class.new
       @sns.token = token
     rescue => e
-      e.log
+      # ⚠ **ここが黙ると原因の分からない 500 だけが残る (#4654)。**`before` の
+      # 失敗は Redis / Postgres 障害（`sns_class.new` / トークン引き当て）が主で、
+      # 従来は一律 `e.log` ＝ Sentry に何も出なかった。
+      report_error(e)
       @sns&.token = nil
     end
 
@@ -65,7 +68,12 @@ module Mulukhiya
       if e.is_a?(Ginseng::Error)
         @renderer.status = e.status
         @renderer.message = e.to_h.except(:backtrace).merge(error: e.message)
-        e.alert
+        # ⚠ **ここは最後の受け皿で、どのルートから来たか分からない (#4654)。**
+        # 判断材料はステータスしか無いので `report_error` に寄せる。従来は
+        # 無条件 `e.alert` で、ルートのローカル rescue をすり抜けた 4xx——
+        # `not_found` を通らない `AuthError` 等——まで Sentry と Event(:alert) に
+        # 落ちていた。⚠ **4 系統目**（#4542 / #4594 / #4603 / #4629）。
+        report_error(e)
       else
         @renderer.status = 500
         @renderer.message = {error: 'Internal Server Error'}
@@ -120,7 +128,12 @@ module Mulukhiya
     end
 
     # クライアント起因の失敗を Sentry alert に上げない共通判定
-    # (#4542 / #4594 / #4603 / #4629)。
+    # (#4542 / #4594 / #4603 / #4629 / #4654)。
+    #
+    # ⚠⚠ **コントローラ層の rescue はここ 1 本に寄せた (#4654)。**最上位の
+    # `error` ブロックも含め、`e.log` / `e.alert` / `e.status < 500 ? ... : ...` の
+    # 直書きは残さない。**唯一の例外は `WebhookController` の `post /admin`** で、
+    # 署名不一致（4xx）を黙らせたくないという理由が現地に書いてある。
     #
     # ⚠⚠ **例外クラスの列挙で判定しない。**同じ方針が 3 系統で別々に書かれ、
     # そのたびに取りこぼした——#4603 は `NotFoundError`、#4629 は `AuthError` と
