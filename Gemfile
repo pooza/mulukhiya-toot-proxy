@@ -4,7 +4,8 @@ gem 'concurrent-ruby'
 gem 'dry-validation'
 gem 'faye-websocket', github: 'pooza/faye-websocket-ruby'
 gem 'ginseng-core', github: 'pooza/ginseng-core', branch: 'main', require: 'ginseng'
-gem 'ginseng-fediverse', github: 'pooza/ginseng-fediverse', branch: 'main', require: 'ginseng/fediverse'
+gem 'ginseng-fediverse', github: 'pooza/ginseng-fediverse', branch: 'main',
+  require: 'ginseng/fediverse'
 gem 'ginseng-piefed', github: 'pooza/ginseng-piefed', branch: 'main', require: 'ginseng/piefed'
 gem 'ginseng-postgres', github: 'pooza/ginseng-postgres', branch: 'main'
 gem 'ginseng-redis', github: 'pooza/ginseng-redis', branch: 'main', require: 'ginseng/redis'
@@ -32,7 +33,7 @@ group :development do
   # RuboCop 設定の正本。本体と minitest/performance/rake プラグインもこの gem が抱える。
   # ⚠⚠ タグではなく SHA で固定する（pooza/ginseng-style#75）。タグは付け替えられる。
   gem 'ginseng-style', github: 'pooza/ginseng-style',
-      ref: 'e5917622d069be324c6879c2a1d2522069d48d2c', require: false # v1.1.10
+    ref: '91c49d3b512a31dcd714baf156cd253b84eb4f0f', require: false # v1.1.11
   gem 'ostruct' # https://github.com/pooza/mulukhiya-toot-proxy/issues/4229
   gem 'rack-test'
   gem 'rails-erb-lint'
