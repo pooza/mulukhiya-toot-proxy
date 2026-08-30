@@ -24,6 +24,11 @@ export LC_ALL=ja_JP.UTF-8
 start_cmd=${name}_start
 stop_cmd=${name}_stop
 
+# listener は proctitle が "ruby: bin/listener_daemon.rb start" のままなので、
+# パターンは daemon スクリプト名で足りる (#4675)。
+mulukhiya_listener_pattern='listener_daemon\.rb'
+mulukhiya_listener_kill_wait=20
+
 mulukhiya_listener_start() {
   cd $mulukhiya_path
   sudo -u $mulukhiya_user /usr/sbin/daemon \
@@ -33,7 +38,17 @@ mulukhiya_listener_start() {
 mulukhiya_listener_stop() {
   cd $mulukhiya_path
   sudo -u $mulukhiya_user /usr/local/bin/bash -lc 'bundle exec bin/listener_daemon.rb stop' 2>/dev/null
-  pkill -9 -u $mulukhiya_user -f 'listener_daemon.rb' 2>/dev/null
+  # pid ファイルから辿れない取り残しにも TERM を送る (#4675)。
+  pkill -u $mulukhiya_user -f "$mulukhiya_listener_pattern" 2>/dev/null
+  # ⚠ SIGKILL の前に落ちきるのを待つ。待たずに -9 を撃つと、graceful stop の
+  # 直後に in-flight の処理を毎回強制終了することになる。
+  _i=0
+  while [ $_i -lt $mulukhiya_listener_kill_wait ]; do
+    pgrep -u $mulukhiya_user -f "$mulukhiya_listener_pattern" >/dev/null 2>&1 || return 0
+    sleep 1
+    _i=$((_i + 1))
+  done
+  pkill -9 -u $mulukhiya_user -f "$mulukhiya_listener_pattern" 2>/dev/null
   sleep 2
 }
 
