@@ -8,29 +8,29 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 87cd033fb39faf35bb6202c2a3cd2559c6b677eb
+  revision: 85d1c5b829cfacf2366c2f3354385c2e8abe5d50
   branch: main
   specs:
-    ginseng-core (1.23.0)
-      activesupport (>= 7.0.7.1)
+    ginseng-core (1.23.4)
+      activesupport (>= 8.1.2.1)
       addressable (>= 2.9.0)
       cgi (>= 0.4.2)
       csv
       date (>= 3.2.1)
-      erb
+      erb (>= 6.0.4)
       etc
       facets
       fileutils (~> 1.7.0)
       find
       httparty (>= 0.24.0)
       json-schema
-      mail
+      mail (>= 2.5.5)
       multi_json
       net-protocol
       net-smtp
-      nokogiri (>= 1.18.9)
+      nokogiri (>= 1.19.4)
       optparse
-      rake (!= 13.4.0)
+      rake (>= 12.3.3, != 13.4.0)
       sanitize (>= 6.0.2)
       securerandom
       set
@@ -38,7 +38,7 @@ GIT
       time (>= 0.2.2)
       yajl-ruby (>= 1.4.3)
       zeitwerk (>= 2.4.0)
-      zlib
+      zlib (>= 3.2.3)
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
