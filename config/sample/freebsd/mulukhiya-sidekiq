@@ -30,7 +30,14 @@ stop_cmd=${name}_stop
 # ⚠ 同じユーザーで動く Mastodon 側の sidekiq (proctitle は "sidekiq <version>
 # mastodon") を巻き込まないよう、必ず mulukhiya-toot-proxy まで含めて絞ること。
 mulukhiya_sidekiq_pattern='sidekiq_daemon\.rb|sidekiq .*mulukhiya-toot-proxy'
-mulukhiya_sidekiq_kill_wait=20
+# ⚠⚠ **Sidekiq の停止の締切 (SidekiqDaemon::SHUTDOWN_TIMEOUT = 25 秒) より長くする
+# こと (#4675 の Codex P1)。**短いと SIGKILL が hard shutdown より先に撃たれ、
+# Sidekiq は「積み残しをキューへ戻す」経路へ到達できない。
+# ⚠ モロヘイヤのワーカーは 15 本中 14 本が `retry: false` なので、そこで落ちた
+# 仕事は**再送もされずに消える**。
+# ⚠ 突き合わせは test/unit/daemon/sidekiq_daemon.rb が自動で行う（この行の値を
+# 直接読んでいる）。片方だけ動かすとテストが落ちる。
+mulukhiya_sidekiq_kill_wait=30
 
 mulukhiya_sidekiq_start() {
   cd $mulukhiya_path
