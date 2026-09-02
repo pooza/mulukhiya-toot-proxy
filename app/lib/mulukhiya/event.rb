@@ -2,6 +2,20 @@ module Mulukhiya
   class Event
     include Package
 
+    # タイムアウトしたハンドラのスレッドが**実際に終わる**のを待つ上限 (秒)。
+    #
+    # ⚠⚠ **`Thread#kill` は終了を「要求」するだけで、`ensure` の後始末が
+    # 走っている間も呼び出し側へ戻る (#4657 の Codex P2)。**待たずに返すと
+    # `WebhookImageHandler#run_workers` が同じく非同期に殺した添付ワーカーと
+    # `Webhook#post` の `sns.post` が重なり、**投稿の後から `push` される窓**が
+    # 残る。それを塞ぐために足したのが `thread.kill` だったので、待たなければ
+    # 目的を果たしていない。
+    #
+    # ⚠ 上限を置くのは、後始末が返ってこないハンドラで**投稿経路ごと止めない**
+    # ため。ここは既にタイムアウト＝劣化した経路なので、待ちきれなければ
+    # 諦めて先へ進む（従来の挙動に戻るだけで、悪化はしない）。
+    HANDLER_KILL_WAIT = 5
+
     attr_reader :label, :params
 
     def initialize(label, params = {})
@@ -93,6 +107,17 @@ module Mulukhiya
         handler.send(method, payload, params)
       end
       return if thread.join(handler.timeout)
+      # ⚠⚠ **タイムアウトしたスレッドは止める (#4657)。**従来は `errors` へ積むだけで
+      # **ワーカーは走り続けていた**。`webhook_image` の timeout は 10 秒だが、
+      # 超えたハンドラが `Webhook#post` の `sns.post` より後に `push` すると
+      # **上限は守れているのに投稿に載らない添付**が出る。
+      #
+      # ⚠ 放置とどちらが安全かではない。**放置は「もう送った payload へ後から書く」**
+      # なので、途中で止めるほうが状態の壊れ方は小さい。
+      thread.kill
+      # ⚠ **殺しただけでは戻ってこない。**終了を待たずに返すと、後始末が走っている
+      # 最中に呼び出し側が dispatch / post へ進む（詳細は HANDLER_KILL_WAIT）。
+      thread.join(HANDLER_KILL_WAIT)
       handler.errors.push(message: 'timeout', timeout: "#{handler.timeout}s")
     end
 
