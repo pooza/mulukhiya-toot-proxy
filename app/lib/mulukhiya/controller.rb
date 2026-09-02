@@ -31,7 +31,9 @@ module Mulukhiya
       end
       logger.info(request: {
         method: request.request_method,
-        path: request.path,
+        # ⚠ **パスも秘匿の対象 (#4655)。**webhook の digest はそれ 1 つで
+        # 投稿権限が通るので、パスをそのまま出すと使うたびに鍵がログに残る。
+        path: scrub_log_path(request.path),
         params: scrub_log_params(@params),
         remote: request.ip,
       })
@@ -39,7 +41,10 @@ module Mulukhiya
       @sns = sns_class.new
       @sns.token = token
     rescue => e
-      e.log
+      # ⚠ **ここが黙ると原因の分からない 500 だけが残る (#4654)。**`before` の
+      # 失敗は Redis / Postgres 障害（`sns_class.new` / トークン引き当て）が主で、
+      # 従来は一律 `e.log` ＝ Sentry に何も出なかった。
+      report_error(e)
       @sns&.token = nil
     end
 
@@ -51,6 +56,9 @@ module Mulukhiya
     not_found do
       @renderer = default_renderer_class.new
       @renderer.status = 404
+      # ⚠ **ここは `scrub_log_path` を通さない (#4655)。**これはログではなく
+      # **要求した本人へ返すボディ**で、パスは相手が送ってきた値そのもの。
+      # 丸めても秘匿にはならず、404 のボディ（api.md の契約）が変わるだけ。
       @renderer.message = Ginseng::NotFoundError.new("Resource #{request.path} not found.").to_h
       return @renderer.to_s
     end
@@ -60,11 +68,16 @@ module Mulukhiya
       if e.is_a?(Ginseng::Error)
         @renderer.status = e.status
         @renderer.message = e.to_h.except(:backtrace).merge(error: e.message)
-        e.alert
+        # ⚠ **ここは最後の受け皿で、どのルートから来たか分からない (#4654)。**
+        # 判断材料はステータスしか無いので `report_error` に寄せる。従来は
+        # 無条件 `e.alert` で、ルートのローカル rescue をすり抜けた 4xx——
+        # `not_found` を通らない `AuthError` 等——まで Sentry と Event(:alert) に
+        # 落ちていた。⚠ **4 系統目**（#4542 / #4594 / #4603 / #4629）。
+        report_error(e)
       else
         @renderer.status = 500
         @renderer.message = {error: 'Internal Server Error'}
-        e.log(path: request.path)
+        e.log(path: scrub_log_path(request.path))
         Sentry.capture_exception(e) rescue nil if Sentry.initialized?
       end
       return @renderer.to_s
@@ -109,13 +122,18 @@ module Mulukhiya
         event: 'token_mismatch',
         expected: expected.first(8),
         actual: sns.token&.first(8),
-        path: request.path,
+        path: scrub_log_path(request.path),
       )
       raise Ginseng::AuthError, 'Token integrity check failed'
     end
 
     # クライアント起因の失敗を Sentry alert に上げない共通判定
-    # (#4542 / #4594 / #4603 / #4629)。
+    # (#4542 / #4594 / #4603 / #4629 / #4654)。
+    #
+    # ⚠⚠ **コントローラ層の rescue はここ 1 本に寄せた (#4654)。**最上位の
+    # `error` ブロックも含め、`e.log` / `e.alert` / `e.status < 500 ? ... : ...` の
+    # 直書きは残さない。**唯一の例外は `WebhookController` の `post /admin`** で、
+    # 署名不一致（4xx）を黙らせたくないという理由が現地に書いてある。
     #
     # ⚠⚠ **例外クラスの列挙で判定しない。**同じ方針が 3 系統で別々に書かれ、
     # そのたびに取りこぼした——#4603 は `NotFoundError`、#4629 は `AuthError` と
@@ -135,9 +153,11 @@ module Mulukhiya
       client_error?(error) ? error.log : error.alert
     end
 
+    # ⚠ 見るのは `status`（モロヘイヤがクライアントへ返す値）。上流の
+    # `source_status` ではない——`handle_gateway_error` が別に扱う。
     def client_error?(error)
       return false unless error.respond_to?(:status)
-      return error.status.to_i.between?(400, 499)
+      return HTTPStatus.client_error?(error.status)
     end
 
     # 上流のエラー包絡をそのままクライアントへ返す (#4480)。
@@ -159,11 +179,12 @@ module Mulukhiya
     # エラーコード（Misskey の `error.code`）で、ユーザー起因の失敗まで
     # Sentry イベントを立てないための口。
     def handle_gateway_error(error, silent_statuses: [401], silent_codes: [])
-      # ⚠⚠ **内部読みの失敗は無条件に alert する (#4631)。**モロヘイヤ自身の
-      # `fetch_status` 等が落ちているのはクライアント起因ではないので、
-      # `silent_statuses` に 404 が入っていても抑止してはいけない。
-      # 抑止すると「ALT 編集が全ユーザーで壊れている」が syslog 1 行に消える。
-      silent = !error.is_a?(InternalGatewayError) &&
+      # ⚠⚠ **抑止を無条件に外す型がある (#4631)。**モロヘイヤ自身の `fetch_status`
+      # 等が落ちているのはクライアント起因ではないので、`silent_statuses` に 404 が
+      # 入っていても抑止してはいけない。抑止すると「ALT 編集が全ユーザーで
+      # 壊れている」が syslog 1 行に消える。
+      # ⚠ 判定はクラスの列挙ではなくマーカーメソッドで行う (#4657)。
+      silent = !never_silent?(error) &&
         (silent_statuses.include?(error.source_status) ||
           silent_codes.include?(upstream_error_code(error)))
       # ⚠ 抑止するのは Sentry だけ。silent でも syslog には残す。完全に無音だと
@@ -178,7 +199,8 @@ module Mulukhiya
       # 上流の 404 をそのまま返すと、クライアントには「その投稿は無い」と読める。
       # 実際に無いのではなく**モロヘイヤ側の読みが失敗した**ので、502 + 自前の
       # 文言に倒して**取り違えを防ぐ**。
-      if error.is_a?(ForeignGatewayError) || error.is_a?(InternalGatewayError)
+      # ⚠ 由来が増えても `WrappedGatewayError` を継げば自動で拒まれる (#4657)。
+      if error.is_a?(WrappedGatewayError)
         @renderer.message = {error: error.message}
         return @renderer.status = error.status
       end
@@ -187,6 +209,13 @@ module Mulukhiya
       body = error.source_body
       @renderer.message = body.is_a?(Hash) ? body : {error: error.message}
       return @renderer.status = error.source_status
+    end
+
+    # ⚠ 素の `Ginseng::GatewayError` は `never_silent?` を持たない。
+    # `respond_to?` で見るのは、包み直していない上流エラーを既定（抑止しうる）
+    # 側へ倒すため。
+    def never_silent?(error)
+      return error.respond_to?(:never_silent?) && error.never_silent?
     end
 
     # 上流の `{"error": {"code": "..."}}` から code を取る。取れなければ nil。
@@ -212,7 +241,7 @@ module Mulukhiya
         event: 'account_mismatch_detected',
         expected_account: sns.account&.id,
         posted_as: posted_id,
-        path: request.path,
+        path: scrub_log_path(request.path),
       )
     end
 

@@ -30,7 +30,9 @@ gem 'sidekiq-scheduler', '~>6.0.1'
 group :development do
   gem 'bundler-audit'
   # RuboCop 設定の正本。本体と minitest/performance/rake プラグインもこの gem が抱える。
-  gem 'ginseng-style', github: 'pooza/ginseng-style', tag: 'v1.1.4', require: false
+  # ⚠⚠ タグではなく SHA で固定する（pooza/ginseng-style#75）。タグは付け替えられる。
+  gem 'ginseng-style', github: 'pooza/ginseng-style',
+      ref: 'e5917622d069be324c6879c2a1d2522069d48d2c', require: false # v1.1.10
   gem 'ostruct' # https://github.com/pooza/mulukhiya-toot-proxy/issues/4229
   gem 'rack-test'
   gem 'rails-erb-lint'

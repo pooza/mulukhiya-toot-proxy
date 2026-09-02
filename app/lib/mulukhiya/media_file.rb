@@ -183,10 +183,10 @@ module Mulukhiya
         'tmp/media',
         "#{uri.to_s.sha256}#{File.extname(uri.path)}",
       )
-      raise_too_large(uri, :content_length) unless
+      raise_too_large!(uri, :content_length) unless
         valid_content_length?(uri, request_options(params))
       body = HTTP.new.get(uri, request_options(params)).body.to_s
-      raise_too_large(uri, :body) if body.bytesize > download_max_bytes
+      raise_too_large!(uri, :body) if body.bytesize > download_max_bytes
       write_atomic(path, body)
       return new(path).file
     end
@@ -195,7 +195,8 @@ module Mulukhiya
     # `\A` アンカーで「値そのものが URL」のときしかマスクしないので、文中へ埋めると
     # webhook から第三者が渡した `image_url`（署名付き URL のことがある）が
     # 平文で syslog に残る。**URI はマスクの効くフィールドで別に残す。**
-    def self.raise_too_large(uri, phase)
+    # ⚠ 必ず raise するメソッドは `!` で示す規約 (#4657)。
+    def self.raise_too_large!(uri, phase)
       Logger.new.error(error: 'too large content', phase:, url: uri.to_s)
       raise Ginseng::GatewayError, 'Too large content'
     end

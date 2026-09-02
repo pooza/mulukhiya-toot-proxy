@@ -88,7 +88,7 @@ module Mulukhiya
       return response.dig('data', 'createRecord', 'record')
     end
 
-    # rubocop:disable Metrics/ParameterLists
+    # rubocop:disable-next Metrics/ParameterLists
     def create_review(work_id:, body:, rating_overall_state: nil, rating_animation_state: nil,
       rating_music_state: nil, rating_story_state: nil, rating_character_state: nil,
       share_twitter: nil, share_facebook: nil)
@@ -106,7 +106,6 @@ module Mulukhiya
       response = annict_query!(:create_review, variables)
       return response.dig('data', 'createReview', 'review')
     end
-    # rubocop:enable Metrics/ParameterLists
 
     # createReview は workId に Relay グローバルノード ID を要求する。capsicum /
     # 番組表が扱うのは数値 annictId なので、resolve_episode_node_id と同じ要領で

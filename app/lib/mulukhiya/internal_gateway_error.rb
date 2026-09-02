@@ -18,15 +18,22 @@ module Mulukhiya
   #
   # `ForeignGatewayError` と同じく `handle_gateway_error` が透過を拒み、
   # **加えて silent 判定を無条件に外す**。
-  class InternalGatewayError < Ginseng::GatewayError
-    # 上流のレスポンスは保つ（`e.log` に状況を残すため）が、**メッセージは
-    # 差し替える**。"Bad response 404" のままだとクライアントにもログにも
-    # 「対象が無い」と読めてしまい、この型を作った意味が消える。
-    def self.wrap(error, label)
-      wrapped = new("internal fetch failed (#{label}): #{error.message}")
-      wrapped.set_backtrace(error.backtrace)
-      wrapped.response = error.response if error.respond_to?(:response)
-      return wrapped
+  class InternalGatewayError < WrappedGatewayError
+    # ⚠ 包み直し自体は `WrappedGatewayError` が持つ (#4657)。この型が変えるのは
+    # **メッセージと silent 抑止の 2 点だけ**。
+    #
+    # "Bad response 404" のままだとクライアントにもログにも「対象が無い」と
+    # 読めてしまい、この型を作った意味が消える。
+    def self.wrapped_message(error, label)
+      return "internal fetch failed (#{label}): #{error.message}"
+    end
+
+    # ⚠⚠ **内部読みの失敗は無条件に alert する (#4631)。**モロヘイヤ自身の
+    # `fetch_status` 等が落ちているのはクライアント起因ではないので、
+    # `silent_statuses` に 404 が入っていても抑止してはいけない。
+    # 抑止すると「ALT 編集が全ユーザーで壊れている」が syslog 1 行に消える。
+    def never_silent?
+      return true
     end
   end
 end

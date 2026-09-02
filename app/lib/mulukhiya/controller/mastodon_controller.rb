@@ -81,6 +81,9 @@ module Mulukhiya
       @renderer.status = reporter.response.code
       return @renderer.to_s
     rescue Ginseng::ValidateError => e
+      # ⚠ **log も alert も残さないのは非対称だった (#4657)。**`report_error` の
+      # 「syslog には必ず残す」に揃える。422 なので alert には上がらない。
+      report_error(e)
       @renderer.message = {error: e.message}
       @renderer.status = 422
       return @renderer.to_s
@@ -241,9 +244,10 @@ module Mulukhiya
     # 4xx は上のとおり日常的に起きるので、**それ自体では内部の失敗と判定できない**。
     # 逆に 5xx・接続失敗（`source_status` が取れない）は上流かモロヘイヤの問題で、
     # クライアントの操作では作れない。
+    # ⚠ 見るのは `source_status`（上流が返した値）。`status` は wrap 後に
+    # 502 へ倒れるので、ここで見ると全部が内部の失敗になる。
     def internal_failure?(error)
-      return true unless error.source_status.to_i.between?(400, 499)
-      return false
+      return !HTTPStatus.client_error?(error.source_status)
     end
 
     # ⚠⚠ **アンケートを持つ投稿は編集させない (#4625)。**
