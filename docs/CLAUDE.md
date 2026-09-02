@@ -1281,7 +1281,7 @@ DB 直読み層（account / status / attachment / postgres）も **omission 0 �
 | #4656 (S) | `api.md` の追随漏れ 4 件（`media_update` は 404 にならない / 502 の新パターン ほか） | ✅ **着地（2026-08-28）**・PR #4665 / #4667 / #4669 |
 | #4657 (M) | 構造改善 6 件（`paired` の 429/401 / エラー型の複写 / `catalog_offset` の複写 ほか） | 3/4/5 は PR #4672 で着地。**1/2/6 は PR #4673 が open**（Codex P2 2 件を `ee4a2ef1` で消化済み） |
 | #4649 (M) | webhook で落ちた添付を送信側へ返す（#4633 の残り） | |
-| #4658 (bug) | shallu の related 辞書 2 本が **Rhino ランタイム廃止**で死亡（V8 へ移行 + 再デプロイ） | 🔓 **死んでいた 2 本は 2026-08-30 18:47 に shallu の `local.yaml` から削除された**（下記）。扱いはユーザー判断待ち |
+| #4658 (bug) | shallu の related 辞書 2 本が **Rhino ランタイム廃止**で死亡（V8 へ移行 + 再デプロイ） | **実機は 2026-08-30 に決着**（復活させず「汎用」辞書へ置き換え・`local.yaml` mtime 18:47）。⚠ **残りは台帳の訂正＝ユーザー作業**なので Issue は open |
 | #4659 (bug) | 辞書ソースの上流 GAS が**間欠 404** を返し、痩せた辞書でキャッシュを上書きしている | ⚠ **キュアスタ！のニチアサに直結**。09-02 の台帳では率が上がっている（下記） |
 | #4675 (bug/S) | monit と rc.d の boot 競合で sidekiq が二重起動する（2026-08-30 追加） | **PR #4676 が open**（Codex P1 を `de3f8d01` で消化済み） |
 | #4618 (M) | `/health` のプール指標が pgbouncer と Sidekiq 側の逼迫を取りこぼす（#4639 の rollback 信号） | ✅ **着地（2026-08-28）**・P1 は PR #4671 / P2 は PR #4660 |
@@ -1421,10 +1421,13 @@ Sentry -2F の 2026-08-30T15:46Z の 17 イベント（shallu / zugoga / gomande
 
 #### 辞書台帳（2026-09-02 生成・本番 4 台）
 
-- 🔓 **shallu の 🔴 直書き 🔴 死亡 2 本が消えた。**#4658 の失効 GAS 2 本が
-  `config/local.yaml`（mtime **2026-08-30 18:47**）から**削除**されている。
-  ⚠ **V8 へ移した新 URL に差し替わったのではない**（旧内容は `local.yaml.bak.20260823` にのみ残る）。
-  Sentry -2Q の最終発生 08-29 もこの変更より前で、以後の再発なし
+- 🔓 **shallu の 🔴 直書き 🔴 死亡 2 本が台帳から消えた。**⚠ **新発見ではなく、
+  2026-08-30 の置き換え（死んだ 2 本を復活させず、新設した「汎用」辞書
+  `mstdn.b-shock.org/api/dic/v1/common.json` へ寄せる決着）が実機に出た形**。
+  失効 GAS 2 本は `config/local.yaml`（mtime **2026-08-30 18:47**）から落ちており、
+  旧内容は `local.yaml.bak.20260823` にのみ残る。shallu の現構成は `common.json`(9) ＋
+  `service.json`(79) の 2 本。Sentry -2Q の最終発生 08-29 もこの変更より前で、以後の再発なし。
+  ⚠ **#4658 自体はまだ open。**残りは台帳（スプレッドシート）の訂正で、**ユーザー作業**
 - ⚠ **🟡 間欠の率が上がっている**（#4659）。母数の窓が 115 → 59 と違うので単純比較はできないが、
   `mstdn.b-shock.org/api/dic/v1/service.json` は shallu / vulcan で **11/59（約 19%）**（前回 1/116）
 - ⚠⚠ **台帳そのものの整備・#4658 の進め方はユーザーが進める。**こちらは生成と差分の報告まで
@@ -1442,6 +1445,19 @@ Sentry -2F の 2026-08-30T15:46Z の 17 イベント（shallu / zugoga / gomande
 ⚠ `ginseng-style` 本体の v1.1.12 への追随は **PR #4674 が既に open**。
 ⚠⚠ ユーザーのコメントどおり **このリポジトリでは no-op ではない**（悲観固定は下限でもあるので、
 `Gemfile.lock` の rubocop が引き上げられる）。
+
+**ginseng-core は同日 `fc6f4aaf` で取り込んだ**（1.23.0 → **1.23.4**）。
+`rake lint` 緑・`rake test`（harness 接続）**1280 tests / 0 failures / 0 errors / 159 omissions**、
+他のロック済み gem の版は 1 つも動いていない。
+⚠ **モロヘイヤ側に届くことを実機で確認**（[[feedback_fix-may-not-reach-through-ginseng]]）:
+`Mulukhiya::Logger#mask_url` / `#mask` で userinfo のパスワード・IPv6 リテラル・zone id 付きの
+3 パターンとも `[FILTERED]` になり、パスワードの無い URL とポート指定の URL は不変。
+
+⚠⚠ **`bundle update` に `--conservative` を付けない（2026-09-02 に踏んだ）。**
+git gem では **revision だけ進んで version が据え置かれた壊れた lock** ができる
+（`85d1c5b` に進んだのに `ginseng-core (1.23.0)` と書かれ、実体は 1.23.4 なので
+`bundle install` が「that version can no longer be found in that source」で止まる）。
+**切り分けに要るのは `--conservative` ではなく引数で 1 本に絞ること。**
 
 
 ### 2026-08-28 セッション同期の記録
