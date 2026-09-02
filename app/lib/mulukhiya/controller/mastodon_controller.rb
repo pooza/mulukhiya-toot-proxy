@@ -12,7 +12,12 @@ module Mulukhiya
     # ⚠ 抑止するのは Sentry だけで syslog には残る (controller.rb の
     # handle_gateway_error)。「上流が /source を廃止して全滅」のような事故は
     # 頻度・偏りで追える。
-    STATUS_UPDATE_SILENT_STATUSES = [401, 404].freeze
+    #
+    # ⚠⚠ **429 は `PAIRED_CLIENT_STATUSES` と対で入っている (#4657 の Codex P2)。**
+    # 透過に戻したのに抑止側へ足さないと、**クライアントがリトライで回復できる
+    # レート制限のたびに `error.alert` が走る**。「透過するが黙らせない」という
+    # 中途半端な状態になっていた。⚠ 片方だけ動かさないこと。
+    STATUS_UPDATE_SILENT_STATUSES = [401, 404, 429].freeze
 
     # `paired` でも**クライアントへそのまま返すべき** 4xx (#4657)。
     #
