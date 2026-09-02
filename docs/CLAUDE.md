@@ -1208,6 +1208,21 @@ detached HEAD 上に乗った。⚠ **`git push` は成功扱いになる**（�
 
 ### fedi-test-harness の検証状況
 
+**Mastodon v4.7.1 stable を 2026-09-02 に実走・`verified` 昇格**（⚠⚠ **GHSA 3 件のセキュリティリリース**。
+本番・ステージング 6 台への適用はユーザーが同日に完了済みで、harness 検証は 07-28 の 4.6.4 と同じく後追い）。
+**1291 tests / 2490 assertions / 0 failures / 0 errors / 159 omissions（100% passed、391 秒）**。
+
+- **DB 直読み層は個別にも実走**: account 34 / status 27 / postgres 11 は **omission 0 で全緑**、
+  attachment は 21 tests / **2 omissions**（既知・pooza/chubo2#64）
+- ⚠ **omission 159 件は v4.7.0 と同数。**tests が 1156 → 1291 に増えたのは 5.36.0 開発中だからで、
+  **Mastodon 版の影響と読まない**
+- **4.7.0 → 4.7.1 はモロヘイヤの面に当たらない**（59 files / 10 commits）。admin 系 15 コントローラ＋
+  新設 `Admin::PermissionsConcern`（⚠ **モロヘイヤは Mastodon の admin API を 1 本も叩かない**）／
+  `json_ld_helper` と `ProcessActivityService` ＝ AP 受信側／認証まわり。
+  ⚠⚠ **マイグレーションの追加は無く、変更された 2 本は冪等化＝適用済み DB では no-op。
+  スキーマもシリアライザも 4.7.0 から不変**
+
+以下は 1 つ前の昇格（v4.7.0）の記録。
 **Mastodon v4.7.0 stable を 2026-08-21 に実走・`verified` 昇格**（本番 3 台・ステージング 3 台への適用と同日。
 **本番と検証済み版が揃った**）。**1156 tests / 2250 assertions / 0 failures / 0 errors / 159 omissions
 （100% passed、332 秒）**。
@@ -1256,18 +1271,20 @@ DB 直読み層（account / status / attachment / postgres）も **omission 0 �
 ## 開発中: 5.36.0
 
 **スコープ確定（2026-08-27）。**[マイルストーン 5.36.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/634)
-作成済み・8 件割り当て済み・`config/application.yaml` は 5.36.0 へバンプ済み（`dbc4cd9d`）。
+作成済み・`config/application.yaml` は 5.36.0 へバンプ済み（`dbc4cd9d`）。
+**2026-09-02 時点で 10 件（closed 4 / open 6）**。#4675 が後から加わっている。
 
 | Issue | 主眼 | 状態 |
 | --- | --- | --- |
 | #4654 (M) | 最上位 `error` ブロックと読み系 rescue が `report_error` に寄っていない（**4 系統目**・約 25 箇所） | ✅ **着地（2026-08-28）**・PR #4670・**57 箇所** |
 | #4655 (S) | webhook digest がリクエストパスとして毎回 syslog に平文で残る | ✅ **着地（2026-08-28）**・PR #4664 / #4666 / #4668 |
 | #4656 (S) | `api.md` の追随漏れ 4 件（`media_update` は 404 にならない / 502 の新パターン ほか） | ✅ **着地（2026-08-28）**・PR #4665 / #4667 / #4669 |
-| #4657 (M) | 構造改善 6 件（`paired` の 429/401 / エラー型の複写 / `catalog_offset` の複写 ほか） | |
+| #4657 (M) | 構造改善 6 件（`paired` の 429/401 / エラー型の複写 / `catalog_offset` の複写 ほか） | 3/4/5 は PR #4672 で着地。**1/2/6 は PR #4673 が open**（Codex P2 2 件を `ee4a2ef1` で消化済み） |
 | #4649 (M) | webhook で落ちた添付を送信側へ返す（#4633 の残り） | |
-| #4658 (bug) | shallu の related 辞書 2 本が **Rhino ランタイム廃止**で死亡（V8 へ移行 + 再デプロイ） | ⚠ **着手条件待ち**（GAS 側はユーザー作業） |
-| #4659 (bug) | 辞書ソースの上流 GAS が**間欠 404** を返し、痩せた辞書でキャッシュを上書きしている | ⚠ **キュアスタ！のニチアサに直結** |
-| #4618 (M) | `/health` のプール指標が pgbouncer と Sidekiq 側の逼迫を取りこぼす（#4639 の rollback 信号） | **P2 は PR #4660 でマージ済み（2026-08-28）。P1 が残り** |
+| #4658 (bug) | shallu の related 辞書 2 本が **Rhino ランタイム廃止**で死亡（V8 へ移行 + 再デプロイ） | 🔓 **死んでいた 2 本は 2026-08-30 18:47 に shallu の `local.yaml` から削除された**（下記）。扱いはユーザー判断待ち |
+| #4659 (bug) | 辞書ソースの上流 GAS が**間欠 404** を返し、痩せた辞書でキャッシュを上書きしている | ⚠ **キュアスタ！のニチアサに直結**。09-02 の台帳では率が上がっている（下記） |
+| #4675 (bug/S) | monit と rc.d の boot 競合で sidekiq が二重起動する（2026-08-30 追加） | **PR #4676 が open**（Codex P1 を `de3f8d01` で消化済み） |
+| #4618 (M) | `/health` のプール指標が pgbouncer と Sidekiq 側の逼迫を取りこぼす（#4639 の rollback 信号） | ✅ **着地（2026-08-28）**・P1 は PR #4671 / P2 は PR #4660 |
 
 ⚠ **#4658 は 5.36.0 のスコープに入っているが、こちらでは動かせない。**GAS の V8 移行と再デプロイが
 先で、新 URL が出たら名前付きパス経由で config へ反映する。**リリースのブロッカーにしない**。
@@ -1336,6 +1353,96 @@ zugoga 本番の実測は **page1 295ms / only_person 6.5ms / cursor 3.1ms**（�
 
 ⚠⚠ **「docs だけだから安全」ではない。**契約を誤って書くと、クライアント側が誤った分岐を実装する。
 **docs の PR もコードと同じ密度でレビューを通すこと。**
+
+### 2026-09-02 セッション同期の記録
+
+- **ブランチ**: `develop` は `origin/develop` と同一。open PR 4 本（#4676 / #4674 / #4673 / #4661）
+- **Dependabot**: open アラート 0 件
+- **Codex**: 直近 12 マージ PR ＋ open PR を横断走査。**未消化が 3 件あった**（下記）。
+  ⚠ **いずれも open PR に付いたもの。**マージ済みだけを見ていると落ちる
+- **Sentry**: 新規イシューなし。ただし **-J / -2F / -2Q の 3 件をトリアージ**した（下記）
+- **chubo2**: `origin/main` と差分なし。open Issue 22 件。
+  **§6-2 の Issue 棚卸しは 2026-08-31 実施済み**（infra-note 冒頭）なのでスキップ（次回は 09-30 以降）
+- **§8 harness upstream チェック**: `last_checked` 08-27 から 6 日経過 → 実施。**Mastodon 4.7.1 を検証・昇格**（下記）
+- **辞書台帳**: 再生成してコミット（chubo2 `a2225a4`）
+
+#### Mastodon 4.7.1 の対応（2026-09-02）
+
+⚠⚠ **セキュリティリリース。**v4.6.7 / v4.5.17 / v4.4.24 が同時に出ており、GHSA が 3 本
+（2FA の認証バイパス / JSON-LD 処理の DoS / 停止済み staff の admin API）。
+
+- **本番・ステージング 6 台への適用はユーザーが 2026-09-02 に完了済み**（chubo2 `d2f1d46`）。
+  実機で確認: `mstdn.b-shock.org` / `mstdn.delmulin.com` / `precure.ml` の
+  `/api/v1/instance` が **3 台とも `4.7.1`**、フォークの 3 ブランチも `v4.7.1` を含む
+- ⚠ **こちら側に残っていた仕事は harness 検証だけだった。**実施して
+  **1291 tests / 2490 assertions / 0 failures / 0 errors / 159 omissions（100% passed、391 秒）**。
+  DB 直読み層を個別にも実走し account 34 / status 27 / postgres 11 は omission 0、
+  attachment は 21 tests / 2 omissions（既知・chubo2#64）
+- ⚠ **omission 159 件は v4.7.0 と同数。**tests が 1156 → 1291 に増えたのは 5.36.0 開発中だからで、
+  **Mastodon 版の影響と読まないこと**
+- **4.7.0 → 4.7.1 の差分（59 files / 10 commits）はモロヘイヤの面に当たらない。**
+  admin 系 15 コントローラ＋新設 `Admin::PermissionsConcern`（⚠ **モロヘイヤは Mastodon の
+  admin API を 1 本も叩かない**。`/admin/*` は自前のルート）／`json_ld_helper` と
+  `ProcessActivityService` ＝ AP 受信側／認証まわり。⚠⚠ **マイグレーションの追加は無く、
+  変更された 2 本は「中断後に再実行できない」の冪等化＝適用済み DB では no-op。
+  スキーマもシリアライザも 4.7.0 から不変**
+- 台帳（`docs/harness-verified-versions.yaml`）は `verified: v4.7.1` へ昇格、
+  chubo2 の `.env.example` / `compose.yml` も v4.7.1 へ（`4e47bca`）
+
+#### Codex の未消化 3 件を消化した（2026-09-02）
+
+⚠ **3 件とも「#4657 / #4675 で足した仕組みが半分しか効いていない」型で、指摘はすべて妥当だった。**
+
+| PR | 指摘 | 対処 |
+| --- | --- | --- |
+| #4673 | P2: 透過に戻した paired の 429 が、ルート側の `STATUS_UPDATE_SILENT_STATUSES`（`[401, 404]`）に無く `error.alert` に乗る | `ee4a2ef1`。抑止側にも 429 を追加。⚠ **「透過するものは全部抑止に入っている」を直接見るテスト**で固定 |
+| #4673 | P2: `Thread#kill` は終了を「要求」するだけで、`ensure` の後始末中に呼び出し側が進む | `ee4a2ef1`。`HANDLER_KILL_WAIT`（5 秒）を上限に `join` |
+| #4676 | P1: rc.d の SIGKILL（20 秒）が Sidekiq の停止の締切（25 秒）より先に撃たれる | `de3f8d01`。待ちを 30 秒へ。`SidekiqDaemon::SHUTDOWN_TIMEOUT` を置いて `sidekiq.timeout` に明示し、**テストが rc.d の値を直接読んで突き合わせる** |
+
+⚠⚠ **`retry: false` が効いてくる。**モロヘイヤのワーカーは 15 本中 14 本が `retry: false` なので、
+Sidekiq の hard shutdown（積み残しをキューへ戻す経路）へ到達できないと**その仕事は消える**。
+「20 秒でも graceful stop は終わっている」ではなく、**締切より前に殺してはいけない**が正しい読み。
+
+⚠ 3 件とも「直す前に戻すと落ちる」ことを実測で確認してから出した。
+
+#### 本番 3 台が 2026-08-31 00:46 に一斉再起動していた
+
+Sentry -2F の 2026-08-30T15:46Z の 17 イベント（shallu / zugoga / gomander が 11 秒以内に同時発火）を
+追って判明。⚠ **障害ではない。**
+
+- 3 台とも uptime の起点が **2026-08-31 00:47 JST** で一致。shallu の `/var/log/messages` に
+  `reboot[70038] rebooted by mastodon`（00:46:14）→ `---<<BOOT>>---`（00:48:04）
+- `auth.log` に 00:31 の publickey ログイン → 00:34 の `sudo su` があり、**手動の計画再起動**
+- Sentry に出たのは「モロヘイヤの sidekiq が Redis の listen より先に起きる」起動順の競合。
+  -J / -2G / -2M / -2N / -2P / -2V と同じ族で、**再起動のたびに数イベント出る**
+- ⚠ **副産物: 同じ `auth.log` に #4675 の二重起動が写っていた。**
+  `sidekiq_daemon.rb start` が **00:48:05 と 00:48:17 の 2 回**走っている。PR #4676 の裏付け
+- 現況は健全（3 台とも `/mulukhiya/api/health` 全サブシステム OK・version 5.35.0）
+
+#### 辞書台帳（2026-09-02 生成・本番 4 台）
+
+- 🔓 **shallu の 🔴 直書き 🔴 死亡 2 本が消えた。**#4658 の失効 GAS 2 本が
+  `config/local.yaml`（mtime **2026-08-30 18:47**）から**削除**されている。
+  ⚠ **V8 へ移した新 URL に差し替わったのではない**（旧内容は `local.yaml.bak.20260823` にのみ残る）。
+  Sentry -2Q の最終発生 08-29 もこの変更より前で、以後の再発なし
+- ⚠ **🟡 間欠の率が上がっている**（#4659）。母数の窓が 115 → 59 と違うので単純比較はできないが、
+  `mstdn.b-shock.org/api/dic/v1/service.json` は shallu / vulcan で **11/59（約 19%）**（前回 1/116）
+- ⚠⚠ **台帳そのものの整備・#4658 の進め方はユーザーが進める。**こちらは生成と差分の報告まで
+
+#### ginseng-\* のピンのずれ（2026-09-02 判定）
+
+**8 本すべてずれている。**⚠ **ただし規模の指標として読まない。**7 本は `ginseng-style` の
+参照更新（v1.1.11 → v1.1.12）だけで、**モロヘイヤの実行時には 1 バイトも効かない**。
+
+| gem | 判定 |
+| --- | --- |
+| `ginseng-core` `87cd033f` → `85d1c5b8`（11 コミット） | **① すぐ取り込む。**⚠ **ログの秘匿の穴が 4 件**（[[project_log-credential-exposure]] の直系）: URL の userinfo のパスワードが平文で残る（#589）/ IPv6 リテラルの URL がマスクを素通り（#601）/ zone id 付き IPv6 も同じ（#609）/ `mask_fields` の既定が狭い（#586）。ほかに `upload` のログの形（#578）。⚠ Windows Logger スタブの件（#602）はモロヘイヤには効かない |
+| 他 7 本 | **③ 見送る。**差分は `ginseng-style` の参照更新のみ＝開発時の RuboCop 設定の話 |
+
+⚠ `ginseng-style` 本体の v1.1.12 への追随は **PR #4674 が既に open**。
+⚠⚠ ユーザーのコメントどおり **このリポジトリでは no-op ではない**（悲観固定は下限でもあるので、
+`Gemfile.lock` の rubocop が引き上げられる）。
+
 
 ### 2026-08-28 セッション同期の記録
 
