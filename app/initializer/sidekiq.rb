@@ -20,6 +20,10 @@ module Mulukhiya
   Sidekiq.configure_server do |sidekiq|
     sidekiq.redis = {url: config.dig(:redis, :dsn)}
     sidekiq.concurrency = config[:concurrency]
+    # ⚠⚠ **停止の締切を上流の既定に任せない (#4675 の Codex P1)。**rc.d の
+    # `mulukhiya_sidekiq_kill_wait` はこの値より長くなければならず、暗黙の既定の
+    # ままだと上流のバージョン更新で黙って食い違う。詳細は SHUTDOWN_TIMEOUT。
+    sidekiq.timeout = SidekiqDaemon::SHUTDOWN_TIMEOUT
     # Sidekiq 内部ログ (retry / scheduler / boot 等) を $stdout ではなく syslog へ。
     # Ginseng::Logger と同じ ident (Package.name) / facility (LOG_USER) を使い、puma・
     # WorkerLoggingMiddleware と同じ /var/log/mulukhiya-toot-proxy.log に集約する (#4362)。
