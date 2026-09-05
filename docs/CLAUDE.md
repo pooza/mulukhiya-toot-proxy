@@ -1272,7 +1272,7 @@ DB 直読み層（account / status / attachment / postgres）も **omission 0 �
 
 **スコープ確定（2026-08-27）。**[マイルストーン 5.36.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/634)
 作成済み・`config/application.yaml` は 5.36.0 へバンプ済み（`dbc4cd9d`）。
-**2026-09-06 時点で 11 件（closed 5 / open 6）**。#4675 と #4663 が後から加わっている。
+**2026-09-06 時点で 12 件（closed 6 / open 6）**。#4675 / #4663 / #4680 が後から加わっている。
 
 | Issue | 主眼 | 状態 |
 | --- | --- | --- |
@@ -1286,6 +1286,7 @@ DB 直読み層（account / status / attachment / postgres）も **omission 0 �
 | #4675 (bug/S) | monit と rc.d の boot 競合で sidekiq が二重起動する（2026-08-30 追加） | **PR #4676 が open**（Codex P1 を `de3f8d01` で消化済み）。⚠ **start 同士のレースは ginseng-core 1.23.7 の `O_EXCL` で閉じた**（`d417f724`）が、**起動順そのものは変わっていない** |
 | #4618 (M) | `/health` のプール指標が pgbouncer と Sidekiq 側の逼迫を取りこぼす（#4639 の rollback 信号） | ✅ **着地（2026-08-28）**・P1 は PR #4671 / P2 は PR #4660 |
 | #4663 (M) | rack / sinatra の版の制約を、検証できる側（モロヘイヤ）へ移す | ✅ **着地（2026-09-06）**・PR #4679。⚠ **③（同時アクセスの回帰テスト）は #4678 へ切り出し** |
+| #4680 (S) | 宣言追加で `Bundler.require` が sinatra classic まで読むようになった | ✅ **着地（2026-09-06）**・PR #4681。#4663 の退行 |
 
 ⚠ **#4658 は 5.36.0 のスコープに入っているが、こちらでは動かせない。**GAS の V8 移行と再デプロイが
 先で、新 URL が出たら名前付きパス経由で config へ反映する。**リリースのブロッカーにしない**。
