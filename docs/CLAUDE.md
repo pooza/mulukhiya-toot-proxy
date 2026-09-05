@@ -1326,6 +1326,36 @@ DB 直読み層（account / status / attachment / postgres）も **omission 0 �
 どちらも現行と同じ）。**将来 4.3 / 3.3 が出たときに効く予防**であって、
 **外してよい条件は #4678 が緑になること**。
 
+#### ⚠⚠ 宣言を足すと `Bundler.require` の対象が増える（#4680・2026-09-06）
+
+**#4663 の ② で入れた退行。**気づいたのは **pooza/cure-api#360 に届いた Codex P1** で、
+⚠ **同じ形がモロヘイヤにもあった**（`app/lib/mulukhiya.rb:111` の `Bundler.require`）。
+
+🔴 **`Gemfile` に書いた gem は `Bundler.require` が全部 require する。**`sinatra` の
+トップレベルは `sinatra/main` で、**classic の `at_exit` runner** を仕込む。モロヘイヤは
+意図して `sinatra/base` だけを使っている（`controller.rb:1`）のに、宣言を足したことで
+`sinatra/main` まで読まれるようになっていた。
+
+| | #4679 の前 | #4679 の後 | `require: false` 後 |
+| --- | --- | --- | --- |
+| `sinatra/main` | 読まない | 🔴 **読む** | 読まない |
+| `Sinatra::Application.app_file` | `nil` | gem 側のファイル | `nil` |
+
+⚠ **`Sinatra::Application` という定数自体は `sinatra/base` が定義する。**`sinatra/main` が
+足すのは **`at_exit` runner** のほう。**「定数があるから classic が入っている」ではない。**
+
+⚠ **Codex の帰結部分（意図しない classic サーバーが起動しうる）はモロヘイヤでは再現しない**
+（`run?` が真でも `run!` を呼ぶのは `sinatra/main` の `at_exit` だけで、それが読まれていない）。
+🔴 **それでも直す。**`app_file` が何に解決されるかは**ロード順に依存する**ので、
+依存が 1 本増減しただけで変わりうる。偶然で成り立っている状態を残す理由が無い。
+
+✅ **`require: false` が #4679 以前と等価であることは実機で確かめた**
+（`6799ffcf` の worktree と突き合わせて、上の表の 1 列目と 3 列目が完全に一致）。
+
+⚠ **宣言の目的は「版の制約」であって「ロードの指示」ではない**、が一般則。
+`Rack::Utils` / `Rack::Session::Cookie` / `Rack::URLMap` / `Rack::Auth::Basic` は
+`sinatra/base` 経由で入るので `require: false` でも解決できる（実測）。
+
 #### ⚠ 依存の削除は 3 リポジトリの連鎖になる（2026-09-06 時点の現在地）
 
 **順序を間違えると `bundle install` が壊れる。**

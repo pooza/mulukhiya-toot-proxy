@@ -30,8 +30,15 @@ gem 'puma', '~> 8.0'
 # 事故で、⚠ CVE になっておらず原因も未特定なので advisory では判定できない。
 # ⚠⚠ 上限を外してよい条件は #4678（同時アクセスの回帰テスト）が緑になること。
 # それまで sinatra 4.3 系 / rack 3.3 系へは動かさない。
-gem 'rack', '~> 3.2.5' # 2026-02 の同時アクセステスト (500 req × 2 並列・不整合 0、#4055) が通った版
-gem 'rack-session', '>= 2.1.1' # ⚠ ginseng-web の床をそのまま移すだけ。事故との関係は無い
+#
+# ⚠⚠ **4 つとも `require: false` (#4680)。**宣言の目的は**版の制約だけ**で、ロードの
+# 指示ではない。🔴 付けないと `Bundler.require` がトップレベルの sinatra
+# ＝ `sinatra/main` を読み、**classic の Sinatra::Application と at_exit runner** が入る
+# （モロヘイヤは controller.rb で `sinatra/base` だけを使っている）。
+# ⚠ Rack::Utils / Rack::Session::Cookie / Rack::URLMap / Rack::Auth::Basic は
+# `sinatra/base` 経由で入るので、`require: false` でも解決できる（実測）。
+gem 'rack', '~> 3.2.5', require: false # 2026-02 の同時アクセステスト (500 req × 2 並列・不整合 0、#4055) が通った版
+gem 'rack-session', '>= 2.1.1', require: false # ⚠ ginseng-web の床をそのまま移すだけ。事故との関係は無い
 gem 'rspotify', github: 'pooza/rspotify', branch: 'master.pooza'
 gem 'ruby-progressbar'
 gem 'ruby-vips', require: 'vips'
@@ -39,8 +46,8 @@ gem 'sentry-ruby'
 gem 'sentry-sidekiq'
 gem 'sidekiq', '~>8.1'
 gem 'sidekiq-scheduler', '~>6.0.1'
-gem 'sinatra', '~> 4.2.1' # 🔴 事故版は 4.2.0。4.2.1 は本番 4 台で 2026-08-09 から無事故 (#4508)
-gem 'tilt', '>= 2.1.0' # ⚠ ginseng-web の床をそのまま移すだけ。事故との関係は無い
+gem 'sinatra', '~> 4.2.1', require: false # 🔴 事故版は 4.2.0。4.2.1 は本番 4 台で 2026-08-09 から無事故 (#4508)
+gem 'tilt', '>= 2.1.0', require: false # ⚠ ginseng-web の床をそのまま移すだけ。事故との関係は無い
 group :development do
   gem 'bundler-audit'
   # RuboCop 設定の正本。本体と minitest/performance/rake プラグインもこの gem が抱える。
