@@ -1272,7 +1272,7 @@ DB 直読み層（account / status / attachment / postgres）も **omission 0 �
 
 **スコープ確定（2026-08-27）。**[マイルストーン 5.36.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/634)
 作成済み・`config/application.yaml` は 5.36.0 へバンプ済み（`dbc4cd9d`）。
-**2026-09-02 時点で 10 件（closed 4 / open 6）**。#4675 が後から加わっている。
+**2026-09-06 時点で 10 件（closed 4 / open 6）**。#4675 が後から加わっている。
 
 | Issue | 主眼 | 状態 |
 | --- | --- | --- |
@@ -1283,7 +1283,7 @@ DB 直読み層（account / status / attachment / postgres）も **omission 0 �
 | #4649 (M) | webhook で落ちた添付を送信側へ返す（#4633 の残り） | |
 | #4658 (bug) | shallu の related 辞書 2 本が **Rhino ランタイム廃止**で死亡（V8 へ移行 + 再デプロイ） | **実機は 2026-08-30 に決着**（復活させず「汎用」辞書へ置き換え・`local.yaml` mtime 18:47）。⚠ **残りは台帳の訂正＝ユーザー作業**なので Issue は open |
 | #4659 (bug) | 辞書ソースの上流 GAS が**間欠 404** を返し、痩せた辞書でキャッシュを上書きしている | ⚠ **キュアスタ！のニチアサに直結**。09-02 の台帳では率が上がっている（下記） |
-| #4675 (bug/S) | monit と rc.d の boot 競合で sidekiq が二重起動する（2026-08-30 追加） | **PR #4676 が open**（Codex P1 を `de3f8d01` で消化済み） |
+| #4675 (bug/S) | monit と rc.d の boot 競合で sidekiq が二重起動する（2026-08-30 追加） | **PR #4676 が open**（Codex P1 を `de3f8d01` で消化済み）。⚠ **start 同士のレースは ginseng-core 1.23.7 の `O_EXCL` で閉じた**（`d417f724`）が、**起動順そのものは変わっていない** |
 | #4618 (M) | `/health` のプール指標が pgbouncer と Sidekiq 側の逼迫を取りこぼす（#4639 の rollback 信号） | ✅ **着地（2026-08-28）**・P1 は PR #4671 / P2 は PR #4660 |
 
 ⚠ **#4658 は 5.36.0 のスコープに入っているが、こちらでは動かせない。**GAS の V8 移行と再デプロイが
@@ -1353,6 +1353,102 @@ zugoga 本番の実測は **page1 295ms / only_person 6.5ms / cursor 3.1ms**（�
 
 ⚠⚠ **「docs だけだから安全」ではない。**契約を誤って書くと、クライアント側が誤った分岐を実装する。
 **docs の PR もコードと同じ密度でレビューを通すこと。**
+
+### 2026-09-06 セッション同期の記録
+
+- **ブランチ**: `develop` は `origin/develop` と同一・未コミット無し。open PR 4 本（#4676 / #4674 / #4673 / #4661）
+- **Dependabot**: open アラート 0 件
+- **Codex**: 直近 12 マージ PR ＋ open PR を横断走査。**未消化ゼロ**（09-02 に消化した 3 件は
+  返信・リアクションとも付いている）。新規の指摘も無し
+- ⚠ **open の 3 本（#4676 / #4674 / #4673）は CI 緑・`MERGEABLE`/`CLEAN` でマージ待ち。**
+  Codex の指摘は消化済みなので、止まっているのはマージだけ
+- **Sentry**: **新規イシューなし。**ただし既存 2 件に新しいイベントが出ていて、両方コメントした（下記）
+- **chubo2**: `origin/main` と差分なし。**09-02 以降 27 コミット**（別セッションの作業。Kuma /
+  tomato-shrieker / Wiki.js / firewall まわり）で open Issue は 22 → 25 件。
+  **§6-2 の Issue 棚卸しは 2026-08-31 実施済み**なのでスキップ（次回は 09-30 以降）
+- **辞書台帳**: 再生成してコミット（chubo2 `2d2452e`）。**🔴 の増減なし**（下記）
+- **§8 harness upstream チェック**: `last_checked` 09-02 から 4 日 → 実施。**新規なし**
+  （Mastodon v4.7.1 / Misskey 2026.7.0 のまま。Misskey の 2026.9.0-alpha.0 は alpha なので動かない）
+
+#### ginseng-core 1.23.7 を取り込んだ — #4675 の直系だった（2026-09-06）
+
+**8 本すべてずれていたが、① は 1 本だけ。**⚠ **残り 7 本は `ginseng-style` の参照更新
+（v1.1.11 → v1.1.12）のみ**＝開発時の RuboCop 設定の話なので ③ 見送り。
+
+| gem | 判定 |
+| --- | --- |
+| `ginseng-core` `85d1c5b8` → `b6e736db`（6 コミット・1.23.4 → **1.23.7**） | **① すぐ取り込む。**⚠ **pid ファイルの穴が 5 件で、#4675 の直系** |
+| 他 7 本 | **③ 見送る。**差分は `ginseng-style` の参照更新のみ |
+
+⚠⚠ **`write_pid` が `O_CREAT | O_EXCL` になった**（pooza/ginseng-core#622）のが本体。
+`Ginseng::Daemon` の pid 周りは `Ginseng::Daemon::PidFile` へ切り出され、
+**`abort_if_running!` は早期の診断でしかなく、start 同士のレースを閉じているのは `write_pid`**
+という整理になっている。ほかに #627（読めない中身を「起動していない」と答えない）/
+#629（symlink を辿らない）/ #633 / #635（読めない pid ファイルで起動を拒む）/ #625（`mask_fields` 公開）。
+
+**モロヘイヤの 3 デーモン（Puma / Sidekiq / Listener）はいずれも `Ginseng::Daemon` を継承していて
+`pid` / `write_pid` / `alive_state` を上書きしていない**ので、修正はそのまま届く。
+
+⚠ **実機で裏を取った**（[[feedback_fix-may-not-reach-through-ginseng]]）:
+
+- `Mulukhiya::SidekiqDaemon#write_pid` の owner が `Ginseng::Daemon::PidFile` であること
+- 同じ pid ファイルへ **8 プロセスから同時に `write_pid`**。勝者が生き続ける条件で
+  **勝者 1 / 敗者 7**（敗者は `already running` で起動しない）。**1.23.4 の `write_pid` は
+  素の `File.write` だったので 8 本とも勝っていた**
+- ⚠ **勝者が即座に終了する条件では勝者 2 になる**が、これは 1 本目の死亡を確認して
+  正当に奪った形（`:dead` と断定できたときだけ奪う）。**同時に 2 本立つ状態ではない**ので
+  退行と読まないこと
+
+`rake lint` 緑・`rake test` **1208 tests / 0 failures / 0 errors / 322 omissions**
+（harness 無しの実行なので omission が多い側）。他のロック済み gem の版は 1 つも動いていない。
+コミットは `d417f724`。
+
+⚠⚠ **これで #4675 が閉じるわけではない。**閉じたのは「start が 2 本とも pid ファイルを取れる」
+レースだけで、**monit と rc.d が両方 start を撃つ起動順そのものは変わっていない**
+（2 本目が `already running` で落ちるようになっただけ）。PR #4676（rc.d の保険 pkill が
+proctitle と一致しない）は別の穴として引き続き必要。
+
+#### Sentry: 2Q が再発していた ＋ 全滅の回はログに残らない（2026-09-06）
+
+⚠⚠ **09-02 のコメントに書いた「以後の再発なし」は誤りだった。**その直後に 3 件出ている。
+
+- **MULUKHIYA-TOOT-PROXY-2Q**（tagging dictionary fetch returned nothing）が
+  JST 09-03 の **02:19 / 04:18 / 07:39** に発火（すべて shallu / 5.35.0）。以後 09-06 04:00 まで静穏
+- ⚠ **08-30 の置き換えで冗長度が落ちている。**shallu の辞書は 3 本（2 オリジン）から
+  **2 本（1 オリジン）** になった。全滅 alert は「**全**ソースが空」でしか鳴らないので、
+  **本数が減るほど全滅は当たりやすくなる**
+- ⚠ **`mstdn.b-shock.org` は shallu 自身**（DNS が `shallu.b-shock.co.jp` に解決）。
+  さらに nginx は proxy ではなく **`return 302`**（09-03 の access log は `/api/dic/v1/*` の
+  **1207 件すべて 302**）なので、**404 を返しているのは GAS 側**で確定。
+  ⚠ **nginx やそのタイムアウトを疑わないこと**
+- **間欠の実測（#4659）**: shallu の syslog 3 日分で **312 回中 21 回（約 6.7%）**が
+  空ソースを 1 本含む（`service.json` 20 / `common.json` 1）
+
+⚠⚠ **全滅した回は syslog に 1 行も残らない。**`refresh` は `discardable?` の枝で
+`alert_empty_result` → `return self` と抜けるので **`log_generation` を飛ばす**。
+`tagging dictionary refreshed` は**成功した回の記録でしかない**ため、
+
+- 上の 6.7% にも、**chubo2 の辞書台帳の 🟡 間欠 n/m にも、全滅回は 1 件も入っていない**
+- 🔴 **ログだけ見ると「1 本欠けただけ」に見え、全滅したことが分からない**
+
+観測の穴として **#4628 に 6 件目として追記**した。⚠ 直すときに `log_generation` を
+そのまま呼ばないこと — `signature` / `generated_at` / `entries` は**据え置いたキャッシュ**の
+値になるので、**据え置きを更新成功として記録する**という元より悪い形になる。
+
+**MULUKHIYA-TOOT-PROXY-1X** にも新イベント（2026-09-04T19:53Z）。⚠ **`server_name=mulukhiya` の
+系統で pooza の本番 4 台ではない**（08-05 以降の切り分けどおり）。
+⚠ **ただし release が 5.26.0 → 5.35.0 に上がっている**ので、放置された環境ではなく
+**追随しているどこか**。発生元の特定は引き続きできていない。
+
+#### 辞書台帳（2026-09-06 生成・本番 4 台）
+
+**🔴 の増減なし。**gomander の 🔴 直書き 1 本（`script.google.com` を直接引いている・
+中身は 🟢 で生きている）と、🔴 台帳に無い 2 行（`mstdn.delmulin.com/api/dic/v1/pron.json` /
+`.../character/v1/detail.json`）は据え置き。⚠ **どちらもユーザー作業。**
+
+⚠ **🟡 間欠の n/m を前回と直接比べない。**窓が 59 回 → 22〜25 回と違う。
+率で見ると shallu が 1〜2/25、vulcan が 2〜4/22、zugoga・gomander が 0〜3/25 で、
+**上の syslog 実測（6.7%）と整合する**。
 
 ### 2026-09-02 セッション同期の記録
 
