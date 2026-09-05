@@ -1333,13 +1333,28 @@ DB 直読み層（account / status / attachment / postgres）も **omission 0 �
 | # | やること | 状態 |
 | --- | --- | --- |
 | 1 | モロヘイヤが 4 つを宣言する | ✅ **完了**（PR #4679・`a921605d`） |
-| 2 | `cure-api` が 4 つを宣言する | **pooza/cure-api#359**（起票済み） |
+| 2 | `cure-api` が 4 つを宣言する | **pooza/cure-api#359 / PR #360**（CI 緑・マージ待ち） |
 | 3 | `ginseng-web` が 5 つを削除（3.0.0） | **pooza/ginseng-web#133**（⚠ **draft**・2 待ち） |
 | 4 | 各利用側で `bundle update ginseng-web` | 未 |
 
-🔴 **`cure-api` は `sinatra` を実使用しているのに宣言していない**（`app/lib/cure_api.rb:2` の
+🔴 **`cure-api` は `sinatra` を実使用しているのに宣言していなかった**（`app/lib/cure_api.rb:2` の
 `require 'sinatra/base'` と `Controller < Sinatra::Base`。`Gemfile` にあるのは `puma` だけ）。
-⚠ **`rack-test` が rack を連れてくるのでテストだけは通ってしまう**。それで「大丈夫」と読まない。
+
+⚠ **連鎖は実機で確かめた**（cure-api の worktree で `ginseng-web` の PR ブランチを指して `bundle install`）:
+
+| 条件 | 結果 |
+| --- | --- |
+| cure-api の宣言あり ＋ `ginseng-web` 3.0.0 | ✅ `rake test` 27 tests / 0 failures / 0 errors・版も動かない |
+| cure-api の宣言なし ＋ `ginseng-web` 3.0.0（lock 作り直し） | 🔴 **`sinatra` と `rack-session` が消え `require 'sinatra/base'` が LoadError** |
+
+⚠ **`rack` と `tilt` は宣言が無くても残る**（`rack-test` と `slim` が連れてくる）＝
+**実際に壊れるのは `sinatra` と `rack-session` の 2 つ**。「4 つとも消える」ではない。
+
+⚠⚠ **既存の `Gemfile.lock` を残したままだと `bundle install` は通ってしまう**（保守的解決で
+既存エントリを保つ）。負側は **lock を作り直して初めて出た**。**「lock があるから大丈夫」と読まない。**
+
+⚠ **cure-api は床だけ（`>=`）にした**（2026-09-06 ユーザー判断）。あちらはリクエスト単位の
+トークンを持たないので事故の形が成立しない（#4663 の 3. の切り分け）。**上限を持つのはモロヘイヤだけ。**
 
 ⚠ `ginseng-web` から外すのは **5 つ**（`puma` も含む）。`puma` はモロヘイヤ・`cure-api` の
 両方が既に自分で宣言している。⚠ **`config/lib.yaml` の `puma.port` は残す**
