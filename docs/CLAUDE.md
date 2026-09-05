@@ -1272,7 +1272,7 @@ DB 直読み層（account / status / attachment / postgres）も **omission 0 �
 
 **スコープ確定（2026-08-27）。**[マイルストーン 5.36.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/634)
 作成済み・`config/application.yaml` は 5.36.0 へバンプ済み（`dbc4cd9d`）。
-**2026-09-06 時点で 11 件（closed 4 / open 7）**。#4675 と #4663 が後から加わっている。
+**2026-09-06 時点で 11 件（closed 5 / open 6）**。#4675 と #4663 が後から加わっている。
 
 | Issue | 主眼 | 状態 |
 | --- | --- | --- |
@@ -1285,7 +1285,7 @@ DB 直読み層（account / status / attachment / postgres）も **omission 0 �
 | #4659 (bug) | 辞書ソースの上流 GAS が**間欠 404** を返し、痩せた辞書でキャッシュを上書きしている | ⚠ **キュアスタ！のニチアサに直結**。09-02 の台帳では率が上がっている（下記） |
 | #4675 (bug/S) | monit と rc.d の boot 競合で sidekiq が二重起動する（2026-08-30 追加） | **PR #4676 が open**（Codex P1 を `de3f8d01` で消化済み）。⚠ **start 同士のレースは ginseng-core 1.23.7 の `O_EXCL` で閉じた**（`d417f724`）が、**起動順そのものは変わっていない** |
 | #4618 (M) | `/health` のプール指標が pgbouncer と Sidekiq 側の逼迫を取りこぼす（#4639 の rollback 信号） | ✅ **着地（2026-08-28）**・P1 は PR #4671 / P2 は PR #4660 |
-| #4663 (M) | rack / sinatra の版の制約を、検証できる側（モロヘイヤ）へ移す | **2026-09-06 に追加**。⚠ **① ② のみ。③（同時アクセスの回帰テスト）は #4678 へ切り出し** |
+| #4663 (M) | rack / sinatra の版の制約を、検証できる側（モロヘイヤ）へ移す | ✅ **着地（2026-09-06）**・PR #4679。⚠ **③（同時アクセスの回帰テスト）は #4678 へ切り出し** |
 
 ⚠ **#4658 は 5.36.0 のスコープに入っているが、こちらでは動かせない。**GAS の V8 移行と再デプロイが
 先で、新 URL が出たら名前付きパス経由で config へ反映する。**リリースのブロッカーにしない**。
@@ -1325,6 +1325,28 @@ DB 直読み層（account / status / attachment / postgres）も **omission 0 �
 ⚠ **上限はいま何も止めていない**（rubygems の最新が `sinatra` 4.2.1 / `rack` 3.2.7 ＝
 どちらも現行と同じ）。**将来 4.3 / 3.3 が出たときに効く予防**であって、
 **外してよい条件は #4678 が緑になること**。
+
+#### ⚠ 依存の削除は 3 リポジトリの連鎖になる（2026-09-06 時点の現在地）
+
+**順序を間違えると `bundle install` が壊れる。**
+
+| # | やること | 状態 |
+| --- | --- | --- |
+| 1 | モロヘイヤが 4 つを宣言する | ✅ **完了**（PR #4679・`a921605d`） |
+| 2 | `cure-api` が 4 つを宣言する | **pooza/cure-api#359**（起票済み） |
+| 3 | `ginseng-web` が 5 つを削除（3.0.0） | **pooza/ginseng-web#133**（⚠ **draft**・2 待ち） |
+| 4 | 各利用側で `bundle update ginseng-web` | 未 |
+
+🔴 **`cure-api` は `sinatra` を実使用しているのに宣言していない**（`app/lib/cure_api.rb:2` の
+`require 'sinatra/base'` と `Controller < Sinatra::Base`。`Gemfile` にあるのは `puma` だけ）。
+⚠ **`rack-test` が rack を連れてくるのでテストだけは通ってしまう**。それで「大丈夫」と読まない。
+
+⚠ `ginseng-web` から外すのは **5 つ**（`puma` も含む）。`puma` はモロヘイヤ・`cure-api` の
+両方が既に自分で宣言している。⚠ **`config/lib.yaml` の `puma.port` は残す**
+（設定の既定値であって gem の依存とは別物）。
+
+⚠ **#128 で書いた「制約の由来」は消さず、移管先へのポインタに書き換えた。**
+依存が無くなっても「**advisory では判定できない事故がある**」という知識は残す必要がある。
 
 ⚠⚠ **`token_mismatch` 0 件は「08-09 以降ずっと」の実測ではない。**
 `/var/log/mulukhiya-toot-proxy.log` の保持は約 8 日（zugoga で `.7.gz` が 08-30）なので、
