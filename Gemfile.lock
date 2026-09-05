@@ -506,6 +506,8 @@ DEPENDENCIES
   ostruct
   parallel (~> 2.0)
   puma (~> 8.0)
+  rack (~> 3.2.5)
+  rack-session (>= 2.1.1)
   rack-test
   rails-erb-lint
   ricecream
@@ -517,8 +519,10 @@ DEPENDENCIES
   sentry-sidekiq
   sidekiq (~> 8.1)
   sidekiq-scheduler (~> 6.0.1)
+  sinatra (~> 4.2.1)
   slim_lint
   test-unit
+  tilt (>= 2.1.0)
   timecop
   webmock
 
