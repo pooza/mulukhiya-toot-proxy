@@ -20,6 +20,18 @@ gem 'marcel'
 gem 'optparse'
 gem 'parallel', '~> 2.0'
 gem 'puma', '~> 8.0'
+# ⚠⚠ rack / sinatra / rack-session / tilt は ginseng-web が使っていないのに宣言していた
+# 依存で、版を決めているのも向こうだった。判定材料（リクエスト単位の同一性）はこちらに
+# しか無いので、制約ごとこちらへ移す (#4663)。ginseng-web 側の削除は 3.0.0 で、
+# ⚠ 順序は「こちらで宣言 → マージ → 向こうで削除」。先に落とすと bundle install が壊れる。
+#
+# 🔴 上限まで書くのは 2025-10 のトークン汚染事故のため
+# (docs/archive/postmortem-2025-10-rack32.md)。異なるアカウントの投稿として送信される
+# 事故で、⚠ CVE になっておらず原因も未特定なので advisory では判定できない。
+# ⚠⚠ 上限を外してよい条件は #4678（同時アクセスの回帰テスト）が緑になること。
+# それまで sinatra 4.3 系 / rack 3.3 系へは動かさない。
+gem 'rack', '~> 3.2.5' # 2026-02 の同時アクセステスト (500 req × 2 並列・不整合 0、#4055) が通った版
+gem 'rack-session', '>= 2.1.1' # ⚠ ginseng-web の床をそのまま移すだけ。事故との関係は無い
 gem 'rspotify', github: 'pooza/rspotify', branch: 'master.pooza'
 gem 'ruby-progressbar'
 gem 'ruby-vips', require: 'vips'
@@ -27,6 +39,8 @@ gem 'sentry-ruby'
 gem 'sentry-sidekiq'
 gem 'sidekiq', '~>8.1'
 gem 'sidekiq-scheduler', '~>6.0.1'
+gem 'sinatra', '~> 4.2.1' # 🔴 事故版は 4.2.0。4.2.1 は本番 4 台で 2026-08-09 から無事故 (#4508)
+gem 'tilt', '>= 2.1.0' # ⚠ ginseng-web の床をそのまま移すだけ。事故との関係は無い
 group :development do
   gem 'bundler-audit'
   # RuboCop 設定の正本。本体と minitest/performance/rake プラグインもこの gem が抱える。
