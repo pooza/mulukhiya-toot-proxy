@@ -37,7 +37,14 @@ misskey:
   verified_at: '2026-08-01'
 
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
-last_checked: '2026-09-02'
+last_checked: '2026-09-06'
+
+# 2026-09-06 チェック結果:
+#   - Mastodon: 最新 stable は **v4.7.1（2026-09-01）のままで verified と同一**。新しい RC も無い
+#     （直近の prerelease は v4.7.0-rc.1 / 08-14 で、ベース版が verified より古い）。対応不要。
+#   - Misskey: 最新 stable は **2026.7.0（2026-07-31）のままで verified と同一**。
+#     ⚠ **2026.9.0-alpha.0（2026-09-04）が出ているが alpha。**方針どおり動かない
+#     （Misskey は stable リリース後・デプロイ前に検証する）。対応不要。
 
 # 2026-09-02 チェック結果:
 #   - Mastodon: **v4.7.1（2026-09-01 14:00Z）を fedi-test-harness で実走し、`verified` を昇格した。**
