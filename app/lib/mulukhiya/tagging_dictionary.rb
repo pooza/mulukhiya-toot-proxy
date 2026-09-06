@@ -11,12 +11,19 @@ module Mulukhiya
     include Package
     include SNSMethods
     include TaggingDictionaryLogMethods
+    include TaggingDictionarySourceCacheMethods
 
     REDIS_KEY = 'tagging_dictionary'.freeze
+    # ソース単位の last-good キャッシュの接頭辞 (#4659 の ②)。
+    SOURCE_REDIS_KEY_PREFIX = "#{REDIS_KEY}/source".freeze
     # キャッシュ payload の形式。envelope を変えたら上げる。旧形式は「無い」ものと
     # して捨てられ、次の refresh で作り直される。
     CACHE_PAYLOAD_VERSION = 1
     DEFAULT_CACHE_TTL = 3600
+    # ⚠ **ソース単位のキャッシュは本体より長く持つ (#4659)。**間欠 404 は
+    # gomander で 1 日 38% の回に出る。本体と同じ 1 時間だと、続けて外した
+    # ソースの last-good が先に消えて意味を成さない。
+    DEFAULT_SOURCE_CACHE_TTL = 86_400
 
     def initialize
       super
@@ -81,12 +88,17 @@ module Mulukhiya
     def refresh
       entries = merge(fetch)
       clear
-      if discardable?(entries)
-        # ソースはあるのに 1 件も取れなかった回。直近の good を残したまま戻る。
+      # ⚠⚠ **全滅は last-good で埋めても鳴らす (#4659 の ②)。**埋まれば
+      # `entries` は present になるので `discardable?` を通らない。ここで
+      # 鳴らさないと、**全ソースが死んでも Sentry には何も出なくなる**
+      # （syslog の `log_generation` は出るようになったが、あれは通知経路ではない）。
+      alert_empty_result if all_sources_empty?
+      if keep_last_known_good?(entries)
+        # 直近の good を残したまま戻る。
         # ⚠ fail-open 自体は残す (GAS の一過性障害で辞書が消し飛ぶのを防ぐ意図は
         # 正しい)。TTL があるので古い内容が無期限に居座ることはない (#4583)。
-        alert_empty_result
         update(cache.to_h)
+        log_retention
         return self
       end
       redis.setex(REDIS_KEY, cache_ttl, Marshal.dump(build_payload(entries)))
@@ -119,8 +131,13 @@ module Mulukhiya
     end
 
     # キャッシュを捨てる。テスト・運用で「既知の状態から始める」ための入口。
+    #
+    # ⚠⚠ **ソース単位の last-good も一緒に捨てる (#4659 の ②)。**本体だけ消しても、
+    # 次の refresh が last-good で埋め直すので**「既知の状態から始める」にならない**。
     def self.invalidate_cache
-      return Redis.new.unlink(REDIS_KEY)
+      redis = Redis.new
+      redis.keys("#{SOURCE_REDIS_KEY_PREFIX}/*").each {|key| redis.unlink(key)}
+      return redis.unlink(REDIS_KEY)
     end
 
     private
@@ -198,6 +215,32 @@ module Mulukhiya
       return cache.present?
     end
 
+    # 直近の good を残したまま戻る回か。
+    #
+    # ⚠⚠ **「全滅」だけでは足りない（PR #4686 の Codex P1）。**last-good がまだ
+    # 無い状態（**この版を入れた直後**・ソースを足した直後・24h の TTL 切れ）だと、
+    # 1 本落ちただけで痩せた辞書が本体キャッシュを上書きする ＝ **この修正が
+    # 狙った症状がそのまま出る**。埋められなかった失敗がある回は公開しない。
+    #
+    # ⚠ **生きたキャッシュがあるときだけ。**初回起動で本体キャッシュも無ければ、
+    # 痩せていても公開するほうがまし（何も引けないより良い）。
+    #
+    # ⚠ **据え置きは無期限にならない。**本体キャッシュの TTL は 1 時間なので、
+    # ソースが恒久的に死んだ場合は 1 時間で失効し、痩せた辞書が公開される。
+    def keep_last_known_good?(entries)
+      return false if cache.blank?
+      return true if discardable?(entries)
+      return unrestorable_failure?
+    end
+
+    # 埋められなかった失敗があった回か。⚠ **本数で見る**（どのソースかは
+    # `log_retention` が出す）。
+    def unrestorable_failure?
+      empty = @empty_sources.to_a.size
+      return false if empty.zero?
+      return empty > @substituted_sources.to_a.size
+    end
+
     def build_payload(entries)
       return {
         version: CACHE_PAYLOAD_VERSION,
@@ -216,13 +259,14 @@ module Mulukhiya
     def fetch
       result = Concurrent::Array.new
       @empty_sources = Concurrent::Array.new
-      Parallel.each(RemoteDictionary.all, in_threads: Parallel.processor_count * 2) do |dic|
-        words = dic.parse
-        @empty_sources.push(dic.uri.to_s) if words.empty?
-        logger.send(words.empty? ? :error : :info, dic: dic.to_h.merge(words: words.count))
-        result.push(words)
+      @substituted_sources = Concurrent::Array.new
+      dics = remote_dictionaries
+      @attempted_sources = dics.size
+      Parallel.each(dics, in_threads: Parallel.processor_count * 2) do |dic|
+        result.push(fetch_source(dic))
       rescue => e
         @empty_sources.push(dic.uri.to_s)
+        result.push(restore_source(dic))
         e.log(dic: dic.to_h)
       end
       return result

@@ -3,6 +3,9 @@ description: 本文中のキーワードに基づいてハッシュタグを自�
 properties:
   cache:
     properties:
+      source_ttl:
+        minimum: 1
+        type: integer
       ttl:
         minimum: 1
         type: integer
