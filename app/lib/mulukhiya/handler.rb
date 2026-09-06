@@ -116,7 +116,10 @@ module Mulukhiya
       return {
         event: event.to_s,
         handler: underscore,
-        entries: recursive_to_a(result.concat(errors)),
+        # 🔴 `concat` にしないこと。`Reporter#push` は 1 つのハンドラに対して
+        # `summary` を 2 回呼ぶので、破壊的だとログ側だけ `errors` が二重になり、
+        # `result` にも染み出す (#4682)。
+        entries: recursive_to_a(result + errors),
       }
     end
 
