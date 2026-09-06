@@ -33,11 +33,41 @@ mastodon:
   verified_at: '2026-09-02'
 
 misskey:
-  verified: 2026.7.0
-  verified_at: '2026-08-01'
+  verified: 2026.9.0
+  verified_at: '2026-09-07'
 
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
-last_checked: '2026-09-06'
+last_checked: '2026-09-07'
+
+# 2026-09-07 チェック結果:
+#   - Misskey: **stable 2026.9.0（2026-09-06 11:19Z）を fedi-test-harness で実走し、`verified` を昇格した。**
+#     ⚠⚠ **重大な脆弱性の修正を含むセキュリティリリース**（リリースノートの IMPORTANT）。
+#     **ダイスキー（vulcan）本番はユーザーが 2026-09-06 20:56〜20:58 JST に適用済み**で、
+#     harness 検証は後追い。⚠ **2026.8.0 は stable が出ていない**ので、verified からの差分は
+#     2026.7.0...2026.9.0 の 1 本（70 commits / 185 files）。
+#   - **1347 tests / 2557 assertions / 0 failures / 0 errors / 146 omissions（100% passed）。**
+#     失敗が 1 件も無いので版間 diff は不要（従来と同じ判断）。`controller=misskey url=http://localhost:3001`
+#     を実走の頭で確認し、`/api/meta` の version も 2026.9.0 であることを確認した。
+#     ⚠ **omission 146 件は 2026-08-22 の Misskey 実走と同数。**tests が 1187 → 1347 に増えたのは
+#     モロヘイヤ側が 5.36.0 開発中だからで、**Misskey 版の影響と読まないこと**。
+#   - **2026.7.0 → 2026.9.0 でモロヘイヤの面に当たるものは無い**。実コード / 実データで確認:
+#     ① ⚠ **マイグレーションが 1 本も無い**（変更 185 ファイルに `migration/` が含まれない）＝
+#        **DB スキーマは 2026.7.0 から不変**。`app/query/misskey/*.sql.erb` 7 本は無風
+#     ② 🔴 **破壊的変更は `notes/reactions` の GET 廃止**。⚠ モロヘイヤが叩くのは
+#        **`POST /api/notes/reactions/create`** で別物（`misskey_controller.rb:152`）。
+#        `notes/create` / `notes/show` / `notes/delete` / `drive/files/*` / `i` / `i/update` /
+#        `meta` / `announcements` / `antennas/list` / `app/create` / `auth/session/*` /
+#        `i/registry/set` / `users/notes` は**いずれも変更なし**
+#     ③ カスタム絵文字の一括インポートが管理者権限必須に ＝ モロヘイヤは使わない
+#        （デルムリン丼の絵文字同期は Mastodon 側の `tootctl emoji sync`）
+#     ④ バックエンドの変更は `FileInfoService`（`AiService` → `SensitiveMediaDetectionService` の
+#        改名追従）/ `misc/zip.ts` 新設 / `config.ts` の型定義 / ログ基盤・WebSocket の後始末など
+#        内部実装。⚠ **センシティブ判定はダイスキーで未設定**なので ④ は空振り
+#   - **本番の実地確認（vulcan）**: `/mulukhiya/api/health` が **200 で全項目 OK**
+#     （redis / sidekiq / postgres / streaming / misskey_redis / ruby YJIT 有効）。
+#     アップグレード後（09-06 20:58 以降）の **1654 リクエストでエラーログ 0 件**、
+#     `POST /api/notes/reactions/create` の実通過も 1 件確認。
+#   - Mastodon: 最新 stable は **v4.7.1（2026-09-01）のままで verified と同一**。新しい RC も無い。対応不要。
 
 # 2026-09-06 チェック結果:
 #   - Mastodon: 最新 stable は **v4.7.1（2026-09-01）のままで verified と同一**。新しい RC も無い

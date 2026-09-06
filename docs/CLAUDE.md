@@ -1542,10 +1542,52 @@ zugoga 本番の実測は **page1 295ms / only_person 6.5ms / cursor 3.1ms**（�
   🔴 台帳に無い 2 行・いずれもユーザー作業）。⚠⚠ **窓が 118 回 → 40 回前後に縮んでいる**
   （ツールは現行の `/var/log/mulukhiya-toot-proxy.log` を丸ごと読むので、**ローテーションで分母が変わる**）。
   **🟡 間欠の n/m を前回と直接比べないこと**
-- **§8 harness upstream チェック**: `last_checked` が 09-06 で 1 日しか経っていないのでスキップ（次回は 09-10 以降）
+- **§8 harness upstream チェック**: ⚠ **経過日数では動かさず、ユーザーの申告で動かした。**
+  「Misskey 2026.9.0 が本番適用済み」との連絡を受けて実施（下記）。**`verified` を 2026.9.0 へ昇格**
 - **ginseng-\* のピン**: `ginseng-core` は**同一**。残り 7 本は **09-06 と同じ内容**
   （`ginseng-style` の参照更新 v1.1.11 → v1.1.12 ＋ docs のみ）＝ **③ 見送り継続**。
   ⚠ **同じ調査を 4 回しないために、09-06 の節の表がそのまま有効**と書いておく
+
+#### Misskey 2026.9.0 を検証し `verified` を昇格した（2026-09-07）
+
+⚠⚠ **これは 09-06 20:56 の Misskey 再起動（上の 2W の節）の正体でもある。**
+ユーザーが**ダイスキー（vulcan）本番へ 2026.9.0 を適用**した窓だった。
+
+**2026.9.0 は重大な脆弱性の修正を含むセキュリティリリース**（リリースノート冒頭の IMPORTANT）。
+⚠ **2026.8.0 は stable が出ていない**ので、`verified`（2026.7.0）からの差分は
+`2026.7.0...2026.9.0` の 1 本＝ **70 commits / 185 files** と、いつもより大きい回。
+
+**harness 実走（`controller=misskey url=http://localhost:3001`・`/api/meta` も 2026.9.0）:**
+
+**1347 tests / 2557 assertions / 0 failures / 0 errors / 146 omissions（100% passed）**
+
+失敗が 1 件も無いので版間 diff は不要（従来と同じ判断）。⚠ **omission 146 件は
+2026-08-22 の Misskey 実走と同数。**tests が 1187 → 1347 に増えたのは**モロヘイヤ側が
+5.36.0 開発中だから**で、**Misskey 版の影響と読まないこと**。
+
+**モロヘイヤの面に当たるものは無い**（実コード / 実データで確認）:
+
+- ⚠⚠ **マイグレーションが 1 本も無い**（185 ファイルに `migration/` が 1 つも含まれない）＝
+  **DB スキーマは 2026.7.0 から不変**。`app/query/misskey/*.sql.erb` 7 本は無風
+- 🔴 **破壊的変更は `notes/reactions` の GET 廃止。**⚠ **モロヘイヤが叩くのは
+  `POST /api/notes/reactions/create`** で別物（`app/lib/mulukhiya/controller/misskey_controller.rb:152`）。
+  `notes/create` / `notes/show` / `notes/delete` / `drive/files/*` / `i` / `i/update` / `meta` /
+  `announcements` / `antennas/list` / `app/create` / `auth/session/*` / `i/registry/set` /
+  `users/notes` は**いずれも変更なし**
+- カスタム絵文字の一括インポートが管理者権限必須に ＝ モロヘイヤは使わない
+  （デルムリン丼の絵文字同期は Mastodon 側の `tootctl emoji sync`）
+- バックエンドの変更は `FileInfoService`（`AiService` → `SensitiveMediaDetectionService` の改名追従）/
+  `misc/zip.ts` 新設 / `config.ts` の型定義 / ログ基盤・WebSocket の後始末など内部実装。
+  ⚠ **センシティブ判定はダイスキーで未設定**なので空振り
+
+**本番（vulcan）の実地確認も取った**（[[feedback_verify-before-claiming-fixed]]）:
+
+- `/mulukhiya/api/health` が **200 で全項目 OK**（redis / sidekiq / postgres / streaming /
+  misskey_redis / ruby YJIT 有効）。⚠ **パスは `/mulukhiya/api/health`**（`/mulukhiya/health` は 404）
+- アップグレード後（09-06 20:58 以降）の **1654 リクエストでエラーログ 0 件**、
+  `POST /api/notes/reactions/create` の実通過も 1 件確認
+
+台帳（`docs/harness-verified-versions.yaml`）と chubo2 のピン（`c85a5f9`）を 2026.9.0 へ更新した。
 
 #### Sentry 2W は ダイスキーの Misskey 再起動の窓に当たっただけだった（2026-09-07）
 
