@@ -1274,7 +1274,9 @@ DB 直読み層（account / status / attachment / postgres）も **omission 0 �
 作成済み・`config/application.yaml` は 5.36.0 へバンプ済み（`dbc4cd9d`）。
 **2026-09-06 時点で 13 件（closed 6 / open 7）**。#4675 / #4663 / #4680 / #4682 が後から加わっている。
 ⚠⚠ **09-06 夜に 6 本をマージし、実装は全件着地した**（#4673 / #4676 / #4674 /
-#4683 / #4684 / #4686）。**残るのはステージング検証だけ。**
+#4683 / #4684 / #4686）。⚠⚠ **2026-09-07 のステージング検証で #4687（sidekiq が
+起動しない）が出て、PR #4688 で是正した**（下の専用節）。**ステージング 4 台は
+`a74605cb`＝ 5.36.0 で緑。**
 ⚠ #4658 はこちらでは動かせない（GAS 側・ユーザー作業）。#4675 は起動順が手つかず。
 ⚠ #4659 は ② だけの着地で、①（リトライ）と ③（呼び出し回数を減らす）は手つかず。
 
@@ -1292,6 +1294,63 @@ DB 直読み層（account / status / attachment / postgres）も **omission 0 �
 | #4618 (M) | `/health` のプール指標が pgbouncer と Sidekiq 側の逼迫を取りこぼす（#4639 の rollback 信号） | ✅ **着地（2026-08-28）**・P1 は PR #4671 / P2 は PR #4660 |
 | #4663 (M) | rack / sinatra の版の制約を、検証できる側（モロヘイヤ）へ移す | ✅ **着地（2026-09-06）**・PR #4679。⚠ **③（同時アクセスの回帰テスト）は #4678 へ切り出し** |
 | #4680 (S) | 宣言追加で `Bundler.require` が sinatra classic まで読むようになった | ✅ **着地（2026-09-06）**・PR #4681。#4663 の退行 |
+| #4687 (S) | 🔴 **sidekiq が起動しない**（`Sidekiq::Config` に `timeout=` は無い） | ✅ **着地（2026-09-07）**・PR #4688（`a74605cb`）。**#4676 の退行**・ステージング検証で発覚 |
+
+### ステージング 4 台へのデプロイ（2026-09-07・5.36.0）と #4687（2026-09-07）
+
+**dev24-27 のすべてを develop `a74605cb`（5.36.0）へ揃えた。**
+
+| | HEAD | health | version | `capabilities.media_update` |
+| --- | --- | --- | --- | --- |
+| dev24 美食丼 | `a74605cb` | 200（全項目 OK） | 5.36.0 | true |
+| dev25 キュアスタ！ | `a74605cb` | 200（全項目 OK） | 5.36.0 | true |
+| dev26 デルムリン丼 | `a74605cb` | 200（全項目 OK） | 5.36.0 | true |
+| dev27 ダイスキー | `a74605cb` | 200（全項目 OK） | 5.36.0 | **キー自体が無い**（Misskey・仕様どおり） |
+
+⚠ **rc.d の 3 本を配り直した**（dev24-26）。#4676 が `config/sample/freebsd/mulukhiya-*` を
+書き換えているので、**このリリースは rc.d 更新が要る回**。dev27（Ubuntu・systemd）は
+ユニットに変更が無いので配り直し不要。
+
+⚠ **`bundle install` は落とせない回だった**（`Gemfile` / `Gemfile.lock` が動いている ＝
+ginseng-core 1.23.7 / ginseng-style 1.1.12 / rack・sinatra の宣言）。
+
+#### 🔴 sidekiq が起動しなかった — `Sidekiq::Config` に `timeout=` は無い（#4687 / PR #4688）
+
+**dev24 に入れた瞬間に sidekiq が起動しなくなった。**`/mulukhiya/api/health` が
+`sidekiq: NG` の 503 を返し続け、**monit が 3 サイクルで 3 サービスの再起動を撃つ
+ループ**に入った（puma が繰り返し起動し直される）。
+
+```
+$ bundle exec sidekiq --require ./app/initializer/sidekiq.rb
+undefined method 'timeout=' for an instance of Sidekiq::Config
+app/initializer/sidekiq.rb:26:in 'block in <module:Mulukhiya>'
+```
+
+`de3f8d01`（PR #4676 ＝ **#4675 の Codex P1** への対応）で入れた
+`sidekiq.timeout = SidekiqDaemon::SHUTDOWN_TIMEOUT` が誤り。
+**`Sidekiq::Config` に `timeout=` は無い**（`concurrency=` はある）。`timeout` は
+`DEFAULTS` の素のキーなので `sidekiq[:timeout] = ...` が正しい。
+
+⚠⚠ **なぜ CI も harness も通ったのか。**🔴 **`Sidekiq.configure_server` のブロックは
+`Sidekiq.server?` が false の環境では yield されない ＝ sidekiq の CLI でしか実行されない。**
+`app/initializer/sidekiq.rb` の中身は **`rake test` でも fedi-test-harness でも puma からも
+1 行も走らない**ので、**CI 緑・harness 両系緑のまま、次の起動で初めて発火する**。
+[[project_latent-landmine-fires-on-next-restart]] と同型。
+
+**1 行直して終わりにしていない。**ブロックの中身を
+`SidekiqDaemon.configure_server(sidekiq, config)` へ切り出し、**実物の `Sidekiq::Config` を
+渡す正テスト**を持たせた。⚠ **ダブルを渡すと「存在しない setter を呼んでいる」という
+この欠陥そのものを取り逃がす。**⚠ `require 'sidekiq/capsule'` の明示も要る
+（従来は sidekiq の CLI が読んでいたので CLI の外から検査できなかった）。
+**修正前のコードでこのテストが `NoMethodError` で落ちることを確認済み。**
+
+⚠⚠ **このままリリースしていたら本番 4 台の sidekiq が全滅していた。**投稿経路そのものは
+puma なので生きるが、**ワーカーが 1 本も動かない**（辞書更新・番組表・ナウプレ・
+media_catalog がすべて止まる）。**ステージング検証が本来の仕事をした回。**
+
+⚠ **監視も「壊れている」とは言ってくれなかった。**monit は health の 503 を見て
+3 サービスを再起動するだけで、**再起動しても直らない**（[[project_5300-release]] の
+YJIT 再起動ループと同じ形）。**ループを見たらまず monit を止めて前景で起こす。**
 
 #### #4659 の ② が着地した — ソース単位の last-good（2026-09-06）
 
