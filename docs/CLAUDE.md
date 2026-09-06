@@ -1364,9 +1364,15 @@ DB 直読み層（account / status / attachment / postgres）も **omission 0 �
 | # | やること | 状態 |
 | --- | --- | --- |
 | 1 | モロヘイヤが 4 つを宣言する | ✅ **完了**（PR #4679・`a921605d`） |
-| 2 | `cure-api` が 4 つを宣言する | **pooza/cure-api#359 / PR #360**（CI 緑・マージ待ち） |
-| 3 | `ginseng-web` が 5 つを削除（3.0.0） | **pooza/ginseng-web#133**（⚠ **draft**・2 待ち） |
-| 4 | 各利用側で `bundle update ginseng-web` | 未 |
+| 2 | `cure-api` が 4 つを宣言する | ✅ **着地（2026-09-06）**・PR #360。⚠ **`develop` 止まり**（`3c392d3`・`main` は未） |
+| 3 | `ginseng-web` が 5 つを削除（3.0.0） | **pooza/ginseng-web#133**（**待ちは解けた**・ready 待ち。09-06 に声かけ済み） |
+| 4 | 各利用側で `bundle update ginseng-web` | 未。⚠ **`cure-api` の develop → main が先**（下記） |
+
+⚠⚠ **`cure-api` の宣言は `develop` にしか無い。**あちらは `ginseng-web` を `branch: 'main'` で
+引いているので、**#133 をマージしたあと `cure-api` の `main` で `bundle update ginseng-web` を
+回すと `LoadError`** になる。`Gemfile.lock` を触らない限りは pin が効いて無事（上の「lock があるから
+大丈夫と読まない」の裏返し）。⚠ **`require:` の件は cure-api 側でも対応済み**
+（`gem 'sinatra', ..., require: 'sinatra/base'`・`d1f790d`）＝ #4680 と同じ穴は踏んでいない。
 
 🔴 **`cure-api` は `sinatra` を実使用しているのに宣言していなかった**（`app/lib/cure_api.rb:2` の
 `require 'sinatra/base'` と `Controller < Sinatra::Base`。`Gemfile` にあるのは `puma` だけ）。
@@ -1546,6 +1552,48 @@ proctitle と一致しない）は別の穴として引き続き必要。
 ⚠ **🟡 間欠の n/m を前回と直接比べない。**窓が 59 回 → 22〜25 回と違う。
 率で見ると shallu が 1〜2/25、vulcan が 2〜4/22、zugoga・gomander が 0〜3/25 で、
 **上の syslog 実測（6.7%）と整合する**。
+
+### 2026-09-06 セッション同期の記録（2 回目）
+
+- **ブランチ**: `develop` は `origin/develop` と同一。open PR 4 本（#4676 / #4674 / #4673 / #4661）で午前と同じ
+- **Dependabot**: open アラート 0 件
+- **Codex**: 直近 12 マージ PR ＋ open PR を横断走査。**未消化ゼロ。**
+  午前の同期の後、#4674 に新しいレビューが 1 本付いたが「指摘なし」
+- **Sentry**: **新規イシューなし。**最新イベントは **2Q の 09-06 04:09 JST** で、
+  午前の同期（04:19 コミット）で拾った分と**同一**
+- ⚠ **今日は日曜＝ニチアサ当日。実況の窓（08:30-09:00）を含めて 2Q の発火は 1 件も無い**＝
+  辞書の全滅は起きていない。⚠ **全滅回は syslog に残らないが Sentry には出る**ので、
+  この静穏は「観測できていないだけ」ではない（午前の節の観測の穴とは別の話）
+- **chubo2**: `origin/main` と差分なし。open Issue **25 件**（午前と同じ）。
+  **§6-2 の Issue 棚卸しは 2026-08-31 実施済み**なのでスキップ（次回は 09-30 以降）
+- **辞書台帳**: 再生成してコミット（chubo2 `9897323`）。**🔴 の増減なし**（3 件とも据え置き・
+  いずれもユーザー作業）。⚠ **窓が 25 回 → 118 回に広がった**ので 🟡 間欠の分母が違う。
+  率は gomander 0.8〜3.4% / shallu 1.7〜2.6% / vulcan 1.8〜4.4% / zugoga 3.4% で、
+  午前の生成および syslog 実測（6.7%）と同じ水準
+- **§8 harness upstream チェック**: `last_checked` が当日（`a26f322c`）なのでスキップ
+- **ginseng-\* のピン**: `ginseng-core` は**同一**（午前に 1.23.7 を取り込み済み）。
+  残り 7 本は**午前と同じ内容**（`ginseng-style` の参照更新と docs のみ）なので **③ 見送り継続**。
+  ⚠ **同じ調査を 3 回しないために、午前の節の表がそのまま有効**と書いておく
+
+#### 依存の連鎖が 1 段進んだ — `cure-api` #360 が着地（2026-09-06 2 回目）
+
+**午前の同期の後（09-06T04:21Z）に pooza/cure-api#360 がマージされた。**これで
+「モロヘイヤ → `cure-api` → `ginseng-web` 3.0.0」の 2 段目が埋まり、
+**pooza/ginseng-web#133 の draft を保つ理由が消えた**ので、依頼側として
+[声かけのコメント](https://github.com/pooza/ginseng-web/pull/133#issuecomment-5558633166)を置いた
+（#133 の本文に「#360 がマージされたら ready にしてください」と書いてあった、その合図）。
+
+⚠⚠ **ただし `cure-api` の着地先は `develop` で、`main` にはまだ宣言が無い**（`3c392d3`）。
+`cure-api` は `ginseng-web` を `branch: 'main'` で引いているので、**#133 をマージしたあとに
+`cure-api` の `main` で `bundle update ginseng-web` を回すと `LoadError`** になる。
+順序は **`cure-api` の develop → main が先**。⚠ `Gemfile.lock` を触らない限りは
+pin が効いて無事（「lock があるから大丈夫と読まない」の裏返しで、ここでは lock が守りに回る）。
+
+⚠ **`require:` の件は `cure-api` 側でも対応済みだった**（`gem 'sinatra', '>= 4.2.1',
+require: 'sinatra/base'`・`d1f790d`）。#4680 と同じ穴は踏んでいない。
+
+⚠ **`cure-api` の Issue #359 は open のまま**（PR がマージされても閉じていない）。
+**あちらのリポジトリの話なのでこちらでは閉じない。**
 
 ### 2026-09-02 セッション同期の記録
 
