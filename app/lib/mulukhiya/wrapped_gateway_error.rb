@@ -35,5 +35,13 @@ module Mulukhiya
     def never_silent?
       return false
     end
+
+    # クライアントへ返す文言 (#4657)。
+    #
+    # ⚠⚠ **`message` をそのまま返すと内部情報が外へ出る型がある。**
+    # ログには詳細を残したいが、クライアントへ返すのは別物。既定は同じ。
+    def client_message
+      return message
+    end
   end
 end
