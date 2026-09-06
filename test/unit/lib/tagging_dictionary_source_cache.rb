@@ -215,6 +215,33 @@ module Mulukhiya
       assert_equal(['キュアスタ', 'デルムリン'].sort, dic.keys.sort)
     end
 
+    # ⚠⚠ **この版を入れた直後は last-good が空（PR #4686 の Codex P1）。**
+    # 1 本落ちただけで痩せた辞書が本体キャッシュを上書きすると、この修正が狙った
+    # 症状がそのまま出る。埋められなかった失敗がある回は公開しないこと。
+    def test_refresh_keeps_the_aggregate_when_last_good_is_cold
+      alive = SourceDouble.build('https://example.jp/a.json', entries('キュアスタ'))
+      flaky = SourceDouble.build('https://example.jp/b.json', entries('デルムリン'))
+      build_dictionary([alive, flaky]).refresh
+
+      # last-good を捨てて「この版を入れた直後」の状態にする。本体キャッシュは残す。
+      redis.keys("#{TaggingDictionary::SOURCE_REDIS_KEY_PREFIX}/*").each {|key| redis.unlink(key)}
+      flaky.words = {}
+      dic = build_dictionary([alive, flaky])
+      dic.refresh
+
+      assert_equal(['キュアスタ', 'デルムリン'].sort, dic.keys.sort)
+    end
+
+    # ⚠ 本体キャッシュも無ければ、痩せていても公開する（何も引けないより良い）。
+    def test_refresh_publishes_partial_without_any_cache
+      alive = SourceDouble.build('https://example.jp/a.json', entries('キュアスタ'))
+      flaky = SourceDouble.build('https://example.jp/b.json', {})
+      dic = build_dictionary([alive, flaky])
+      dic.refresh
+
+      assert_equal(['キュアスタ'], dic.keys)
+    end
+
     private
 
     def redis

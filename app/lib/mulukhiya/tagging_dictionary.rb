@@ -93,12 +93,12 @@ module Mulukhiya
       # 鳴らさないと、**全ソースが死んでも Sentry には何も出なくなる**
       # （syslog の `log_generation` は出るようになったが、あれは通知経路ではない）。
       alert_empty_result if all_sources_empty?
-      if discardable?(entries)
-        # ソースはあるのに 1 件も取れず、last-good も無かった回。
+      if keep_last_known_good?(entries)
         # 直近の good を残したまま戻る。
         # ⚠ fail-open 自体は残す (GAS の一過性障害で辞書が消し飛ぶのを防ぐ意図は
         # 正しい)。TTL があるので古い内容が無期限に居座ることはない (#4583)。
         update(cache.to_h)
+        log_retention
         return self
       end
       redis.setex(REDIS_KEY, cache_ttl, Marshal.dump(build_payload(entries)))
@@ -213,6 +213,32 @@ module Mulukhiya
       return false if entries.present?
       return false if sources.none?
       return cache.present?
+    end
+
+    # 直近の good を残したまま戻る回か。
+    #
+    # ⚠⚠ **「全滅」だけでは足りない（PR #4686 の Codex P1）。**last-good がまだ
+    # 無い状態（**この版を入れた直後**・ソースを足した直後・24h の TTL 切れ）だと、
+    # 1 本落ちただけで痩せた辞書が本体キャッシュを上書きする ＝ **この修正が
+    # 狙った症状がそのまま出る**。埋められなかった失敗がある回は公開しない。
+    #
+    # ⚠ **生きたキャッシュがあるときだけ。**初回起動で本体キャッシュも無ければ、
+    # 痩せていても公開するほうがまし（何も引けないより良い）。
+    #
+    # ⚠ **据え置きは無期限にならない。**本体キャッシュの TTL は 1 時間なので、
+    # ソースが恒久的に死んだ場合は 1 時間で失効し、痩せた辞書が公開される。
+    def keep_last_known_good?(entries)
+      return false if cache.blank?
+      return true if discardable?(entries)
+      return unrestorable_failure?
+    end
+
+    # 埋められなかった失敗があった回か。⚠ **本数で見る**（どのソースかは
+    # `log_retention` が出す）。
+    def unrestorable_failure?
+      empty = @empty_sources.to_a.size
+      return false if empty.zero?
+      return empty > @substituted_sources.to_a.size
     end
 
     def build_payload(entries)
