@@ -1288,13 +1288,47 @@ DB 直読み層（account / status / attachment / postgres）も **omission 0 �
 | #4657 (M) | 構造改善 6 件（`paired` の 429/401 / エラー型の複写 / `catalog_offset` の複写 ほか） | ✅ **6 件とも着地（2026-09-06）**・3/4/5 は PR #4672 / 1/2/6 は PR #4673（`0b427070`）。⚠ **Issue は open のまま**（モンキーテスト可なのでステージング検証まで持つ） |
 | #4649 (M) | webhook で落ちた添付を送信側へ返す（#4633 の残り） | ✅ **着地（2026-09-06）**・PR #4684（`b70b6e5e`）。⚠ **Issue は open**（モンキーテスト可） |
 | #4682 (S) | `Handler#summary` が `result` を破壊し、syslog にエラーが二重で出る | ✅ **着地（2026-09-06）**・PR #4683（`ad77ca9c`）。#4649 の前提として切り出した |
-| #4658 (bug) | shallu の related 辞書 2 本が **Rhino ランタイム廃止**で死亡（V8 へ移行 + 再デプロイ） | **実機は 2026-08-30 に決着**（復活させず「汎用」辞書へ置き換え・`local.yaml` mtime 18:47）。⚠ **残りは台帳の訂正＝ユーザー作業**なので Issue は open |
+| #4658 (bug) | shallu の related 辞書 2 本が **Rhino ランタイム廃止**で死亡（V8 へ移行 + 再デプロイ） | ✅ **クローズ（2026-09-07）**。実機は 08-30 に決着（復活させず「汎用」辞書へ置き換え）。⚠ 後片付けで `/usr/local/etc` 側の残骸が出た（下の節） |
 | #4659 (bug) | 辞書ソースの上流 GAS が**間欠 404** を返し、痩せた辞書でキャッシュを上書きしている | ✅ **② が着地（2026-09-06）**・PR #4686（`6a2f5e5e`）。⚠ **① と ③ は手つかず**・Issue は open |
 | #4675 (bug/S) | monit と rc.d の boot 競合で sidekiq が二重起動する（2026-08-30 追加） | 保険 pkill は ✅ **着地（2026-09-06）**・PR #4676（`ca9311fb`）。⚠⚠ **Issue は open。**start 同士のレースは ginseng-core 1.23.7 の `O_EXCL` で閉じた（`d417f724`）が、**起動順そのものは手つかず** |
 | #4618 (M) | `/health` のプール指標が pgbouncer と Sidekiq 側の逼迫を取りこぼす（#4639 の rollback 信号） | ✅ **着地（2026-08-28）**・P1 は PR #4671 / P2 は PR #4660 |
 | #4663 (M) | rack / sinatra の版の制約を、検証できる側（モロヘイヤ）へ移す | ✅ **着地（2026-09-06）**・PR #4679。⚠ **③（同時アクセスの回帰テスト）は #4678 へ切り出し** |
 | #4680 (S) | 宣言追加で `Bundler.require` が sinatra classic まで読むようになった | ✅ **着地（2026-09-06）**・PR #4681。#4663 の退行 |
 | #4687 (S) | 🔴 **sidekiq が起動しない**（`Sidekiq::Config` に `timeout=` は無い） | ✅ **着地（2026-09-07）**・PR #4688（`a74605cb`）。**#4676 の退行**・ステージング検証で発覚 |
+
+### #4658 をクローズ — 後片付けで `/usr/local/etc` の残骸が出た（2026-09-07）
+
+**shallu の実機は 08-30 に決着していた**（Rhino で死んだ 2 本を復活させず
+`mstdn.b-shock.org/api/dic/v1/common.json` へ置き換え）。本日の実測で
+`sources: 2 / empty_sources: 0 / entries: 88`、Sentry 2Q も 09-06 04:09 JST 以降は静穏。
+
+🔴 **ただし `/usr/local/etc/mulukhiya-toot-proxy/local.yaml`（mtime 2026-08-02）に
+死んだ 2 本がそのまま残っていた。**
+
+⚠⚠ **`Ginseng::Config#load` は basename ごとに最初に見つけたディレクトリが総取りする**
+（`next if @raw.key?(key)`）。探索順は `<repo>/config` → `/usr/local/etc/<pkg>` → `/etc/<pkg>` なので、
+**リポジトリ内に `local.yaml` があると `/usr/local/etc` 側は 1 バイトも読まれない**（マージもされない）。
+つまり無害だが、⚠ **`config/local.yaml` は gitignore（`config/.gitignore` の `local.*`）なので、
+クローンし直すと死んだ設定が復活する**形だった。[[project_latent-landmine-fires-on-next-restart]] と同型。
+
+**原因は 2026-08-23 の `capabilities.media_update` 追加。**当時 `config/local.yaml` は
+`/usr/local/etc/...` へのシンボリックリンクだったが、**`awk` の出力を一時ファイルへ書いて `mv`
+したのでリンクが実ファイルに置き換わった**。以後の編集は repo 側にしか効かず、
+**本番 3 台とも `/usr/local/etc` 側が `media_update` を欠いたまま**だった。
+
+⚠⚠ **設定ファイルを「一時ファイル + `mv`」で書き換えないこと。**`cat tmp > 対象` のように
+**対象のファイルへ直接書き込む**形にすればリンクも所有者もモードも保たれる。
+
+**是正**: shallu / zugoga / gomander の 3 台とも `/usr/local/etc` 側を有効 config と同一に揃え、
+陳腐化した `.bak` を削除（所有者・モードは保持。gomander の 640 も維持）。本番 4 台とも health 200。
+
+⚠ **shallu の `local.yaml.bak`（2026-02-22）は Spotify / Annict の client id・secret を持っていた**が、
+**現行 config の `service/` 配下に同じ値があること**をハッシュ照合で確かめてから消した。
+⚠ **旧レイアウトはトップレベルの `spotify/` / `annict/`** なので、**キー名だけ比べると
+「現行に無いキー」に見える**（消す前に値で確かめること）。
+
+正本は chubo2 `docs/infra-history.md` の 2026-09-07 の節と `docs/infra-mastodon.md`
+「config/local.yaml の編集について」。**どちらに 1 本化するかは pooza/chubo2#224 で決める。**
 
 ### ステージング 4 台へのデプロイ（2026-09-07・5.36.0）と #4687（2026-09-07）
 
