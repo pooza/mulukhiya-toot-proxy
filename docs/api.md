@@ -1527,11 +1527,64 @@ Slack 互換のペイロードを投稿に変換する。`text` / `blocks` / `at
 | `visibility` | string | 任意 | この投稿の公開範囲（5.34.0〜、#4599） |
 
 🔴 **上限を超えた添付・取得に失敗した添付は、その 1 枚だけが落ちて投稿は成立する**（#4656）。
-**応答は 200 と作成済み投稿のオブジェクト**で、⚠⚠ **送信側から成功と区別する手段は現状ない。**
+**応答は 200 と作成済み投稿のオブジェクト**で、投稿そのものは成立している。
 
 - 落ちた添付は syslog に `webhook attachment dropped` として残る（サーバー側からは見える）
 - 「1 枚落ちても投稿は通す」という設計自体は意図どおり。**通知が丸ごと消えるより良い**という判断
-- ⚠ **送信側へ返す口は #4649 で用意する予定**
+
+###### 落ちた添付の返却（5.36.0〜・#4649）
+
+**落ちた添付があるときだけ**、応答に `mulukhiya` キーが足される。
+
+```json
+{
+  "id": "114514",
+  "content": "<p>ほげ</p>",
+  "media_attachments": [],
+
+  "mulukhiya": {
+    "attachment_errors": [
+      {
+        "url": "https://example.com/big.png",
+        "message": "file too large (41.2MiB > 32MiB)"
+      }
+    ],
+    "missing_attachments": 1
+  }
+}
+```
+
+| キー | 型 | 説明 |
+|------|-----|------|
+| `mulukhiya.attachment_errors[].url` | string | 落ちた添付の `image_url`（送信側が送った URL そのまま） |
+| `mulukhiya.attachment_errors[].message` | string | 落ちた理由。⚠ **人間向けの文言で、機械判定用の安定した識別子ではない** |
+| `mulukhiya.missing_attachments` | integer | **上流へ渡したのに、返ってきた投稿に載っていない添付の本数**。下記 |
+
+⚠ **どちらのキーも、該当が無ければ付かない。**`mulukhiya` キー自体も同様なので、
+`response["mulukhiya"]` の有無だけで「全部通った / 何かおかしい」を判定できる。
+
+🔴 **`missing_attachments` は主に `Idempotency-Key` の再送で出る。**添付の取得に
+失敗した投稿を、送信側が**同じ `Idempotency-Key`** で送り直すと、
+
+1. モロヘイヤは画像を取り直してアップロードする（今度は成功する）
+2. ⚠⚠ **上流（Mastodon）は初回のキャッシュ済み投稿を返す**ので、**その添付は載っていない**
+
+という形になる。この回の `attachment_errors` は空なので、**それだけを見ると
+「全部通った」と読めてしまう**。⚠ **`missing_attachments` が付いていたら、
+`Idempotency-Key` を変えて送り直すこと**（同じ鍵では何度送っても結果は変わらない）。
+
+⚠ **本数の突き合わせができない場合は付かない**（`missing_attachments` は
+「0 本欠けている」ではなく「欠けていない、または判定できない」）。上流の応答が
+`media_attachments`（Mastodon）でも `createdNote.files`（Misskey）でもない形のときが該当する。
+
+⚠⚠ **`mulukhiya` 以外のキーは上流の応答そのままで、1 バイトも変えていない。**
+未知のキーを無視するクライアントは従来どおり動く。
+
+⚠ **返すのは `url` と `message` だけ。**落ちた添付を丸ごと返すと、Slack legacy attachments の
+本文系（`title` / `text` / `pretext` / `footer` / `author_name`）がレスポンスに載ってしまう（#4630）。
+
+⚠ **上流が JSON オブジェクト以外（配列・エラーページの HTML）を返した場合は素通しする**ので、
+その形では `mulukhiya` キーは付かない。
 
 ⚠⚠ **当座の突き合わせは「`attachments` の件数」ではできない。**モロヘイヤが取り込むのは
 **画像 URL の本数**で、`attachments` の要素数とは一致しない。

@@ -87,6 +87,12 @@ module Mulukhiya
       body[visibility_field] = visibility_for(body[visibility_field])
       reporter = Reporter.new
       Event.new(:pre_webhook, {reporter:, sns:}).dispatch(body)
+      # ⚠⚠ **上流へ渡した添付の本数を控える (#4649・PR #4684 の Codex P1)。**
+      # `Idempotency-Key` を付けた再送では、**上流が初回のキャッシュ済み投稿を返す**。
+      # このリクエストではアップロードが成功して `errors` が空でも、返ってくる投稿には
+      # その添付が載っていない。**「errors が空 ＝ 全部載った」と読めない**ので、
+      # 応答側と突き合わせるための本数をここで残す。
+      reporter.temp[:attachment_count] = Array(body[attachment_field]).size
       reporter.response = sns.post(body, params)
       Event.new(:post_webhook, {reporter:, sns:}).dispatch(body)
       return reporter
