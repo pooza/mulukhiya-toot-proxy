@@ -15,9 +15,10 @@ module Mulukhiya
       @controller = WebhookController.new!
     end
 
-    def build_reporter(errors, parsed_response = UPSTREAM.dup)
+    def build_reporter(errors, parsed_response = UPSTREAM.dup, sent: nil)
       reporter = Reporter.new
       reporter.errors.concat(errors)
+      reporter.temp[:attachment_count] = sent unless sent.nil?
       reporter.response = ResponseDouble.new(200, parsed_response)
       return reporter
     end
@@ -96,6 +97,70 @@ module Mulukhiya
       entry = body(reporter).dig('mulukhiya', 'attachment_errors').first
 
       assert_equal(['url', 'message'], entry.keys)
+    end
+
+    # ⚠⚠ **`Idempotency-Key` の再送（PR #4684 の Codex P1）。**上流は初回の
+    # キャッシュ済み投稿を返すので、**このリクエストのアップロードが成功していても
+    # 応答には載らない**。errors が空だからと `mulukhiya` を落とすと「全部通った」と
+    # 嘘をつくことになる。
+    def test_missing_attachment_is_reported_without_errors
+      reporter = build_reporter([], {'id' => '114514', 'media_attachments' => []}, sent: 1)
+
+      assert_equal(1, body(reporter).dig('mulukhiya', 'missing_attachments'))
+    end
+
+    def test_no_missing_when_upstream_returned_everything
+      reporter = build_reporter([], {'id' => '114514', 'media_attachments' => [{'id' => '1'}]}, sent: 1)
+
+      assert_nil(body(reporter)['mulukhiya'])
+    end
+
+    # ⚠⚠ **Misskey は `createdNote.files`。**トップレベルの `files` を読むと
+    # 常に見つからず、毎回「全部欠けている」と誤判定する。
+    def test_misskey_response_shape
+      reporter = build_reporter([], {'createdNote' => {'id' => 'x', 'files' => [{'id' => '1'}]}}, sent: 1)
+
+      assert_nil(body(reporter)['mulukhiya'])
+    end
+
+    def test_misskey_missing_attachment
+      reporter = build_reporter([], {'createdNote' => {'id' => 'x', 'files' => []}}, sent: 2)
+
+      assert_equal(2, body(reporter).dig('mulukhiya', 'missing_attachments'))
+    end
+
+    # ⚠ **分からないときは黙る。**応答の形が未知なら「欠けている」と言わない。
+    def test_unknown_response_shape_claims_nothing
+      reporter = build_reporter([], {'id' => '114514'}, sent: 3)
+
+      assert_nil(body(reporter)['mulukhiya'])
+    end
+
+    # 渡した本数を控えていない経路でも「欠けている」と言わない。
+    def test_without_sent_count_claims_nothing
+      reporter = build_reporter([], {'id' => '114514', 'media_attachments' => []})
+
+      assert_nil(body(reporter)['mulukhiya'])
+    end
+
+    # 落ちた添付は errors、載らなかった分は missing_attachments。二重計上しない。
+    def test_errors_and_missing_coexist
+      reporter = build_reporter(
+        [{message: 'file too large', attachment: {'image_url' => 'https://example.com/big.png'}}],
+        {'id' => '114514', 'media_attachments' => []},
+        sent: 1,
+      )
+      entity = body(reporter)['mulukhiya']
+
+      assert_equal(1, entity['attachment_errors'].size)
+      assert_equal(1, entity['missing_attachments'])
+    end
+
+    # ⚠ 上流が渡した本数より**多く**返すことは無いが、負の値を返さないこと。
+    def test_never_reports_negative
+      reporter = build_reporter([], {'id' => '114514', 'media_attachments' => [{'id' => '1'}, {'id' => '2'}]}, sent: 1)
+
+      assert_nil(body(reporter)['mulukhiya'])
     end
 
     # ⚠ 上流が Hash 以外（配列・エラーページの文字列）を返すことがある。

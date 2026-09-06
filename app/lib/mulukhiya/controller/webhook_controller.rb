@@ -89,9 +89,44 @@ module Mulukhiya
       # ⚠ 上流が Hash 以外（配列・文字列・エラーページ）を返すことがある。
       # その形に追加キーは足せないので素通しする。
       return body unless body.is_a?(Hash)
+      entity = mulukhiya_entity(reporter, body)
+      return body if entity.empty?
+      return body.merge('mulukhiya' => entity)
+    end
+
+    def mulukhiya_entity(reporter, body)
+      entity = {}
       errors = attachment_errors(reporter)
-      return body if errors.empty?
-      return body.merge('mulukhiya' => {'attachment_errors' => errors})
+      missing = missing_attachment_count(reporter, body)
+      entity['attachment_errors'] = errors if errors.present?
+      entity['missing_attachments'] = missing if missing.positive?
+      return entity
+    end
+
+    # ⚠⚠ **「落ちなかった」を上流の応答で裏づける（PR #4684 の Codex P1）。**
+    # `Idempotency-Key` を付けた再送では、上流（Mastodon）が**初回のキャッシュ済み
+    # 投稿**を返す。このリクエストのアップロードが成功して `errors` が空でも、
+    # **返ってくる投稿にはその添付が載っていない**ので、`mulukhiya` キーを落とすと
+    # **「全部通った」と嘘をつく**ことになる。渡した本数と応答の本数を突き合わせる。
+    #
+    # ⚠ **分からないときは 0 を返す**（黙って「欠けている」と言わない）。渡した本数を
+    # 控えていない経路と、応答の形が未知の場合が該当する。
+    def missing_attachment_count(reporter, body)
+      sent = reporter.temp[:attachment_count]
+      return 0 unless sent.is_a?(Integer)
+      returned = response_attachment_count(body)
+      return 0 unless returned.is_a?(Integer)
+      return [sent - returned, 0].max
+    end
+
+    # 上流が返した投稿の添付本数。
+    #
+    # ⚠⚠ **Misskey は `createdNote.files`**（トップレベルの `files` ではない）。
+    # トップレベルを読むと常に見つからず、**毎回「全部欠けている」と誤判定する**
+    # （`docs/api.md` の「応答の添付配列」と同じ罠）。
+    def response_attachment_count(body)
+      attachments = body['media_attachments'] || body.dig('createdNote', 'files')
+      return attachments.is_a?(Array) ? attachments.size : nil
     end
 
     # ⚠ **添付に紐づく失敗だけを返す。**`reporter.errors` にはハンドラの

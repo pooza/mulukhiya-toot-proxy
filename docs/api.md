@@ -1548,7 +1548,8 @@ Slack 互換のペイロードを投稿に変換する。`text` / `blocks` / `at
         "url": "https://example.com/big.png",
         "message": "file too large (41.2MiB > 32MiB)"
       }
-    ]
+    ],
+    "missing_attachments": 1
   }
 }
 ```
@@ -1557,9 +1558,24 @@ Slack 互換のペイロードを投稿に変換する。`text` / `blocks` / `at
 |------|-----|------|
 | `mulukhiya.attachment_errors[].url` | string | 落ちた添付の `image_url`（送信側が送った URL そのまま） |
 | `mulukhiya.attachment_errors[].message` | string | 落ちた理由。⚠ **人間向けの文言で、機械判定用の安定した識別子ではない** |
+| `mulukhiya.missing_attachments` | integer | **上流へ渡したのに、返ってきた投稿に載っていない添付の本数**。下記 |
 
-⚠ **落ちた添付が無ければ `mulukhiya` キー自体が付かない。**`response["mulukhiya"]` の
-有無だけで「全部通った / 何か落ちた」を判定できる。
+⚠ **どちらのキーも、該当が無ければ付かない。**`mulukhiya` キー自体も同様なので、
+`response["mulukhiya"]` の有無だけで「全部通った / 何かおかしい」を判定できる。
+
+🔴 **`missing_attachments` は主に `Idempotency-Key` の再送で出る。**添付の取得に
+失敗した投稿を、送信側が**同じ `Idempotency-Key`** で送り直すと、
+
+1. モロヘイヤは画像を取り直してアップロードする（今度は成功する）
+2. ⚠⚠ **上流（Mastodon）は初回のキャッシュ済み投稿を返す**ので、**その添付は載っていない**
+
+という形になる。この回の `attachment_errors` は空なので、**それだけを見ると
+「全部通った」と読めてしまう**。⚠ **`missing_attachments` が付いていたら、
+`Idempotency-Key` を変えて送り直すこと**（同じ鍵では何度送っても結果は変わらない）。
+
+⚠ **本数の突き合わせができない場合は付かない**（`missing_attachments` は
+「0 本欠けている」ではなく「欠けていない、または判定できない」）。上流の応答が
+`media_attachments`（Mastodon）でも `createdNote.files`（Misskey）でもない形のときが該当する。
 
 ⚠⚠ **`mulukhiya` 以外のキーは上流の応答そのままで、1 バイトも変えていない。**
 未知のキーを無視するクライアントは従来どおり動く。
