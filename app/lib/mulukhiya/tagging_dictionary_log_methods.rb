@@ -16,6 +16,10 @@ module Mulukhiya
     # 空なら error で出す（更新自体は成功しているので message は変えない）。
     def log_generation
       empty = @empty_sources.to_a
+      # ⚠ **last-good で埋めた本数も出す (#4659 の ②)。**`empty_sources` と
+      # `entries` だけだと、「痩せた辞書で更新した回」と「埋めたので痩せずに
+      # 済んだ回」が同じ見え方になる。
+      substituted = @substituted_sources.to_a
       payload = {
         message: 'tagging dictionary refreshed',
         redis_key: TaggingDictionary::REDIS_KEY,
@@ -23,6 +27,7 @@ module Mulukhiya
         generated_at: generated_at&.iso8601,
         sources: sources.size,
         empty_sources: empty.size,
+        substituted_sources: substituted.size,
         entries: size,
         ttl: cache_ttl,
       }

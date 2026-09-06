@@ -92,6 +92,9 @@ handler:
   dictionary_tag:
     cache:
       ttl: 3600
+      # ソース単位の last-good キャッシュの TTL (#4659)。⚠ 本体の ttl より長く持つ
+      # （間欠 404 が続いた時に last-good が先に消えると意味を成さない）。
+      source_ttl: 86400
     dics: []
     word:
       min: 2
