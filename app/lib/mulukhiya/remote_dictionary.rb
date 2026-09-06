@@ -64,6 +64,19 @@ module Mulukhiya
       return {uri: uri.to_s}
     end
 
+    # ソース単位の last-good キャッシュ (#4659) の同一性。
+    #
+    # ⚠⚠ **URL と型だけでは足りない（PR #4686 の Codex P2）。**`strict` のように
+    # **解釈に効く**設定があり、同じ URL・同じ `type` でも `parse` が返す entries が
+    # 変わる（`RelatedRemoteDictionary#strict?`）。キーを踏み合うと、**取得に失敗した
+    # 回に別設定の辞書で埋めたものが本体キャッシュへ最大 24 時間居座る**。
+    #
+    # ⚠ **ハッシュにしてから使うこと。**`@params` には `?access_token=` 付きの URL が
+    # 入る (#4511)。Redis のキー一覧は運用の手元にも syslog にも出る。
+    def cache_signature
+      return Digest::SHA256.hexdigest([self.class.name, @params.sort].to_json)
+    end
+
     def self.all(&block)
       return enum_for(__method__) unless block
       return unless handler = Handler.create(:dictionary_tag)

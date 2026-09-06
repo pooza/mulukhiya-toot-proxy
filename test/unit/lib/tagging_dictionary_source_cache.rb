@@ -22,17 +22,22 @@ module Mulukhiya
 
       def parse = @words
 
-      attr_writer :words
+      attr_writer :words, :strict
 
       def to_h = {uri: uri.to_s}
+
+      # 本物と同じく「解釈に効く設定まで含めた」同一性を返す。
+      def cache_signature
+        return Digest::SHA256.hexdigest([self.class.name, uri.to_s, @strict].to_json)
+      end
     end
 
     URL = 'https://example.jp/api/dic/v1/a.json?access_token=deadbeef'.freeze
 
     def setup
       TaggingDictionary.invalidate_cache
-      @dic = build_dictionary
       @source = SourceDouble.build(URL, entries)
+      @dic = build_dictionary([@source])
     end
 
     def teardown
@@ -102,6 +107,13 @@ module Mulukhiya
       assert_not_equal(@dic.send(:source_key, @source), @dic.send(:source_key, other))
     end
 
+    def test_source_key_separates_parsing_options
+      other = SourceDouble.build(URL, entries)
+      other.strict = true
+
+      assert_not_equal(@dic.send(:source_key, @source), @dic.send(:source_key, other))
+    end
+
     def test_source_key_separates_urls
       other = SourceDouble.build('https://example.jp/api/dic/v1/b.json', entries)
 
@@ -142,9 +154,48 @@ module Mulukhiya
       assert_false(@dic.send(:all_sources_empty?))
     end
 
-    # 何も試していない回を「全滅」と言わない。
-    def test_all_sources_empty_without_attempts
-      assert_false(@dic.send(:all_sources_empty?))
+    # ⚠ 1 本でも取れていれば全滅ではない（残りが空でも）。
+    def test_all_sources_empty_is_false_with_a_partial_failure
+      other = SourceDouble.build('https://example.jp/api/dic/v1/b.json', {})
+      dic = build_dictionary([@source, other])
+      dic.instance_variable_set(:@attempted_sources, 2)
+      dic.send(:fetch_source, @source)
+      dic.send(:fetch_source, other)
+
+      assert_false(dic.send(:all_sources_empty?))
+    end
+
+    # ソースが 1 本も設定されていない回を「全滅」と言わない。
+    def test_all_sources_empty_without_sources
+      assert_false(build_dictionary.send(:all_sources_empty?))
+    end
+
+    # ⚠⚠ **設定はあるのに 1 本も組み立てられなかった回は「全滅」（PR #4686 の
+    # Codex P2）。**`RemoteDictionary.create` が全部落ちると `attempted` が 0 になる。
+    # ここを取り逃がすと、全ソースが使えないのに Sentry へ何も出ない。
+    def test_all_sources_empty_when_nothing_could_be_built
+      dic = build_dictionary([@source])
+      dic.instance_variable_set(:@attempted_sources, 0)
+
+      assert_true(dic.send(:all_sources_empty?))
+    end
+
+    # ⚠⚠ **解釈に効く設定が違えば別のキー（PR #4686 の Codex P2）。**
+    # 同じ URL・同じ type でも `strict` で entries が変わるので、踏み合うと
+    # 別設定の辞書で埋めたものが本体キャッシュへ最大 24 時間居座る。
+    def test_cache_signature_follows_parsing_options
+      loose = RemoteDictionary.create({'url' => URL, 'type' => 'related'})
+      strict = RemoteDictionary.create({'url' => URL, 'type' => 'related', 'strict' => true})
+
+      assert_not_equal(loose.cache_signature, strict.cache_signature)
+      assert_not_equal(@dic.send(:source_key, loose), @dic.send(:source_key, strict))
+    end
+
+    def test_cache_signature_does_not_leak_the_url
+      signature = RemoteDictionary.create({'url' => URL, 'type' => 'related'}).cache_signature
+
+      assert_not_include(signature, 'example.jp')
+      assert_not_include(signature, 'deadbeef')
     end
 
     # `refresh` を通した振る舞い。1 本欠けても辞書が痩せないこと。

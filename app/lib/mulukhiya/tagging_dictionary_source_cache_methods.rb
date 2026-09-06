@@ -59,13 +59,11 @@ module Mulukhiya
       return words
     end
 
-    # ⚠⚠ **URL をキーに埋めない。**辞書 URL は `?access_token=` を持つことがあり、
-    # Redis のキー一覧は運用の手元にも syslog にも出る (#4511)。ハッシュだけを使う。
-    # ⚠ **クラス名も混ぜる。**同じ URL を別の `type` で二重に登録できるので、
-    # URL だけだと互いの last-good を踏み合う。
+    # ⚠ **同一性の判定は `RemoteDictionary#cache_signature` に持たせてある。**
+    # URL と型だけで割ると、`strict` のように解釈に効く設定が違うソース同士が
+    # 互いの last-good を踏み合う（PR #4686 の Codex P2）。
     def source_key(dic)
-      digest = Digest::SHA256.hexdigest([dic.class.name, dic.uri.to_s].to_json)
-      return "#{TaggingDictionary::SOURCE_REDIS_KEY_PREFIX}/#{digest}"
+      return "#{TaggingDictionary::SOURCE_REDIS_KEY_PREFIX}/#{dic.cache_signature}"
     end
 
     def source_cache_ttl
@@ -81,8 +79,12 @@ module Mulukhiya
     # ある（`RemoteDictionary.create` が落ちた本は `all` に出てこない）。
     # `sources.size` で割ると、**全滅しているのに鳴らない**回ができる。
     def all_sources_empty?
+      return false if sources.none?
       attempted = @attempted_sources.to_i
-      return false unless attempted.positive?
+      # ⚠⚠ **設定はあるのに 1 本も組み立てられなかった回も「全滅」（PR #4686 の
+      # Codex P2）。**`RemoteDictionary.create` が全部落ちると `attempted` が 0 に
+      # なる。ここを false に倒すと、**全ソースが使えないのに Sentry へ何も出ない**。
+      return true unless attempted.positive?
       return @empty_sources.to_a.size >= attempted
     end
   end
