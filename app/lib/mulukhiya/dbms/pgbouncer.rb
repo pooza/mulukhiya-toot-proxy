@@ -1,4 +1,5 @@
 require 'pg'
+require 'timeout'
 
 module Mulukhiya
   # pgbouncer の待ち行列を `/health` に載せる (#4618 の P1)。
@@ -75,19 +76,31 @@ module Mulukhiya
 
       private
 
+      # ⚠⚠ **全体を期限で括る (#4691)。**`connect_timeout` が効くのは**接続確立まで**で、
+      # このあとの `SHOW` 4 往復は無界だった。`/health` は monit の唯一の判定材料
+      # （`check host mulukhiya ... request "/mulukhiya/api/health"` / `set daemon 30` ×
+      # `for 3 cycles`）なので、admin コンソールが「TCP は受けるが答えない」状態に
+      # なると、🔴 **puma / sidekiq / listener が健全でも 90 秒ごとに 3 本まとめて
+      # 再起動される**。⚠ モロヘイヤを再起動しても pgbouncer は直らないのでループになる。
+      #
+      # ⚠ 期限切れは `health` の rescue に落ちて `{pgbouncer: {error: ...}}` になる。
+      # **status は動かさない**という設計はそのまま（観測が取れないことで health を
+      # 落とさない）。
       def probe
-        connection = connect
-        pool = pool_row(connection)
-        return {
-          database: dsn.dbname,
-          # ⚠ 該当プールがまだ作られていないことはある（誰も繋いでいない）。
-          # **0 と「不明」は違う**ので、行が無いときは値を載せない。
-          **(pool ? POOL_FIELDS.to_h {|k| [k.to_sym, pool[k].to_i]} : {absent: true}),
-          **clients(connection),
-          **cumulative(connection),
-        }
-      ensure
-        connection&.close
+        Timeout.timeout(config['/postgres/pgbouncer/timeout']) do
+          connection = connect
+          pool = pool_row(connection)
+          return {
+            database: dsn.dbname,
+            # ⚠ 該当プールがまだ作られていないことはある（誰も繋いでいない）。
+            # **0 と「不明」は違う**ので、行が無いときは値を載せない。
+            **(pool ? POOL_FIELDS.to_h {|k| [k.to_sym, pool[k].to_i]} : {absent: true}),
+            **clients(connection),
+            **cumulative(connection),
+          }
+        ensure
+          connection&.close
+        end
       end
 
       def connect

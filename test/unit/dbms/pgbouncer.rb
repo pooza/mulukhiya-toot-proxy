@@ -77,6 +77,24 @@ module Mulukhiya
       def close = @closed = true
     end
 
+    # ⚠⚠ **「TCP は受けるが答えない」admin コンソールのダブル (#4691)。**
+    # `connect_timeout` は接続確立までしか効かないので、詰まりはここに出る。
+    class HangingAdmin
+      attr_reader :closed
+
+      def initialize(seconds = 5)
+        @seconds = seconds
+        @closed = false
+      end
+
+      def exec(_sql)
+        sleep(@seconds)
+        raise 'unreachable'
+      end
+
+      def close = @closed = true
+    end
+
     def setup
       config['/postgres/dsn'] = 'postgres://mastodon:secret@127.0.0.1:6432/mastodon'
       config['/postgres/pgbouncer/enable'] = 'auto'
@@ -174,6 +192,29 @@ module Mulukhiya
       end
 
       assert_equal('no more connections allowed (max_client_conn)', health.dig(:pgbouncer, :error))
+    end
+
+    # 🔴 **`/health` は monit の唯一の判定材料 (#4691)。**`set daemon 30` ×
+    # `for 3 cycles` ＝ 90 秒で puma / sidekiq / listener が**まとめて再起動される**
+    # ので、admin コンソールが答えないときにここが返らないと、健全な 3 本を
+    # 巻き込んだ再起動ループになる。⚠ モロヘイヤを再起動しても pgbouncer は直らない。
+    def test_health_gives_up_when_the_admin_console_never_answers
+      config['/postgres/pgbouncer/timeout'] = 0.2
+      admin = HangingAdmin.new
+      started = Time.now
+      health = with_admin(admin) {Pgbouncer.health}
+
+      assert_operator(Time.now - started, :<, 2)
+      assert_predicate(health.dig(:pgbouncer, :error), :present?)
+    end
+
+    # ⚠ 期限切れでも接続は返す。`ensure` が期限の内側にあると閉じ損ねる。
+    def test_the_connection_is_closed_even_when_the_probe_times_out
+      config['/postgres/pgbouncer/timeout'] = 0.2
+      admin = HangingAdmin.new
+      with_admin(admin) {Pgbouncer.health}
+
+      assert_predicate(admin, :closed)
     end
 
     # ⚠⚠ **`cl_waiting` / `maxwait` は「いまキューに居る人」の値でしかない**
