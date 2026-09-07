@@ -12,6 +12,14 @@ gem 'ginseng-redis', github: 'pooza/ginseng-redis', branch: 'main', require: 'gi
 gem 'ginseng-web', github: 'pooza/ginseng-web', branch: 'main', require: 'ginseng/web'
 gem 'ginseng-youtube', github: 'pooza/ginseng-youtube', branch: 'main', require: 'ginseng/you_tube'
 gem 'icalendar'
+# ⚠⚠ **推移依存だが上限をこちらで持つ (#4699)。**`json` を要求している gem は
+# どれも `json (>= 2.3)` のように**下限しか書いていない**ので、`bundle update` の
+# たびに最新の major を掴む。5.36.0 のリリース当日に **3.0.0（前日 2026-09-07
+# リリース・ダウンロード 10 万件）** を掴んだ。2.21.2 は 1,440 万件。
+# 🔴 `json` は API 応答・webhook・辞書・設定の全経路で使う土台なので壊れ方が広く、
+# ⚠ `rake test` 緑は根拠にならない（#4687 / postmortem-2025-10-rack32.md）。
+# ⚠ 上限を外す条件は #4699。**harness 両系 + ステージング 4 台で実走してから**動かす。
+gem 'json', '~> 2.21'
 # JSON::Validator を app/lib/mulukhiya.rb で直に使う。ginseng-core の推移依存で
 # 入ってはいるが、Bundler.require が読むのは Gemfile に書いた gem だけで、
 # ginseng-core 側は Ginseng::Config が autoload された副作用で require していた。

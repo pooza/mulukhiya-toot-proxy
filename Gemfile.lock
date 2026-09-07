@@ -42,33 +42,33 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: bd2d558e22d41842f76a8dd7226f048c9d079651
+  revision: 8d6d1fa6f9e49f71347cd3b47eea794f12ae8f45
   branch: main
   specs:
     ginseng-fediverse (1.8.31)
 
 GIT
   remote: https://github.com/pooza/ginseng-piefed.git
-  revision: e70e384bc308f86078cd09a459c95449ba63ee8b
+  revision: afddcdace7ae524cfba4967e5f7de97637bbea32
   branch: main
   specs:
     ginseng-piefed (0.1.1)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
-  revision: cfda28fa13b887ce550fa0e876de5847016fcbe1
+  revision: 23e10ea2b7897f48f485caca4c8fd5cae6f4f2ca
   branch: main
   specs:
-    ginseng-postgres (2.0.0)
+    ginseng-postgres (2.0.1)
       pg
       sequel
 
 GIT
   remote: https://github.com/pooza/ginseng-redis.git
-  revision: 292093c12365c3e7ee27858e34a1d44fe5e98da0
+  revision: 7a1e9c658de93b3bb9a8871d2aa35939fb07e69f
   branch: main
   specs:
-    ginseng-redis (2.0.5)
+    ginseng-redis (2.0.6)
       redis-client
 
 GIT
@@ -84,7 +84,7 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: 9814f164d64658c94923c55b0e8a920b6c798960
+  revision: 2f4fd0e68fe24fe56914648b5d3a967791f99309
   branch: main
   specs:
     ginseng-web (2.0.0)
@@ -100,10 +100,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-youtube.git
-  revision: 4e68124c97581897e53b27b394ab22af8c6255ca
+  revision: 71415a45d291f7a823e1b51c397e4651d9625237
   branch: main
   specs:
-    ginseng-youtube (3.0.0)
+    ginseng-youtube (3.0.1)
 
 GIT
   remote: https://github.com/pooza/rspotify.git
@@ -169,7 +169,7 @@ GEM
     crass (1.0.7)
     csv (3.3.6)
     date (3.5.1)
-    domain_name (0.6.20240107)
+    domain_name (0.6.20260902)
     drb (2.2.3)
     dry-configurable (1.4.0)
       dry-core (~> 1.0)
@@ -208,7 +208,7 @@ GEM
       zeitwerk (~> 2.6)
     erb (6.0.7)
     erubi (1.13.1)
-    et-orbi (1.4.1)
+    et-orbi (1.4.2)
       tzinfo
     etc (1.4.6)
     eventmachine (1.2.7)
@@ -265,7 +265,7 @@ GEM
       net-imap
       net-pop
       net-smtp
-    marcel (1.2.1)
+    marcel (2.1.0)
     mime-types (3.7.0)
       logger
       mime-types-data (~> 3.2025, >= 3.2025.0507)
@@ -275,7 +275,7 @@ GEM
     minitest (6.0.6)
       drb (~> 2.0)
       prism (~> 1.5)
-    multi_json (1.21.1)
+    multi_json (1.21.2)
     multi_xml (0.9.1)
       bigdecimal (>= 3.1, < 5)
     mustermann (3.1.1)
@@ -321,7 +321,7 @@ GEM
       omniauth (~> 2.0)
     optparse (0.8.1)
     ostruct (0.6.3)
-    parallel (2.1.0)
+    parallel (2.2.0)
     parser (3.3.12.0)
       ast (~> 2.4.1)
       racc
@@ -412,14 +412,14 @@ GEM
     sassc (2.4.0)
       ffi (~> 1.9)
     securerandom (0.4.1)
-    sentry-ruby (6.7.0)
+    sentry-ruby (7.0.0)
       bigdecimal
       concurrent-ruby (~> 1.0, >= 1.0.2)
       logger
-    sentry-sidekiq (6.7.0)
-      sentry-ruby (~> 6.7.0)
+    sentry-sidekiq (7.0.0)
+      sentry-ruby (~> 7.0.0)
       sidekiq (>= 5.0)
-    sequel (5.107.0)
+    sequel (5.108.0)
       bigdecimal
     set (1.1.3)
     sidekiq (8.1.7)
@@ -467,7 +467,7 @@ GEM
     uri (1.1.1)
     useragent (0.16.11)
     version_gem (1.1.15)
-    webmock (3.26.3)
+    webmock (3.26.4)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
@@ -500,6 +500,7 @@ DEPENDENCIES
   ginseng-web!
   ginseng-youtube!
   icalendar
+  json (~> 2.21)
   json-schema
   marcel
   optparse
