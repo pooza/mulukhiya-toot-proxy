@@ -26,7 +26,19 @@ module Mulukhiya
       end
       begin
         @params = Sinatra::IndifferentHash[JSON.parse(@body)]
-      rescue StandardError
+      rescue StandardError => e
+        # ⚠⚠ **ここは黙って body を捨てる経路 (#4699)。**フォーム POST や空 body でも
+        # 通るので rescue 自体は正しいが、**JSON のつもりで送られた body が落ちた**ときも
+        # 同じ穴に落ちる。クライアントからは「投稿したのに内容が空」に見え、
+        # ログに手掛かりが 1 行も残らない。
+        #
+        # ⚠ **JSON らしい body のときだけ残す。**毎リクエスト出すとフォーム POST で
+        # syslog が埋まる（#4549 の型）。
+        #
+        # 🔴 **json 3.0 へ上げる前の前提。**3.0 は `allow_duplicate_key` の既定が
+        # false になるので、**いままで「後勝ち」で通っていた重複キーの body が
+        # 丸ごとここへ落ちる**。無音のままだと版を上げた影響を切り分けられない。
+        log_unparsable_body(e)
         @params = Sinatra::IndifferentHash[params]
       end
       logger.info(request: {
@@ -104,6 +116,35 @@ module Mulukhiya
         Sentry.capture_exception(e) rescue nil if Sentry.initialized?
       end
       return @renderer.to_s
+    end
+
+    # JSON のつもりで送られた body が解釈できなかったことを残す (#4699)。
+    #
+    # ⚠ **JSON らしい body のときだけ。**`{` / `[` で始まらないものはフォーム POST や
+    # 空 body なので、落ちるのが正常。毎回出すと syslog が埋まる。
+    # ⚠⚠ **例外メッセージを出さない（PR #4708 の Codex P1）。**
+    # `JSON::ParserError` のメッセージは**壊れた入力をそのまま反響する**。実測:
+    #
+    #   JSON::ParserError: unexpected character: '秘密の本文}' at line 1 column 12
+    #   JSON::ParserError: expected ',' or '}' after object value, got: '秘密のトークンabc123}'
+    #
+    # ⚠ json 3 の重複キーエラーは**キー名そのもの**を含む。どちらも利用者由来の
+    # 値なので、`message` を出した時点で「本文は出さない」が破れる（#4394 / #4630）。
+    # ⚠ 長さの上限も無いので、**巨大なログ 1 行**にもなりうる。
+    #
+    # **残すのは型と大きさだけ。**「どこで落ちたか」は class と path で足りる。
+    def log_unparsable_body(error)
+      return unless json_body?
+      logger.error(
+        error: 'request body is not parsable as JSON',
+        class: error.class.to_s,
+        bytesize: @body.bytesize,
+        path: scrub_log_path(request.path),
+      )
+    end
+
+    def json_body?
+      return @body.to_s.lstrip.start_with?('{', '[')
     end
 
     def name
