@@ -4,6 +4,12 @@ module Mulukhiya
     # ⚠ ハンドラの中では `Event::HANDLER_DEADLINE_KEY` の残りのほうが短くなる。
     DEFAULT_FFMPEG_TIMEOUT = 90
 
+    # 内側へ渡す下限 (秒)。⚠ **0 以下を渡さない** — `Timeout.timeout(0)` は
+    # 「制限なし」の意味になり、塞いだはずの穴がそのまま開く。
+    # ⚠ 1 秒ではなくこの値なのは、`timeout` に数秒を設定したハンドラで
+    # **下限が締切そのものを追い越さない**ようにするため（PR #4706 の Codex P2）。
+    MIN_FFMPEG_TIMEOUT = 0.1
+
     def values
       return {
         type:,
@@ -104,11 +110,15 @@ module Mulukhiya
       return [handler_deadline_remaining, ffmpeg_timeout_limit].compact.min
     end
 
-    # ハンドラ締切までの残り。⚠ **0 以下を渡さない** — `Timeout.timeout(0)` は
-    # 「制限なし」の意味になり、**塞いだはずの穴がそのまま開く**。
+    # ハンドラ締切までの残り。
+    #
+    # ⚠⚠ **単調時計で読む（PR #4706 の Codex P2）。**配る側（`Event#handler_deadline`）と
+    # 物差しを揃える。壁時計を混ぜると NTP / VM の時刻補正で内外がずれる。
+    # ⚠ 下限は `MIN_FFMPEG_TIMEOUT`。0 以下は `Timeout.timeout` が「制限なし」と読む。
     def handler_deadline_remaining
       return nil unless deadline = Thread.current[Event::HANDLER_DEADLINE_KEY]
-      return [deadline - Time.now, 1].max
+      remaining = deadline - Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      return [remaining, MIN_FFMPEG_TIMEOUT].max
     end
 
     def ffmpeg_timeout_limit

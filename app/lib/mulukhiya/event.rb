@@ -33,6 +33,11 @@ module Mulukhiya
 
     # 内側の締切を外側より確実に手前へ置くための余白 (秒)。
     # ⚠ 内側が `Timeout::Error` で正規に抜け、`ensure` の後始末が走りきるまでの分。
+    #
+    # ⚠⚠ **そのまま引くのではなく「締切の半分」と短いほうを取る（PR #4706 の Codex P2）。**
+    # `timeout` に 1〜5 秒を設定した（schema 上は妥当な）ハンドラでは
+    # `now + timeout - 5` が**既に過ぎた時刻**になり、内側の取り分が下限へ張り付く。
+    # そうなると外側の `thread.join` が先に発火しうる＝**塞いだはずの穴が開く**。
     HANDLER_DEADLINE_MARGIN = 5
 
     attr_reader :label, :params
@@ -121,7 +126,7 @@ module Mulukhiya
     # counter を渡すとハンドラのスレッドで HTTP が集計される (#4464)。
     # nil のときは計装なし＝従来どおりの挙動。
     def run_handler(handler, payload, counter)
-      deadline = Time.now + handler.timeout - HANDLER_DEADLINE_MARGIN
+      deadline = handler_deadline(handler.timeout)
       thread = Thread.new do
         Thread.current[HandlerProfile::HTTP_KEY] = counter
         # ⚠ **外側の `join` より手前で切れる締切を配る (#4696)。**時刻で配るので、
@@ -142,6 +147,20 @@ module Mulukhiya
       # 最中に呼び出し側が dispatch / post へ進む（詳細は HANDLER_KILL_WAIT）。
       thread.join(HANDLER_KILL_WAIT)
       handler.errors.push(message: 'timeout', timeout: "#{handler.timeout}s")
+    end
+
+    # ハンドラ締切の絶対時刻。
+    #
+    # ⚠⚠ **単調時計で持つ（PR #4706 の Codex P2）。**`Thread#join` と
+    # `Timeout.timeout` はどちらも単調時計で数えるので、壁時計で持つと
+    # **NTP / VM の時刻補正で内外の物差しがずれる**。後ろへ飛べば内側の残りが
+    # 伸びて外側に追い越され、前へ飛べば正常な変換が途中で切られる。
+    #
+    # ⚠ 前倒し幅は「余白」と「締切の半分」の短いほう。`timeout` が余白より短い
+    # 設定でも、**内側の取り分が必ず正で残る**。
+    def handler_deadline(timeout)
+      lead = [HANDLER_DEADLINE_MARGIN, timeout / 2.0].min
+      return Process.clock_gettime(Process::CLOCK_MONOTONIC) + timeout - lead
     end
 
     def resolve_pipeline

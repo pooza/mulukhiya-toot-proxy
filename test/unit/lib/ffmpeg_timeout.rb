@@ -22,14 +22,12 @@ module Mulukhiya
     # 🔴 **本体。**ハンドラ締切から逆算した残りが、**必ずハンドラ締切より短い**。
     # ⚠ プローブに上限いっぱい掛かった最悪ケースでも内側が先に切れること。
     def test_inner_deadline_always_precedes_the_handler
-      Thread.current[Event::HANDLER_DEADLINE_KEY] =
-        Time.now + HANDLER_TIMEOUT - Event::HANDLER_DEADLINE_MARGIN
+      publish(HANDLER_TIMEOUT)
 
       assert_operator(timeout, :<, HANDLER_TIMEOUT)
 
       # プローブが上限（30 秒）を使い切った後でも成り立つ。
-      Thread.current[Event::HANDLER_DEADLINE_KEY] =
-        Time.now + HANDLER_TIMEOUT - Event::HANDLER_DEADLINE_MARGIN - probe_timeout
+      Thread.current[Event::HANDLER_DEADLINE_KEY] -= probe_timeout
 
       assert_operator(timeout, :<, HANDLER_TIMEOUT - probe_timeout)
     end
@@ -37,7 +35,7 @@ module Mulukhiya
     # 🔴 **`Timeout.timeout(0)` は「制限なし」**なので、0 以下を渡してはいけない。
     # ⚠ 締切を過ぎていても穴が開かないこと。
     def test_expired_deadline_never_disables_the_timeout
-      Thread.current[Event::HANDLER_DEADLINE_KEY] = Time.now - 3600
+      Thread.current[Event::HANDLER_DEADLINE_KEY] = monotonic - 3600
 
       assert_operator(timeout, :>, 0)
     end
@@ -51,7 +49,7 @@ module Mulukhiya
 
     # ⚠ 締切が上限より遠くても、上限を超えない。
     def test_limit_caps_a_distant_deadline
-      Thread.current[Event::HANDLER_DEADLINE_KEY] = Time.now + 100_000
+      Thread.current[Event::HANDLER_DEADLINE_KEY] = monotonic + 100_000
 
       assert_equal(config['/ffmpeg/timeout'], timeout)
     end
@@ -80,10 +78,43 @@ module Mulukhiya
       Event.new(:pre_toot).send(:run_handler, handler, {}, nil)
 
       assert_not_nil(seen, '締切がスレッドへ配られていない')
-      assert_operator(seen - Time.now, :<=, HANDLER_TIMEOUT - Event::HANDLER_DEADLINE_MARGIN)
+      assert_operator(seen - monotonic, :<=, HANDLER_TIMEOUT - Event::HANDLER_DEADLINE_MARGIN)
+    end
+
+    # 🔴 **短いハンドラ締切でも内側が先に切れる**（PR #4706 の Codex P2）。
+    # ⚠ 余白をそのまま引くと `timeout` が 1〜5 秒のとき締切が既に過ぎた時刻になり、
+    # 内側が下限へ張り付いて**外側が先に発火しうる**。
+    def test_short_handler_timeout_keeps_a_positive_lead
+      [1, 2, 5].each do |seconds|
+        publish(seconds)
+
+        assert_operator(timeout, :>, 0, "#{seconds}s: 0 以下は制限なしになる")
+        assert_operator(timeout, :<, seconds, "#{seconds}s: 内側が外側を追い越している")
+      end
+    end
+
+    # ⚠⚠ **単調時計で持つ**（PR #4706 の Codex P2）。壁時計だと NTP / VM の補正で
+    # 内外の物差しがずれ、後ろへ飛べば内側が外側に追い越される。
+    def test_deadline_is_monotonic
+      publish(HANDLER_TIMEOUT)
+      deadline = Thread.current[Event::HANDLER_DEADLINE_KEY]
+
+      # 壁時計基準なら epoch 秒（10^9 台）になる。単調時計は起動からの経過。
+      assert_in_delta(monotonic + HANDLER_TIMEOUT - Event::HANDLER_DEADLINE_MARGIN, deadline, 1)
+      assert_operator(deadline, :<, Time.now.to_f, '壁時計基準になっている')
     end
 
     private
+
+    def monotonic
+      return Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    end
+
+    # `Event#run_handler` が配るのと同じ形で締切を置く。
+    def publish(handler_timeout)
+      Thread.current[Event::HANDLER_DEADLINE_KEY] =
+        Event.new(:pre_toot).send(:handler_deadline, handler_timeout)
+    end
 
     def timeout
       return @file.send(:ffmpeg_timeout)
