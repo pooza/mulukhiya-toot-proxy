@@ -23,6 +23,7 @@ export LC_ALL=ja_JP.UTF-8
 
 start_cmd=${name}_start
 stop_cmd=${name}_stop
+status_cmd=${name}_status
 
 # listener は proctitle が "ruby: bin/listener_daemon.rb start" のままなので、
 # パターンは daemon スクリプト名で足りる (#4675)。
@@ -31,7 +32,19 @@ mulukhiya_listener_kill_wait=20
 
 mulukhiya_listener_start() {
   cd $mulukhiya_path
-  sudo -u $mulukhiya_user /usr/sbin/daemon \
+  # ⚠⚠ **`-f` を付けないと SSH 越しの restart が戻ってこない (#4478)。**
+  # `daemon(8)` は既定で標準入出力・標準エラーを**そのまま子へ引き継ぐ**ため、
+  # プロセスがデーモン化しても **fd の持ち主が残っている限り ssh は待ち続ける**。
+  # 2026-07-23 の lbock ではこれで **3 サービスのうち sidekiq だけ再起動された
+  # 混在状態**になった（ループの 1 周目で止まり、puma / listener は旧プロセスのまま）。
+  #
+  # ⚠⚠ **`-f` 単独にしないこと。**`-f` は 3 本とも /dev/null へ捨てるので、
+  # **FreeBSD で Sidekiq のログを no-reader pipe へ捨てていた #4362 と同じ轍**になる。
+  # `-S -T mulukhiya-toot-proxy` を併用すると、fd を切り離したうえで stdout / stderr を
+  # syslog へ流せる。タグは chubo2 の rsyslog 設定
+  # （`:programname, isequal, "mulukhiya-toot-proxy"`）が拾い、既存の
+  # `/var/log/mulukhiya-toot-proxy.log` に入る。
+  sudo -u $mulukhiya_user /usr/sbin/daemon -f -S -T mulukhiya-toot-proxy \
     /usr/local/bin/bash -lc "cd ${mulukhiya_path} && bundle exec bin/listener_daemon.rb start"
 }
 
@@ -50,6 +63,20 @@ mulukhiya_listener_stop() {
   done
   pkill -9 -u $mulukhiya_user -f "$mulukhiya_listener_pattern" 2>/dev/null
   sleep 2
+}
+
+# `service mulukhiya-listener status` が `unknown directive` にならないようにする (#4478)。
+# ⚠ **`daemon -p` の pidfile は使えない。**`bin/*_daemon.rb start` 自身が fork して
+# デーモン化するので、`daemon` が見ている子はすぐ終わる＝ pid が死んだ値になる。
+# 停止判定と同じ pattern で見るのが唯一の一貫した物差し。
+mulukhiya_listener_status() {
+  _pids=`pgrep -u $mulukhiya_user -f "$mulukhiya_listener_pattern" 2>/dev/null | tr '\n' ' '`
+  if [ -n "$_pids" ]; then
+    echo "mulukhiya-listener is running as pid ${_pids}."
+    return 0
+  fi
+  echo "mulukhiya-listener is not running."
+  return 1
 }
 
 run_rc_command "$1"
