@@ -26,7 +26,19 @@ module Mulukhiya
       end
       begin
         @params = Sinatra::IndifferentHash[JSON.parse(@body)]
-      rescue StandardError
+      rescue StandardError => e
+        # ⚠⚠ **ここは黙って body を捨てる経路 (#4699)。**フォーム POST や空 body でも
+        # 通るので rescue 自体は正しいが、**JSON のつもりで送られた body が落ちた**ときも
+        # 同じ穴に落ちる。クライアントからは「投稿したのに内容が空」に見え、
+        # ログに手掛かりが 1 行も残らない。
+        #
+        # ⚠ **JSON らしい body のときだけ残す。**毎リクエスト出すとフォーム POST で
+        # syslog が埋まる（#4549 の型）。
+        #
+        # 🔴 **json 3.0 へ上げる前の前提。**3.0 は `allow_duplicate_key` の既定が
+        # false になるので、**いままで「後勝ち」で通っていた重複キーの body が
+        # 丸ごとここへ落ちる**。無音のままだと版を上げた影響を切り分けられない。
+        log_unparsable_body(e)
         @params = Sinatra::IndifferentHash[params]
       end
       logger.info(request: {
@@ -81,6 +93,26 @@ module Mulukhiya
         Sentry.capture_exception(e) rescue nil if Sentry.initialized?
       end
       return @renderer.to_s
+    end
+
+    # JSON のつもりで送られた body が解釈できなかったことを残す (#4699)。
+    #
+    # ⚠ **JSON らしい body のときだけ。**`{` / `[` で始まらないものはフォーム POST や
+    # 空 body なので、落ちるのが正常。毎回出すと syslog が埋まる。
+    # ⚠ **本文は出さない。**投稿本文が平文で残る（#4394 / #4630）。
+    def log_unparsable_body(error)
+      return unless json_body?
+      logger.error(
+        error: 'request body is not parsable as JSON',
+        class: error.class.to_s,
+        message: error.message,
+        bytesize: @body.bytesize,
+        path: scrub_log_path(request.path),
+      )
+    end
+
+    def json_body?
+      return @body.to_s.lstrip.start_with?('{', '[')
     end
 
     def name
