@@ -43,6 +43,27 @@ module Mulukhiya
       end
     end
 
+    # 🔴 **上流のガードをすり抜けない**（PR #4710 の Codex P1）。
+    # ⚠⚠ `PinningError` / `TooLargeError` は **`GatewayError` のサブクラス**なので、
+    # `is_a?` で拾うと **`source_status` がたまたま 404 のときに再送してしまう**。
+    # pinning は設定の問題で試行の間に変わらず、上限超過は同じ場所で超えるだけ。
+    def test_upstream_guards_are_not_bypassed
+      [Ginseng::PinningError, Ginseng::TooLargeError].each do |klass|
+        error = klass.new('boom')
+        error.define_singleton_method(:source_status) {404}
+
+        refute(@dic.send(:retryable?, error), "#{klass} が 404 で再送対象になっている")
+      end
+    end
+
+    # ⚠ ガードは `GatewayError` のサブクラスとして足される。列挙せず
+    # `instance_of?` で見ているので、上流が増やしても自動で追随する。
+    def test_guards_are_gateway_error_subclasses
+      [Ginseng::PinningError, Ginseng::TooLargeError].each do |klass|
+        assert_operator(klass, :<, Ginseng::GatewayError)
+      end
+    end
+
     # ⚠ **`retry_limit` の reader を潰していない。**呼び出し側の
     # `http.retry_limit = 1` が効かなくなると、絞ったつもりの経路が黙って戻る。
     def test_retry_limit_stays_assignable

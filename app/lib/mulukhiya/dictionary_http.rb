@@ -54,9 +54,19 @@ module Mulukhiya
 
     # ⚠ **`super` を先に通す。**pinning / 上限超過 / 5xx / 接続断の判定は上流のまま。
     # ここで足すのは 404 だけ。
+    #
+    # ⚠⚠ **`instance_of?` で見る（PR #4710 の Codex P1）。**上流が明示的に落として
+    # いる `PinningError` / `TooLargeError` は **`GatewayError` のサブクラス**なので、
+    # `is_a?` で拾うと **`source_status` がたまたま 404 のときに上流のガードを
+    # すり抜ける**。pinning は設定の問題で試行の間に変わらず、上限超過は同じ場所で
+    # 超えるだけなので、再送してはいけない。
+    #
+    # ⚠ **サブクラスを列挙しない**のは、上流がガードを増やしたときに自動で追随する
+    # ため。上流のレスポンス由来の 404 は `GatewayError.new("Bad response 404")`
+    # ＝ **素の `GatewayError`** なので、これで過不足なく拾える。
     def retryable?(error)
       return true if super
-      return false unless error.is_a?(Ginseng::GatewayError)
+      return false unless error.instance_of?(Ginseng::GatewayError)
       return RETRYABLE_CLIENT_STATUSES.include?(error.source_status)
     end
   end
