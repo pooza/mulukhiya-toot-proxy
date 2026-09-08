@@ -2,6 +2,10 @@ module Mulukhiya
   class WebhookImageHandler < Handler
     include LogScrubber
 
+    # 内部例外を丸めて返すときの文言 (#4694)。⚠ **原文は syslog に残す**ので、
+    # 運用側の切り分けは失われない。
+    GENERIC_DROP_MESSAGE = 'attachment could not be processed'.freeze
+
     def disable?
       return true unless controller_class.webhook?
       return true unless sns.account&.webhook
@@ -16,6 +20,17 @@ module Mulukhiya
       return RemoteHost.validator
     end
 
+    # ⚠⚠ **`drain` は `ensure` に置く (#4694)。**#4657 の `thread.kill` は
+    # `run_workers` の `threads.each(&:join)` を途中で切るので、素直に後ろへ
+    # 書くと**タイムアウト経路でだけ実行されない**。`drain` は「枠切れ・未処理で
+    # 残った添付」を `record_drop` する**唯一の経路**なので、走らないと
+    # 🔴 **キューに残った添付が syslog にも応答にも 1 行も残らない。**
+    #
+    # ⚠ 5.35.0 までは殺されなかったので、応答には間に合わないものの syslog には
+    # 残っていた。**#4633 で塞いだ穴が、タイムアウト経路でだけ開き直していた。**
+    #
+    # ⚠ `Thread#kill` は殺されるスレッドの `ensure` を走らせる。この
+    # `handle_pre_webhook` 自身が殺される側なので、ここに置けば必ず通る。
     def handle_pre_webhook(payload, params = {})
       payload.deep_stringify_keys!
       payload[attachment_field] = Concurrent::Array.new(payload[attachment_field] || [])
@@ -23,7 +38,8 @@ module Mulukhiya
       (payload['attachments'] || []).each {|v| queue.push(v)}
       slots = create_slots(payload)
       run_workers(queue, payload, slots)
-      drain(queue)
+    ensure
+      drain(queue) if queue
     end
 
     private
@@ -102,7 +118,25 @@ module Mulukhiya
     # 自体は正しいが、上限超過 (`/media/download/max_bytes`) も取得失敗も
     # **200 と作成済み投稿 ID が返るだけ**で、送信側は成功と区別できなかった。
     def drop_attachment(error, attachment)
-      record_drop(error.class.to_s, error.message, attachment)
+      record_drop(error.class.to_s, client_message(error), attachment, detail: error.message)
+    end
+
+    # 送信側へ返してよいメッセージ (#4694)。
+    #
+    # ⚠⚠ **`upload_attachment` の rescue は全例外を拾う。**素通しすると
+    # `Errno::EACCES - /home/mulukhiya/.../tmp/media/xxxx.jpg`（**サーバー内の
+    # 絶対パス**）や `PG::ConnectionBad: connection to server at "127.0.0.1",
+    # port 6432 failed`（**内部ホスト・ポート**）がそのまま第三者へ返る。
+    # ⚠ webhook は第三者システムへ配るものなので、digest を持つ相手に限られる
+    # ことは緩和材料にならない。
+    #
+    # ⚠ **`InternalGatewayError#client_message` と同じ方針**（内部メソッド名と
+    # 上流ステータスを外へ出さない）。あちらと非対称なままにしない。
+    # ⚠ **原文は syslog には残す。**外に出さないことと、こちらが見られなくなる
+    # ことは別（`record_drop` の `detail:`）。
+    def client_message(error)
+      return error.message if error.is_a?(Ginseng::Error)
+      return GENERIC_DROP_MESSAGE
     end
 
     # ⚠⚠ **添付を丸ごと出さない (#4630)。**Slack legacy attachments の
@@ -112,9 +146,16 @@ module Mulukhiya
     # 値しか伏せないので、`image_url` 全体も本文も素通しする。
     # ⚠ `errors` 側も同じものを通す。`Reporter` が `summary` 経由で `logger.info`
     # へ流すため、片方だけ伏せても意味がない。
-    def record_drop(reason, message, attachment)
+    # ⚠ `detail:` は **syslog にだけ**出す原文 (#4694)。送信側へ返すのは
+    # `message`（丸めた側）。
+    def record_drop(reason, message, attachment, detail: nil)
       scrubbed = scrub_log_params(attachment)
-      logger.error(error: 'webhook attachment dropped', reason:, attachment: scrubbed)
+      logger.error(
+        error: 'webhook attachment dropped',
+        reason:,
+        message: detail || message,
+        attachment: scrubbed,
+      )
       errors.push(class: reason, message:, attachment: scrubbed)
     end
 

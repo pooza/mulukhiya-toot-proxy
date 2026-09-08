@@ -160,7 +160,9 @@ module Mulukhiya
         return uri.to_s
       end
 
-      def record_drop(reason, _message, attachment)
+      # ⚠ `detail:` は syslog 専用の原文 (#4694)。ここでは使わないが、
+      # 本体と同じ signature にしておかないと呼び出しで落ちる。
+      def record_drop(reason, _message, attachment, detail: nil)
         @dropped.push(reason:, attachment: scrub_log_params(attachment))
       end
     end
