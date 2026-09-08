@@ -99,7 +99,7 @@ cure-api 側を触るときに「カスタムフィードも一緒に整理」�
 **機能再開を判断する場合の手順**:
 
 1. #4323 を on-hold から外す
-2. [media-catalog-index-plan.md](media-catalog-index-plan.md) に従い zugoga / shallu / gomander の本番 DB に candidate A の partial index を `CONCURRENTLY` 適用
+2. [media_catalog.md](media_catalog.md)「性能トラックの記録」に従い zugoga / shallu / gomander の本番 DB に candidate A の partial index を `CONCURRENTLY` 適用
 3. 効果計測（同じ EXPLAIN 比較）後、対象サーバーの overlay yaml で `/mastodon/data/media_catalog: true` を設定
 4. `pooza/mastodon` migration PR で index を恒久化（[chubo2 docs/infra-note.md](https://github.com/pooza/chubo2) の daisskey drive_file 先行事例と同パターン）
 
@@ -2712,7 +2712,7 @@ Linode metadata service で **プラン・リージョン・vCPU・RAM がすべ
 
 切り分けの指針: タグ検索は Mastodon 本体の status 生成（relay ~1.5s と確定済みの部分）の中で起き、モロヘイヤのハンドラ側には乗らない。したがって **relay 部分の低下＝インデックス是正の効果、ハンドラ部分の変化＝移行・HEv2 の効果**として読む。
 
-**優先度ダウン（後ろ倒し）: #4393 media_catalog sub-second 化**。2026-07-18 に優先度を下げ 5.29.0 から除外（「落ち着いた頃に」）。media_catalog 再有効化トラック（#4323/#4351/#4352/#4375/#4393、runbook=docs/media-catalog-index-plan.md）は生きているが着手時期を後ろ倒し。#4393（query 再構成/非正規化、size:L）が #4351 Gate 2 の前提ブロッカーである構図は不変。
+**優先度ダウン（後ろ倒し）: #4393 media_catalog sub-second 化**。2026-07-18 に優先度を下げ 5.29.0 から除外（「落ち着いた頃に」）。media_catalog 再有効化トラック（#4323/#4351/#4352/#4375/#4393、runbook=docs/media_catalog.md「性能トラックの記録」）は生きているが着手時期を後ろ倒し。#4393（query 再構成/非正規化、size:L）が #4351 Gate 2 の前提ブロッカーである構図は不変。
 
 **ステージング再建（解消済み）**: Proxmox ステージング dev24-27（美食丼/キュアスタ！/デルムリン丼=Mastodon、ダイスキー=Misskey）が稼働し、「ステージング検証省略不可」を実運用で満たせる状態に復帰（旧 dev04/15/22/23 は退役、現行構成は chubo2 `docs/infra-note.md`「ステージング」節が正）。5.28.0 の省略障害（MEMORY `project_5280-staging-skip-postmortem`）は解消。構成乖離#36/Linode 移行#35 等の長期構想は MEMORY `project_proxmox-staging-rebuild` 継続。
 
@@ -2740,7 +2740,7 @@ Issue #4233 の APIController 段階的リファクタは「1〜2 マイルス�
 ### メタ Issue（生きている）
 
 - #4233 APIController: 残る長大エンドポイントの段階的リファクタ（サブ #4283/#4284/#4285、上記ロードマップで進行中）
-- #4323 perf: media_attachments 関連 index 見直し（サブ #4393 sub-second 化 query 再構成 / #4351 zugoga 再有効化 / #4352 shallu/lbock 横展開 / #4353 本家 migration / #4375 Misskey track）。**zugoga 本番 EXPLAIN で partial index 単独では sub-second に届かないと判明し、#4393（query 再構成/非正規化、size:L）を #4351 の前提に格上げ**。実行 runbook は docs/media-catalog-index-plan.md（決定ゲート Gate 0〜2 + rollback）。Mastodon は statuses partial index、Misskey は別ルート（drive_file、daisskey で実証済み）
+- #4323 perf: media_attachments 関連 index 見直し（サブ #4393 sub-second 化 query 再構成 / #4351 zugoga 再有効化 / #4352 shallu/lbock 横展開 / #4353 本家 migration / #4375 Misskey track）。**zugoga 本番 EXPLAIN で partial index 単独では sub-second に届かないと判明し、#4393（query 再構成/非正規化、size:L）を #4351 の前提に格上げ**。実行 runbook は docs/media_catalog.md「性能トラックの記録」（決定ゲート Gate 0〜2 + rollback）。Mastodon は statuses partial index、Misskey は別ルート（drive_file、daisskey で実証済み）
 
 ### マイルストーン未設定
 
@@ -2970,7 +2970,7 @@ chubo2 の [docs/infra-note.md](https://github.com/pooza/chubo2/blob/main/docs/i
 - [ginseng-config-internals.md](ginseng-config-internals.md) — Ginseng::Config 内部構造
 - [test-harness.md](test-harness.md) — #4379 chubo2 fedi-test-harness を使った実サーバーテストの手順
 - [capsicum-requirements.md](capsicum-requirements.md) — capsicum プロジェクトからの依頼事項
-- [media-catalog-index-plan.md](media-catalog-index-plan.md) — #4323 media_catalog index 見直し調査ドラフト（zugoga 本番ベースライン EXPLAIN 取得済み・candidate A 適用方針確定、#4343 で機能をデフォルト無効化したため適用は on-hold）
+- ⚠ **`media-catalog-index-plan.md` は 2026-09-08 に [media_catalog.md](media_catalog.md) の「性能トラックの記録」へ統合した**（正本を 1 本にするため）。内容は削らず全量を移してある
 
 ### アーカイブ (docs/archive/)
 
