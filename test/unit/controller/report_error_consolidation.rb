@@ -51,7 +51,9 @@ module Mulukhiya
     end
 
     # モロヘイヤ自身のバグは黙らせない。
+    # ⚠ 抑止の窓を開け直してから測る（#4693 のデッドマン）。
     def test_server_error_reaching_top_level_is_alerted
+      clear_alert_throttle(Ginseng::GatewayError)
       error = probe(Ginseng::GatewayError.new('Bad response 502'))
 
       assert_equal([:alert], error.mulukhiya_calls)
@@ -68,8 +70,8 @@ module Mulukhiya
     def spy(error)
       calls = []
       error.define_singleton_method(:mulukhiya_calls) {calls}
-      error.define_singleton_method(:alert) {calls << :alert}
-      error.define_singleton_method(:log) {calls << :log}
+      error.define_singleton_method(:alert) {|*| calls << :alert}
+      error.define_singleton_method(:log) {|*| calls << :log}
       return error
     end
   end

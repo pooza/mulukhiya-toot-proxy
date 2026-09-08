@@ -32,10 +32,10 @@ module Mulukhiya
       access_token = parsed['access_token'] || parsed['accessToken']
       raise Ginseng::AuthError, 'No access token in response' unless access_token
       if info_bot_token?(access_token)
-        config.update_file(agent: {info: {token: access_token.encrypt}})
+        config.update_file(agent: {info: {token: encrypt_token!(access_token)}})
         config.reload
       end
-      token_crypt = access_token.encrypt
+      token_crypt = encrypt_token!(access_token)
       @renderer.status = 302
       redirect_url = "/mulukhiya/app/token_complete?token=#{Rack::Utils.escape(token_crypt)}"
       response['Location'] = redirect_url

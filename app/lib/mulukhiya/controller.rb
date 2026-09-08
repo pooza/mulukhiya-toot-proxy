@@ -15,6 +15,12 @@ module Mulukhiya
     # `X-Mulukhiya` まで混ざる。転送してよいものだけを 1 本の許可リストに置く。
     FORWARDED_HEADERS = ['Idempotency-Key'].freeze
 
+    # サーバー側の失敗を鳴らす間隔 (秒) と、その印を置く Redis キーの接頭辞 (#4693)。
+    # ⚠ 型ごとに独立して数える。`Sequel::DatabaseConnectionError` の連打を抑えている間に
+    # 別の型（本物のバグ）が出たら、そちらは 1 回目として鳴ってほしい。
+    ALERT_THROTTLE_SECONDS = 300
+    ALERT_THROTTLE_KEY_PREFIX = 'alert_throttle'.freeze
+
     set :root, Environment.dir
     enable :method_override
 
@@ -178,6 +184,23 @@ module Mulukhiya
       return @headers.to_h.slice(*FORWARDED_HEADERS)
     end
 
+    # トークンを暗号化する。⚠ **失敗はこちらの設定の問題 (#4693)。**
+    #
+    # ⚠⚠ `Ginseng::CryptError#status` は **403** なので、`report_error` の
+    # ステータス判定では「クライアントが悪い」側に落ちて **`log` 止め**になる。
+    # だが実体は `/crypt/password` の未設定・破損で、**全ユーザーのトークン発行が
+    # 403 になるのに Sentry には何も出ない**（`Crypt.password` が `rescue nil` で
+    # nil に落ち、`PKCS5.pbkdf2_hmac(nil, ...)` が `CryptError` に包まれる）。
+    #
+    # ⚠ **クライアントは何も悪くない**ので、ここで印を付けて必ず鳴らす。
+    # ⚠ `report_error` 側で例外クラスを列挙しないための形（#4603 / #4629 で
+    # 列挙は実際に取りこぼしている）。
+    def encrypt_token!(value)
+      return value.encrypt
+    rescue => e
+      raise NeverSilent.mark(e)
+    end
+
     def verify_token_integrity!
       expected = token
       return unless expected
@@ -188,7 +211,11 @@ module Mulukhiya
         actual: sns.token&.first(8),
         path: scrub_log_path(request.path),
       )
-      raise Ginseng::AuthError, 'Token integrity check failed'
+      # ⚠⚠ **これは「クライアントが悪い」ではない (#4693)。**リクエスト間で
+      # トークンが混線した＝**セキュリティ不変条件の破れ**で、2025-10 のトークン
+      # 汚染事故（`Gemfile` が rack / sinatra に上限を書いている理由そのもの）の
+      # 再発検知がここに掛かっている。401 なので既定では log 止めになる。
+      raise NeverSilent.mark(Ginseng::AuthError.new('Token integrity check failed'))
     end
 
     # クライアント起因の失敗を Sentry alert に上げない共通判定
@@ -214,7 +241,42 @@ module Mulukhiya
     # モロヘイヤ自身のバグを黙らせてはいけないので、これが正しい既定。
     # `respond_to?` のガードは refine が外れたときの保険で、通常は到達しない。
     def report_error(error)
-      client_error?(error) ? error.log : error.alert
+      # ⚠⚠ **① 印が付いていればステータスに依らず必ず鳴らす (#4693)。**
+      # 「403 だがこちらの設定が壊れている」型（`Ginseng::CryptError`）や
+      # 「401 だがセキュリティ不変条件の破れ」型（`token_mismatch`）が、
+      # ステータスだけの判定では丸ごと無音になっていた。
+      return error.alert if never_silent?(error)
+      # ② クライアント起因は従来どおり log 止め。
+      return error.log if client_error?(error)
+      # ⚠⚠ **③ サーバー側の失敗は鳴らすが、連続はデッドマンで抑える (#4693)。**
+      # `before` は**全リクエスト**（未認証・スキャナ由来を含む）で走り、失敗の
+      # 主因は Redis / Postgres 障害。素通しだと **DB 全断中にリクエスト 1 本ごとに
+      # Sentry イベント 1 件＋ slack / line / mail** が飛び、障害中に外向き HTTP を
+      # 増やす二次被害とレート制限になる。
+      return throttled_alert(error)
+    end
+
+    # 同じ型の失敗は窓のあいだ 1 回だけ鳴らす (#4693)。
+    #
+    # ⚠ `StartupNotificationWorker#notify_failure` と同じ「連続失敗の 1 回目だけ」の
+    # 考え方だが、**成功で解除する代わりに TTL で解除する。**`before` は毎リクエスト
+    # 走るので、成功のたびに Redis を書くと平常時のコストが乗る。
+    #
+    # ⚠⚠ **カウンタ自体が落ちたら log へ倒す。**ここへ来る主因が Redis 全断なので、
+    # 抑止できないからと鳴らす側へ倒すと**まさに避けたいスパムになる**。
+    # Redis の死は `/health` の redis 側で観測されるので、二重に鳴らす価値がない
+    # （`StartupNotificationWorker` と同じ判断）。
+    # ⚠ **厳密な排他ではない。**`Ginseng::Redis::Service#set` は `NX` を取らないので
+    # `key?` → `setex` の 2 段になる。同時に来た数本が二重に鳴ることはあるが、
+    # **抑えたいのは「全断中に毎リクエスト鳴る」**ほうなので、これで足りる。
+    def throttled_alert(error)
+      redis = Redis.new
+      key = "#{ALERT_THROTTLE_KEY_PREFIX}/#{error.class}"
+      return error.log(throttled: true) if redis.key?(key)
+      redis.setex(key, ALERT_THROTTLE_SECONDS, 1)
+      error.alert
+    rescue => e
+      error.log(throttle_error: e.class.to_s)
     end
 
     # ⚠ 見るのは `status`（モロヘイヤがクライアントへ返す値）。上流の
