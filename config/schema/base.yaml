@@ -121,6 +121,16 @@ properties:
           type: object
         type: array
     type: object
+  config:
+    properties:
+      validation:
+        properties:
+          strict:
+            type: boolean
+        required:
+          - strict
+        type: object
+    type: object
   controller:
     enum:
       - mastodon
