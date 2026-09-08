@@ -28,6 +28,13 @@ module Mulukhiya
         return @renderer.to_s
       end
 
+      # ⚠ 上流が 404 と**空の JSON ボディ**を返したときの透過（PR #4707 の Codex P2）。
+      get '/empty' do
+        @renderer.status = 404
+        @renderer.message = {}
+        return @renderer.to_s
+      end
+
       # message を持たないレンダラへ差し替えたまま 404 になる経路。
       get '/raw' do
         @renderer = Ginseng::Web::RawRenderer.new
@@ -53,6 +60,16 @@ module Mulukhiya
       assert_nil(body['class'])
       assert_nil(body['package'])
       assert_not_match(/not found\.\z/, body['error'].to_s)
+    end
+
+    # 🔴 **上流の空 JSON ボディ `{}` を潰さない**（PR #4707 の Codex P2）。
+    # ⚠ `{}.present?` は false なので、`present?` で判定すると既定メッセージへ化ける。
+    # `api.md` が約束している「上流の包絡をそのまま透過する」に反する。
+    def test_empty_upstream_body_is_not_replaced
+      body = request('/empty')
+
+      assert_equal({}, body)
+      assert_equal(404, last_response.status)
     end
 
     # ルート未一致は従来どおり既定メッセージ。⚠ ここを壊すと 404 が空になる。
