@@ -104,6 +104,8 @@ module Mulukhiya
 
   # 検証そのものが実行できなかった場合だけ握る。⚠ ここでの fail-open は
   # 「schema を読めない環境でも起動はできる」ための意図的なもの。
+  # ⚠ `format: regex` の検証は `Config#errors` に寄せてある (#4597)。
+  # **`rake config:lint` と `#audit` も同じ結果を見る**必要があるため。
   def self.config_validation_errors
     return Config.instance.errors
   rescue => e
