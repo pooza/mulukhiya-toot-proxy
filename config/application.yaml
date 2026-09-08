@@ -73,6 +73,10 @@ ffmpeg:
   preset: veryfast
   probe:
     timeout: 30
+  # ffmpeg 1 回あたりの上限 (秒)。⚠ ハンドラの中では
+  # `/handler/video_format_convert/timeout` から逆算した残りのほうが短くなるので、
+  # これが効くのは rake・CLI・テストなど**ハンドラの外**だけ (#4696)。
+  timeout: 90
 firefish:
   capabilities:
     reaction: true

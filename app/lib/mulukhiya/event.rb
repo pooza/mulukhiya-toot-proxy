@@ -16,6 +16,30 @@ module Mulukhiya
     # 諦めて先へ進む（従来の挙動に戻るだけで、悪化はしない）。
     HANDLER_KILL_WAIT = 5
 
+    # ハンドラの締切時刻を、そのハンドラのスレッドから引くためのキー (#4696)。
+    #
+    # ⚠⚠ **内側の締切を「同じ設定値の定数」で置いてはいけない。**
+    # `VideoFile#ffmpeg_timeout` は `/handler/video_format_convert/timeout` = 90 を
+    # 読んでいたが、**外側の `thread.join(handler.timeout)` が先に始まり、しかも
+    # transcode の前に `video_stream` のプローブ（`/ffmpeg/probe/timeout` = 30）が
+    # 挟まる**ので、内側の `Timeout.timeout(90)` は**構造的に一度も発火しなかった**。
+    # 発火しない Timeout は `log_ffmpeg_error` と `"ffmpeg failed: ..."` の経路ごと
+    # 殺し、残るのは `{message: 'timeout'}` 1 行だけになる。
+    #
+    # ⚠ **短い定数に置き換えるのも違う。**それでは今まで通っていた変換が落ちる。
+    # **締切そのものを配って残り時間から逆算させる**と、内側は必ず先に切れ、かつ
+    # 使える時間は縮まない。
+    HANDLER_DEADLINE_KEY = :mulukhiya_handler_deadline
+
+    # 内側の締切を外側より確実に手前へ置くための余白 (秒)。
+    # ⚠ 内側が `Timeout::Error` で正規に抜け、`ensure` の後始末が走りきるまでの分。
+    #
+    # ⚠⚠ **そのまま引くのではなく「締切の半分」と短いほうを取る（PR #4706 の Codex P2）。**
+    # `timeout` に 1〜5 秒を設定した（schema 上は妥当な）ハンドラでは
+    # `now + timeout - 5` が**既に過ぎた時刻**になり、内側の取り分が下限へ張り付く。
+    # そうなると外側の `thread.join` が先に発火しうる＝**塞いだはずの穴が開く**。
+    HANDLER_DEADLINE_MARGIN = 5
+
     attr_reader :label, :params
 
     def initialize(label, params = {})
@@ -102,8 +126,12 @@ module Mulukhiya
     # counter を渡すとハンドラのスレッドで HTTP が集計される (#4464)。
     # nil のときは計装なし＝従来どおりの挙動。
     def run_handler(handler, payload, counter)
+      deadline = handler_deadline(handler.timeout)
       thread = Thread.new do
         Thread.current[HandlerProfile::HTTP_KEY] = counter
+        # ⚠ **外側の `join` より手前で切れる締切を配る (#4696)。**時刻で配るので、
+        # ハンドラの中で何段ネストしても「残り」は一意に決まる。
+        Thread.current[HANDLER_DEADLINE_KEY] = deadline
         handler.send(method, payload, params)
       end
       return if thread.join(handler.timeout)
@@ -119,6 +147,20 @@ module Mulukhiya
       # 最中に呼び出し側が dispatch / post へ進む（詳細は HANDLER_KILL_WAIT）。
       thread.join(HANDLER_KILL_WAIT)
       handler.errors.push(message: 'timeout', timeout: "#{handler.timeout}s")
+    end
+
+    # ハンドラ締切の絶対時刻。
+    #
+    # ⚠⚠ **単調時計で持つ（PR #4706 の Codex P2）。**`Thread#join` と
+    # `Timeout.timeout` はどちらも単調時計で数えるので、壁時計で持つと
+    # **NTP / VM の時刻補正で内外の物差しがずれる**。後ろへ飛べば内側の残りが
+    # 伸びて外側に追い越され、前へ飛べば正常な変換が途中で切られる。
+    #
+    # ⚠ 前倒し幅は「余白」と「締切の半分」の短いほう。`timeout` が余白より短い
+    # 設定でも、**内側の取り分が必ず正で残る**。
+    def handler_deadline(timeout)
+      lead = [HANDLER_DEADLINE_MARGIN, timeout / 2.0].min
+      return Process.clock_gettime(Process::CLOCK_MONOTONIC) + timeout - lead
     end
 
     def resolve_pipeline
