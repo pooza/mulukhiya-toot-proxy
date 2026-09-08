@@ -9,7 +9,10 @@ properties:
     minimum: 1
     type: integer
   to:
-    format: email
+    # ⚠ **`format: email` は json-schema に検証実装が無く素通しだった (#4597)。**
+    # `not-an-email` も `@` も `a b@c` も通っていた。⚠ RFC 5322 を厳密に書くのは
+    # 不毛なので、**typo を落とせる最小限**（空白なし・`@` が 1 つ・ドメインに `.`）に絞る。
+    pattern: '^[^@[:space:]]+@[^@[:space:]]+\.[^@[:space:]]+$'
     type: string
 required:
   - to

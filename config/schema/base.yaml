@@ -177,7 +177,10 @@ properties:
               format: uri
               type: string
             path:
-              format: ^/
+              # ⚠⚠ **`format: ^/` は format 名ですらなかった (#4597)。**未知の format は
+              # 黙って無視されるので、**1 文字の違いで完全な no-op** になっていた。
+              # 書き手の意図（「`/` で始まること」）は正規表現なので `pattern` が正しい。
+              pattern: '^/'
               type: string
             title:
               type: string
@@ -213,7 +216,10 @@ properties:
       hosts:
         properties:
           default:
-            format: hostname
+            # ⚠ **`format: hostname` は json-schema に検証実装が無く素通しだった (#4597)。**
+            # `not a hostname!` も `http://example.com` も `.....` も通っていた。
+            # RFC 1123 のラベル（英数字とハイフン・先頭末尾はハイフン不可）で書き直す。
+            pattern: '^[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$'
             type: string
         type: object
     type: object
@@ -232,7 +238,10 @@ properties:
       hosts:
         properties:
           default:
-            format: hostname
+            # ⚠ **`format: hostname` は json-schema に検証実装が無く素通しだった (#4597)。**
+            # `not a hostname!` も `http://example.com` も `.....` も通っていた。
+            # RFC 1123 のラベル（英数字とハイフン・先頭末尾はハイフン不可）で書き直す。
+            pattern: '^[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$'
             type: string
         type: object
       subject:

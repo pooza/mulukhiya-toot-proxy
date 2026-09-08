@@ -104,8 +104,13 @@ module Mulukhiya
 
   # 検証そのものが実行できなかった場合だけ握る。⚠ ここでの fail-open は
   # 「schema を読めない環境でも起動はできる」ための意図的なもの。
+  # ⚠⚠ **schema の検証だけでは足りない (#4597)。**json-schema には `regex` の
+  # 検証実装が無く、`format: regex` と書いてあっても壊れた正規表現が素通しする。
+  # 🔴 `/sentry/scrub_patterns` は `before_send` の中で毎回 `Regexp.new` されるので、
+  # **Sentry へイベントを送ろうとした瞬間に初めて倒れる**＝**例外を集める仕組みが
+  # 例外で止まる**。ここで一緒に見て、strict なら起動で止める。
   def self.config_validation_errors
-    return Config.instance.errors
+    return Config.instance.errors + ConfigFormatValidator.new.errors
   rescue => e
     warn "config validation skipped: #{e.message}"
     return []
