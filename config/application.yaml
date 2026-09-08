@@ -37,6 +37,13 @@ cherrypick:
 cli:
   progress_bar:
     format: '%c/%C (%p%%)| %B'
+config:
+  validation:
+    # ⚠ 真にすると、schema 検証エラーがある状態では起動そのものを止める (#4596)。
+    # 既定は偽（警告だけ出して起動する）。⚠⚠ **ここに既定値があること自体が
+    # ガードの一部** — 宣言が無いと `Config#[]` が ConfigError を上げ、
+    # 「厳格かどうか」を判定する前に検証が飛ぶ。
+    strict: false
 controller: mastodon
 daemon:
   restart:
