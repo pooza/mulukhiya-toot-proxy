@@ -68,9 +68,14 @@ module Mulukhiya
     # ⚠⚠ **抑止は型ごとに Redis へ残る。**同じ型を扱うテストが 2 本以上あると、
     # **後のテストが「抑止されている」状態から始まって順序依存になる**。
     # 「実際に alert すること」を見るテストは、必ずこれを通してから測る。
+    # ⚠ キーは `<prefix>/<型>/<発生源>` (#4693・PR #4712 の Codex P2)。
+    # テストからは発生源を特定しにくいので、接頭辞で総なめする。
     def clear_alert_throttle(*classes)
       redis = Redis.new
-      classes.each {|klass| redis.unlink("#{Controller::ALERT_THROTTLE_KEY_PREFIX}/#{klass}")}
+      classes.each do |klass|
+        prefix = "#{Controller::ALERT_THROTTLE_KEY_PREFIX}/#{klass}"
+        redis.keys("#{prefix}*").each {|key| redis.unlink(key)}
+      end
     rescue Ginseng::Redis::Error
       nil
     end

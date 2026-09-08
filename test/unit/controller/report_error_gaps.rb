@@ -69,6 +69,31 @@ module Mulukhiya
       assert_equal(:alert, report(error), '印が付いているのに抑えられている')
     end
 
+    # 🔴 **抑止は発生源ごと（PR #4712 の Codex P2）。**
+    # ⚠⚠ `report_error` は `before` だけでなく**各コントローラの rescue から
+    # 呼ばれる**ので、型だけで括ると **`RuntimeError` のような広い型で、あるルートの
+    # 失敗が別ルートの本物のバグを 300 秒握り潰す。**
+    def test_throttle_is_scoped_to_the_origin
+      error = RuntimeError.new('boom')
+
+      assert_equal(:alert, report_from(error, 'POST /api/v?/status/tags'))
+      assert_equal(:log, report_from(error, 'POST /api/v?/status/tags'), '同じルートが抑えられていない')
+      assert_equal(:alert, report_from(error, 'GET /api/v?/about'), '別ルートまで抑えている')
+    ensure
+      clear_alert_throttle(RuntimeError)
+    end
+
+    # ⚠ ルートが決まる前（`before`）は 1 つのバケツ。**パスごとに分けると
+    # 分けた数だけ鳴る**＝抑えたい相手そのものを取り逃がす。
+    def test_before_failures_share_one_bucket
+      error = RuntimeError.new('db is down')
+
+      assert_equal(:alert, report_from(error, nil))
+      assert_equal(:log, report_from(error, nil))
+    ensure
+      clear_alert_throttle(RuntimeError)
+    end
+
     # ⚠⚠ **抑止できないなら鳴らす側へ倒さない。**ここへ来る主因が Redis 全断な
     # ので、倒すとまさに避けたいスパムになる。Redis の死は `/health` が見る。
     def test_falls_back_to_log_when_redis_is_unavailable
@@ -80,6 +105,16 @@ module Mulukhiya
     end
 
     private
+
+    # 発生源（`sinatra.route`）を指定して呼ぶ。
+    def report_from(error, route)
+      env = route ? {'sinatra.route' => route} : {}
+      @controller.define_singleton_method(:request) do
+        @probe_request ||= {}
+        @probe_request[route] ||= Struct.new(:env).new(env)
+      end
+      return report(error)
+    end
 
     # `log` / `alert` のどちらが呼ばれたかだけを見る。
     def report(error)

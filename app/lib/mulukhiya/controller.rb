@@ -21,6 +21,12 @@ module Mulukhiya
     ALERT_THROTTLE_SECONDS = 300
     ALERT_THROTTLE_KEY_PREFIX = 'alert_throttle'.freeze
 
+    # ルートが決まる前に落ちたときの発生源 (#4693・PR #4712 の Codex P2)。
+    #
+    # ⚠⚠ **ここは 1 つのバケツにまとめる。**`before` は全リクエストで走り、
+    # **パスごとに分けると分けた数だけ鳴る**＝抑えたい相手そのものを取り逃がす。
+    BEFORE_ORIGIN = 'before'.freeze
+
     set :root, Environment.dir
     enable :method_override
 
@@ -271,12 +277,34 @@ module Mulukhiya
     # **抑えたいのは「全断中に毎リクエスト鳴る」**ほうなので、これで足りる。
     def throttled_alert(error)
       redis = Redis.new
-      key = "#{ALERT_THROTTLE_KEY_PREFIX}/#{error.class}"
+      key = alert_throttle_key(error)
       return error.log(throttled: true) if redis.key?(key)
       redis.setex(key, ALERT_THROTTLE_SECONDS, 1)
       error.alert
     rescue => e
       error.log(throttle_error: e.class.to_s)
+    end
+
+    # 抑止のバケツ。**型だけでは粗すぎる（PR #4712 の Codex P2）。**
+    #
+    # ⚠⚠ `report_error` は `before` だけでなく**各コントローラの rescue から
+    # 呼ばれる**ので、型だけで括ると **`RuntimeError` / `NoMethodError` のような
+    # 広い型で、あるルートの失敗が別ルートの本物のバグを 300 秒握り潰す。**
+    # 発生源（ルート）を混ぜて、**抑えたいのは「同じ場所の連打」だけ**にする。
+    #
+    # ⚠ `sinatra.route` は `"POST /api/v?/status/tags"` のような**パターン**なので、
+    # id を含まず安定している（実測）。ルートが決まる前＝ `before` の失敗では nil。
+    def alert_throttle_key(error)
+      return [ALERT_THROTTLE_KEY_PREFIX, error.class, alert_throttle_origin].join('/')
+    end
+
+    # ⚠ リクエストの外（rake・テスト）では `request` が nil。**黙って倒すが、
+    # 倒す先は「より強く抑える」側**なので、無音で緩むことにはならない。
+    def alert_throttle_origin
+      return BEFORE_ORIGIN unless request
+      return request.env['sinatra.route'].presence || BEFORE_ORIGIN
+    rescue StandardError
+      return BEFORE_ORIGIN
     end
 
     # ⚠ 見るのは `status`（モロヘイヤがクライアントへ返す値）。上流の
