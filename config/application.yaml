@@ -101,6 +101,13 @@ handler:
       - https://pf.korako.me/plugins/community-hashtag-map.json
     cache_ttl: 3600
   dictionary_tag:
+    # 辞書ソース取得の再送回数 (#4689)。⚠ **404 を再送するのは辞書だけ**
+    # （GAS の間欠 404 のため）。⚠⚠ 1 ソースあたりの最悪は
+    # `limit × /http/timeout/seconds + (limit - 1) × /http/retry/seconds`
+    # ＝ **2 なら 61 秒 / 3 なら 92 秒**。worker は 10 分周期なので 2 で余裕を残す。
+    # ⚠ 増やすと #4690（取得回数を減らす）と逆に効くので、総リクエスト数で見ること。
+    retry:
+      limit: 2
     cache:
       ttl: 3600
       # ソース単位の last-good キャッシュの TTL (#4659)。⚠ 本体の ttl より長く持つ

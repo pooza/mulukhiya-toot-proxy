@@ -145,11 +145,10 @@ module Mulukhiya
 
     def initialize(params)
       @params = params.key_flatten
-      @http = HTTP.new
-    end
-
-    def retry_limit
-      return config['/http/retry/limit'] rescue 5
+      # ⚠ **辞書だけ 404 を再送する (#4689)。**GAS の間欠 404 は「取れなかった」
+      # ではなく相手側の一過性なので、last-good で埋める前に引き直す。
+      # ⚠⚠ **`Mulukhiya::HTTP` 全体では開けない**（恒久的な 404 を 3 倍叩くだけ）。
+      @http = DictionaryHTTP.new
     end
   end
 end
