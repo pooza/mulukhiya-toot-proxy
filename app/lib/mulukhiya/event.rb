@@ -16,6 +16,25 @@ module Mulukhiya
     # 諦めて先へ進む（従来の挙動に戻るだけで、悪化はしない）。
     HANDLER_KILL_WAIT = 5
 
+    # ハンドラの締切時刻を、そのハンドラのスレッドから引くためのキー (#4696)。
+    #
+    # ⚠⚠ **内側の締切を「同じ設定値の定数」で置いてはいけない。**
+    # `VideoFile#ffmpeg_timeout` は `/handler/video_format_convert/timeout` = 90 を
+    # 読んでいたが、**外側の `thread.join(handler.timeout)` が先に始まり、しかも
+    # transcode の前に `video_stream` のプローブ（`/ffmpeg/probe/timeout` = 30）が
+    # 挟まる**ので、内側の `Timeout.timeout(90)` は**構造的に一度も発火しなかった**。
+    # 発火しない Timeout は `log_ffmpeg_error` と `"ffmpeg failed: ..."` の経路ごと
+    # 殺し、残るのは `{message: 'timeout'}` 1 行だけになる。
+    #
+    # ⚠ **短い定数に置き換えるのも違う。**それでは今まで通っていた変換が落ちる。
+    # **締切そのものを配って残り時間から逆算させる**と、内側は必ず先に切れ、かつ
+    # 使える時間は縮まない。
+    HANDLER_DEADLINE_KEY = :mulukhiya_handler_deadline
+
+    # 内側の締切を外側より確実に手前へ置くための余白 (秒)。
+    # ⚠ 内側が `Timeout::Error` で正規に抜け、`ensure` の後始末が走りきるまでの分。
+    HANDLER_DEADLINE_MARGIN = 5
+
     attr_reader :label, :params
 
     def initialize(label, params = {})
@@ -102,8 +121,12 @@ module Mulukhiya
     # counter を渡すとハンドラのスレッドで HTTP が集計される (#4464)。
     # nil のときは計装なし＝従来どおりの挙動。
     def run_handler(handler, payload, counter)
+      deadline = Time.now + handler.timeout - HANDLER_DEADLINE_MARGIN
       thread = Thread.new do
         Thread.current[HandlerProfile::HTTP_KEY] = counter
+        # ⚠ **外側の `join` より手前で切れる締切を配る (#4696)。**時刻で配るので、
+        # ハンドラの中で何段ネストしても「残り」は一意に決まる。
+        Thread.current[HANDLER_DEADLINE_KEY] = deadline
         handler.send(method, payload, params)
       end
       return if thread.join(handler.timeout)
