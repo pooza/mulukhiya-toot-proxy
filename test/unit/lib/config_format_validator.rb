@@ -76,7 +76,26 @@ module Mulukhiya
       assert_empty(found, '検証実装の無い format が残っている')
     end
 
+    # 🔴 **`Config#errors` に届くこと（PR #4711 の Codex P1）。**
+    # ⚠⚠ `Mulukhiya.validate_config` にだけ足すと、**`rake config:lint` も
+    # `Config#audit` も `errors` を直に見ている**ので素通りする。`config:lint` は
+    # 起動前チェックとして設定されているのに `config: OK` を返してしまう。
+    def test_errors_reach_every_consumer
+      config = Config.instance
+      original = config.raw['local']
+      config.raw['local'] = {'spoiler' => {'pattern' => '[unclosed'}}
+
+      assert_equal(1, regexp_errors(config.errors).length, 'Config#errors に出ていない')
+      assert_equal(1, regexp_errors(config.audit[:errors]).length, 'Config#audit に出ていない')
+    ensure
+      config.raw['local'] = original
+    end
+
     private
+
+    def regexp_errors(errors)
+      return errors.select {|e| e.include?('is not a valid regular expression')}
+    end
 
     def validate(values)
       return ConfigFormatValidator.new(Config.instance.schema, values).errors

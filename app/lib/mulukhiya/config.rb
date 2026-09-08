@@ -45,6 +45,17 @@ module Mulukhiya
       }
     end
 
+    # ⚠⚠ **schema の検証だけでは足りない (#4597)。**json-schema には `regex` の
+    # 検証実装が無く、`format: regex` と書いてあっても壊れた正規表現が素通しする。
+    #
+    # 🔴 **ここに足す（PR #4711 の Codex P1）。**`Mulukhiya.validate_config` にだけ
+    # 足すと、**`rake config:lint` も `#audit` も `errors` を直に見ている**ので
+    # 素通りしてしまう。`config:lint` は起動前チェックとして設定されているのに
+    # `config: OK` を返し、管理画面の audit にも出ない。**消費者ごとに配線しない。**
+    def errors
+      return super + ConfigFormatValidator.new(schema, merged_raw).errors
+    end
+
     def audit
       local = raw['local']
       return {errors: [], unknown_keys: []} unless local.is_a?(Hash)
