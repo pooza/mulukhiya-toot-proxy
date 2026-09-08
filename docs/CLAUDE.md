@@ -1271,10 +1271,16 @@ DB 直読み層（account / status / attachment / postgres）も **omission 0 �
 ## 開発中: 5.37.0
 
 **2026-09-08 に 5.36.0 を出荷した直後の状態。**
-[マイルストーン 5.37.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/635) 作成済み・**13 件 / 重み 23**。
+[マイルストーン 5.37.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/635) 作成済み・**14 件 / 重み 25**。
+`config/application.yaml` は 5.37.0 へバンプ済み。
 
 ⚠ **消化を目的にした回**（2026-09-08 のユーザーとの整理）。テーマで選ばず、**年齢と重みで選んだ**。
 「リリース運用 → リリース前レビュー → 消化を目的にしたマイルストーン」を参照。
+
+⚠⚠ **ただし「消化だけの回」にはしない**（2026-09-09 のユーザー指示）。
+**「不具合修正だけだとモチベーションを持てないので、何かしらは含めてほしい」。**
+消化が目的の回でも、**機能が前へ進む Issue を最低 1 件は入れる。**
+この回は **#4639（メディアカタログの点灯）** がそれにあたる。
 
 **棚の実測（2026-09-08・サイズを全件へ付与した後）**: `on-hold` 8 件を除いて
 **`size:S` 12 / `size:M` 23 / `size:L` 5 ＝ 重み 121 ＝ 約 5.4 マイルストーン分**。
@@ -1294,6 +1300,23 @@ DB 直読み層（account / status / attachment / postgres）も **omission 0 �
 | 1 | #4694 | 3 | webhook 応答の穴 4 件 |
 | 1 | #4693 | 3 | `report_error` の alert 過不足 3 系統 |
 | 1 | #4689 | 1 | 辞書ソースの間欠 404 を再送する |
+| 18 | **#4639** | 3 | 🎯 **メディアカタログ Gate 2 の overlay flip を zugoga で実施**（2026-09-09 追加） |
+
+### 🎯 #4639 — この回の「機能が前へ進む」枠（2026-09-09 追加）
+
+⚠ **年齢・重みでは選ばれない枠。**上記のとおりユーザーの明示指示で入れている。
+
+**#4393 の LATERAL merge が着地済み（26,415ms → 56.7ms）**なので、残るのは
+**overlay を立てて実際に点けること**だけ。rollback の信号も **#4618 の `/health` 拡張が
+5.36.0 で本番に乗った**ところで揃っている（`postgres.pool.waiting` / pgbouncer ブロック）。
+`total_wait_time_us` の起点は「本番 4 台へのデプロイ（2026-09-08・5.36.0）」の節にある。
+
+- ⚠ **手順 3（dev26）は性能検証ではない。**壊れていないことだけを見る
+- ⚠ **`/health` は Puma 1 プロセスの Sequel プールしか見ていない。**2026-05-19 に枯れたのは
+  **pgbouncer**（[[project_incident-2026-05-19-feed-media-pool]]）。判定は pgbouncer 側の
+  `cl_waiting` を主に取る
+- ⚠ **後続は #4352（shallu / gomander への横展開）だが、24 時間観測が前提**なので
+  同じマイルストーンには入れない（2026-09-09 の判断）
 
 ### ⚠ #4593 は実質着地している（2026-09-08 の棚卸しで実測）
 
@@ -1760,6 +1783,44 @@ zugoga 本番の実測は **page1 295ms / only_person 6.5ms / cursor 3.1ms**（�
 
 ⚠⚠ **「docs だけだから安全」ではない。**契約を誤って書くと、クライアント側が誤った分岐を実装する。
 **docs の PR もコードと同じ密度でレビューを通すこと。**
+
+### 2026-09-09 セッション同期の記録
+
+- **ブランチ**: `develop` は `origin/develop` と同一・未コミット無し。**open PR は #4701 だけ**
+  （`ginseng-*` 7 本の版固定）。CI は Mastodon 322 / Misskey 311 とも緑
+- **Dependabot**: open アラート 0 件
+- **Codex**: 直近 6 マージ PR ＋ open PR #4701 を走査。**マージ済みぶんは未消化ゼロ**だが、
+  🔴 **#4701 に未処理の P2 が 1 件**（下記・**指摘が正しい**）
+- **Sentry**: 新規 **1 件**（MULUKHIYA-TOOT-PROXY-2X）。**一過性・対応不要**としてトリアージ済み（下記）
+- **chubo2**: `origin/main` と差分なし。open Issue **29 件**。
+  **§6-2 の Issue 棚卸しは 2026-08-31 実施済み**なのでスキップ（次回は 09-30 以降）
+- **§8 harness upstream チェック**: `last_checked: 2026-09-07` ＝ **2 日経過なのでスキップ**（既定 4 日）
+- **ginseng-\* のピン**: `ginseng-style`（docs のみ）と `ginseng-web`（**v3.0.0 の破壊的変更**）の 2 本がずれ。
+  ⚠ **どちらも今は動かさない。**`ginseng-web` は **#4701 が意図的に v2.0.0 で置いている**もので、
+  版を上げるのは固定後の dependabot PR の仕事という設計（ただし下記のとおりその受け皿が無い）
+- **マイルストーン**: 5.37.0 に **#4639 を追加**（下記・ユーザー指示）。`config/application.yaml` を
+  **5.37.0 へバンプ**（[[feedback_bump-version-first]]）
+
+#### 🔴 PR #4701 の Codex P2 は正しい — 固定の受け皿が存在しない
+
+指摘は「タグ固定すると `bundle update` がタグより先へ進めず、`.github/dependabot.yml` は
+**Bundler 2 エントリとも `open-pull-requests-limit: 0`** なので version-update PR が出ない。
+7 本が凍結する」。**実機の `.github/dependabot.yml` を読んで裏を取った** — `v4` / `develop` の
+両方が `open-pull-requests-limit: 0` だった。
+
+⚠⚠ **PR 本体は「dependabot が `bump ginseng-web from v2.0.0 to v3.0.0` として出し、
+この repo の CI がそこで受けます。それがこの固定の目的です」と書いているが、その受け皿が無い。**
+固定そのものの是非ではなく、**PR が自分で述べた目的が成立していない**という指摘。
+マージ前に `open-pull-requests-limit` を開けるか、別の追随経路を用意する必要がある。
+
+#### Sentry 2X（Annict の `Net::ReadTimeout`）— 一過性
+
+count=2（09-08 06:22Z / 18:33Z）・`server_name=zugoga` / 5.36.0 / production。
+culprit は `Mulukhiya::AnnictService in query` で、スタックは `net/protocol.rb rbuf_fill` まで
+降りている＝ **Annict 上流が返さなかっただけ**。⚠ **#4593 の棚卸しどおり 30 秒のタイムアウトは
+実際に効いていて**、`repeat` が `log_retry_error` を出してから `GatewayError` に包む設計どおりの
+経路を通っている（握り潰しではない）。⚠ Annict の staleness が無音なのは **#4577 の既知**なので、
+頻度が上がったらそちらで受ける。
 
 ### 2026-09-07 セッション同期の記録
 
