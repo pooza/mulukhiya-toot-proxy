@@ -59,8 +59,10 @@ module Mulukhiya
       instance.connection.fetch('SELECT 1 AS ok').first
       return {status: 'OK'}.merge(snapshot).merge(Pgbouncer.health)
     rescue Sequel::PoolTimeout => e
-      return {error: e.message, status: 'WARN', reason: 'pool_exhausted'}
-          .merge(snapshot || pool).merge(Pgbouncer.health)
+      # ⚠ `snapshot` は必ず Hash。`pool` は自前の rescue で `{}` を返すので raise せず、
+      # ここへ来る時点で代入は済んでいる（`|| pool` は到達しない死にコードだった）。
+      result = {error: e.message, status: 'WARN', reason: 'pool_exhausted'}
+      return result.merge(snapshot).merge(Pgbouncer.health)
     rescue => e
       # ⚠ NG のときこそ pgbouncer の生死が要る。「Postgres NG だが pgbouncer は
       # 答える」と「両方死んでいる」は切り分けが真逆になる。

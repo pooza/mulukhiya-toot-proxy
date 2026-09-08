@@ -1336,18 +1336,37 @@ DB 直読み層（account / status / attachment / postgres）も **omission 0 �
 改善ではあるが、測って決めた記録は無い。⚠⚠ **クローズしてよいかはユーザーに確認する**
 （[[feedback_defer-requires-followup-issue]]「元要件を先送りする時は受け皿を起票するまでクローズ不可・クローズ前に確認」）。
 
-### ⚠ 先にやること: 小粒の掃除（手順 12）
+### 小粒の掃除（手順 12）— ✅ 着地（2026-09-09）
 
-**#4698 から外した 5 件**を 1 PR で落とす。⚠ **動作を変えない・既存テストで担保される・lint 緑**のものだけ。
+**#4698 から外した 5 件**を 1 PR で落とした。⚠ **動作を変えない・既存テストで担保される・lint 緑**のものだけ。
 
-1. `app/lib/mulukhiya/model/attachment_methods.rb` — `"\#{self}.catalog_cursor_key"` の補間がエスケープされていて literal で出る（**1 文字**）
-2. `app/lib/mulukhiya/dbms/postgres.rb` — `return` に多行チェイン（ginseng-style の明示的禁止形）。⚠ `snapshot || pool` の `|| pool` は到達しない
-3. `test/unit/dbms/pgbouncer.rb` — 見栄えのための桁揃え 4 行
-4. `app/lib/mulukhiya/webhook.rb` — `extend LogScrubber` が死にコード（`self.create` は #4657 で削除済み）
-5. `test/unit/daemon/sidekiq_daemon.rb` — クラス名 `SudekiqDaemonTest` の綴り
+| | 対象 | 結果 |
+| --- | --- | --- |
+| 1 | `model/attachment_methods.rb` — `"\#{self}.catalog_cursor_key"` の補間がエスケープされ literal で出る | ✅ 修正（**1 文字**） |
+| 2 | `dbms/postgres.rb` — `return` に多行チェイン ＋ 到達しない `\|\| pool` | ✅ 修正（一時変数に割って 1 行 return・`\|\| pool` を削除） |
+| 3 | `test/unit/dbms/pgbouncer.rb` — 見栄えのための桁揃え 4 行 | ⚠ **既に無かった**（`459cfa75` で解消済み）。着手前に実測すること |
+| 4 | `webhook.rb` — `extend LogScrubber` が死にコード | 🔴 **誤り。取り下げた**（下記） |
+| 5 | `test/unit/daemon/sidekiq_daemon.rb` — クラス名 `SudekiqDaemonTest` の綴り | ✅ 修正 |
 
-あわせて ① として「起票しない」と決めたもの: `TaggingDictionary.invalidate_cache` の `KEYS` は
-**呼び出し元がテストと rake のみ＝本番影響なし**なので、**該当箇所へコメント 1 行**を残して終わりにする。
+あわせて ① として「起票しない」と決めていた `TaggingDictionary.invalidate_cache` の `KEYS` は、
+**該当箇所へコメント**を残して終わりにした。⚠ 起票時の「呼び出し元はテストと **rake**」は不正確で、
+**実際の呼び出し元はテストだけ**（`TestCase.invalidate_shared_caches` と辞書キャッシュのテスト 3 本）。
+`app/task/mulukhiya/tagging.rb` が叩いているのは `TaggingDictionaryUpdateWorker` で、これとは別物。
+
+#### 🔴 4 は死にコードではなかった — テストが根拠付きで依存していた
+
+`Webhook` の `extend LogScrubber` は、導入時の呼び出し元（`self.create`）こそ #4657 で消えているが、
+**`test/unit/controller/log_scrub_path.rb` の `test_webhook_class_scrubs_digest` が
+`Webhook.scrub_log_digest` を直接叩いている。**しかもそのテストには
+
+> ⚠ **クラスメソッドからも引ける**ことを押さえる。digest をログへ出す経路がクラス側に生えたときに、素の値が漏れないため。
+
+という**意図の明記**がある。⚠⚠ **「呼び出し元が消えた」だけで死にコードと判定してはいけない。**
+`extend` / `include` は**能力を生やす**ので、消費者はクラス本体の外（テスト・将来の経路）にいる。
+今回は `grep -rn "Webhook\.scrub"` を repo 全体へ打って初めて見つかった。
+
+取り下げの代わりに、**stale だったコメントのほうを直した**（`self.create` を根拠として挙げていたので、
+読んだ人が同じ誤判定を繰り返す形になっていた）。
 
 ## リリース済み: 5.36.0（2026-09-08）
 

@@ -136,6 +136,9 @@ module Mulukhiya
     # 次の refresh が last-good で埋め直すので**「既知の状態から始める」にならない**。
     def self.invalidate_cache
       redis = Redis.new
+      # ⚠ `KEYS` は Redis 全体を走査してブロックするが、**呼び出し元はテストだけ**
+      # （`TestCase.invalidate_shared_caches` と辞書キャッシュのテスト 3 本）で、
+      # 本番の要求経路には乗らない。SCAN へ置き換える価値が無いので意図して残す。
       redis.keys("#{SOURCE_REDIS_KEY_PREFIX}/*").each {|key| redis.unlink(key)}
       return redis.unlink(REDIS_KEY)
     end
