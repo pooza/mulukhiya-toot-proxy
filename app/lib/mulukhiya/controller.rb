@@ -99,13 +99,22 @@ module Mulukhiya
     #
     # ⚠ **JSON らしい body のときだけ。**`{` / `[` で始まらないものはフォーム POST や
     # 空 body なので、落ちるのが正常。毎回出すと syslog が埋まる。
-    # ⚠ **本文は出さない。**投稿本文が平文で残る（#4394 / #4630）。
+    # ⚠⚠ **例外メッセージを出さない（PR #4708 の Codex P1）。**
+    # `JSON::ParserError` のメッセージは**壊れた入力をそのまま反響する**。実測:
+    #
+    #   JSON::ParserError: unexpected character: '秘密の本文}' at line 1 column 12
+    #   JSON::ParserError: expected ',' or '}' after object value, got: '秘密のトークンabc123}'
+    #
+    # ⚠ json 3 の重複キーエラーは**キー名そのもの**を含む。どちらも利用者由来の
+    # 値なので、`message` を出した時点で「本文は出さない」が破れる（#4394 / #4630）。
+    # ⚠ 長さの上限も無いので、**巨大なログ 1 行**にもなりうる。
+    #
+    # **残すのは型と大きさだけ。**「どこで落ちたか」は class と path で足りる。
     def log_unparsable_body(error)
       return unless json_body?
       logger.error(
         error: 'request body is not parsable as JSON',
         class: error.class.to_s,
-        message: error.message,
         bytesize: @body.bytesize,
         path: scrub_log_path(request.path),
       )

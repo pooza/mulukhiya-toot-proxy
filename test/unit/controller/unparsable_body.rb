@@ -79,12 +79,39 @@ module Mulukhiya
       assert_empty(errors)
     end
 
-    # ⚠ **本文は出さない。**投稿本文が平文で残る（#4394 / #4630）。
+    # 🔴 **本文は出さない**（#4394 / #4630・PR #4708 の Codex P1）。
+    #
+    # ⚠⚠ **パーサのメッセージは壊れた入力をそのまま反響しうる。**json gem 素の
+    # `JSON.parse` は実測でこう出る:
+    #
+    #   unexpected character: '秘密の本文}' at line 1 column 12
+    #   expected ',' or '}' after object value, got: '秘密のトークンabc123}'
+    #
+    # ⚠ **いまのアプリ内では反響しない。**`ginseng-core` が引く yajl-ruby の
+    # `yajl/json_gem` が `JSON.parse` を差し替えており、Yajl は
+    # `lexical error: invalid char in json text.` としか言わない。
+    # ⚠⚠ **だからこのテストは「いま」は素通りする。**それでも残すのは、
+    # **パーサが差し替わった瞬間に本文が漏れ出す**形だから
+    # （下の `test_log_carries_no_exception_message` が本命の歯止め）。
+    #
+    # ⚠ `,,` のような入力だと反響部分が記号だけになるので、実際に本文が
+    # 反響しうる入力で見ること。
     def test_log_does_not_carry_the_body
-      post_body('{"status": "秘密の本文",,}')
+      ['{"status": 秘密の本文}', '{"a": "x" 秘密のトークンabc123}'].each do |body|
+        @logged.clear
+        post_body(body)
 
-      assert_not_match(/秘密の本文/, errors.to_s)
-      assert_operator(errors.first[:bytesize], :>, 0)
+        assert_equal(1, errors.length)
+        assert_not_match(/秘密の(本文|トークン)/, errors.to_s, '本文が反響している')
+        assert_operator(errors.first[:bytesize], :>, 0)
+      end
+    end
+
+    # ⚠ 例外メッセージそのものを載せない（長さの上限が無く、巨大な 1 行にもなる）。
+    def test_log_carries_no_exception_message
+      post_body('{"a": 1,,}')
+
+      refute(errors.first.key?(:message), 'message を載せている')
     end
 
     private
