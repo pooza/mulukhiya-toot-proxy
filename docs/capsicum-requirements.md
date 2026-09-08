@@ -108,7 +108,7 @@ capsicum では管理者ロールに `:sabacan:` カスタム絵文字を表示�
 }
 ```
 
-- DB 未接続時（Misskey 等）やエラー時は空配列 `[]` を返す
+- ⚠ **Misskey でも実 ID を返す**（`Misskey::Role.where(isAdministrator: true)`・#4176 で実装）。空配列 `[]` になるのは **DB 未接続時とエラー時**だけ
 - Misskey は `isAdministrator` フィールドがあるため不要だが、空配列が返るだけなので capsicum 側で分岐不要
 
 ### 実装詳細
@@ -272,7 +272,7 @@ POST /mulukhiya/api/account/is_cat
 2. `Accept: application/activity+json` で actor を GET
 3. actor JSON のトップレベル `isCat` フィールドを取得
 4. `isCat` が `true` → `true`、`false` / 未設定 / actor 取得失敗 → `false`（取得失敗時のみ `null` 許容）
-5. 結果を Redis キャッシュ（TTL 24h）
+5. 結果を Redis キャッシュ（TTL **1 時間**。`/account/is_cat/cache/ttl` = `3600`。⚠ 6h → 1h に短縮済み）
 
 ### capsicum 側の利用方法
 
@@ -280,9 +280,9 @@ POST /mulukhiya/api/account/is_cat
 2. `true` が返った acct のユーザーに猫耳を表示
 3. capsicum 側でもメモリキャッシュし、同一セッション内の再問い合わせを抑制
 
-### 現在の問題（2026-04-17 確認）
+### ✅ 解決済み（#4247・2026-04-16）
 
-API は到達・認証成功しているが、`pooza@misskey.delmulin.com`（`isCat: true` を設定済み）に対して `null` が返る。サーバーからの `curl` で ActivityPub actor を直接取得すると `"isCat": true` が確認できるため、`fetch_actor` の結果から `isCat` を抽出する処理に問題がある可能性。
+かつて `isCat: true` のユーザーに `null` が返る不具合があった（`fetch_actor` の結果から `isCat` を抽出できていなかった）。**#4247 で解消済み。**
 
 ### 関連
 

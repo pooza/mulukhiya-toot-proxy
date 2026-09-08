@@ -1,11 +1,23 @@
 # media_catalog index 見直し計画 & 実行 runbook（#4323 / #4351）
 
-> **ステータス**: 実行 runbook。候補 index の設計（背景・病理仮説・候補 A/B/C）は
-> 確定済みだが、**実機 EXPLAIN は未検証**。本ドキュメントの DDL は SQL 構造から
-> 設計した候補であり、適用前に**本番相当データでの `EXPLAIN (ANALYZE, BUFFERS)`
-> 検証が必須**（ステージング dev04 等は本番と桁違いに少データで性能・index 検証に
-> 使えないため、最初から zugoga 本番で EXPLAIN を取る）。検証・適用は chubo2 側の
-> オプス作業（[chubo2#37](https://github.com/pooza/chubo2/issues/37) 隣接）。
+> ## ⚠⚠ ステータス（2026-09-08 更新）: **設計は決着済み。残るのは Gate 2 だけ**
+>
+> **このドキュメントは「検証前の計画」ではない。**#4351（Gate 0/1）は 2026-08-22、
+> #4393（sub-second 化）は 2026-08-27 に**どちらもクローズ済み**で、
+> **決着は候補 A（partial index）ではなく B 案（LATERAL merge・PR #4613）**だった。
+>
+> - `/feed/media` page1: **26,415ms → 56.7ms** / `only_person`: **25,998ms → 6.5ms**
+> - 🔴 **追加 index は不要だった**。Mastodon 本体の
+>   `index_media_attachments_on_account_id_and_status_id` で成立する
+>
+> ⚠ **残っているのは Gate 2（overlay flip を zugoga で実施）だけで、追跡先は #4639。**
+> **#4351 ではない**（クローズ済み）。
+>
+> 以下は**そこへ至るまでに何を試して何が効かなかったかの記録**として残している。
+> ⚠ **DDL をそのまま適用しないこと。**候補 A は 170s → 約 10s までしか届かず、採用されていない。
+>
+> ⚠ 性能・index の検証はステージング（dev24-27）では不可能（本番と桁違いに少データ）。
+> **最初から本番で `EXPLAIN (ANALYZE, BUFFERS)` を取る。**
 >
 > 検証手順は [`bin/diag/media_catalog_index.sql`](../bin/diag/media_catalog_index.sql)
 > にスクリプト化済み（棚卸し → ベースライン EXPLAIN → 候補 DDL → 再計測 → 撤去）。
@@ -208,10 +220,14 @@ EXPLAIN 改善を確認してから、chubo2 配下の zugoga overlay で
 
 ## #4393 フェーズ: sub-second 化の設計決着（Gate 2 の前提）
 
-**現在地**: Gate 0 / 1 は zugoga 本番で消化済み。候補 A の適用で `/feed/media` は
+> ✅ **決着済み（2026-08-27・#4393 クローズ）。**以下は候補を絞る前の検討記録。
+> **採用されたのは B 案（LATERAL merge・PR #4613）**で、`/feed/media` page1 は
+> **26,415ms → 56.7ms**。⚠ **追加 index は要らなかった。**
+
+**当時の現在地**: Gate 0 / 1 は zugoga 本番で消化済み。候補 A の適用で `/feed/media` は
 **170s → 約 10s**。ただし約 10s では同時実行時に接続プールを圧迫するため
 **Gate 2（overlay flip）は保留**（2026-06-06 判断）。ここを sub-second まで
-落とすのが #4393。
+落とすのが #4393 だった。
 
 ⚠ **「index をもう 1 本足す」では届かないことは検証済み。**プランナは
 `ORDER BY attachments.id DESC LIMIT n` の短絡見積りで media_attachments の
@@ -293,7 +309,9 @@ daisskey 先行事例に準拠しつつ、**EXPLAIN ベースライン・候補�
 
 - 親 issue: #4306（cursor ページング切替、5.21.2 で完了）
 - 連動: #4335（`cursor_pagination?` の Attachment 移譲、closed）。
-- サブ Issue: #4351（A: zugoga 再有効化）/ #4352（B: shallu/gomander 横展開）/
+- ⚠ **Gate 2 の追跡先は #4639**（overlay flip を zugoga で実施）。#4351 はクローズ済みで、
+  一時期この受け皿が消えていた。
+- サブ Issue: ~~#4351（A: zugoga 再有効化・**closed 2026-08-22**）~~ / #4352（B: shallu/gomander 横展開）/
   #4353（C: pooza/mastodon migration 恒久化）/ **#4375（D: Misskey track
   — `drive_file` index + 複合キー cursor 化で `Misskey::Attachment.cursor_pagination?`
   を true 反転）**。

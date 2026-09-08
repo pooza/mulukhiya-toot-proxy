@@ -64,12 +64,14 @@ digest は以下3要素の SHA256 ハッシュで、Webhook URL の一部とし�
 ```yaml
 source:
   type: icalendar
-  uri: https://precure.ml/program.ics
+  uri: https://precure.ml/mulukhiya/api/program.ics
 ```
 
 ### 制約・今後
 
-- 現状エントリは放送曜日を持たないため、繰り返し（`RRULE`）は付けず `start_time` の「次回発生」を単発 VEVENT として出力する MVP。週次レギュラー番組を `RRULE:FREQ=WEEKLY` で表現するにはエントリへ曜日欄の追加が必要
+- ⚠⚠ **`RRULE` も曜日ルールも却下済み。再提案しないこと**（#4373・2026-08-06 クローズ）。エントリは **`next_on`（次回放送日）** を持ち、その 1 回ぶんを単発 VEVENT として出す形で確定した。
+  - 🔴 **曜日ルールにすると fail-open で毎週誤発火する。**話数が動的値なので、更新が止まった週も**古い話数のまま**繰り返し配信されてしまう。「曜日欄を足せば `RRULE:FREQ=WEEKLY` にできる」という当初の見立ては誤りだった。
+  - ⚠ 実質キュアスタ！専用の機能という整理（`docs/api.md` の `next_on` の節が正本）。
 
 ## インシデント履歴
 

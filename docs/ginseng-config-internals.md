@@ -42,7 +42,7 @@ application.yaml:
 self[key]  # → 値を返す or ConfigError を raise
 ```
 
-- flattened keys を検索し、見つからなければ `ConfigError` を raise（ginseng-core `config.rb:57-69`）
+- flattened keys を検索し、見つからなければ `ConfigError` を raise（ginseng-core `Config#[]`）
 - deprecated aliases（`raw['deprecated']`）も自動的にチェックする
 
 ### 中間パスは動作しない
@@ -56,7 +56,7 @@ self['/mastodon/capabilities/repost']  # => true（リーフなので OK）
 
 ### sub_hash で中間パスからサブハッシュを取得
 
-中間パスのサブツリーが必要な場合は `Mulukhiya::Config#sub_hash` を使う（`app/lib/mulukhiya/config.rb:102-104`）:
+中間パスのサブツリーが必要な場合は `Mulukhiya::Config#sub_hash` を使う（`app/lib/mulukhiya/config.rb` の `Config#sub_hash`）:
 
 ```ruby
 config.sub_hash('/misskey/capabilities')

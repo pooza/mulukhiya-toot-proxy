@@ -10,7 +10,7 @@
 
 - **本番ベースライン（zugoga、2026-05-23 計測）**: 単一クエリで実行時間 **175,248 ms（約 2 分 55 秒）**。対象テーブル `media_attachments` 1,872,570 行、`statuses` 約 1,500 万行、local 比率 0.27%。
 - **2026-05-19 障害**: 全サーバー（zugoga / shallu / lbock）で投稿不可。重 SQL が DB 接続プール（pgbouncer）を専有し、Mastodon Web の `POST /inbox` 等が連鎖タイムアウト。
-- **最適化（#4323）の規模**: partial index `idx_mlkhy_statuses_local_catalog` 追加を candidate A として確定（[`docs/media-catalog-index-plan.md`](media-catalog-index-plan.md) 参照）。daisskey の drive_file partial index で 29,500 ms → 0.7 ms に削減した先行事例と同型。ただし本番複数台への段階的展開・観測で 1〜2 週間スケール。
+- **最適化（2026-08 に決着）**: ⚠⚠ **candidate A（partial index）では届かなかった**（170s → 約 10s 止まり）。**決着は #4393 の B 案（LATERAL merge・PR #4613）**で、`/feed/media` page1 が **26,415ms → 56.7ms**、`only_person` が **25,998ms → 6.5ms**。🔴 **追加 index は不要**（Mastodon 本体の `index_media_attachments_on_account_id_and_status_id` で成立）。⚠ `docs/media-catalog-index-plan.md` の DDL は**採用されなかった候補**なので、そのまま適用しないこと。
 - **判断**: 機能自体が pooza の毎晩ルーチン（Annict + 番組表）と独立しており、最適化を急ぐより停止する選択を取った。partial index と機能再開はセットで判断する。
 
 詳細経緯と最適化計画は [`docs/media-catalog-index-plan.md`](media-catalog-index-plan.md)、検証スクリプトは [`bin/diag/media_catalog_index.sql`](../bin/diag/media_catalog_index.sql) を参照。
@@ -85,9 +85,11 @@ curl -s https://your.instance/mulukhiya/api/about | jq '.config.features.media_c
 
 ## 関連
 
-- [`docs/media-catalog-index-plan.md`](media-catalog-index-plan.md) — partial index 計画と candidate A/B/C DDL
+- [`docs/media-catalog-index-plan.md`](media-catalog-index-plan.md) — ⚠ **採用されなかった** partial index 計画と candidate A/B/C DDL（**記録として保存**）
 - [`bin/diag/media_catalog_index.sql`](../bin/diag/media_catalog_index.sql) — 検証スクリプト（棚卸し → ベースライン → 候補 DDL → 再計測 → 撤去）
 - [`docs/api.md`](api.md) `/media` セクション — API レスポンス仕様
 - [#4343](https://github.com/pooza/mulukhiya-toot-proxy/issues/4343) — デフォルト無効化と disabled シグナル
-- [#4323](https://github.com/pooza/mulukhiya-toot-proxy/issues/4323) — partial index 見直し（on-hold）
+- [#4323](https://github.com/pooza/mulukhiya-toot-proxy/issues/4323) — partial index 見直し（メタ Issue・open）
+- 🎯 **[#4639](https://github.com/pooza/mulukhiya-toot-proxy/issues/4639) — Gate 2（overlay flip を zugoga で実施）。⚠ このトラックで残っているのはこれだけ**
+- [#4351](https://github.com/pooza/mulukhiya-toot-proxy/issues/4351)（closed 2026-08-22）/ [#4393](https://github.com/pooza/mulukhiya-toot-proxy/issues/4393)（closed 2026-08-27）— Gate 0/1 と sub-second 化
 - [pooza/capsicum#606](https://github.com/pooza/capsicum/issues/606) — クライアント側 gate

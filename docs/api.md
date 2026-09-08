@@ -173,6 +173,7 @@ Bad response 404` のように内部メソッド名と上流ステータスが�
 | `features.nowplaying_resolver`（常時 `true`） | `/nowplaying/resolve` |
 | `features.compose_templates`（常時 `true`。#4457 未デプロイのバージョンではキー自体が欠落し capsicum は false 判定して導線を出さない） | `/compose/templates`（GET/POST/PUT/DELETE） |
 | `features.media_update`（Mastodon ＋ `/mastodon/capabilities/media_update` の opt-in ＋ ginseng-fediverse 1.8.30 以降。既定は `false`。⚠ **モロヘイヤの版番号では代用できない**。⚠⚠ **ゲートには使われていない**——上の注記を参照） | `PUT /api/:version/statuses/:id`（`X-Mulukhiya-Purpose: media_update`） |
+| `features.nowplaying_url_resolver`（`NowplayingUrlResolver.enabled?`・#4415）。ナウプレ enrich の**逆方向**（共有 URL → メタ解決） | `POST /nowplaying/resolve-url` — capsicum の Share 経路 enrich の可否判定に使う |
 | `features.spotify_enabled`（`/service/spotify/oauth/user_oauth_enabled` + 資格情報設定時に有効） | `/spotify/oauth_uri`, `/spotify/auth`, `/spotify/currently_playing` |
 | `features.spotify_linked`（当該ユーザーが Spotify 連携済みか） | `/spotify/currently_playing` |
 
@@ -369,7 +370,7 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
     "email": ["author@example.com"],
     "license": "MIT",
     "url": "https://github.com/pooza/mulukhiya-toot-proxy",
-    "version": "5.8.0"
+    "version": "5.36.0"
   },
   "config": {
     "controller": "mastodon",
@@ -394,11 +395,17 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
       "annict_review": true,
       "announcement": true,
       "announcement_push": false,
+      "compose_templates": true,
       "feed": true,
       "media_catalog": false,
       "media_update": true,
+      "nowplaying_resolver": true,
+      "nowplaying_url_resolver": true,
       "program_editable": true,
-      "webhook": true
+      "spotify_enabled": false,
+      "spotify_linked": false,
+      "webhook": true,
+      "word_suggest": true
     },
     "handlers": ["amazon_image", "default_tag", "itunes_music_nowplaying", "..."],
     "admin_role_ids": ["3"],
@@ -415,7 +422,7 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
 }
 ```
 
-**`admin_role_ids`**: 管理者権限を持つロールの ID 一覧（文字列配列）。Mastodon の `user_roles` テーブルから `permissions` ビット 0（Administrator）が立っているロールを返す。DB 未接続時（Misskey 等）は空配列。capsicum でユーザーのロール ID と照合し、管理者バッジ表示に利用する（`pooza/capsicum#159`）。
+**`admin_role_ids`**: 管理者権限を持つロールの ID 一覧（文字列配列）。Mastodon の `user_roles` テーブルから `permissions` ビット 0（Administrator）が立っているロールを返す。⚠ **Misskey でも実 ID を返す**（`isAdministrator` が立っているロールを引く・#4176）。空配列になるのは **DB 未接続時とエラー時**。capsicum でユーザーのロール ID と照合し、管理者バッジ表示に利用する（`pooza/capsicum#159`）。
 
 **`info_bot`**: お知らせボットのプロフィール情報。`username`、`acct`（@user@domain 形式）、`url`（プロフィールページURL）、`display_name` を含む。お知らせボットのトークンが未設定の環境では `null` を返す。capsicum のお知らせ画面でボットのプロフィールリンク表示に利用する（`pooza/capsicum#189`）。
 

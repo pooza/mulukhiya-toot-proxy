@@ -49,9 +49,10 @@ MASTODON_REDIS_DSN=redis://127.0.0.1:6380
 `MULUKHIYA_HARNESS_DIR` を渡すだけで DB 依存テストまで動く。local.yaml に要るのは
 harness が用意しないもの（`crypt.password` 等）のみ。
 
-> 既知: ローカル Mastodon の status は `uri` カラムが null のことがあり、
-> `StatusTest#test_uri` が落ちる（harness 起因か mulukhiya テスト側で吸収すべきか
-> 要切り分け。chubo2#48 で追跡）。
+> ⚠ **かつて**「ローカル Mastodon の status は `uri` カラムが null のことがあり
+> `StatusTest#test_uri` が落ちる」という既知の失敗があったが、**pooza/chubo2#48 は
+> クローズ済みで再現しない**（下記「リリースゲートとしての実走」の判定基準も
+> 「既知例外は無い」を前提にしている）。落ちたら例外を作らず原因を切り分けること。
 
 ## 手順（Mastodon）
 
