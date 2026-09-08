@@ -236,6 +236,22 @@ properties:
       dsn:
         format: uri
         type: string
+      pgbouncer:
+        properties:
+          # auto = dsn のポートが 5432 以外なら pgbouncer が挟まっているとみなす (#4618)
+          enable:
+            oneOf:
+              - type: boolean
+              - enum:
+                  - auto
+          timeout:
+            minimum: 1
+            maximum: 30
+            type: integer
+        required:
+          - enable
+          - timeout
+        type: object
       pool:
         properties:
           size:

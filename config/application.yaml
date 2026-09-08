@@ -92,6 +92,9 @@ handler:
   dictionary_tag:
     cache:
       ttl: 3600
+      # ソース単位の last-good キャッシュの TTL (#4659)。⚠ 本体の ttl より長く持つ
+      # （間欠 404 が続いた時に last-good が先に消えると意味を成さない）。
+      source_ttl: 86400
     dics: []
     word:
       min: 2
@@ -470,7 +473,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 5.35.0
+  version: 5.36.0
 parser:
   note:
     fields:
@@ -495,6 +498,16 @@ parser:
       visibility: visibility
 postgres:
   dsn: null
+  # pgbouncer の待ち行列を /health に載せるか (#4618)。
+  # auto = dsn のポートが 5432 以外なら pgbouncer が挟まっているとみなす。
+  # ⚠⚠ **null を既定値にしないこと。**Ginseng の config は null を「キーが無い」と
+  # 同じに扱って ConfigError を上げる。三値は文字列で表す。
+  # ⚠ 素の PostgreSQL へ pgbouncer ユーザーで入りに行くと、認証失敗が /health を
+  # 叩くたびに PostgreSQL のログへ溜まる。true 固定にするのは pgbouncer が
+  # 5432 で待っている構成に限ること。
+  pgbouncer:
+    enable: auto
+    timeout: 2
   pool:
     size: 10
     timeout: 5

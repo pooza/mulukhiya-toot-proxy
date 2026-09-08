@@ -24,6 +24,21 @@ export LC_ALL=ja_JP.UTF-8
 start_cmd=${name}_start
 stop_cmd=${name}_stop
 
+# ⚠ sidekiq は proctitle を "ruby: sidekiq <version> mulukhiya-toot-proxy ..." へ
+# 書き換えるので、'sidekiq_daemon.rb' だけでは一致しない。この保険は導入以来ずっと
+# 空振りしており、pid ファイルから辿れない 2 本目を落とせなかった (#4675)。
+# ⚠ 同じユーザーで動く Mastodon 側の sidekiq (proctitle は "sidekiq <version>
+# mastodon") を巻き込まないよう、必ず mulukhiya-toot-proxy まで含めて絞ること。
+mulukhiya_sidekiq_pattern='sidekiq_daemon\.rb|sidekiq .*mulukhiya-toot-proxy'
+# ⚠⚠ **Sidekiq の停止の締切 (SidekiqDaemon::SHUTDOWN_TIMEOUT = 25 秒) より長くする
+# こと (#4675 の Codex P1)。**短いと SIGKILL が hard shutdown より先に撃たれ、
+# Sidekiq は「積み残しをキューへ戻す」経路へ到達できない。
+# ⚠ モロヘイヤのワーカーは 15 本中 14 本が `retry: false` なので、そこで落ちた
+# 仕事は**再送もされずに消える**。
+# ⚠ 突き合わせは test/unit/daemon/sidekiq_daemon.rb が自動で行う（この行の値を
+# 直接読んでいる）。片方だけ動かすとテストが落ちる。
+mulukhiya_sidekiq_kill_wait=30
+
 mulukhiya_sidekiq_start() {
   cd $mulukhiya_path
   sudo -u $mulukhiya_user /usr/sbin/daemon \
@@ -33,7 +48,17 @@ mulukhiya_sidekiq_start() {
 mulukhiya_sidekiq_stop() {
   cd $mulukhiya_path
   sudo -u $mulukhiya_user /usr/local/bin/bash -lc 'bundle exec bin/sidekiq_daemon.rb stop' 2>/dev/null
-  pkill -9 -u $mulukhiya_user -f 'sidekiq_daemon.rb' 2>/dev/null
+  # pid ファイルから辿れない取り残しにも TERM を送る (#4675)。
+  pkill -u $mulukhiya_user -f "$mulukhiya_sidekiq_pattern" 2>/dev/null
+  # ⚠ SIGKILL の前に落ちきるのを待つ。待たずに -9 を撃つと、graceful stop の
+  # 直後に in-flight の処理を毎回強制終了することになる。
+  _i=0
+  while [ $_i -lt $mulukhiya_sidekiq_kill_wait ]; do
+    pgrep -u $mulukhiya_user -f "$mulukhiya_sidekiq_pattern" >/dev/null 2>&1 || return 0
+    sleep 1
+    _i=$((_i + 1))
+  done
+  pkill -9 -u $mulukhiya_user -f "$mulukhiya_sidekiq_pattern" 2>/dev/null
   sleep 2
 }
 

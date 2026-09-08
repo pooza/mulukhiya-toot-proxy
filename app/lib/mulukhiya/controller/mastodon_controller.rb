@@ -12,7 +12,25 @@ module Mulukhiya
     # ⚠ 抑止するのは Sentry だけで syslog には残る (controller.rb の
     # handle_gateway_error)。「上流が /source を廃止して全滅」のような事故は
     # 頻度・偏りで追える。
-    STATUS_UPDATE_SILENT_STATUSES = [401, 404].freeze
+    #
+    # ⚠⚠ **429 は `PAIRED_CLIENT_STATUSES` と対で入っている (#4657 の Codex P2)。**
+    # 透過に戻したのに抑止側へ足さないと、**クライアントがリトライで回復できる
+    # レート制限のたびに `error.alert` が走る**。「透過するが黙らせない」という
+    # 中途半端な状態になっていた。⚠ 片方だけ動かさないこと。
+    STATUS_UPDATE_SILENT_STATUSES = [401, 404, 429].freeze
+
+    # `paired` でも**クライアントへそのまま返すべき** 4xx (#4657)。
+    #
+    # ⚠ **1 本目と 2 本目の間に状態が変わりうる。**上流のレート制限 (429) は
+    # 2 本目だけに当たるのが普通で、トークンの失効 (401) もこの窓で起きる。
+    # どちらも「モロヘイヤの内部読みが壊れた」ではなく、**クライアントが
+    # リトライ・再認証で回復できる状態**。502 に潰すと capsicum が
+    # **リトライやトークン再取得の導線に載せられない**。
+    #
+    # ⚠ それ以外の 4xx（404 等）は従来どおり内部の失敗として扱う。
+    # **1 本目が 200 なのに 2 本目が 404 は #4621 の症状そのもの**で、
+    # クライアントには作れない。
+    PAIRED_CLIENT_STATUSES = [401, 429].freeze
 
     # PUT /api/:version/statuses/:id が受け付ける X-Mulukhiya-Purpose。
     # nil / '' は nginx を経由しない直接アクセス（#4474 の map が外部からの
@@ -81,6 +99,9 @@ module Mulukhiya
       @renderer.status = reporter.response.code
       return @renderer.to_s
     rescue Ginseng::ValidateError => e
+      # ⚠ **log も alert も残さないのは非対称だった (#4657)。**`report_error` の
+      # 「syslog には必ず残す」に揃える。422 なので alert には上がらない。
+      report_error(e)
       @renderer.message = {error: e.message}
       @renderer.status = 422
       return @renderer.to_s
@@ -208,6 +229,11 @@ module Mulukhiya
       # クライアント起因ではありえない（投稿が無いならどちらも 404、トークンが
       # 切れているならどちらも 401 になる）。**この非対称そのものが #4621 の
       # 症状**だったので、片落ちは内部の失敗として扱う。
+      #
+      # ⚠⚠ **ただし「あらゆる 4xx」ではない (#4657)。**2 本の間に起きうる
+      # **上流のレート制限 (429) とトークン失効 (401)** は、非対称でも
+      # クライアント起因の状態。これを 502 に付け替えると capsicum が
+      # **リトライやトークン再取得の導線に載せられず**、Sentry alert も立つ。
       status = fetch_internal(:fetch_status, id, headers, paired: true)
       reject_poll!(status)
       return sanitize_spoiler({
@@ -232,8 +258,14 @@ module Mulukhiya
     def fetch_internal(method, id, headers, paired: false)
       return sns.public_send(method, id, {headers:})
     rescue Ginseng::GatewayError => e
-      raise InternalGatewayError.wrap(e, method) if paired || internal_failure?(e)
-      raise
+      raise unless internal_failure?(e) || paired_failure?(e, paired:)
+      raise InternalGatewayError.wrap(e, method)
+    end
+
+    # 片落ち（1 本目は通ったのに 2 本目だけ落ちた）を内部の失敗として扱うか。
+    def paired_failure?(error, paired:)
+      return false unless paired
+      return !PAIRED_CLIENT_STATUSES.include?(error.source_status)
     end
 
     # クライアント起因ではありえない失敗か (#4631)。
@@ -241,9 +273,10 @@ module Mulukhiya
     # 4xx は上のとおり日常的に起きるので、**それ自体では内部の失敗と判定できない**。
     # 逆に 5xx・接続失敗（`source_status` が取れない）は上流かモロヘイヤの問題で、
     # クライアントの操作では作れない。
+    # ⚠ 見るのは `source_status`（上流が返した値）。`status` は wrap 後に
+    # 502 へ倒れるので、ここで見ると全部が内部の失敗になる。
     def internal_failure?(error)
-      return true unless error.source_status.to_i.between?(400, 499)
-      return false
+      return !HTTPStatus.client_error?(error.source_status)
     end
 
     # ⚠⚠ **アンケートを持つ投稿は編集させない (#4625)。**

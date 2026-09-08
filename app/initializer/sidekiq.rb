@@ -17,27 +17,13 @@ require 'syslog/logger'
 module Mulukhiya
   daemon = SidekiqDaemon.new
   config = YAML.load_file(daemon.config_cache_path).deep_symbolize_keys
+  # ⚠⚠ **中身は SidekiqDaemon.configure_server に置く (#4687)。**
+  # `Sidekiq.configure_server` のブロックは **sidekiq の CLI でしか実行されない**
+  # (`Sidekiq.server?` が false の環境では yield されない) ため、ここに直接書くと
+  # `rake test` でも fedi-test-harness でも puma からも 1 行も走らない。
+  # 🔴 **#4687 はそれで CI 緑・harness 両系緑のまま本番の起動で初めて発火した。**
   Sidekiq.configure_server do |sidekiq|
-    sidekiq.redis = {url: config.dig(:redis, :dsn)}
-    sidekiq.concurrency = config[:concurrency]
-    # Sidekiq 内部ログ (retry / scheduler / boot 等) を $stdout ではなく syslog へ。
-    # Ginseng::Logger と同じ ident (Package.name) / facility (LOG_USER) を使い、puma・
-    # WorkerLoggingMiddleware と同じ /var/log/mulukhiya-toot-proxy.log に集約する (#4362)。
-    # WorkerLoggingMiddleware が出すジョブライフサイクルログ (#4079) はそのまま維持。
-    sidekiq.logger = Syslog::Logger.new(Package.name)
-    sidekiq.logger.level = config.dig(:logger, :level)
-    sidekiq.logger.formatter = Sidekiq::Logger::Formatters::JSON.new
-    sidekiq.server_middleware do |chain|
-      chain.add WorkerLoggingMiddleware
-    end
-    # local.yaml で `capsule: null` が混入しても media_catalog キューを listen する
-    # capsule が必ず立ち上がるよう defensive default を取る。schema 上 optional だが
-    # 未設定 = 専用 capsule 無し = ジョブが Redis に溜まり続ける経路は塞ぐ。
-    capsule_config = config.dig(:capsule, :media_catalog) || {}
-    sidekiq.capsule(:media_catalog) do |cap|
-      cap.queues = ['media_catalog']
-      cap.concurrency = capsule_config[:concurrency] || 1
-    end
+    SidekiqDaemon.configure_server(sidekiq, config)
   end
   Sidekiq::Scheduler.enabled = true
   Sidekiq::Scheduler.dynamic = true

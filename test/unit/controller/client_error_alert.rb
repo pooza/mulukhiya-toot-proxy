@@ -66,21 +66,15 @@ module Mulukhiya
 
   # 引き当ての失敗を「未知の digest」の 404 に化かさない (#4603 の Codex P1)。
   #
-  # ⚠⚠ **`Webhook.create` は全例外を握って nil を返す。**それを
+  # ⚠⚠ **かつて `Webhook.create` が全例外を握って nil を返していた。**それを
   # `verify_webhook!` が 404 に変換するので、alert 抑止を入れると
-  # **DB 障害で全 webhook が落ちている状態が無音になる**。
+  # **DB 障害で全 webhook が落ちている状態が無音になる**。#4657 で `create` 自体を
+  # 削除したが、`create!` の例外が alert 側へ倒れることは引き続き押さえる。
   class WebhookLookupFailureTest < TestCase
     class LookupError < StandardError; end
 
-    # 従来どおり nil へ倒れる（他の呼び出し元の互換）。
-    def test_create_still_swallows
-      with_failing_lookup do
-        assert_nil(Webhook.create('deadbeef'))
-      end
-    end
-
-    # ⚠ **こちらが本命。**引き当ての失敗はそのまま上がるので、
-    # 呼び側は「そんな digest は無い」と区別できる。
+    # ⚠ **引き当ての失敗はそのまま上がる。**呼び側は「そんな digest は無い」と
+    # 区別できる。⚠ 全例外を握って nil を返す `create` は #4657 で削除した。
     def test_create_bang_propagates
       with_failing_lookup do
         assert_raise(LookupError) {Webhook.create!('deadbeef')}

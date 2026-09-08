@@ -15,6 +15,25 @@ module Mulukhiya
       undef_method :num_waiting
     end
 
+    # `SELECT 1` を待っている間に待ち行列が捌けるプールを模す (#4618)。
+    # ⚠ **これが起きると、観測を後から取る実装は「詰まっていない」と報告する。**
+    class DrainingPool < FakePool
+      def initialize(...)
+        super
+        @drained = false
+      end
+
+      def drain
+        @drained = true
+      end
+
+      def num_waiting
+        return 0 if @drained
+
+        return super
+      end
+    end
+
     class FakeConnection
       attr_reader :disconnected
       attr_writer :pool
@@ -33,6 +52,7 @@ module Mulukhiya
       end
 
       def fetch(_sql)
+        @pool.drain if @pool.respond_to?(:drain)
         return [{ok: 1}]
       end
     end
@@ -107,6 +127,18 @@ module Mulukhiya
       stub_instance(nil)
 
       assert_empty(Postgres.pool)
+    end
+
+    # ⚠ **回帰テスト (#4618)。**観測を `SELECT 1` の後に取る実装だと、
+    # health 自身が待ち行列に並んでいる間に前の待ちが捌けて `waiting: 0` に化ける。
+    # **有限のスパイクだけが見えない**ので、Gate 2 の rollback 信号として使えない。
+    def test_health_reports_pool_state_before_the_probe_query
+      config['/postgres/dsn'] = 'postgres://example.invalid/dummy'
+      stub_instance(DrainingPool.new(max: 10, size: 10, waiting: 5))
+      health = Postgres.health
+
+      assert_equal('OK', health[:status])
+      assert_equal(5, health[:pool][:waiting])
     end
 
     def test_health_includes_pool

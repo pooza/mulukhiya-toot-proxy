@@ -39,7 +39,7 @@ module Mulukhiya
 
     def test_create
       Webhook.all do |hook|
-        assert_kind_of([Webhook, NilClass], Webhook.create(hook.digest))
+        assert_kind_of([Webhook, NilClass], Webhook.create!(hook.digest))
       end
     end
 

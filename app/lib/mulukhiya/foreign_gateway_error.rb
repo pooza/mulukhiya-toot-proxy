@@ -11,14 +11,8 @@ module Mulukhiya
   # （ClippingWorker は生 URL へ、`Status#to_md` はローカルのテンプレートへ）ので
   # リクエスト層までは届かない。**この型は「届いたときに透過されない」ことを
   # 担保するためのもの**で、`Controller#handle_gateway_error` が明示的に弾く。
-  class ForeignGatewayError < Ginseng::GatewayError
-    # 上流のレスポンスを保ったまま「他人のサーバー由来」に印を付け替える。
-    # レスポンスを捨てないのは、ログ (`e.log`) に上流の状況を残すため。
-    def self.wrap(error)
-      wrapped = new(error.message)
-      wrapped.set_backtrace(error.backtrace)
-      wrapped.response = error.response if error.respond_to?(:response)
-      return wrapped
-    end
+  # ⚠ 包み直し自体は `WrappedGatewayError` が持つ (#4657)。この型が足すのは
+  # 「他人のサーバー由来」という印だけで、メッセージは上流のまま。
+  class ForeignGatewayError < WrappedGatewayError
   end
 end

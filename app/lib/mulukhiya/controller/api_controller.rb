@@ -13,7 +13,7 @@ module Mulukhiya
       @renderer.message = about
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -42,7 +42,7 @@ module Mulukhiya
       }
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -54,7 +54,7 @@ module Mulukhiya
       @renderer.message = {config: sns.account.user_config.to_h}
       return @renderer.to_s
     rescue => e
-      e.alert
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -68,9 +68,7 @@ module Mulukhiya
       @renderer.message = {templates: ComposeTemplateContainer.new(sns.account).all}
       return @renderer.to_s
     rescue => e
-      # 認証失敗 (403) 等の想定内 4xx は log、read 経路の真の 5xx（Redis 障害等）は
-      # write 系と対称に alert する。
-      e.status < 500 ? e.log : e.alert
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -89,9 +87,7 @@ module Mulukhiya
       @renderer.message = {template:, templates: container.all}
       return @renderer.to_s
     rescue => e
-      # 上限超過 (409) 等の想定内クライアントエラーは log に留め、保存失敗 (5xx) だけ
-      # alert する（想定内 4xx で Sentry を汚さない）。
-      e.status < 500 ? e.log : e.alert
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -110,7 +106,7 @@ module Mulukhiya
       @renderer.message = {template:, templates: container.all}
       return @renderer.to_s
     rescue => e
-      e.status < 500 ? e.log : e.alert
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -123,8 +119,7 @@ module Mulukhiya
       @renderer.message = {template:, templates: container.all}
       return @renderer.to_s
     rescue => e
-      # 既に削除済み (404) は race で起こる想定内。log に留める。
-      e.status < 500 ? e.log : e.alert
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -143,7 +138,7 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
-      e.alert
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -163,7 +158,7 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
-      e.alert
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -199,7 +194,7 @@ module Mulukhiya
       }
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -221,7 +216,7 @@ module Mulukhiya
       @renderer.message = {state: removed ? 'unsubscribed' : 'not-subscribed'}
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -233,7 +228,7 @@ module Mulukhiya
       @renderer.message = sns.emoji_palettes(sns.account)
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -245,7 +240,7 @@ module Mulukhiya
       @renderer.message = sns.fetch_avatar_decorations
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -260,7 +255,7 @@ module Mulukhiya
       @renderer.message = {config: sns.account.user_config.to_h}
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -275,7 +270,7 @@ module Mulukhiya
       @renderer.message = Program.instance.sorted_data
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -288,13 +283,10 @@ module Mulukhiya
       @renderer = ProgramCalendarRenderer.new
       return @renderer.to_s
     rescue => e
-      # 404 (非対応サーバー) は期待動作なので log のみ。tomato-shrieker が定期 GET する
-      # 外部購読先なので、5xx の恒常失敗は検知できるよう alert に昇格する (#4394)。
-      if e.is_a?(Ginseng::NotFoundError)
-        e.log
-      else
-        e.alert
-      end
+      # ⚠ **クラスの列挙をやめて `report_error` に寄せた (#4654)。**tomato-shrieker が
+      # 定期 GET する外部購読先なので、非対応サーバーの 404 は静かなまま、
+      # 5xx の恒常失敗だけ alert に上げたい (#4394)。判定はステータスで足りる。
+      report_error(e)
       @renderer = default_renderer_class.new
       @renderer.status = e.status
       @renderer.message = {error: e.message}
@@ -306,7 +298,7 @@ module Mulukhiya
       ProgramUpdateWorker.perform_async
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -328,7 +320,7 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -345,7 +337,7 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -375,7 +367,7 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -386,7 +378,7 @@ module Mulukhiya
       MediaCleaningWorker.perform_async
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -397,7 +389,7 @@ module Mulukhiya
       MediaMetadataStorage.new.clear
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -420,7 +412,7 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -435,7 +427,7 @@ module Mulukhiya
       )
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -462,7 +454,7 @@ module Mulukhiya
       @renderer.message = {error: e.message}
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -490,7 +482,7 @@ module Mulukhiya
       @renderer.message = {error: e.message}
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -510,7 +502,7 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -534,7 +526,7 @@ module Mulukhiya
       @renderer.message = resolver.resolve
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -551,7 +543,7 @@ module Mulukhiya
       @renderer.message = NowplayingUrlResolver.new(url: params[:url]).resolve
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -562,7 +554,7 @@ module Mulukhiya
       @renderer.message = {oauth_uri: AnnictService.new.oauth_uri.to_s}
       return @renderer.to_s
     rescue => e
-      e.alert
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -585,7 +577,7 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
-      e.alert
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -596,7 +588,7 @@ module Mulukhiya
       @renderer.message = {oauth_uri: SpotifyUserService.new.oauth_uri.to_s}
       return @renderer.to_s
     rescue => e
-      e.alert
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -615,7 +607,7 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
-      e.alert
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -641,7 +633,7 @@ module Mulukhiya
       @renderer.message = {error: e.message}
       return @renderer.to_s
     rescue => e
-      e.alert
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -654,7 +646,7 @@ module Mulukhiya
       @renderer.message = {config: sns.account.user_config.to_h}
       return @renderer.to_s
     rescue => e
-      e.alert
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -747,7 +739,7 @@ module Mulukhiya
       AnnouncementWorker.perform_async
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -762,7 +754,7 @@ module Mulukhiya
       @renderer.message = Announcement.new.load.values
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -774,7 +766,7 @@ module Mulukhiya
       @renderer.message = hash_tag_class.favorites
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -785,7 +777,7 @@ module Mulukhiya
       TaggingDictionaryUpdateWorker.perform_async
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -806,7 +798,7 @@ module Mulukhiya
       end.to_h
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -822,7 +814,7 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -833,7 +825,7 @@ module Mulukhiya
       UserTagInitializeWorker.perform_async
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -851,7 +843,7 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -873,7 +865,7 @@ module Mulukhiya
       @renderer.message = {words: dictionary.all, size: dictionary.size, digest:}
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -885,7 +877,7 @@ module Mulukhiya
       @renderer.message = sns.account.piefed&.communities || {}
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -910,7 +902,7 @@ module Mulukhiya
       FeedUpdateWorker.perform_async
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -1015,7 +1007,7 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -1032,7 +1024,7 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -1043,7 +1035,7 @@ module Mulukhiya
       @renderer.message = config.audit
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -1061,7 +1053,7 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -1072,7 +1064,7 @@ module Mulukhiya
       PumaDaemonRestartWorker.perform_in(config['/puma/restart/seconds'], {})
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -1107,7 +1099,7 @@ module Mulukhiya
       @renderer.message = result
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s

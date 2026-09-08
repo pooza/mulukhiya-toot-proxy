@@ -7,7 +7,7 @@ module Mulukhiya
       @renderer.status = 404 unless @renderer.exist?
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer = Ginseng::Web::XMLRenderer.new
       @renderer.status = e.status
       @renderer.message = e.message
@@ -24,7 +24,7 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
-      e.log
+      report_error(e)
       @renderer = Ginseng::Web::XMLRenderer.new
       @renderer.status = e.status
       @renderer.message = e.message
@@ -36,7 +36,7 @@ module Mulukhiya
         @renderer = feed.renderer
         return @renderer.to_s
       rescue => e
-        e.log
+        report_error(e)
         @renderer = Ginseng::Web::XMLRenderer.new
         @renderer.status = e.status
         @renderer.message = e.message
