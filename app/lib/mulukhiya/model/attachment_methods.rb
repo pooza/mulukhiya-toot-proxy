@@ -59,7 +59,7 @@ module Mulukhiya
       # note_id ベースで unnest を展開するため `status_id`。**この 1 行が
       # 2 ファイルを分けていた唯一の差分。**
       def catalog_cursor_key
-        raise NotImplementedError, "\#{self}.catalog_cursor_key"
+        raise NotImplementedError, "#{self}.catalog_cursor_key"
       end
     end
 
