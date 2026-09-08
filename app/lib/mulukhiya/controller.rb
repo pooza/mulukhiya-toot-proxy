@@ -54,6 +54,23 @@ module Mulukhiya
     end
 
     not_found do
+      # ⚠⚠ **ルート側が既に body を作っていたら差し替えない (#4520)。**
+      # Sinatra は `response.status == 404` を見て、**ルートが正常に返った後でも**
+      # この block を呼ぶ（`invoke { error_block!(response.status) }`）。そのため
+      # ルートの `rescue` が組み立てた `{error: e.message}` が毎回この既定メッセージで
+      # 上書きされ、**404 だけボディの形が違って**いた。
+      #
+      # 🔴 影響は「見た目が違う」では済まない。403/422/5xx は `error` / `errors` キーを
+      # 持つのに 404 だけ `{package, class, message}` になるので、**クライアントが
+      # キーの有無で分岐できない**。404 の理由（投稿が無い / 他人の投稿 / 機能が無効）も
+      # 全部同じ body に潰れていた。
+      #
+      # ⚠ **ルート未一致と区別できる。**`before` が毎回 `default_renderer_class.new` を
+      # 置くが、`message` は nil のままなので、埋まっているのは**ルートが書いたとき
+      # だけ**。⚠ `respond_to?` を見るのは、ルートが message を持たない
+      # レンダラ（フィード・生ファイル）へ差し替えていることがあるため。
+      return @renderer.to_s if @renderer.respond_to?(:message) && @renderer.message.present?
+
       @renderer = default_renderer_class.new
       @renderer.status = 404
       # ⚠ **ここは `scrub_log_path` を通さない (#4655)。**これはログではなく
