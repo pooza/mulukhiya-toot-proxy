@@ -1594,12 +1594,22 @@ Slack 互換のペイロードを投稿に変換する。`text` / `blocks` / `at
 
 | キー | 型 | 説明 |
 |------|-----|------|
-| `mulukhiya.attachment_errors[].url` | string | 落ちた添付の `image_url`（送信側が送った URL そのまま） |
-| `mulukhiya.attachment_errors[].message` | string | 落ちた理由。⚠ **人間向けの文言で、機械判定用の安定した識別子ではない** |
+| `mulukhiya.attachment_errors[].url` | string | 落ちた添付の `image_url`（送信側が送った URL そのまま）。⚠ **`image_url` を持たない添付では、このキーごと付かない**（5.37.0 / #4694。それ以前は `null` が入りうる） |
+| `mulukhiya.attachment_errors[].message` | string | 落ちた理由。⚠ **人間向けの文言で、機械判定用の安定した識別子ではない**。⚠⚠ **5.37.0 (#4694) から、モロヘイヤ内部の例外は `attachment could not be processed` に丸める**（サーバー内の絶対パスや内部ホスト・ポートが混ざっていた）。原文は syslog にだけ残る |
 | `mulukhiya.missing_attachments` | integer | **上流へ渡したのに、返ってきた投稿に載っていない添付の本数**。下記 |
 
 ⚠ **どちらのキーも、該当が無ければ付かない。**`mulukhiya` キー自体も同様なので、
 `response["mulukhiya"]` の有無だけで「全部通った / 何かおかしい」を判定できる。
+
+⚠⚠ **ただし「`mulukhiya` があれば投稿が成立している」とは読まないこと (#4694)。**
+`mulukhiya` は**上流の応答が Hash でありさえすれば足される**ので、上流が
+`{"error": "Validation failed: ..."}` を返した回（422 等）にもエラー本文と同居する。
+**投稿の成否は HTTP ステータスで見ること。**
+
+⚠ **5.36.0 以前には、ハンドラのタイムアウトで落ちた添付が `attachment_errors` にも
+syslog にも残らない穴があった**（#4694 の 1・5.37.0 で是正）。⚠⚠ **その回は
+`mulukhiya` キー自体が付かないので、送信側は「全部通った」と読む。**
+5.36.0 以前を相手にするクライアントは、この経路があることを前提にすること。
 
 🔴 **`missing_attachments` は主に `Idempotency-Key` の再送で出る。**添付の取得に
 失敗した投稿を、送信側が**同じ `Idempotency-Key`** で送り直すと、

@@ -96,7 +96,9 @@ module Mulukhiya
 
       entry = body(reporter).dig('mulukhiya', 'attachment_errors').first
 
-      assert_equal(['url', 'message'], entry.keys)
+      # ⚠ **順序は `message` → `url`（#4694）。**`url` は「あるときだけ足す」形に
+      # なったので後ろに来る。`image_url` を持たない添付では**キーごと付かない**。
+      assert_equal(['message', 'url'], entry.keys)
     end
 
     # ⚠⚠ **`Idempotency-Key` の再送（PR #4684 の Codex P1）。**上流は初回の

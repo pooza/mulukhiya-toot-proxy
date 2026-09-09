@@ -143,10 +143,15 @@ module Mulukhiya
         next unless error.is_a?(Hash)
         attachment = error[:attachment] || error['attachment']
         next unless attachment.is_a?(Hash)
-        {
-          'url' => attachment['image_url'],
-          'message' => error[:message] || error['message'],
-        }
+        # ⚠ **`url` が nil になる回がある (#4694)。**`SlackWebhookPayload` は
+        # `blocks` の `type: image` を `image_url` の有無を見ずに images へ積むので、
+        # `image_url` を持たない image ブロックがここまで来る。
+        # `docs/api.md` は `url` を string と書いているので、**キーごと落とす**
+        # （null を返して契約を破らない）。
+        entry = {'message' => error[:message] || error['message']}
+        url = attachment['image_url']
+        entry['url'] = url if url.is_a?(String) && url.present?
+        entry
       end
     end
 
