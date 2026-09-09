@@ -1218,7 +1218,7 @@ capsicum が Spotify Web API 経由で「現在再生中」を OS 非依存に�
   1. クライアントが `GET /spotify/oauth_uri` で認可 URL を取得する
   2. クライアントが認可 URL をブラウザで開き、ユーザーが Spotify で認可する
   3. Spotify が Redirect URI（`/service/spotify/oauth/redirect_uri`、capsicum が捕捉できる URL／カスタムスキーム）へ認可コード付きでリダイレクトする
-  4. クライアントが捕捉した認可コードを `POST /spotify/auth` に送信（ユーザー特定は SNS トークンで行うため `state` は不要）
+  4. クライアントが捕捉した認可コードを、⚠ **1 で受け取った `state` と一緒に** `POST /spotify/auth` に送信する
   5. 以降クライアントは `GET /spotify/currently_playing` で現在再生中の URL を取得できる
 
 ##### GET /mulukhiya/api/spotify/oauth_uri
@@ -1228,7 +1228,10 @@ Spotify の OAuth 認可 URL を取得する。
 - **認証**: 不要
 - **前提条件**: `features.spotify_enabled` が `true`（false 時は 404）
 - **パラメータ**: なし
-- **レスポンス例**: `{ "oauth_uri": "https://accounts.spotify.com/authorize?client_id=...&response_type=code&redirect_uri=...&scope=user-read-currently-playing" }`
+- **レスポンス例**: `{ "oauth_uri": "https://accounts.spotify.com/authorize?client_id=...&response_type=code&redirect_uri=...&scope=user-read-currently-playing&state=..." }`
+
+⚠⚠ **5.37.0 (#4414) から `state` が付く。**クライアントは**この値を保持し、`POST /spotify/auth` へそのまま戻す**必要がある。
+⚠ **呼ぶたびに新しい値**が発行され、⚠ **一度使うと消える**（リプレイ不可）。⚠ 有効期間は **600 秒**。
 
 ##### POST /mulukhiya/api/spotify/auth
 
@@ -1241,8 +1244,17 @@ Spotify の OAuth 認可 URL を取得する。
 | 名前 | 型 | 必須 | 説明 |
 |------|-----|------|------|
 | `code` | string | 必須 | Spotify OAuth 認可コード |
+| `state` | string | 必須 | ⚠⚠ **`GET /spotify/oauth_uri` が返した URI の `state`。**5.37.0 (#4414) から必須 |
 
 - **レスポンス**: `{ "config": { ... } }`（更新後のユーザー設定）
+
+⚠ **`state` が欠けている・知らない・使用済みなら 401**（`{"error": "Invalid OAuth state"}`）。
+契約違反（`state` キー自体が無い）は 422。
+
+⚠⚠ **これは 5.36.0 以前からの破壊的変更。**`state` を送らないクライアントは 422 になる。
+本機能は `features.spotify_enabled` が既定で false（本番 4 台とも `client_id` 未設定で
+ルートごと 404）なので**稼働中の利用者はいない**が、capsicum 側の code 捕捉フローに
+往復の追加が要る（pooza/capsicum#570）。
 
 ##### GET /mulukhiya/api/spotify/currently_playing
 

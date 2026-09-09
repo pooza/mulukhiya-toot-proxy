@@ -44,7 +44,7 @@ module Mulukhiya
       )
       account = account_double
 
-      SpotifyUserService.new(account).auth('the-code')
+      SpotifyUserService.new(account).auth('the-code', issued_state)
 
       assert_requested(stub.with do |req|
         body = URI.decode_www_form(req.body).to_h
@@ -102,7 +102,7 @@ module Mulukhiya
       stub = stub_token_endpoint(access_token: 'a', refresh_token: 'r', expires_in: 3600)
       expected = Base64.strict_encode64('test_client_id:test_client_secret')
 
-      SpotifyUserService.new(account_double).auth('the-code')
+      SpotifyUserService.new(account_double).auth('the-code', issued_state)
 
       assert_requested(stub.with do |req|
         req.headers['Authorization'] == "Basic #{expected}" &&
@@ -233,6 +233,12 @@ module Mulukhiya
     # 実 Account/UserConfig (DB・Redis 依存) を避けるための最小ダブル。
     # UserConfig は暗号化値をそのまま保持し read 時に復号しない仕様だが、本ダブルは
     # 平文を保持する (service 側 decrypt は復号失敗時に値をそのまま返すため整合する)。
+    # ⚠ `auth` は 5.37.0 (#4414) から `state` の検証を通る。テストでは
+    # **実際に発行した state** を使う（素の文字列だと 401 になる）。
+    def issued_state
+      return SpotifyUserService.allocate.send(:create_state)
+    end
+
     def account_double(store = {})
       user_config = FakeUserConfig.new(store)
       return Struct.new(:user_config).new(user_config)

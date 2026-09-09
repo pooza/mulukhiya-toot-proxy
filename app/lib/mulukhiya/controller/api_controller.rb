@@ -602,7 +602,7 @@ module Mulukhiya
         @renderer.status = 422
         @renderer.message = {errors:}
       else
-        SpotifyUserService.new(sns.account).auth(params[:code])
+        SpotifyUserService.new(sns.account).auth(params[:code], params[:state])
         @renderer.message = {config: sns.account.user_config.to_h}
       end
       return @renderer.to_s
