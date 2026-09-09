@@ -104,8 +104,13 @@ module Mulukhiya
       queue = Queue.new
       6.times {|i| queue.push({'image_url' => "https://example.com/#{i}.png"})}
 
-      handler.send(:run_workers, queue, payload, Concurrent::AtomicFixnum.new(4))
-      handler.send(:drain, queue)
+      # ⚠ 第 4 引数は処理中の添付を控える置き場 (#4694)。ここは正常完了する
+      # ケースなので、走り終えた時点で空になっている。
+      inflight = Concurrent::Array.new
+      handler.send(:run_workers, queue, payload, Concurrent::AtomicFixnum.new(4), inflight)
+      handler.send(:drain, queue, inflight)
+
+      assert_empty(inflight, '正常完了なのに処理中の控えが残っている')
 
       assert_equal(4, payload['media'].count)
       assert_equal(2, handler.dropped.count)
@@ -182,7 +187,10 @@ module Mulukhiya
     # 「全ワーカーが枠を持っている間に skip が起きる」条件を作れない。
     def drive(handler, queue, payload, slots)
       atomic = Concurrent::AtomicFixnum.new(slots)
-      run_concurrently(WORKERS) {handler.send(:consume, queue, payload, atomic)}
+      # ⚠ 第 4 引数は処理中の添付を控える置き場 (#4694)。ここでは枠の勘定だけを
+      # 見るので中身は使わないが、スレッド安全な実体を渡す必要がある。
+      inflight = Concurrent::Array.new
+      run_concurrently(WORKERS) {handler.send(:consume, queue, payload, atomic, inflight)}
     end
 
     # 本体と同じ実装を呼ぶ (private なので send)。

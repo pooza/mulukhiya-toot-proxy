@@ -43,6 +43,29 @@ module Mulukhiya
       assert(@handler.errors.all? {|e| e[:class] == 'SlotExhausted'})
     end
 
+    # 🔴 **①-b 取り出し済みで処理中だった添付も残る（PR #4713 の Codex P1）。**
+    #
+    # ⚠⚠ `pop_attachment` はキューから**取り除いてから**アップロードに入るので、
+    # その最中に殺されると **キューにも残らず `rescue` も通らない**
+    # （`Thread#kill` は `rescue => e` を通さない）。⚠ **添付 1 枚 = ワーカー 1 本**
+    # という最も普通の形でキューが空になり、`drain` だけでは何も残らなかった。
+    def test_inflight_attachments_are_recorded_when_killed
+      # アップロードで固まるワーカーを作る。⚠ `parse_image_uri` は通す。
+      # ⚠ setup の `create_slots` は 0 枠なので、ここだけ枠を開ける
+      # （0 枠だとキューから取り出されず `SlotExhausted` の側になる）。
+      @handler.define_singleton_method(:create_slots) {|*| Concurrent::AtomicFixnum.new(4)}
+      @handler.define_singleton_method(:upload_attachment) {|*| sleep(10)}
+      payload = {'attachments' => [{'image_url' => 'https://example.com/a.png'}]}
+
+      thread = Thread.new {@handler.handle_pre_webhook(payload)}
+      sleep(0.3)
+      thread.kill
+      thread.join(5)
+
+      assert_equal(1, @handler.errors.length, '処理中だった添付が残っていない')
+      assert_equal('Timeout', @handler.errors.first[:class])
+    end
+
     # 🔴 **② 内部例外の生メッセージを送信側へ返さない。**
     # ⚠⚠ 素通しすると **サーバー内の絶対パス**や**内部ホスト・ポート**が第三者へ返る。
     def test_internal_exception_message_is_not_leaked

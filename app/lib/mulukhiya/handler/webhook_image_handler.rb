@@ -6,6 +6,11 @@ module Mulukhiya
     # 運用側の切り分けは失われない。
     GENERIC_DROP_MESSAGE = 'attachment could not be processed'.freeze
 
+    # 殺したワーカーが `ensure` を走り終えるのを待つ上限 (秒) (#4694)。
+    # ⚠ 待たないと、**処理中だった添付を「落ちた」と報告した直後にワーカーが
+    # 成功で消す**（あるいはその逆の）競合が残る。
+    WORKER_KILL_WAIT = 1
+
     def disable?
       return true unless controller_class.webhook?
       return true unless sns.account&.webhook
@@ -37,9 +42,15 @@ module Mulukhiya
       queue = Queue.new
       (payload['attachments'] || []).each {|v| queue.push(v)}
       slots = create_slots(payload)
-      run_workers(queue, payload, slots)
+      # ⚠⚠ **取り出し済みで処理中の添付も控える（PR #4713 の Codex P1）。**
+      # `pop_attachment` はキューから**取り除いてから**アップロードに入るので、
+      # その最中に殺されると 🔴 **キューにも残らず `rescue` も通らない**
+      # （`Thread#kill` は `rescue => e` を通さない）。**添付 1 枚 = ワーカー 1 本**
+      # という最も普通の形でキューが空になり、`drain` だけでは何も残らなかった。
+      inflight = Concurrent::Array.new
+      run_workers(queue, payload, slots, inflight)
     ensure
-      drain(queue) if queue
+      drain(queue, inflight) if queue
     end
 
     private
@@ -53,18 +64,22 @@ module Mulukhiya
     # 2. **ワーカーの後始末**。`Parallel.each(in_threads:)` は `ensure` で
     #    `threads.each(&:kill)` していた。無いと、join が例外で打ち切られたときに
     #    走り続けたスレッドが**応答を組み立てた後**に `push` して孤児メディアを作る
-    def run_workers(queue, payload, slots)
+    def run_workers(queue, payload, slots, inflight)
       counter = Thread.current[HandlerProfile::HTTP_KEY]
       workers = [Parallel.processor_count, queue.size].min
       threads = Array.new(workers) do
         Thread.new do
           Thread.current[HandlerProfile::HTTP_KEY] = counter if counter
-          consume(queue, payload, slots)
+          consume(queue, payload, slots, inflight)
         end
       end
       threads.each(&:join)
     ensure
       threads&.each(&:kill)
+      # ⚠ **殺した後に待つ (#4694)。**待たないと、外側の `drain` が読む `inflight` が
+      # ワーカーの `ensure` と競合する。⚠ 待ちきれなくても先へ進む（ここは既に
+      # 劣化した経路なので、投稿経路ごと止めない）。
+      threads&.each {|thread| thread.join(WORKER_KILL_WAIT)}
     end
 
     # ⚠⚠ **枠を取ってから候補を取り出す。**逆順（取り出してから枠を取る）だと、
@@ -75,27 +90,41 @@ module Mulukhiya
     #
     # ⚠ 候補を「配る」形（`Parallel.each`）に戻さないこと。枠切れで skip した候補が
     # 二度と戻らず、空いた枠が使われないまま有効な添付が落ちる (#4633・Codex P2)。
-    def consume(queue, payload, slots)
+    def consume(queue, payload, slots, inflight)
       loop do
         break unless reserve_slot(slots)
         unless attachment = pop_attachment(queue)
           slots.increment
           break
         end
+        # ⚠ **取り出したら控える。**外した瞬間から `ensure` で外すまでの間に
+        # 殺されると、この添付はどこからも辿れなくなる（PR #4713 の Codex P1）。
+        inflight.push(attachment)
         unless uri = parse_image_uri(attachment)
           slots.increment
+          inflight.delete(attachment)
           next
         end
         upload_attachment(payload, uri, slots, attachment)
+        # ⚠⚠ **`ensure` で外さない。**`Thread#kill` でも `ensure` は走るので、
+        # **殺された添付まで「片付いた」ことにしてしまう**（それでは元の穴のまま）。
+        # ⚠ `upload_attachment` は自前の `rescue` で失敗を記録して**正常に返る**ので、
+        # ここへ来たら成否によらず「処理は終わった」と言える。
+        inflight.delete(attachment)
       end
     end
 
     # ⚠ **枠切れで残った候補も「落ちた」として残す (#4633)。**従来は完全に無音で、
     # 6 枚送って 4 枚しか付かなくても送信側にも運用者にも何も出なかった。
     # 取得失敗と上限超過だけ記録して枠切れを黙らせるのは、この Issue の趣旨に反する。
-    def drain(queue)
+    # ⚠ `inflight` は**取り出し済みで処理中だった**もの（PR #4713 の Codex P1）。
+    # 枠切れ（キューに残った）とは理由が違うので、別の `class` で残す。
+    def drain(queue, inflight = nil)
       while attachment = pop_attachment(queue)
         record_drop('SlotExhausted', 'max media attachments exceeded', attachment)
+      end
+      inflight&.each do |attachment|
+        record_drop('Timeout', 'handler timed out while uploading', attachment)
       end
     end
 
