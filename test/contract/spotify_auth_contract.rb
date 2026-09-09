@@ -5,8 +5,9 @@ module Mulukhiya
     end
 
     def test_call
-      # ユーザー特定は bearer 認証で行うため code のみ必須・token は不要。
-      errors = @contract.call(code: 'auth-code').errors
+      # ユーザー特定は bearer 認証で行うため token は不要。
+      # ⚠ `state` は 5.37.0 (#4414) から必須（CSRF 対策）。
+      errors = @contract.call(code: 'auth-code', state: 'the-state').errors
 
       assert_empty(errors)
 

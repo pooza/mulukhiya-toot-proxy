@@ -11,9 +11,15 @@ module Mulukhiya
   # トークンは UserConfig (Redis、暗号化) に保管する。Spotify の access_token は
   # 3600s で失効するため refresh_token も保管し、失効時/401 時に自動更新する。
   # capsicum 側は code-post 方式で、ブラウザ認可後の code を POST /api/spotify/auth に
-  # 渡すだけでよい (ユーザー特定は SNS トークンで行うため state は不要)。
+  # 渡す。⚠⚠ **5.37.0 (#4414) から `state` の往復が必須**（`GET /spotify/oauth_uri` が
+  # 返した URI の `state` を、`POST /spotify/auth` へそのまま戻す）。
   class SpotifyUserService
     include Package
+
+    # `OAuthStateStorage` へ入れる印。⚠ **同じストアを Mastodon / Misskey の
+    # PKCE フローと共有する**ので、他系統で発行した state を Spotify の認可に
+    # 使い回せないようにする (#4414)。
+    SERVICE_NAME = 'spotify'.freeze
 
     AUTHORIZE_PATH = '/authorize'.freeze
     TOKEN_PATH = '/api/token'.freeze
@@ -38,6 +44,8 @@ module Mulukhiya
       @account = account
     end
 
+    # ⚠ **呼ぶたびに新しい `state` を発行して短命ストアへ置く (#4414)。**
+    # 返した URI の `state` を、クライアントは `POST /spotify/auth` へそのまま戻す。
     def oauth_uri
       uri = accounts_service.create_uri(AUTHORIZE_PATH)
       uri.query_values = {
@@ -45,12 +53,49 @@ module Mulukhiya
         response_type: 'code',
         redirect_uri: redirect_uri,
         scope: scopes.join(' '),
+        state: create_state,
       }
       return uri
     end
 
+    # ⚠⚠ **発行したアカウントに縛る（PR #4714 の Codex P1）。**縛らないと、
+    # 🔴 **攻撃者が自分の Spotify を認可して得た code/state の組を、ログイン中の
+    # 被害者の callback へ流し込める**。`POST /spotify/auth` は「どこかで発行された
+    # 有効な state」を受け入れてしまい、**攻撃者のトークンが被害者の `UserConfig` に
+    # 入る**（セッション固定と同型）。
+    def create_state
+      raise Ginseng::AuthError, 'Unauthorized' unless account_id
+      state = OAuthHelper.generate_state
+      OAuthHelper.storage.set(state, {service: SERVICE_NAME, account_id:})
+      return state
+    end
+
+    def account_id
+      return @account&.id
+    end
+
+    # ⚠ **一度きり。**`consume` が読み出しと同時に消すので、同じ `state` での再送は
+    # 通らない（リプレイ防止）。⚠ TTL は `OAuthStateStorage::TTL`（600 秒）。
+    #
+    # ⚠⚠ **`service` の印を見る。**`OAuthStateStorage` は Mastodon / Misskey の PKCE
+    # フローと**同じストア**なので、見ないと**他系統で発行した state を Spotify の
+    # 認可に使い回せる**。
+    def verify_state!(state)
+      raise Ginseng::AuthError, 'Invalid OAuth state' if state.blank?
+      entry = OAuthHelper.consume_oauth_state(state)
+      raise Ginseng::AuthError, 'Invalid OAuth state' unless entry
+      raise Ginseng::AuthError, 'Invalid OAuth state' unless entry[:service] == SERVICE_NAME
+      # ⚠⚠ **発行したアカウント以外では使えない（PR #4714 の Codex P1）。**
+      return if entry[:account_id].present? && entry[:account_id] == account_id
+      raise Ginseng::AuthError, 'Invalid OAuth state'
+    end
+
     # authorization code を access_token + refresh_token に交換し保管する。
-    def auth(code)
+    #
+    # ⚠⚠ **`state` は必須 (#4414)。**認可レスポンスの取り違え・横取り（CSRF）への
+    # 対策で、OAuth のベストプラクティス。⚠ **一致しなければ code の交換に進まない。**
+    def auth(code, state)
+      verify_state!(state)
       response = token_request(
         'grant_type' => 'authorization_code',
         'code' => code,
