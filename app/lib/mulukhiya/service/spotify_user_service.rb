@@ -58,10 +58,20 @@ module Mulukhiya
       return uri
     end
 
+    # ⚠⚠ **発行したアカウントに縛る（PR #4714 の Codex P1）。**縛らないと、
+    # 🔴 **攻撃者が自分の Spotify を認可して得た code/state の組を、ログイン中の
+    # 被害者の callback へ流し込める**。`POST /spotify/auth` は「どこかで発行された
+    # 有効な state」を受け入れてしまい、**攻撃者のトークンが被害者の `UserConfig` に
+    # 入る**（セッション固定と同型）。
     def create_state
+      raise Ginseng::AuthError, 'Unauthorized' unless account_id
       state = OAuthHelper.generate_state
-      OAuthHelper.storage.set(state, {service: SERVICE_NAME})
+      OAuthHelper.storage.set(state, {service: SERVICE_NAME, account_id:})
       return state
+    end
+
+    def account_id
+      return @account&.id
     end
 
     # ⚠ **一度きり。**`consume` が読み出しと同時に消すので、同じ `state` での再送は
@@ -74,7 +84,9 @@ module Mulukhiya
       raise Ginseng::AuthError, 'Invalid OAuth state' if state.blank?
       entry = OAuthHelper.consume_oauth_state(state)
       raise Ginseng::AuthError, 'Invalid OAuth state' unless entry
-      return if entry[:service] == SERVICE_NAME
+      raise Ginseng::AuthError, 'Invalid OAuth state' unless entry[:service] == SERVICE_NAME
+      # ⚠⚠ **発行したアカウント以外では使えない（PR #4714 の Codex P1）。**
+      return if entry[:account_id].present? && entry[:account_id] == account_id
       raise Ginseng::AuthError, 'Invalid OAuth state'
     end
 

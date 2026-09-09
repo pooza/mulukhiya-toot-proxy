@@ -585,7 +585,15 @@ module Mulukhiya
 
     get '/spotify/oauth_uri' do
       raise Ginseng::NotFoundError, 'Not Found' unless SpotifyUserService.config?
-      @renderer.message = {oauth_uri: SpotifyUserService.new.oauth_uri.to_s}
+      # ⚠⚠ **認証が要る（PR #4714 の Codex P1）。**発行する `state` を**呼んだ本人の
+      # アカウントに縛る**ため。縛らないと、攻撃者が自分の Spotify を認可して得た
+      # code/state の組を被害者の callback へ流し込め、**攻撃者のトークンが被害者の
+      # `UserConfig` に入る**（セッション固定と同型）。
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      # ⚠ **`state` は一度きりなので、応答をキャッシュさせない（同 P2）。**
+      # 使い回された応答の `state` は 2 回目以降必ず 403 になる。
+      headers 'Cache-Control' => 'no-store'
+      @renderer.message = {oauth_uri: SpotifyUserService.new(sns.account).oauth_uri.to_s}
       return @renderer.to_s
     rescue => e
       report_error(e)
