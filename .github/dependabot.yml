@@ -1,5 +1,8 @@
 version: 2
 updates:
+# ⚠⚠ **v4 系は据え置き（limit 0 ＝ version update 無効）。**
+# 保守は「必要なものだけバックポート」の方針なので、日次で PR が出ても捌けない。
+# ⚠ security update は limit 0 でも動くので、脆弱性の通知は止まらない。
 - package-ecosystem: bundler
   directory: '/'
   schedule:
@@ -9,12 +12,36 @@ updates:
   open-pull-requests-limit: 0
   target-branch: v4
   versioning-strategy: lockfile-only
+# ⚠⚠ **develop は version update を開ける (#4702)。**
+# #4701 で `ginseng-*` をタグ固定したが、**limit 0 のままだと版を上げる経路が
+# どこにも無く、7 本が凍結する**（PR #4701 の Codex P2）。⚠ 固定の目的は
+# 「破綻の受け皿を `bundle update` の中から版上げ PR の CI へ移す」ことなので、
+# **その PR が出ないと固定した意味が無い。**
+#
+# ⚠ `allow:` で `ginseng-*` に絞ってはいけない。`allow` は **security update にも効く**
+# ので、他の gem の脆弱性 PR まで止まる（limit 0 でも生きている唯一の安全弁を壊す）。
+# ⚠ dependabot は同一 `(ecosystem, directory, target-branch)` の重複を許さないので、
+# 「ginseng 専用のもう 1 エントリ」も足せない。**groups で束ねて本数を抑える。**
 - package-ecosystem: bundler
   directory: '/'
   schedule:
     interval: daily
     time: '03:00'
     timezone: 'Asia/Tokyo'
-  open-pull-requests-limit: 0
+  # ⚠ グループ 2 つぶん。1 日に出る PR は最大 2 本。
+  open-pull-requests-limit: 2
   target-branch: develop
   versioning-strategy: lockfile-only
+  groups:
+    # ⚠ 自作 gem。タグ固定したので `bump ginseng-core from v1.23.7 to ...` と
+    # **版として読める**タイトルになる（#4701 が狙っていた効果）。
+    ginseng:
+      patterns:
+        - 'ginseng-*'
+    # それ以外はまとめて 1 本。⚠ `versioning-strategy: lockfile-only` なので
+    # `Gemfile` の制約は動かず、`Gemfile.lock` だけが上がる。
+    others:
+      patterns:
+        - '*'
+      exclude-patterns:
+        - 'ginseng-*'
