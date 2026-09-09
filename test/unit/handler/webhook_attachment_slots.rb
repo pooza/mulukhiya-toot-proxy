@@ -106,7 +106,7 @@ module Mulukhiya
 
       # ⚠ 第 4 引数は処理中の添付を控える置き場 (#4694)。ここは正常完了する
       # ケースなので、走り終えた時点で空になっている。
-      inflight = Concurrent::Array.new
+      inflight = Concurrent::Hash.new.tap(&:compare_by_identity)
       handler.send(:run_workers, queue, payload, Concurrent::AtomicFixnum.new(4), inflight)
       handler.send(:drain, queue, inflight)
 
@@ -189,7 +189,7 @@ module Mulukhiya
       atomic = Concurrent::AtomicFixnum.new(slots)
       # ⚠ 第 4 引数は処理中の添付を控える置き場 (#4694)。ここでは枠の勘定だけを
       # 見るので中身は使わないが、スレッド安全な実体を渡す必要がある。
-      inflight = Concurrent::Array.new
+      inflight = Concurrent::Hash.new.tap(&:compare_by_identity)
       run_concurrently(WORKERS) {handler.send(:consume, queue, payload, atomic, inflight)}
     end
 

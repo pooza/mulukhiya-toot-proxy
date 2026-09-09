@@ -47,7 +47,12 @@ module Mulukhiya
       # その最中に殺されると 🔴 **キューにも残らず `rescue` も通らない**
       # （`Thread#kill` は `rescue => e` を通さない）。**添付 1 枚 = ワーカー 1 本**
       # という最も普通の形でキューが空になり、`drain` だけでは何も残らなかった。
-      inflight = Concurrent::Array.new
+      # ⚠⚠ **`Concurrent::Array` ではなく Hash（PR #4713 の Codex P1）。**
+      # `Array#delete` は**値の等価**で消すので、**同じ内容の添付が 2 枚あると、
+      # 先に終わったワーカーがまだ走っている別ワーカーの分まで消す**。
+      # そのワーカーが締切で殺されると、キューにも `inflight` にも残らず
+      # **また無音で落ちる**。**同一性**で 1 件ずつ独立に扱う。
+      inflight = Concurrent::Hash.new.tap(&:compare_by_identity)
       run_workers(queue, payload, slots, inflight)
     ensure
       drain(queue, inflight) if queue
@@ -99,7 +104,7 @@ module Mulukhiya
         end
         # ⚠ **取り出したら控える。**外した瞬間から `ensure` で外すまでの間に
         # 殺されると、この添付はどこからも辿れなくなる（PR #4713 の Codex P1）。
-        inflight.push(attachment)
+        inflight[attachment] = attachment
         unless uri = parse_image_uri(attachment)
           slots.increment
           inflight.delete(attachment)
@@ -123,7 +128,7 @@ module Mulukhiya
       while attachment = pop_attachment(queue)
         record_drop('SlotExhausted', 'max media attachments exceeded', attachment)
       end
-      inflight&.each do |attachment|
+      inflight&.each_value do |attachment|
         record_drop('Timeout', 'handler timed out while uploading', attachment)
       end
     end

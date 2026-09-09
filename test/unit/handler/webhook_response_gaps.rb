@@ -66,6 +66,32 @@ module Mulukhiya
       assert_equal('Timeout', @handler.errors.first[:class])
     end
 
+    # 🔴 **①-c 同じ内容の添付が 2 枚あっても取りこぼさない（PR #4713 の Codex P1）。**
+    #
+    # ⚠⚠ `Concurrent::Array#delete` は**値の等価**で消すので、**先に終わった
+    # ワーカーがまだ走っている別ワーカーの分まで消して**しまう。そのワーカーが
+    # 締切で殺されると、キューにも控えにも残らず**また無音で落ちる**。
+    def test_duplicate_attachments_are_tracked_independently
+      attachment = {'image_url' => 'https://example.com/same.png'}
+      # ⚠ **両方が控えに載ってから、片方だけが先に終わる**形を作る。
+      # 素直に「1 枚目は即終わり」にすると、**2 枚目が控えに載る前に 1 枚目が
+      # 終わってしまい競合が起きない**（実際に false negative を踏んだ）。
+      calls = Concurrent::AtomicFixnum.new(0)
+      @handler.define_singleton_method(:create_slots) {|*| Concurrent::AtomicFixnum.new(4)}
+      @handler.define_singleton_method(:upload_attachment) do |*|
+        sleep(calls.increment == 1 ? 0.3 : 10)
+      end
+      payload = {'attachments' => [attachment.dup, attachment.dup]}
+
+      thread = Thread.new {@handler.handle_pre_webhook(payload)}
+      sleep(1.0)
+      thread.kill
+      thread.join(5)
+
+      assert_equal(1, @handler.errors.length, '重複した添付が取りこぼされている')
+      assert_equal('Timeout', @handler.errors.first[:class])
+    end
+
     # 🔴 **② 内部例外の生メッセージを送信側へ返さない。**
     # ⚠⚠ 素通しすると **サーバー内の絶対パス**や**内部ホスト・ポート**が第三者へ返る。
     def test_internal_exception_message_is_not_leaked
