@@ -46,8 +46,17 @@ module Mulukhiya
     def teardown
       super
       return if disable?
-      # ⚠ 他のテストが同じアカウントを見るので、必ず戻す。
-      account.user_config.token = @original_token if @original_token
+      # ⚠⚠ **無かったなら「無い」に戻す（PR #4715 の Codex P2）。**
+      # harness のアカウントは**トークンを持たないのが通常の状態**なので、
+      # `if @original_token` を付けると 🔴 **最初の 1 本が webhook を有効にしたまま
+      # 共有アカウントを汚染し、後続のテストや次回の harness 実行がその設定を見る**。
+      # ⚠ `UserConfig#token=` は nil を受けられない（`nil.encrypt` で落ちる）ので、
+      # 消す側は `update` を直に使う。
+      if @original_token
+        account.user_config.token = @original_token
+      else
+        account.user_config.update(mulukhiya: {token: nil}, webhook: {token: nil})
+      end
     end
 
     # 🔴 **本体。**受信からパイプラインを通って upstream へ実投稿されること。
