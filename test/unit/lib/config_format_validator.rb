@@ -76,6 +76,24 @@ module Mulukhiya
       assert_empty(found, '検証実装の無い format が残っている')
     end
 
+    # 🔴 **本番の書き方のカスタムフィードを拒否しない (#4728)。**
+    # ⚠⚠ #4597 で `/feed/custom/*/path` に `pattern: '^/'` を付けたら、先頭 `/` 無しで
+    # 書かれた本番の設定（zugoga / gomander）が全部 config:lint で落ちた。
+    # `CustomFeed` は `File.join` で組むので、どちらの書き方も正しい。
+    def test_custom_feed_paths_in_both_forms_are_accepted
+      config = Config.instance
+      original = config.raw['local']
+      config.raw['local'] = {'feed' => {'custom' => [
+        {'path' => 'dqdai-official', 'command' => ['bin/dqdai-official.rb']},
+        {'path' => 'precure/portal', 'command' => ['bin/precure-portal.rb']},
+        {'path' => '/absolute', 'command' => ['bin/absolute.rb']},
+      ]}}
+
+      assert_empty(config.errors.grep(%r{#/feed/custom}), 'カスタムフィードの path を拒否している')
+    ensure
+      config.raw['local'] = original
+    end
+
     # 🔴 **`Config#errors` に届くこと（PR #4711 の Codex P1）。**
     # ⚠⚠ `Mulukhiya.validate_config` にだけ足すと、**`rake config:lint` も
     # `Config#audit` も `errors` を直に見ている**ので素通りする。`config:lint` は

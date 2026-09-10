@@ -177,10 +177,12 @@ properties:
               format: uri
               type: string
             path:
-              # ⚠⚠ **`format: ^/` は format 名ですらなかった (#4597)。**未知の format は
-              # 黙って無視されるので、**1 文字の違いで完全な no-op** になっていた。
-              # 書き手の意図（「`/` で始まること」）は正規表現なので `pattern` が正しい。
-              pattern: '^/'
+              # ⚠⚠ **`pattern` を付けない (#4728)。**`CustomFeed` は
+              # `File.join('/mulukhiya/feed', path)` で組むので、**先頭 `/` 無しが正規の
+              # 書き方**（本番の `dqdai-official` / `precure/portal` 等はすべてそう）。
+              # 旧 `format: ^/` は format 名ですらなく何も検証していなかったが、#4597 で
+              # 「`/` で始まること」と読んで `pattern: '^/'` にしたら、本番の正しい設定を
+              # 全部拒否した。**効いていない制約は、意図を実物と突き合わせてから効かせる。**
               type: string
             title:
               type: string
