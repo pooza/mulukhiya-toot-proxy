@@ -41,6 +41,14 @@ properties:
     type: array
   disabled:
     type: boolean
+  retry:
+    properties:
+      limit:
+        minimum: 1
+        type: integer
+    required:
+      - limit
+    type: object
   timeout:
     minimum: 1
     type: integer

@@ -108,7 +108,7 @@ capsicum では管理者ロールに `:sabacan:` カスタム絵文字を表示�
 }
 ```
 
-- DB 未接続時（Misskey 等）やエラー時は空配列 `[]` を返す
+- ⚠ **Misskey でも実 ID を返す**（`Misskey::Role.where(isAdministrator: true)`・#4176 で実装）。空配列 `[]` になるのは **DB 未接続時とエラー時**だけ
 - Misskey は `isAdministrator` フィールドがあるため不要だが、空配列が返るだけなので capsicum 側で分岐不要
 
 ### 実装詳細
@@ -272,7 +272,7 @@ POST /mulukhiya/api/account/is_cat
 2. `Accept: application/activity+json` で actor を GET
 3. actor JSON のトップレベル `isCat` フィールドを取得
 4. `isCat` が `true` → `true`、`false` / 未設定 / actor 取得失敗 → `false`（取得失敗時のみ `null` 許容）
-5. 結果を Redis キャッシュ（TTL 24h）
+5. 結果を Redis キャッシュ（TTL **1 時間**。`/account/is_cat/cache/ttl` = `3600`。⚠ 6h → 1h に短縮済み）
 
 ### capsicum 側の利用方法
 
@@ -280,9 +280,9 @@ POST /mulukhiya/api/account/is_cat
 2. `true` が返った acct のユーザーに猫耳を表示
 3. capsicum 側でもメモリキャッシュし、同一セッション内の再問い合わせを抑制
 
-### 現在の問題（2026-04-17 確認）
+### ✅ 解決済み（#4247・2026-04-16）
 
-API は到達・認証成功しているが、`pooza@misskey.delmulin.com`（`isCat: true` を設定済み）に対して `null` が返る。サーバーからの `curl` で ActivityPub actor を直接取得すると `"isCat": true` が確認できるため、`fetch_actor` の結果から `isCat` を抽出する処理に問題がある可能性。
+かつて `isCat: true` のユーザーに `null` が返る不具合があった（`fetch_actor` の結果から `isCat` を抽出できていなかった）。**#4247 で解消済み。**
 
 ### 関連
 
@@ -418,12 +418,17 @@ capsicum の macOS Share Extension（capsicum #422）によるナウプレ投稿
 
 | メソッド | パス | 用途 | 認証 |
 | --- | --- | --- | --- |
-| GET | `/spotify/oauth_uri` | OAuth 認可 URL 取得 | 不要 |
-| POST | `/spotify/auth` | 認可コードを token に交換・保管（body: `code`） | SNS token |
+| GET | `/spotify/oauth_uri` | OAuth 認可 URL 取得（⚠ URI に `state` が乗る） | ⚠⚠ **SNS token（5.37.0 から必須）** |
+| POST | `/spotify/auth` | 認可コードを token に交換・保管（body: `code` と ⚠ **`state`**） | SNS token |
 | GET | `/spotify/currently_playing` | 現在再生中の URL（`{url}` / 無再生は `{url: null}`） | SNS token |
 | DELETE | `/spotify/auth` | 連携解除 | SNS token |
 
-- **認証フロー**: capsicum がブラウザで認可 URL を開き、Redirect URI で捕捉した認可コードを `POST /spotify/auth` に渡す。ユーザー特定は SNS トークンで行うため `state` は不要。詳細は `docs/api.md` の「Spotify user OAuth」節。
+- **認証フロー**: capsicum が **SNS トークン付きで** `GET /spotify/oauth_uri` を叩いて認可 URL を得て、ブラウザで開く。Redirect URI で捕捉した認可コードを、⚠ **1 で受け取った URI の `state` と一緒に** `POST /spotify/auth` に渡す。詳細は `docs/api.md` の「Spotify user OAuth」節。
+- ⚠⚠ **5.37.0 (#4414) からの破壊的変更**（capsicum 側の改修が要る・申し送りは pooza/capsicum#737）:
+  - `GET /spotify/oauth_uri` は **Bearer 無しだと 403**。`state` を**呼んだ本人のアカウントに縛る**ため（縛らないと、攻撃者の code/state の組を被害者の callback へ流し込めて、攻撃者のトークンが被害者の UserConfig に入る）
+  - `POST /spotify/auth` は **`state` 無しだと 422**、知らない・使用済み・別アカウントの `state` は **403**
+  - ⚠ `state` は**一度きり・600 秒**。`oauth_uri` の応答は `Cache-Control: no-store` なので**使い回さない**
+  - ⚠ **`GET` を叩いたトークンと `POST` のトークンは同じである必要がある**
 - **トークン管理**: access_token（3600s 失効）と refresh_token をモロヘイヤが暗号化保管し、失効・401 時に自動リフレッシュ。capsicum は意識不要。refresh_token 失効時は 403（要再連携）。
 - **エラー**: 未連携・refresh 失効 → 403、Spotify API 障害 → 502、無再生／広告／プライベートセッション → `{url: null}`（200）。
 

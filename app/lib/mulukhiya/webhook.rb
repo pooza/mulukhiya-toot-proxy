@@ -2,7 +2,11 @@ module Mulukhiya
   class Webhook
     include Package
     include SNSMethods
-    # ⚠ クラスメソッド (`self.create`) から digest を丸めるので `extend` (#4655)。
+    # ⚠ **クラス側から digest を丸められるようにしておく (#4655)。**
+    # 導入時の呼び出し元だった `self.create` は #4657 で消えたが、これは
+    # **意図して残している** — digest をログへ出す経路がクラス側に生えたときに
+    # 素の値が漏れないための備えで、`LogScrubPathTest#test_webhook_class_scrubs_digest`
+    # が `Webhook.scrub_log_digest` を直接叩いて押さえている。**死にコードではない。**
     extend LogScrubber
 
     attr_reader :sns, :reporter

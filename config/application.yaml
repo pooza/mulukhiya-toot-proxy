@@ -37,6 +37,13 @@ cherrypick:
 cli:
   progress_bar:
     format: '%c/%C (%p%%)| %B'
+config:
+  validation:
+    # ⚠ 真にすると、schema 検証エラーがある状態では起動そのものを止める (#4596)。
+    # 既定は偽（警告だけ出して起動する）。⚠⚠ **ここに既定値があること自体が
+    # ガードの一部** — 宣言が無いと `Config#[]` が ConfigError を上げ、
+    # 「厳格かどうか」を判定する前に検証が飛ぶ。
+    strict: false
 controller: mastodon
 daemon:
   restart:
@@ -66,6 +73,10 @@ ffmpeg:
   preset: veryfast
   probe:
     timeout: 30
+  # ffmpeg 1 回あたりの上限 (秒)。⚠ ハンドラの中では
+  # `/handler/video_format_convert/timeout` から逆算した残りのほうが短くなるので、
+  # これが効くのは rake・CLI・テストなど**ハンドラの外**だけ (#4696)。
+  timeout: 90
 firefish:
   capabilities:
     reaction: true
@@ -90,6 +101,13 @@ handler:
       - https://pf.korako.me/plugins/community-hashtag-map.json
     cache_ttl: 3600
   dictionary_tag:
+    # 辞書ソース取得の再送回数 (#4689)。⚠ **404 を再送するのは辞書だけ**
+    # （GAS の間欠 404 のため）。⚠⚠ 1 ソースあたりの最悪は
+    # `limit × /http/timeout/seconds + (limit - 1) × /http/retry/seconds`
+    # ＝ **2 なら 61 秒 / 3 なら 92 秒**。worker は 10 分周期なので 2 で余裕を残す。
+    # ⚠ 増やすと #4690（取得回数を減らす）と逆に効くので、総リクエスト数で見ること。
+    retry:
+      limit: 2
     cache:
       ttl: 3600
       # ソース単位の last-good キャッシュの TTL (#4659)。⚠ 本体の ttl より長く持つ
@@ -473,7 +491,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 5.36.0
+  version: 5.37.0
 parser:
   note:
     fields:

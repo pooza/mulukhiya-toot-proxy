@@ -15,6 +15,18 @@ module Mulukhiya
     # `X-Mulukhiya` まで混ざる。転送してよいものだけを 1 本の許可リストに置く。
     FORWARDED_HEADERS = ['Idempotency-Key'].freeze
 
+    # サーバー側の失敗を鳴らす間隔 (秒) と、その印を置く Redis キーの接頭辞 (#4693)。
+    # ⚠ 型ごとに独立して数える。`Sequel::DatabaseConnectionError` の連打を抑えている間に
+    # 別の型（本物のバグ）が出たら、そちらは 1 回目として鳴ってほしい。
+    ALERT_THROTTLE_SECONDS = 300
+    ALERT_THROTTLE_KEY_PREFIX = 'alert_throttle'.freeze
+
+    # ルートが決まる前に落ちたときの発生源 (#4693・PR #4712 の Codex P2)。
+    #
+    # ⚠⚠ **ここは 1 つのバケツにまとめる。**`before` は全リクエストで走り、
+    # **パスごとに分けると分けた数だけ鳴る**＝抑えたい相手そのものを取り逃がす。
+    BEFORE_ORIGIN = 'before'.freeze
+
     set :root, Environment.dir
     enable :method_override
 
@@ -26,7 +38,19 @@ module Mulukhiya
       end
       begin
         @params = Sinatra::IndifferentHash[JSON.parse(@body)]
-      rescue StandardError
+      rescue StandardError => e
+        # ⚠⚠ **ここは黙って body を捨てる経路 (#4699)。**フォーム POST や空 body でも
+        # 通るので rescue 自体は正しいが、**JSON のつもりで送られた body が落ちた**ときも
+        # 同じ穴に落ちる。クライアントからは「投稿したのに内容が空」に見え、
+        # ログに手掛かりが 1 行も残らない。
+        #
+        # ⚠ **JSON らしい body のときだけ残す。**毎リクエスト出すとフォーム POST で
+        # syslog が埋まる（#4549 の型）。
+        #
+        # 🔴 **json 3.0 へ上げる前の前提。**3.0 は `allow_duplicate_key` の既定が
+        # false になるので、**いままで「後勝ち」で通っていた重複キーの body が
+        # 丸ごとここへ落ちる**。無音のままだと版を上げた影響を切り分けられない。
+        log_unparsable_body(e)
         @params = Sinatra::IndifferentHash[params]
       end
       logger.info(request: {
@@ -54,6 +78,29 @@ module Mulukhiya
     end
 
     not_found do
+      # ⚠⚠ **ルート側が既に body を作っていたら差し替えない (#4520)。**
+      # Sinatra は `response.status == 404` を見て、**ルートが正常に返った後でも**
+      # この block を呼ぶ（`invoke { error_block!(response.status) }`）。そのため
+      # ルートの `rescue` が組み立てた `{error: e.message}` が毎回この既定メッセージで
+      # 上書きされ、**404 だけボディの形が違って**いた。
+      #
+      # 🔴 影響は「見た目が違う」では済まない。403/422/5xx は `error` / `errors` キーを
+      # 持つのに 404 だけ `{package, class, message}` になるので、**クライアントが
+      # キーの有無で分岐できない**。404 の理由（投稿が無い / 他人の投稿 / 機能が無効）も
+      # 全部同じ body に潰れていた。
+      #
+      # ⚠ **ルート未一致と区別できる。**`before` が毎回 `default_renderer_class.new` を
+      # 置くが、`message` は nil のままなので、埋まっているのは**ルートが書いたとき
+      # だけ**。⚠ `respond_to?` を見るのは、ルートが message を持たない
+      # レンダラ（フィード・生ファイル）へ差し替えていることがあるため。
+      #
+      # ⚠⚠ **判定は `present?` ではなく `nil?`（PR #4707 の Codex P2）。**上流が 404 と
+      # **空の JSON ボディ `{}`** を返すと `handle_gateway_error` が `{}` を `message` へ
+      # 入れるが、`{}.present?` は false なので `present?` だと**上流の応答をここで
+      # 潰してしまう**。`api.md` が約束している「上流の包絡をそのまま透過する」に反する。
+      # **未設定は nil だけ**なので `nil?` で足りる。
+      return @renderer.to_s if @renderer.respond_to?(:message) && !@renderer.message.nil?
+
       @renderer = default_renderer_class.new
       @renderer.status = 404
       # ⚠ **ここは `scrub_log_path` を通さない (#4655)。**これはログではなく
@@ -81,6 +128,35 @@ module Mulukhiya
         Sentry.capture_exception(e) rescue nil if Sentry.initialized?
       end
       return @renderer.to_s
+    end
+
+    # JSON のつもりで送られた body が解釈できなかったことを残す (#4699)。
+    #
+    # ⚠ **JSON らしい body のときだけ。**`{` / `[` で始まらないものはフォーム POST や
+    # 空 body なので、落ちるのが正常。毎回出すと syslog が埋まる。
+    # ⚠⚠ **例外メッセージを出さない（PR #4708 の Codex P1）。**
+    # `JSON::ParserError` のメッセージは**壊れた入力をそのまま反響する**。実測:
+    #
+    #   JSON::ParserError: unexpected character: '秘密の本文}' at line 1 column 12
+    #   JSON::ParserError: expected ',' or '}' after object value, got: '秘密のトークンabc123}'
+    #
+    # ⚠ json 3 の重複キーエラーは**キー名そのもの**を含む。どちらも利用者由来の
+    # 値なので、`message` を出した時点で「本文は出さない」が破れる（#4394 / #4630）。
+    # ⚠ 長さの上限も無いので、**巨大なログ 1 行**にもなりうる。
+    #
+    # **残すのは型と大きさだけ。**「どこで落ちたか」は class と path で足りる。
+    def log_unparsable_body(error)
+      return unless json_body?
+      logger.error(
+        error: 'request body is not parsable as JSON',
+        class: error.class.to_s,
+        bytesize: @body.bytesize,
+        path: scrub_log_path(request.path),
+      )
+    end
+
+    def json_body?
+      return @body.to_s.lstrip.start_with?('{', '[')
     end
 
     def name
@@ -114,6 +190,23 @@ module Mulukhiya
       return @headers.to_h.slice(*FORWARDED_HEADERS)
     end
 
+    # トークンを暗号化する。⚠ **失敗はこちらの設定の問題 (#4693)。**
+    #
+    # ⚠⚠ `Ginseng::CryptError#status` は **403** なので、`report_error` の
+    # ステータス判定では「クライアントが悪い」側に落ちて **`log` 止め**になる。
+    # だが実体は `/crypt/password` の未設定・破損で、**全ユーザーのトークン発行が
+    # 403 になるのに Sentry には何も出ない**（`Crypt.password` が `rescue nil` で
+    # nil に落ち、`PKCS5.pbkdf2_hmac(nil, ...)` が `CryptError` に包まれる）。
+    #
+    # ⚠ **クライアントは何も悪くない**ので、ここで印を付けて必ず鳴らす。
+    # ⚠ `report_error` 側で例外クラスを列挙しないための形（#4603 / #4629 で
+    # 列挙は実際に取りこぼしている）。
+    def encrypt_token!(value)
+      return value.encrypt
+    rescue => e
+      raise NeverSilent.mark(e)
+    end
+
     def verify_token_integrity!
       expected = token
       return unless expected
@@ -124,7 +217,11 @@ module Mulukhiya
         actual: sns.token&.first(8),
         path: scrub_log_path(request.path),
       )
-      raise Ginseng::AuthError, 'Token integrity check failed'
+      # ⚠⚠ **これは「クライアントが悪い」ではない (#4693)。**リクエスト間で
+      # トークンが混線した＝**セキュリティ不変条件の破れ**で、2025-10 のトークン
+      # 汚染事故（`Gemfile` が rack / sinatra に上限を書いている理由そのもの）の
+      # 再発検知がここに掛かっている。401 なので既定では log 止めになる。
+      raise NeverSilent.mark(Ginseng::AuthError.new('Token integrity check failed'))
     end
 
     # クライアント起因の失敗を Sentry alert に上げない共通判定
@@ -150,7 +247,77 @@ module Mulukhiya
     # モロヘイヤ自身のバグを黙らせてはいけないので、これが正しい既定。
     # `respond_to?` のガードは refine が外れたときの保険で、通常は到達しない。
     def report_error(error)
-      client_error?(error) ? error.log : error.alert
+      # ⚠⚠ **① 印が付いていればステータスに依らず必ず鳴らす (#4693)。**
+      # 「403 だがこちらの設定が壊れている」型（`Ginseng::CryptError`）や
+      # 「401 だがセキュリティ不変条件の破れ」型（`token_mismatch`）が、
+      # ステータスだけの判定では丸ごと無音になっていた。
+      return error.alert if never_silent?(error)
+      # ② クライアント起因は従来どおり log 止め。
+      return error.log if client_error?(error)
+      # ⚠⚠ **③ サーバー側の失敗は鳴らすが、連続はデッドマンで抑える (#4693)。**
+      # `before` は**全リクエスト**（未認証・スキャナ由来を含む）で走り、失敗の
+      # 主因は Redis / Postgres 障害。素通しだと **DB 全断中にリクエスト 1 本ごとに
+      # Sentry イベント 1 件＋ slack / line / mail** が飛び、障害中に外向き HTTP を
+      # 増やす二次被害とレート制限になる。
+      return throttled_alert(error)
+    end
+
+    # 同じ型 × 同じ発生源の失敗は、窓のあいだ 1 回だけ鳴らす (#4693)。
+    #
+    # ⚠ `StartupNotificationWorker#notify_failure` と同じ「連続失敗の 1 回目だけ」の
+    # 考え方だが、**成功で解除する代わりに TTL で解除する。**`before` は毎リクエスト
+    # 走るので、成功のたびに Redis を書くと平常時のコストが乗る。
+    #
+    # ⚠ **抑止中の log には発生源を載せる。**抑止しているあいだは syslog が唯一の
+    # 記録なので、どのルートで何件落ちたかを数えられないと意味が無い。
+    def throttled_alert(error)
+      return error.alert if acquire_alert_slot(alert_throttle_key(error))
+      return error.log(throttled: true, origin: alert_throttle_origin)
+    end
+
+    # 鳴らす権利を獲得できたか。
+    #
+    # 🔴 **5.37.0 リリース前レビューの赤。**当初は `key?` → `setex` の 2 段で、
+    # - `key?` の中身が **`KEYS`** で、**障害の最中に要求のたびに Redis を塞いでいた**
+    #   （Mastodon と共有しているインスタンス。同じリリースの #4703 が
+    #   「KEYS は本番の要求経路に乗らない」と書いたのと矛盾していた）
+    # - `setex` の再送で、書き込みを拒む Redis では **5xx のたびに約 2 秒止まった**
+    # - ⚠⚠ **書き込みを拒む Redis（ディスク満杯の MISCONF・OOM・READONLY）では、
+    #   印が永遠に書けないので全ルートのサーバー側失敗が 1 回も鳴らなくなった。**
+    #   しかも `/health` の redis は**読みしか試さない**ので OK のまま＝
+    #   「Redis の死は /health が見る」という前提が崩れていた
+    #
+    # → **`SET NX EX` を再送なしで 1 回**撃つ。⚠⚠ **書けなかったら黙らせない。**
+    # プロセス内の抑止へ倒す（`LocalAlertThrottle`）。**Redis が健全なら
+    # クラスタ全体で 1 回、壊れていればプロセスごとに 1 回**鳴る。どちらでも
+    # 「黙る」ことも「連打する」ことも無い。
+    def acquire_alert_slot(key)
+      return Redis.new.acquire(key, ALERT_THROTTLE_SECONDS)
+    rescue => e
+      logger.error(error: 'alert throttle unavailable', class: e.class.to_s, key:)
+      return LocalAlertThrottle.acquire(key, ALERT_THROTTLE_SECONDS)
+    end
+
+    # 抑止のバケツ。**型だけでは粗すぎる（PR #4712 の Codex P2）。**
+    #
+    # ⚠⚠ `report_error` は `before` だけでなく**各コントローラの rescue から
+    # 呼ばれる**ので、型だけで括ると **`RuntimeError` / `NoMethodError` のような
+    # 広い型で、あるルートの失敗が別ルートの本物のバグを 300 秒握り潰す。**
+    # 発生源（ルート）を混ぜて、**抑えたいのは「同じ場所の連打」だけ**にする。
+    #
+    # ⚠ `sinatra.route` は `"POST /api/v?/status/tags"` のような**パターン**なので、
+    # id を含まず安定している（実測）。ルートが決まる前＝ `before` の失敗では nil。
+    def alert_throttle_key(error)
+      return [ALERT_THROTTLE_KEY_PREFIX, error.class, alert_throttle_origin].join('/')
+    end
+
+    # ⚠ リクエストの外（rake・テスト）では `request` が nil。**黙って倒すが、
+    # 倒す先は「より強く抑える」側**なので、無音で緩むことにはならない。
+    def alert_throttle_origin
+      return BEFORE_ORIGIN unless request
+      return request.env['sinatra.route'].presence || BEFORE_ORIGIN
+    rescue StandardError
+      return BEFORE_ORIGIN
     end
 
     # ⚠ 見るのは `status`（モロヘイヤがクライアントへ返す値）。上流の

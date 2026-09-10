@@ -25,8 +25,9 @@ module Mulukhiya
       assert_false(SpotifyUserService.config?)
     end
 
+    # ⚠ `oauth_uri` は `state` を発行するのでアカウントが要る（#4414）。
     def test_oauth_uri
-      uri = SpotifyUserService.new.oauth_uri
+      uri = SpotifyUserService.new(account_double).oauth_uri
 
       assert_equal('accounts.spotify.com', uri.host)
       assert_equal('/authorize', uri.path)
@@ -36,6 +37,12 @@ module Mulukhiya
       assert_equal('code', query['response_type'])
       assert_equal('user-read-currently-playing', query['scope'])
       assert_equal(config['/service/spotify/oauth/redirect_uri'], query['redirect_uri'])
+      assert_predicate(query['state'], :present?)
+    end
+
+    # ⚠ アカウント無しでは発行しない（縛れないものを配らない・#4414）。
+    def test_oauth_uri_requires_an_account
+      assert_raises(Ginseng::AuthError) {SpotifyUserService.new.oauth_uri}
     end
 
     def test_auth_exchanges_code_and_stores_tokens
@@ -44,7 +51,7 @@ module Mulukhiya
       )
       account = account_double
 
-      SpotifyUserService.new(account).auth('the-code')
+      SpotifyUserService.new(account).auth('the-code', issued_state(account))
 
       assert_requested(stub.with do |req|
         body = URI.decode_www_form(req.body).to_h
@@ -102,7 +109,9 @@ module Mulukhiya
       stub = stub_token_endpoint(access_token: 'a', refresh_token: 'r', expires_in: 3600)
       expected = Base64.strict_encode64('test_client_id:test_client_secret')
 
-      SpotifyUserService.new(account_double).auth('the-code')
+      account = account_double
+
+      SpotifyUserService.new(account).auth('the-code', issued_state(account))
 
       assert_requested(stub.with do |req|
         req.headers['Authorization'] == "Basic #{expected}" &&
@@ -233,9 +242,18 @@ module Mulukhiya
     # 実 Account/UserConfig (DB・Redis 依存) を避けるための最小ダブル。
     # UserConfig は暗号化値をそのまま保持し read 時に復号しない仕様だが、本ダブルは
     # 平文を保持する (service 側 decrypt は復号失敗時に値をそのまま返すため整合する)。
-    def account_double(store = {})
+    # ⚠ `auth` は 5.37.0 (#4414) から `state` の検証を通る。テストでは
+    # **そのアカウントで実際に発行した state** を使う（素の文字列や別アカウント
+    # 発行のものは 403 になる）。
+    def issued_state(account)
+      return SpotifyUserService.new(account).send(:create_state)
+    end
+
+    # ⚠ `id` を持たせるのは、`state` が**発行したアカウントに縛られる**ため
+    # （#4414・PR #4714 の Codex P1）。
+    def account_double(store = {}, id = 4414)
       user_config = FakeUserConfig.new(store)
-      return Struct.new(:user_config).new(user_config)
+      return Struct.new(:user_config, :id).new(user_config, id)
     end
 
     class FakeUserConfig

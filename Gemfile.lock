@@ -9,7 +9,7 @@ GIT
 GIT
   remote: https://github.com/pooza/ginseng-core.git
   revision: b6e736db820caca781890fb134b937e7e37ca61c
-  branch: main
+  tag: v1.23.7
   specs:
     ginseng-core (1.23.7)
       activesupport (>= 8.1.2.1)
@@ -42,22 +42,22 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 8d6d1fa6f9e49f71347cd3b47eea794f12ae8f45
-  branch: main
+  revision: f6e160a2794db2573b9210eea23ab7593dcc5123
+  tag: v1.8.31
   specs:
     ginseng-fediverse (1.8.31)
 
 GIT
   remote: https://github.com/pooza/ginseng-piefed.git
-  revision: afddcdace7ae524cfba4967e5f7de97637bbea32
-  branch: main
+  revision: ec2bf39fd0c706c33a9d159fb13fd8006b001927
+  tag: v0.1.1
   specs:
     ginseng-piefed (0.1.1)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
-  revision: 23e10ea2b7897f48f485caca4c8fd5cae6f4f2ca
-  branch: main
+  revision: dfb8e65fe645e745ae03f2cb9a84c1fb8e95188b
+  tag: v2.0.1
   specs:
     ginseng-postgres (2.0.1)
       pg
@@ -65,8 +65,8 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-redis.git
-  revision: 7a1e9c658de93b3bb9a8871d2aa35939fb07e69f
-  branch: main
+  revision: 0019c73ea1eed170ef40712f788171f1edf242c9
+  tag: v2.0.6
   specs:
     ginseng-redis (2.0.6)
       redis-client
@@ -84,8 +84,8 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: 2f4fd0e68fe24fe56914648b5d3a967791f99309
-  branch: main
+  revision: 9814f164d64658c94923c55b0e8a920b6c798960
+  tag: v2.0.0
   specs:
     ginseng-web (2.0.0)
       erb
@@ -100,8 +100,8 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-youtube.git
-  revision: 71415a45d291f7a823e1b51c397e4651d9625237
-  branch: main
+  revision: 74b9f344df15ab8a2f6f09808781f97e6ad872a5
+  tag: v3.0.1
   specs:
     ginseng-youtube (3.0.1)
 
@@ -169,7 +169,7 @@ GEM
     crass (1.0.7)
     csv (3.3.6)
     date (3.5.1)
-    domain_name (0.6.20260902)
+    domain_name (0.6.20260907)
     drb (2.2.3)
     dry-configurable (1.4.0)
       dry-core (~> 1.0)
@@ -281,7 +281,7 @@ GEM
     mustermann (3.1.1)
     net-http (0.9.1)
       uri (>= 0.11.1)
-    net-imap (0.6.6)
+    net-imap (0.6.7)
       date
       net-protocol
     net-pop (0.1.2)

@@ -44,6 +44,21 @@ module Mulukhiya
       assert_equal('mastodon', consumed[:sns_type])
     end
 
+    # 🔴 **読み出しと削除が原子的であること（PR #4714 の Codex P2）。**
+    # ⚠⚠ `get` → `unlink` の 2 段だと、**同じ state を使った同時アクセスが
+    # 両方とも通る**。`GETDEL` で 1 コマンドにしてある。
+    def test_consume_is_atomic
+      result = OAuthHelper.create_oauth_state(sns_type: 'mastodon')
+      winners = Concurrent::Array.new
+
+      threads = Array.new(8) do
+        Thread.new {winners.push(OAuthHelper.consume_oauth_state(result[:state]))}
+      end
+      threads.each(&:join)
+
+      assert_equal(1, winners.compact.length, '同じ state で複数回通っている')
+    end
+
     def test_consume_oauth_state_one_time
       result = OAuthHelper.create_oauth_state(sns_type: 'misskey')
       consumed = OAuthHelper.consume_oauth_state(result[:state])

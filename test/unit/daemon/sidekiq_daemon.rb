@@ -1,5 +1,5 @@
 module Mulukhiya
-  class SudekiqDaemonTest < TestCase
+  class SidekiqDaemonTest < TestCase
     def setup
       @daemon = SidekiqDaemon.new
       config['/crypt/password'] = 'mulukhiya'

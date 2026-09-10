@@ -3,6 +3,7 @@ inflections:
   amazon_url_handler: AmazonURLHandler
   api_controller: APIController
   css_renderer: CSSRenderer
+  dictionary_http: DictionaryHTTP
   ffmpeg_command_builder: FFmpegCommandBuilder
   http: HTTP
   http_status: HTTPStatus

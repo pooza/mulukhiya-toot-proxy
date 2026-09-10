@@ -1,5 +1,8 @@
 version: 2
 updates:
+# ⚠⚠ **v4 系は据え置き（limit 0 ＝ version update 無効）。**
+# 保守は「必要なものだけバックポート」の方針なので、日次で PR が出ても捌けない。
+# ⚠ security update は limit 0 でも動くので、脆弱性の通知は止まらない。
 - package-ecosystem: bundler
   directory: '/'
   schedule:
@@ -9,12 +12,67 @@ updates:
   open-pull-requests-limit: 0
   target-branch: v4
   versioning-strategy: lockfile-only
+# ⚠⚠ **develop は version update を開ける (#4702)。**
+# #4701 で `ginseng-*` をタグ固定したが、**limit 0 のままだと版を上げる経路が
+# どこにも無く、7 本が凍結する**（PR #4701 の Codex P2）。⚠ 固定の目的は
+# 「破綻の受け皿を `bundle update` の中から版上げ PR の CI へ移す」ことなので、
+# **その PR が出ないと固定した意味が無い。**
+#
+# ⚠ `allow:` で `ginseng-*` に絞ってはいけない。`allow` は **security update にも効く**
+# ので、他の gem の脆弱性 PR まで止まる（limit 0 でも生きている唯一の安全弁を壊す）。
+# ⚠ dependabot は同一 `(ecosystem, directory, target-branch)` の重複を許さないので、
+# 「ginseng 専用のもう 1 エントリ」も足せない。**groups で束ねて本数を抑える。**
 - package-ecosystem: bundler
   directory: '/'
   schedule:
     interval: daily
     time: '03:00'
     timezone: 'Asia/Tokyo'
-  open-pull-requests-limit: 0
+  # ⚠ グループ 2 つぶん。1 日に出る PR は最大 2 本。
+  open-pull-requests-limit: 2
   target-branch: develop
-  versioning-strategy: lockfile-only
+  # ⚠⚠ **`lockfile-only` では ginseng の版が上がらない（PR #4716 の Codex P1）。**
+  # `tag: 'v1.23.7'` を新しいタグへ上げるには **`Gemfile` の書き換えが要る**が、
+  # `lockfile-only` は「manifest の変更が要る版は無視する」ので、**ginseng グループから
+  # PR が 1 本も出ない**（= この設定を足した目的そのものが成立しない）。
+  #
+  # `increase-if-necessary` は **今の制約を満たさない版のときだけ** manifest を動かす。
+  # ⚠ ただしそれでは、**意図して上限を置いている gem まで制約を広げる PR が出る**。
+  # そこで下の `ignore` で、上限の外へ出る版上げだけを止める（据え置きの判断は Issue で行う）。
+  # ⚠ `ignore` は version update にだけ効き、**security update は止めない**。
+  versioning-strategy: increase-if-necessary
+  # ⚠⚠ **`Gemfile` の `~>` と対にしてある。**上限を足した・外したら、ここも直す
+  # （`test/unit/lib/dependabot_config.rb` がずれを捕まえる）。
+  #   `~> X.Y`   → 上限の外は major       → major を止める
+  #   `~> X.Y.Z` → 上限の外は minor 以上  → minor と major を止める
+  ignore:
+    # #4699: json 3.0 はリリース翌日のメジャー。harness ＋ステージングで実走してから上げる
+    - dependency-name: json
+      update-types: ['version-update:semver-major']
+    # #4663 / #4678: 2026-02 の同時アクセステストを通った版。上げる判断は実測で行う
+    - dependency-name: rack
+      update-types: ['version-update:semver-major', 'version-update:semver-minor']
+    # 🔴 事故版は 4.2.0。4.2.1 は本番 4 台で無事故（#4508）
+    - dependency-name: sinatra
+      update-types: ['version-update:semver-major', 'version-update:semver-minor']
+    - dependency-name: sidekiq-scheduler
+      update-types: ['version-update:semver-major', 'version-update:semver-minor']
+    - dependency-name: parallel
+      update-types: ['version-update:semver-major']
+    - dependency-name: puma
+      update-types: ['version-update:semver-major']
+    - dependency-name: sidekiq
+      update-types: ['version-update:semver-major']
+  groups:
+    # ⚠ 自作 gem。タグ固定したので `bump ginseng-core from v1.23.7 to ...` と
+    # **版として読める**タイトルになる（#4701 が狙っていた効果）。
+    ginseng:
+      patterns:
+        - 'ginseng-*'
+    # それ以外はまとめて 1 本。⚠ 上の `ignore` があるので、**上限を置いた gem の
+    # 制約は動かない**（上限の内側の版上げは `Gemfile.lock` だけが上がる）。
+    others:
+      patterns:
+        - '*'
+      exclude-patterns:
+        - 'ginseng-*'

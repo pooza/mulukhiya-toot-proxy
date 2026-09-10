@@ -49,9 +49,10 @@ MASTODON_REDIS_DSN=redis://127.0.0.1:6380
 `MULUKHIYA_HARNESS_DIR` を渡すだけで DB 依存テストまで動く。local.yaml に要るのは
 harness が用意しないもの（`crypt.password` 等）のみ。
 
-> 既知: ローカル Mastodon の status は `uri` カラムが null のことがあり、
-> `StatusTest#test_uri` が落ちる（harness 起因か mulukhiya テスト側で吸収すべきか
-> 要切り分け。chubo2#48 で追跡）。
+> ⚠ **かつて**「ローカル Mastodon の status は `uri` カラムが null のことがあり
+> `StatusTest#test_uri` が落ちる」という既知の失敗があったが、**pooza/chubo2#48 は
+> クローズ済みで再現しない**（下記「リリースゲートとしての実走」の判定基準も
+> 「既知例外は無い」を前提にしている）。落ちたら例外を作らず原因を切り分けること。
 
 ## 手順（Mastodon）
 
@@ -170,6 +171,43 @@ tests / failures / errors / omissions の 4 つで見る。
 
 記録先: [harness-verified-versions.yaml](harness-verified-versions.yaml)。上流バージョンの
 `verified` 昇格を伴う実走は、この台帳に日付つきで残す。
+
+## webhook 投稿経路の検証（#4428）
+
+**`WebhookInprocessTest`** が `/mulukhiya/webhook/<digest>` の受信 → `pre_toot`
+パイプライン → `sns.post` で upstream へ実投稿、までを **1 プロセスで**通す。
+
+⚠ **puma を別に立てない。**`include Rack::Test::Methods` + `def app = WebhookController`
+で Sinatra を直接叩く。harness には前段の mulukhiya が居ないので、curl 方式
+（`WebhookTest#test_command`）は**構造的に検証できない**（あちらは従来どおり omit）。
+
+### ⚠⚠ harness 側に provisioning が要る（pooza/chubo2#232）
+
+**mulukhiya の webhook 引き当ては、アプリ名で候補を絞る**:
+
+```sql
+AND (apps.name LIKE 'mulukhiya%')   -- Mastodon / Misskey とも同じ
+```
+
+そのため harness 側に **`mulukhiya` で始まる名前のアプリ**と、それに紐づく
+アクセストークンが要る。**無いと `oauth_access_tokens` / `access_token` に行があっても
+候補が 0 件になり、`/mulukhiya/webhook/<digest>` は必ず 404 になる。**
+
+| | harness が作るもの | 必要な追加 |
+| --- | --- | --- |
+| Mastodon | Doorkeeper アプリ `fedi-test-harness` | **名前を `mulukhiya (fedi-test-harness)` へ** |
+| Misskey | ⚠ **`app` / `access_token` の行を作らない**（signup が返すのはネイティブトークン） | **両方の行を作る** |
+
+⚠ **Misskey は `hash` 列が実トークン。**mulukhiya の `Misskey::AccessToken` は
+`to_s` が `values[:hash]`、`get(token:)` が `first(hash: token)` なので、
+`hash` に `.env.test` のトークンを入れる（`token` 列は使われない）。
+
+### ⚠ テストは webhook トークンを自分で用意する
+
+harness のアカウントは webhook トークンを持たないので、`WebhookInprocessTest#setup` が
+`account.user_config.token` を入れてから `account.webhook` を取る。
+⚠ **入れてから取る**（`Webhook#initialize` がそのとき `@sns.token` を固定するため）。
+⚠ teardown で必ず戻す（他のテストが同じアカウントを見る）。
 
 ## 後片付け
 

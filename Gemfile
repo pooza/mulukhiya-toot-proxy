@@ -3,14 +3,14 @@ ruby '>= 4.0.2', '< 5.0'
 gem 'concurrent-ruby'
 gem 'dry-validation'
 gem 'faye-websocket', github: 'pooza/faye-websocket-ruby'
-gem 'ginseng-core', github: 'pooza/ginseng-core', branch: 'main', require: 'ginseng'
-gem 'ginseng-fediverse', github: 'pooza/ginseng-fediverse', branch: 'main',
+gem 'ginseng-core', github: 'pooza/ginseng-core', tag: 'v1.23.7', require: 'ginseng'
+gem 'ginseng-fediverse', github: 'pooza/ginseng-fediverse', tag: 'v1.8.31',
   require: 'ginseng/fediverse'
-gem 'ginseng-piefed', github: 'pooza/ginseng-piefed', branch: 'main', require: 'ginseng/piefed'
-gem 'ginseng-postgres', github: 'pooza/ginseng-postgres', branch: 'main'
-gem 'ginseng-redis', github: 'pooza/ginseng-redis', branch: 'main', require: 'ginseng/redis'
-gem 'ginseng-web', github: 'pooza/ginseng-web', branch: 'main', require: 'ginseng/web'
-gem 'ginseng-youtube', github: 'pooza/ginseng-youtube', branch: 'main', require: 'ginseng/you_tube'
+gem 'ginseng-piefed', github: 'pooza/ginseng-piefed', tag: 'v0.1.1', require: 'ginseng/piefed'
+gem 'ginseng-postgres', github: 'pooza/ginseng-postgres', tag: 'v2.0.1'
+gem 'ginseng-redis', github: 'pooza/ginseng-redis', tag: 'v2.0.6', require: 'ginseng/redis'
+gem 'ginseng-web', github: 'pooza/ginseng-web', tag: 'v2.0.0', require: 'ginseng/web'
+gem 'ginseng-youtube', github: 'pooza/ginseng-youtube', tag: 'v3.0.1', require: 'ginseng/you_tube'
 gem 'icalendar'
 # ⚠⚠ **推移依存だが上限をこちらで持つ (#4699)。**`json` を要求している gem は
 # どれも `json (>= 2.3)` のように**下限しか書いていない**ので、`bundle update` の

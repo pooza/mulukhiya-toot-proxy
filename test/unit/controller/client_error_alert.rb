@@ -14,8 +14,8 @@ module Mulukhiya
         @calls = []
       end
 
-      def alert = @calls << :alert
-      def log = @calls << :log
+      def alert(*) = @calls << :alert
+      def log(*) = @calls << :log
     end
 
     # ⚠ status を持たない素の例外（NoMethodError 等）はモロヘイヤ自身のバグ。
@@ -23,12 +23,13 @@ module Mulukhiya
       attr_reader :calls
 
       def initialize = @calls = []
-      def alert = @calls << :alert
-      def log = @calls << :log
+      def alert(*) = @calls << :alert
+      def log(*) = @calls << :log
     end
 
     def setup
       @controller = MisskeyController.new!
+      clear_alert_throttle(ErrorDouble, StatuslessDouble)
     end
 
     def test_client_errors_are_logged_not_alerted
@@ -40,8 +41,13 @@ module Mulukhiya
       end
     end
 
+    # ⚠ **同じ型を続けて投げると 2 本目以降は抑止される (#4693)。**サーバー側の
+    # 失敗は「連続失敗の 1 回目だけ鳴らす」デッドマンに乗ったので、**窓を毎回
+    # 開け直してから**「1 回目は鳴る」を見る。抑止そのものは
+    # `ReportErrorGapsTest` が正面から確かめている。
     def test_server_errors_are_alerted
       [500, 502, 503].each do |status|
+        clear_alert_throttle(ErrorDouble)
         error = ErrorDouble.new(status)
         @controller.report_error(error)
 
@@ -51,6 +57,7 @@ module Mulukhiya
 
     # ⚠ 黙らせてよいのはステータスで「クライアント起因」と言えるものだけ。
     def test_statusless_error_is_alerted
+      clear_alert_throttle(StatuslessDouble)
       error = StatuslessDouble.new
       @controller.report_error(error)
 
@@ -82,12 +89,14 @@ module Mulukhiya
     end
 
     # ⚠ 上がってきた例外は `status` を持たないので、`report_error` は alert 側へ倒す。
+    # ⚠ 抑止の窓を開け直してから測る（#4693）。
     def test_lookup_failure_is_alerted
       error = LookupError.new('connection refused')
       calls = []
-      error.define_singleton_method(:alert) {calls << :alert}
-      error.define_singleton_method(:log) {calls << :log}
+      error.define_singleton_method(:alert) {|*| calls << :alert}
+      error.define_singleton_method(:log) {|*| calls << :log}
 
+      clear_alert_throttle(LookupError)
       MisskeyController.new!.report_error(error)
 
       assert_equal([:alert], calls)
@@ -140,6 +149,7 @@ module Mulukhiya
 
     # モロヘイヤ自身のバグは黙らせない。
     def test_server_error_is_alerted
+      clear_alert_throttle(Ginseng::GatewayError)
       error = spy(Ginseng::GatewayError.new('Bad response 502'))
       handle(error)
 
@@ -155,8 +165,8 @@ module Mulukhiya
     def spy(error)
       calls = []
       error.define_singleton_method(:mulukhiya_calls) {calls}
-      error.define_singleton_method(:alert) {calls << :alert}
-      error.define_singleton_method(:log) {calls << :log}
+      error.define_singleton_method(:alert) {|*| calls << :alert}
+      error.define_singleton_method(:log) {|*| calls << :log}
       return error
     end
   end

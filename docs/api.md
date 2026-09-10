@@ -58,9 +58,23 @@ capsicum 等のクライアントアプリが、モロヘイヤ固有の機能�
 
 #### Not Found (404)
 
+**ルートが返した 404**（投稿が無い / 機能が無効）。⚠ **他人の投稿は 404 ではなく 403**（`updatable_by?` で弾く）:
+
 ```json
 {"error": "Not Found"}
 ```
+
+**ルート自体が存在しない 404**（未定義のパス）:
+
+```json
+{"package": "ginseng-core", "class": "Ginseng::NotFoundError", "message": "Resource /path not found."}
+```
+
+⚠ **5.37.0 (#4520) で、この 2 つが区別できるようになった。**それ以前は Sinatra の
+`not_found` ハンドラが**ルートの組み立てたボディを毎回上書き**しており、
+**すべての 404 が下の形**になっていた。⚠⚠ そのため 403 / 422 / 5xx は `error` /
+`errors` キーを持つのに **404 だけキーの形が違い、クライアントがキーの有無で
+分岐できなかった**。404 の理由も全部同じボディに潰れていた。
 
 #### バリデーションエラー (422)
 
@@ -134,9 +148,11 @@ Bad response 404` のように内部メソッド名と上流ステータスが�
 壊れていても観測面に何も出ない状態）。この 502 は**必ず alert される**ので、
 見たらサーバー側の問題として報告してよい。
 
-**⚠ 上流が 404 を返した場合は透過が効かない。** Sinatra の `not_found` ハンドラが
-ボディを差し替えるため、`{"package":"ginseng-core","class":"Ginseng::NotFoundError",...}`
-になる（#4520）。「モロヘイヤのルートが無い」という意味ではない点に注意。
+**⚠ 上流が 404 を返した場合の透過は 5.37.0 (#4520) で効くようになった。**
+それ以前は Sinatra の `not_found` ハンドラがボディを差し替えるため
+`{"package":"ginseng-core","class":"Ginseng::NotFoundError",...}` になっていた。
+⚠ **5.36.0 以前を相手にするクライアントは、この形を「モロヘイヤのルートが無い」と
+読まないこと。**
 
 ### 機能フラグ
 
@@ -173,6 +189,7 @@ Bad response 404` のように内部メソッド名と上流ステータスが�
 | `features.nowplaying_resolver`（常時 `true`） | `/nowplaying/resolve` |
 | `features.compose_templates`（常時 `true`。#4457 未デプロイのバージョンではキー自体が欠落し capsicum は false 判定して導線を出さない） | `/compose/templates`（GET/POST/PUT/DELETE） |
 | `features.media_update`（Mastodon ＋ `/mastodon/capabilities/media_update` の opt-in ＋ ginseng-fediverse 1.8.30 以降。既定は `false`。⚠ **モロヘイヤの版番号では代用できない**。⚠⚠ **ゲートには使われていない**——上の注記を参照） | `PUT /api/:version/statuses/:id`（`X-Mulukhiya-Purpose: media_update`） |
+| `features.nowplaying_url_resolver`（`NowplayingUrlResolver.enabled?`・#4415）。ナウプレ enrich の**逆方向**（共有 URL → メタ解決） | `POST /nowplaying/resolve-url` — capsicum の Share 経路 enrich の可否判定に使う |
 | `features.spotify_enabled`（`/service/spotify/oauth/user_oauth_enabled` + 資格情報設定時に有効） | `/spotify/oauth_uri`, `/spotify/auth`, `/spotify/currently_playing` |
 | `features.spotify_linked`（当該ユーザーが Spotify 連携済みか） | `/spotify/currently_playing` |
 
@@ -369,7 +386,7 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
     "email": ["author@example.com"],
     "license": "MIT",
     "url": "https://github.com/pooza/mulukhiya-toot-proxy",
-    "version": "5.8.0"
+    "version": "5.36.0"
   },
   "config": {
     "controller": "mastodon",
@@ -394,11 +411,17 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
       "annict_review": true,
       "announcement": true,
       "announcement_push": false,
+      "compose_templates": true,
       "feed": true,
       "media_catalog": false,
       "media_update": true,
+      "nowplaying_resolver": true,
+      "nowplaying_url_resolver": true,
       "program_editable": true,
-      "webhook": true
+      "spotify_enabled": false,
+      "spotify_linked": false,
+      "webhook": true,
+      "word_suggest": true
     },
     "handlers": ["amazon_image", "default_tag", "itunes_music_nowplaying", "..."],
     "admin_role_ids": ["3"],
@@ -415,7 +438,7 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
 }
 ```
 
-**`admin_role_ids`**: 管理者権限を持つロールの ID 一覧（文字列配列）。Mastodon の `user_roles` テーブルから `permissions` ビット 0（Administrator）が立っているロールを返す。DB 未接続時（Misskey 等）は空配列。capsicum でユーザーのロール ID と照合し、管理者バッジ表示に利用する（`pooza/capsicum#159`）。
+**`admin_role_ids`**: 管理者権限を持つロールの ID 一覧（文字列配列）。Mastodon の `user_roles` テーブルから `permissions` ビット 0（Administrator）が立っているロールを返す。⚠ **Misskey でも実 ID を返す**（`isAdministrator` が立っているロールを引く・#4176）。空配列になるのは **DB 未接続時とエラー時**。capsicum でユーザーのロール ID と照合し、管理者バッジ表示に利用する（`pooza/capsicum#159`）。
 
 **`info_bot`**: お知らせボットのプロフィール情報。`username`、`acct`（@user@domain 形式）、`url`（プロフィールページURL）、`display_name` を含む。お知らせボットのトークンが未設定の環境では `null` を返す。capsicum のお知らせ画面でボットのプロフィールリンク表示に利用する（`pooza/capsicum#189`）。
 
@@ -1096,7 +1119,7 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 |---|---|---|
 | 認証なし・トークン不正 | **403** | `{"error":"Unauthorized"}` |
 | **他人の投稿**（ID は存在するが所有者が違う） | **403** | `{"error":"Unauthorized"}` |
-| 存在しない ID | **404** | `{"package":"ginseng-core","class":"Ginseng::NotFoundError","message":"Resource /mulukhiya/api/status/tags not found."}` |
+| 存在しない ID | **404** | `{"error":"Not Found"}` |
 | `/{controller}/capabilities/repost` が false | **404** | 同上 |
 | `tags` 未指定・不正 | **422** | `{"errors":{"tags":["空欄です。"]}}` |
 | 上流 SNS のエラー | **上流のステータス**（422・400 等） | `{"error":"Bad response NNN"}` |
@@ -1105,9 +1128,11 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
   `status.updatable_by?(sns.account)` を見るので、**存在する他人の投稿は「無い」ではなく
   「権限が無い」になる**。クライアントは 404 を「消えた」、403 を「触れない」として扱ってよい。
 
-  ⚠ **404 の body だけ他と形が違う。**コントローラは `{"error":"Not Found"}` を組み立てているが、
-  Sinatra の `not_found` ハンドラがステータス 404 を見て body を差し替えるため、個別のメッセージが
-  失われる。**`error` キーを持たないので、クライアントは `error` の有無で分岐してはいけない**（#4520）。
+  ⚠ **5.37.0 (#4520) から 404 も `error` キーを持つ。**5.36.0 以前は Sinatra の `not_found`
+  ハンドラがルートの組み立てた body を差し替えていたため、404 だけ
+  `{"package":"ginseng-core","class":"Ginseng::NotFoundError","message":"Resource ... not found."}`
+  という `error` キーの無い形になっていた。**5.36.0 以前を相手にするクライアントは、
+  `error` の有無だけで分岐しないこと。**
 
 #### GET /mulukhiya/api/media
 
@@ -1195,17 +1220,21 @@ capsicum が Spotify Web API 経由で「現在再生中」を OS 非依存に�
   1. クライアントが `GET /spotify/oauth_uri` で認可 URL を取得する
   2. クライアントが認可 URL をブラウザで開き、ユーザーが Spotify で認可する
   3. Spotify が Redirect URI（`/service/spotify/oauth/redirect_uri`、capsicum が捕捉できる URL／カスタムスキーム）へ認可コード付きでリダイレクトする
-  4. クライアントが捕捉した認可コードを `POST /spotify/auth` に送信（ユーザー特定は SNS トークンで行うため `state` は不要）
+  4. クライアントが捕捉した認可コードを、⚠ **1 で受け取った `state` と一緒に** `POST /spotify/auth` に送信する
   5. 以降クライアントは `GET /spotify/currently_playing` で現在再生中の URL を取得できる
 
 ##### GET /mulukhiya/api/spotify/oauth_uri
 
 Spotify の OAuth 認可 URL を取得する。
 
-- **認証**: 不要
+- **認証**: ⚠⚠ **必須（Bearer / SNS token）。**5.37.0 (#4414) から。発行する `state` を**呼んだ本人のアカウントに縛る**ため
 - **前提条件**: `features.spotify_enabled` が `true`（false 時は 404）
 - **パラメータ**: なし
-- **レスポンス例**: `{ "oauth_uri": "https://accounts.spotify.com/authorize?client_id=...&response_type=code&redirect_uri=...&scope=user-read-currently-playing" }`
+- **レスポンス例**: `{ "oauth_uri": "https://accounts.spotify.com/authorize?client_id=...&response_type=code&redirect_uri=...&scope=user-read-currently-playing&state=..." }`
+- **レスポンスヘッダ**: `Cache-Control: no-store`（⚠ `state` は一度きりなので、応答を使い回すと 2 回目以降必ず失敗する）
+
+⚠⚠ **5.37.0 (#4414) から `state` が付く。**クライアントは**この値を保持し、`POST /spotify/auth` へそのまま戻す**必要がある。
+⚠ **呼ぶたびに新しい値**が発行され、⚠ **一度使うと消える**（リプレイ不可）。⚠ 有効期間は **600 秒**。
 
 ##### POST /mulukhiya/api/spotify/auth
 
@@ -1218,8 +1247,26 @@ Spotify の OAuth 認可 URL を取得する。
 | 名前 | 型 | 必須 | 説明 |
 |------|-----|------|------|
 | `code` | string | 必須 | Spotify OAuth 認可コード |
+| `state` | string | 必須 | ⚠⚠ **`GET /spotify/oauth_uri` が返した URI の `state`。**5.37.0 (#4414) から必須 |
 
 - **レスポンス**: `{ "config": { ... } }`（更新後のユーザー設定）
+
+⚠ **`state` が欠けている・知らない・使用済み・別アカウントのものなら 403**
+（`{"error": "Invalid OAuth state"}`）。契約違反（`state` キー自体が無い）は 422。
+⚠⚠ **`state` は発行したアカウントでしか使えない。**`GET /spotify/oauth_uri` を叩いた
+トークンと、`POST /spotify/auth` のトークンが同じである必要がある。
+
+⚠⚠ **これは 5.36.0 以前からの破壊的変更で、壊れる箇所は 2 つある。**
+
+| 呼び出し | 5.36.0 以前 | 5.37.0 以降 |
+| --- | --- | --- |
+| `GET /spotify/oauth_uri` を **Bearer 無し**で叩く | 200 | ⚠ **403** `{"error":"Unauthorized"}` |
+| `POST /spotify/auth` に **`state` を付けない** | 200 | ⚠ **422**（`state` キー自体が無い） |
+
+本機能は `features.spotify_enabled` が既定で false（本番 4 台とも `client_id` 未設定で
+ルートごと 404）なので**稼働中の利用者はいない**が、capsicum 側の code 捕捉フローに
+**Bearer の付与**と **`state` の往復**の両方が要る（申し送りは pooza/capsicum#737。
+⚠ #570 はクローズ済み）。
 
 ##### GET /mulukhiya/api/spotify/currently_playing
 
@@ -1556,12 +1603,22 @@ Slack 互換のペイロードを投稿に変換する。`text` / `blocks` / `at
 
 | キー | 型 | 説明 |
 |------|-----|------|
-| `mulukhiya.attachment_errors[].url` | string | 落ちた添付の `image_url`（送信側が送った URL そのまま） |
-| `mulukhiya.attachment_errors[].message` | string | 落ちた理由。⚠ **人間向けの文言で、機械判定用の安定した識別子ではない** |
+| `mulukhiya.attachment_errors[].url` | string | 落ちた添付の `image_url`（送信側が送った URL そのまま）。⚠ **`image_url` を持たない添付では、このキーごと付かない**（5.37.0 / #4694。それ以前は `null` が入りうる） |
+| `mulukhiya.attachment_errors[].message` | string | 落ちた理由。⚠ **人間向けの文言で、機械判定用の安定した識別子ではない**。⚠⚠ **5.37.0 (#4694) から、モロヘイヤ内部の例外は `attachment could not be processed` に丸める**（サーバー内の絶対パスや内部ホスト・ポートが混ざっていた）。原文は syslog にだけ残る |
 | `mulukhiya.missing_attachments` | integer | **上流へ渡したのに、返ってきた投稿に載っていない添付の本数**。下記 |
 
 ⚠ **どちらのキーも、該当が無ければ付かない。**`mulukhiya` キー自体も同様なので、
 `response["mulukhiya"]` の有無だけで「全部通った / 何かおかしい」を判定できる。
+
+⚠⚠ **ただし「`mulukhiya` があれば投稿が成立している」とは読まないこと (#4694)。**
+`mulukhiya` は**上流の応答が Hash でありさえすれば足される**ので、上流が
+`{"error": "Validation failed: ..."}` を返した回（422 等）にもエラー本文と同居する。
+**投稿の成否は HTTP ステータスで見ること。**
+
+⚠ **5.36.0 以前には、ハンドラのタイムアウトで落ちた添付が `attachment_errors` にも
+syslog にも残らない穴があった**（#4694 の 1・5.37.0 で是正）。⚠⚠ **その回は
+`mulukhiya` キー自体が付かないので、送信側は「全部通った」と読む。**
+5.36.0 以前を相手にするクライアントは、この経路があることを前提にすること。
 
 🔴 **`missing_attachments` は主に `Idempotency-Key` の再送で出る。**添付の取得に
 失敗した投稿を、送信側が**同じ `Idempotency-Key`** で送り直すと、

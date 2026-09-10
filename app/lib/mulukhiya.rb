@@ -88,14 +88,42 @@ module Mulukhiya
     return Rack::URLMap.new(Environment.route)
   end
 
+  # ⚠⚠ **`rescue` をメソッド全体に掛けてはいけない (#4596)。**
+  # `Ginseng::ConfigError < Ginseng::Error < StandardError` なので、以前の形は
+  # **最後の `raise` を自分の `rescue => e` が握り込んでいた**＝ `strict` が
+  # 構造的に発火しなかった。`config validation skipped: config validation failed`
+  # という「失敗した」と「飛ばした」が 1 行に同居した警告が、その状態の目印。
+  # **握るのは「検証そのものが実行できなかった」場合だけ**に絞る。
   def self.validate_config
-    errors = Config.instance.errors
+    errors = config_validation_errors
     return if errors.empty?
     errors.each {|e| warn "config validation: #{e}"}
-    return unless Config.instance['/config/validation/strict']
+    return unless config_validation_strict?
     raise Ginseng::ConfigError, "config validation failed (#{errors.length} errors)"
+  end
+
+  # 検証そのものが実行できなかった場合だけ握る。⚠ ここでの fail-open は
+  # 「schema を読めない環境でも起動はできる」ための意図的なもの。
+  # ⚠ `format: regex` の検証は `Config#errors` に寄せてある (#4597)。
+  # **`rake config:lint` と `#audit` も同じ結果を見る**必要があるため。
+  def self.config_validation_errors
+    return Config.instance.errors
   rescue => e
     warn "config validation skipped: #{e.message}"
+    return []
+  end
+
+  # ⚠⚠ **ガードのパラメータを fail-open な `rescue` の内側で読まない (#4596)。**
+  # `Ginseng::Config#[]` はキーが無ければ `ConfigError` を上げるので、素で読むと
+  # **設定パスの typo がガードの恒常 no-op に化ける**（pooza/makoto2#77 と同型）。
+  # 既定値は `config/application.yaml` の `/config/validation/strict: false` にあるので、
+  # ここへ例外で来るのは**設定そのものが壊れている**とき。⚠ **黙って false に倒さず、
+  # 必ず警告を残す** — 無音だと「strict を書いたのに止まらない」が観測できない。
+  def self.config_validation_strict?
+    return Config.instance['/config/validation/strict'] == true
+  rescue => e
+    warn "config validation: strict flag unreadable (#{e.message})"
+    return false
   end
 
   def self.load_tasks
