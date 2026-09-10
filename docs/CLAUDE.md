@@ -1326,6 +1326,8 @@ DB 直読み層（account / status / attachment / postgres）も **omission 0 �
 | #4428 harness で webhook 検証 | #4715 | ✅ マージ・harness 側は pooza/chubo2#232 |
 | #4639 手順 3 で見つけた `/feed/media` の不具合 | #4717 | ✅ マージ |
 | #4702 dependabot の受け皿（マイルストーン外） | #4716 | ✅ マージ・⚠ **効くのは `main` に入ってから** |
+| リリース前レビューの赤（alert のデッドマン） | #4719 | ✅ マージ（下の「リリース前レビュー」参照） |
+| リリース前レビューの docs の齟齬 | #4720 | ✅ マージ |
 
 #### 🔴 #4639 の手順 3（dev26 で flip）で眠っていた不具合が出た
 
@@ -1401,6 +1403,59 @@ json text.` としか言わない（入力を反響しない）**」と書いた
 ⚠ **実害は無い。**#4708 は Codex の P1 を受けて**ログに `message` をそもそも載せない**形に
 してあるので、Yajl が反響しても外へは出ない。**むしろ #4708 の判断が必要だった裏付け**。
 ⚠ **エンコーディングが BINARY の文字列を、UTF-8 の正規表現で「含まない」と判定しないこと。**
+
+### リリース前レビュー（5 観点）の結果（2026-09-10）
+
+| 観点 | 赤 | 黄 | 緑 |
+| --- | ---: | ---: | ---: |
+| セキュリティ | 0 | 0 | 3（＋差分外の参考 3） |
+| API 契約 | 0 | 2 | 3 |
+| 並行性・ライフサイクル | 0 | 4 | 2（＋差分外の参考 3） |
+| エラー処理・観測性 | 0 | 2 | 5 |
+| スタイル・規約 | 0 | 1 | 13 |
+
+⚠⚠ **各観点は赤 0 だったが、合わせると赤が 1 件あった。**`throttled_alert`（#4693 / PR #4712）が
+「KEYS を撃つ」（並行性・観測性・API 契約の 3 観点が別々に指摘）と「書けない Redis では
+再送の sleep ＋全ルートの alert が黙る（`/health` は OK のまま）」（観測性が実測）を
+**同時に持っていた**。→ **PR #4719 でマージ済み**（`SET NX EX` 1 発・失敗時はプロセス内の
+抑止へ倒す）。⚠ **観点ごとの深刻度をそのまま並べず、同じ場所への指摘は束ねて読み直す。**
+
+**中以上は Issue にした**（マイルストーン外・引き金つき）:
+
+| Issue | 中身 |
+| --- | --- |
+| #4721 | webhook のタイムアウト経路の残り（手を付けていない添付を「上限超過」と誤報告 / 動画変換の締切がネストで引き継がれない）。⚠ `event.rb` の「何段ネストしても一意」は誤り |
+| #4722 | メディア変換の残り（ffmpeg の内側 Timeout で alert が動画ごと / 音声変換・ffprobe が締切を見ない / 出力先の同名競合） |
+| #4723 | webhook `/admin` の alert 洪水 / `client_message` を許可リストに |
+| #4724 | OAuth state の取り出し失敗が 403 に化けて無音 / error ブロックの非 Ginseng 分岐 |
+| #4725 | 404 で Content-Type と本文が食い違う（既存） |
+| #4726 | `/oauth/callback` のログイン CSRF（**要確認**・security） |
+| #4727 | 管理画面から再起動した puma の stderr が `/dev/null` |
+
+⚠ **yajl-ruby の件（`JSON.parse` の差し替え・入力の反響）はユーザーが起票する**（2026-09-10 明示）。
+こちらから起票しない。
+
+**極小は手順 12 の掃除 PR へ**（リリース後。⚠ 先送りではなく、ここが受け皿）:
+
+- `/ffmpeg/timeout` を schema に宣言し、0 以下を弾く（0 で `Timeout.timeout(0)`＝無制限になる）。コメントの「ハンドラの外だけ」も直す
+- webhook `/:digest` の rescue が `{error: e.message}` を返す（DB 障害中は `PG::ConnectionBad` の接続先が認証なしで返る）
+- `media_convert_handler.rb` の `errors.push` を `e.alert` の前へ（#4722 の一部）
+- PKCE の callback で `code_verifier` を必須にする（#4726 の一部）
+- json 3.0 のコメント（`controller.rb` / `unparsable_body.rb`）を Yajl の実態へ。`test_duplicate_key_body_reaches_the_same_path` の `<= 1` は 0 件でも通る
+- `test_log_does_not_carry_the_body` の false negative（BINARY エンコーディング）を ASCII 部分で判定する形へ
+- NeverSilent の配線そのものを通すテスト（`verify_token_integrity!` / `encrypt_token!`）
+- `AuthError` を 401 と書いているコメント 2 か所（実際は 403）
+- コメントとメソッドの割り込み（`test_case.rb` の `invalidate_shared_caches`、`spotify_user_service` テストの `account_double`）
+- `SpotifyUserService#initialize` のコメント（`oauth_uri` はアカウント必須になった）、`create_state` / `account_id` / `verify_state!` を private へ
+- `spotify_auth_contract.rb` の `pooza/capsicum#570` → `#737`
+- 弱いアサーション: `webhook_inprocess` の 404 は `error` キーまで、`listener_root_cert` の blank は error ログが出ないことまで見る
+- schema の `pattern` の `^` / `$` → `\A` / `\z`（4 か所）
+- `test.yml` の「実インスタンス」→「実サーバー」
+- rc.d の status コメント「`start` 自身が fork する」（fork するのは `restart` だけ）
+- `.bundler-audit.yml` の Sinatra ReDoS 除外（前提の 4.1.1 固定はもう無い）
+- `oauth_state_storage.rb` の「本番 3 台」→ 4 台（vulcan も Redis 8.0.5 で GETDEL が通る）
+- `event.rb` の「何段ネストしても一意」を #4721 への参照に置き換える
+- 抑止した log 行に `origin` を足す → ⚠ **PR #4719 で入れた**（ここでは不要）
 
 ### 🎯 #4639 — この回の「機能が前へ進む」枠（2026-09-09 追加）
 
@@ -3052,13 +3107,23 @@ Issue #4233 の APIController 段階的リファクタは「1〜2 マイルス�
 こちらには 1 バイトも届かない**。「Issue が close された」は**取り込み済みを意味しない**。
 
 ```sh
-# ロック済み revision と各リポジトリの main HEAD を突き合わせる
-ruby -e 'File.read("Gemfile.lock").scan(%r{github\.com/pooza/(ginseng-\w+)\.git\s+revision: (\h+)}) {|n,r|
-  head = `gh api repos/pooza/#{n}/commits/main --jq .sha`.strip
-  puts "#{n}\t#{head.start_with?(r) ? "同一" : "ずれ #{r[0,8]} -> #{head[0,8]}"}" }'
+# Gemfile で固定した版と、各リポジトリの最新タグを突き合わせる
+ruby -e 'File.read("Gemfile").scan(/gem .(ginseng-[\w-]+).,\s+github: \S+,\s+(tag|ref): .(\w[\w.]*)./) {|n, kind, pin|
+  tags = `git ls-remote --tags --sort=-v:refname https://github.com/pooza/#{n}.git "v*"`
+  latest = tags[%r{refs/tags/(v[\d.]+)$}, 1]
+  ok = kind == "tag" ? pin == latest : tags.match?(/^#{pin}\trefs\/tags\/#{Regexp.escape(latest)}(\^\{\})?$/)
+  puts "#{n}\t#{ok ? "最新 #{latest}" : "ずれ #{pin[0, 12]} -> #{latest}"}" }'
 ```
 
-- **ずれていたら「何が変わったか」を読む**: `gh api repos/pooza/ginseng-X/compare/<locked>...main --jq '.commits[].commit.message'`。
+⚠⚠ **5.37.0（#4702 / PR #4716）から `Gemfile` は版（タグ）で固定している**
+（`ginseng-style` だけは SHA・pooza/ginseng-style#75）。以前のスクリプトは
+**lock の revision と main HEAD** を比べていたので、タグで固定した後は
+**main にタグ未満のコミットが 1 本でもあると毎回「ずれ」を出す**（ノイズ）。
+⚠ 2026-09-10 時点の既知: **ginseng-web だけ v2.0.0 → v3.0.0 のずれ**（破壊的変更・意図して保留）。
+⚠ **タグが切られていない main のコミットはこのスクリプトには出ない。**依頼した修正が
+着地したかを見るときは `gh api repos/pooza/ginseng-X/compare/<最新タグ>...main` を読む。
+
+- **ずれていたら「何が変わったか」を読む**: `gh api repos/pooza/ginseng-X/compare/<固定中の版>...<最新タグ> --jq '.commits[].commit.message'`。
   ⚠ **モロヘイヤが触る面**（`HTTP` / `Logger` / `Controller` / `TagContainer` / `Environment`）に
   当たるかで判断する
 - **判断は 3 択**: ① すぐ取り込む（実害がある・依頼した修正の着地）② 次のマイルストーンで取り込む
