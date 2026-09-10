@@ -70,7 +70,12 @@ module Mulukhiya
     # 「実際に alert すること」を見るテストは、必ずこれを通してから測る。
     # ⚠ キーは `<prefix>/<型>/<発生源>` (#4693・PR #4712 の Codex P2)。
     # テストからは発生源を特定しにくいので、接頭辞で総なめする。
+    # ⚠ **プロセス内の抑止も消す**（Redis に書けないときの受け皿・5.37.0 の赤）。
+    # 片方だけ消すと、Redis 側を空にしても前のテストの印がプロセスに残る。
     def clear_alert_throttle(*classes)
+      classes.each do |klass|
+        LocalAlertThrottle.clear("#{Controller::ALERT_THROTTLE_KEY_PREFIX}/#{klass}")
+      end
       redis = Redis.new
       classes.each do |klass|
         prefix = "#{Controller::ALERT_THROTTLE_KEY_PREFIX}/#{klass}"

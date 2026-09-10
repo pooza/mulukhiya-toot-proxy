@@ -262,27 +262,40 @@ module Mulukhiya
       return throttled_alert(error)
     end
 
-    # 同じ型の失敗は窓のあいだ 1 回だけ鳴らす (#4693)。
+    # 同じ型 × 同じ発生源の失敗は、窓のあいだ 1 回だけ鳴らす (#4693)。
     #
     # ⚠ `StartupNotificationWorker#notify_failure` と同じ「連続失敗の 1 回目だけ」の
     # 考え方だが、**成功で解除する代わりに TTL で解除する。**`before` は毎リクエスト
     # 走るので、成功のたびに Redis を書くと平常時のコストが乗る。
     #
-    # ⚠⚠ **カウンタ自体が落ちたら log へ倒す。**ここへ来る主因が Redis 全断なので、
-    # 抑止できないからと鳴らす側へ倒すと**まさに避けたいスパムになる**。
-    # Redis の死は `/health` の redis 側で観測されるので、二重に鳴らす価値がない
-    # （`StartupNotificationWorker` と同じ判断）。
-    # ⚠ **厳密な排他ではない。**`Ginseng::Redis::Service#set` は `NX` を取らないので
-    # `key?` → `setex` の 2 段になる。同時に来た数本が二重に鳴ることはあるが、
-    # **抑えたいのは「全断中に毎リクエスト鳴る」**ほうなので、これで足りる。
+    # ⚠ **抑止中の log には発生源を載せる。**抑止しているあいだは syslog が唯一の
+    # 記録なので、どのルートで何件落ちたかを数えられないと意味が無い。
     def throttled_alert(error)
-      redis = Redis.new
-      key = alert_throttle_key(error)
-      return error.log(throttled: true) if redis.key?(key)
-      redis.setex(key, ALERT_THROTTLE_SECONDS, 1)
-      error.alert
+      return error.alert if acquire_alert_slot(alert_throttle_key(error))
+      return error.log(throttled: true, origin: alert_throttle_origin)
+    end
+
+    # 鳴らす権利を獲得できたか。
+    #
+    # 🔴 **5.37.0 リリース前レビューの赤。**当初は `key?` → `setex` の 2 段で、
+    # - `key?` の中身が **`KEYS`** で、**障害の最中に要求のたびに Redis を塞いでいた**
+    #   （Mastodon と共有しているインスタンス。同じリリースの #4703 が
+    #   「KEYS は本番の要求経路に乗らない」と書いたのと矛盾していた）
+    # - `setex` の再送で、書き込みを拒む Redis では **5xx のたびに約 2 秒止まった**
+    # - ⚠⚠ **書き込みを拒む Redis（ディスク満杯の MISCONF・OOM・READONLY）では、
+    #   印が永遠に書けないので全ルートのサーバー側失敗が 1 回も鳴らなくなった。**
+    #   しかも `/health` の redis は**読みしか試さない**ので OK のまま＝
+    #   「Redis の死は /health が見る」という前提が崩れていた
+    #
+    # → **`SET NX EX` を再送なしで 1 回**撃つ。⚠⚠ **書けなかったら黙らせない。**
+    # プロセス内の抑止へ倒す（`LocalAlertThrottle`）。**Redis が健全なら
+    # クラスタ全体で 1 回、壊れていればプロセスごとに 1 回**鳴る。どちらでも
+    # 「黙る」ことも「連打する」ことも無い。
+    def acquire_alert_slot(key)
+      return Redis.new.acquire(key, ALERT_THROTTLE_SECONDS)
     rescue => e
-      error.log(throttle_error: e.class.to_s)
+      logger.error(error: 'alert throttle unavailable', class: e.class.to_s, key:)
+      return LocalAlertThrottle.acquire(key, ALERT_THROTTLE_SECONDS)
     end
 
     # 抑止のバケツ。**型だけでは粗すぎる（PR #4712 の Codex P2）。**
