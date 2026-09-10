@@ -40,7 +40,7 @@ module Mulukhiya
       # (`Sequel::DatabaseConnectionError` 等) も 500 を返す＝ `report_error` の
       # alert 側へ倒れる。`respond_to?` は refine が外れたときの保険。
       @renderer.status = e.respond_to?(:status) ? e.status : 500
-      @renderer.message = {error: e.message}
+      @renderer.message = {error: error_body_message(e)}
       return @renderer.to_s
     end
 
@@ -54,7 +54,7 @@ module Mulukhiya
       # **引き当ての失敗だけが alert される**。
       report_error(e)
       @renderer.status = e.respond_to?(:status) ? e.status : 500
-      @renderer.message = {error: e.message}
+      @renderer.message = {error: error_body_message(e)}
       return @renderer.to_s
     end
 
@@ -72,6 +72,21 @@ module Mulukhiya
     end
 
     private
+
+    # `/:digest` の失敗を送信側へ返す文言。
+    #
+    # ⚠⚠ **5xx の原文は返さない（5.37.0 リリース前レビュー）。**`/:digest` は認証前に
+    # 任意の digest で叩けるので、DB 障害中は `Webhook.create!` が上げる
+    # `PG::ConnectionBad: connection to server at "127.0.0.1", port 6432 ...` が**第三者へ
+    # そのまま返っていた**（#4694 が添付エラーだけで塞いだものと同じ種類の漏れ）。
+    # 原文は `report_error` が syslog / Sentry に残す。
+    # ⚠ 4xx（未知の digest など）と、自前で文言を決めている 503 は送信側が対処できる
+    # 情報なので通す。
+    def error_body_message(error)
+      return error.message if error.is_a?(ServiceUnavailableError)
+      return error.message if error.respond_to?(:status) && error.status < 500
+      return 'Internal Server Error'
+    end
 
     # 落ちた添付を送信側へ返す (#4649)。
     #

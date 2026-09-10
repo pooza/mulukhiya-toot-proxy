@@ -75,5 +75,34 @@ module Mulukhiya
 
       assert_nil(consumed)
     end
+
+    # 🔴 **PKCE の callback は `code_verifier` を持たない state を拒む。**
+    # ⚠⚠ 同じストアに Spotify の state（`{service:, account_id:}`・#4414）も入る。
+    # 有無だけ見ると **`code_verifier` が nil のままトークン交換へ進み**、PKCE の束縛が
+    # 効かない（5.37.0 リリース前レビュー・#4726 の関連）。
+    def test_pkce_rejects_a_state_without_code_verifier
+      state = OAuthHelper.generate_state
+      OAuthHelper.storage.set(state, {service: 'spotify', account_id: 1})
+
+      assert_raises(Ginseng::AuthError) {pkce_service.auth_with_pkce('code', state)}
+    end
+
+    # 自分で発行した state は通る（機能を殺していない）。
+    def test_pkce_accepts_its_own_state
+      result = OAuthHelper.create_oauth_state(sns_type: 'mastodon')
+
+      assert_equal(:exchanged, pkce_service.auth_with_pkce('code', result[:state]))
+    end
+
+    private
+
+    # ⚠ `allocate` で作る（`new` は SNS への接続設定を読む）。見たいのは state の
+    # 検査だけなので、トークン交換と callback URI は差し替える。
+    def pkce_service
+      service = MastodonService.allocate
+      service.define_singleton_method(:oauth_token_request) {|*, **| :exchanged}
+      service.define_singleton_method(:oauth_callback_uri) {'https://example.com/mulukhiya/oauth/callback'}
+      return service
+    end
   end
 end

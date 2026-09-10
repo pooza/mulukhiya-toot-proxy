@@ -76,9 +76,10 @@ mulukhiya_sidekiq_stop() {
 }
 
 # `service mulukhiya-sidekiq status` が `unknown directive` にならないようにする (#4478)。
-# ⚠ **`daemon -p` の pidfile は使えない。**`bin/*_daemon.rb start` 自身が fork して
-# デーモン化するので、`daemon` が見ている子はすぐ終わる＝ pid が死んだ値になる。
-# 停止判定と同じ pattern で見るのが唯一の一貫した物差し。
+# ⚠ **`daemon -p` の pidfile は使えない。**`start` は `exec` で前面に居座るので
+# rc.d から起動した回は `daemon` の子になるが、**管理画面からの再起動**
+# （`bin/*_daemon.rb restart`）は fork + setsid で別に立ち上がり、pidfile が死んだ値になる
+# （#4727）。停止判定と同じ pattern で見るのが唯一の一貫した物差し。
 mulukhiya_sidekiq_status() {
   _pids=`pgrep -u $mulukhiya_user -f "$mulukhiya_sidekiq_pattern" 2>/dev/null | tr '\n' ' '`
   if [ -n "$_pids" ]; then

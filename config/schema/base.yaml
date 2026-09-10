@@ -192,6 +192,33 @@ properties:
           type: object
         type: array
     type: object
+  ffmpeg:
+    # ⚠ 宣言が無いと、local.yaml に書いた正当な `/ffmpeg/*` が `Config#audit` の
+    # unknown_keys に出る（運用者が typo と思って消しかねない）。
+    properties:
+      audio:
+        properties:
+          bitrate:
+            type: integer
+        type: object
+      crf:
+        type: integer
+      preset:
+        type: string
+      probe:
+        properties:
+          timeout:
+            minimum: 0
+            exclusiveMinimum: true
+            type: number
+        type: object
+      timeout:
+        # ⚠⚠ **0 以下を通さない。**`Timeout.timeout(0)` は「制限なし」の意味になり、
+        # #4696 で塞いだ穴（ffmpeg が締切を持たない）がそのまま開く。
+        minimum: 0
+        exclusiveMinimum: true
+        type: number
+    type: object
   google:
     properties:
       api:
@@ -221,7 +248,9 @@ properties:
             # ⚠ **`format: hostname` は json-schema に検証実装が無く素通しだった (#4597)。**
             # `not a hostname!` も `http://example.com` も `.....` も通っていた。
             # RFC 1123 のラベル（英数字とハイフン・先頭末尾はハイフン不可）で書き直す。
-            pattern: '^[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$'
+            # ⚠ `^` / `$` ではなく `\A` / `\z`。Ruby の `^` / `$` は行ごとに一致するので、
+            # `"x\nexample.com"` のような複数行の値が通ってしまう。
+            pattern: '\A[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*\z'
             type: string
         type: object
     type: object
@@ -243,7 +272,9 @@ properties:
             # ⚠ **`format: hostname` は json-schema に検証実装が無く素通しだった (#4597)。**
             # `not a hostname!` も `http://example.com` も `.....` も通っていた。
             # RFC 1123 のラベル（英数字とハイフン・先頭末尾はハイフン不可）で書き直す。
-            pattern: '^[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$'
+            # ⚠ `^` / `$` ではなく `\A` / `\z`。Ruby の `^` / `$` は行ごとに一致するので、
+            # `"x\nexample.com"` のような複数行の値が通ってしまう。
+            pattern: '\A[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*\z'
             type: string
         type: object
       subject:

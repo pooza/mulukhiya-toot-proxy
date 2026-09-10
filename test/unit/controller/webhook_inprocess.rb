@@ -83,7 +83,8 @@ module Mulukhiya
       post("/#{'0' * 64}", '{"text":"x"}', rack_env)
 
       assert_equal(404, last_response.status)
-      assert_predicate(JSON.parse(last_response.body), :present?)
+      # ⚠ `present?` だけだと #4520 以前の `{package, class, message}` でも通る。
+      assert(JSON.parse(last_response.body).key?('error'), '404 の本文に error キーが無い')
     end
 
     # ⚠ 契約違反は 422。`text` も `blocks` も無いペイロード。

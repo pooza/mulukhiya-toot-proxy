@@ -38,8 +38,9 @@ module Mulukhiya
       'invalid_scope',
     ].freeze
 
-    # account は currently_playing / auth / unlink で必要 (refresh したトークンを
-    # UserConfig へ書き戻すため)。oauth_uri のみ account なしでも使える。
+    # account は全メソッドで必要。currently_playing / auth / unlink は refresh した
+    # トークンを UserConfig へ書き戻すため、⚠ `oauth_uri` も 5.37.0 (#4414) から
+    # 発行する `state` をアカウントに縛るので、account が無いと `AuthError` になる。
     def initialize(account = nil)
       @account = account
     end
@@ -56,38 +57,6 @@ module Mulukhiya
         state: create_state,
       }
       return uri
-    end
-
-    # ⚠⚠ **発行したアカウントに縛る（PR #4714 の Codex P1）。**縛らないと、
-    # 🔴 **攻撃者が自分の Spotify を認可して得た code/state の組を、ログイン中の
-    # 被害者の callback へ流し込める**。`POST /spotify/auth` は「どこかで発行された
-    # 有効な state」を受け入れてしまい、**攻撃者のトークンが被害者の `UserConfig` に
-    # 入る**（セッション固定と同型）。
-    def create_state
-      raise Ginseng::AuthError, 'Unauthorized' unless account_id
-      state = OAuthHelper.generate_state
-      OAuthHelper.storage.set(state, {service: SERVICE_NAME, account_id:})
-      return state
-    end
-
-    def account_id
-      return @account&.id
-    end
-
-    # ⚠ **一度きり。**`consume` が読み出しと同時に消すので、同じ `state` での再送は
-    # 通らない（リプレイ防止）。⚠ TTL は `OAuthStateStorage::TTL`（600 秒）。
-    #
-    # ⚠⚠ **`service` の印を見る。**`OAuthStateStorage` は Mastodon / Misskey の PKCE
-    # フローと**同じストア**なので、見ないと**他系統で発行した state を Spotify の
-    # 認可に使い回せる**。
-    def verify_state!(state)
-      raise Ginseng::AuthError, 'Invalid OAuth state' if state.blank?
-      entry = OAuthHelper.consume_oauth_state(state)
-      raise Ginseng::AuthError, 'Invalid OAuth state' unless entry
-      raise Ginseng::AuthError, 'Invalid OAuth state' unless entry[:service] == SERVICE_NAME
-      # ⚠⚠ **発行したアカウント以外では使えない（PR #4714 の Codex P1）。**
-      return if entry[:account_id].present? && entry[:account_id] == account_id
-      raise Ginseng::AuthError, 'Invalid OAuth state'
     end
 
     # authorization code を access_token + refresh_token に交換し保管する。
@@ -157,6 +126,38 @@ module Mulukhiya
     end
 
     private
+
+    # ⚠⚠ **発行したアカウントに縛る（PR #4714 の Codex P1）。**縛らないと、
+    # 🔴 **攻撃者が自分の Spotify を認可して得た code/state の組を、ログイン中の
+    # 被害者の callback へ流し込める**。`POST /spotify/auth` は「どこかで発行された
+    # 有効な state」を受け入れてしまい、**攻撃者のトークンが被害者の `UserConfig` に
+    # 入る**（セッション固定と同型）。
+    def create_state
+      raise Ginseng::AuthError, 'Unauthorized' unless account_id
+      state = OAuthHelper.generate_state
+      OAuthHelper.storage.set(state, {service: SERVICE_NAME, account_id:})
+      return state
+    end
+
+    def account_id
+      return @account&.id
+    end
+
+    # ⚠ **一度きり。**`consume` が読み出しと同時に消すので、同じ `state` での再送は
+    # 通らない（リプレイ防止）。⚠ TTL は `OAuthStateStorage::TTL`（600 秒）。
+    #
+    # ⚠⚠ **`service` の印を見る。**`OAuthStateStorage` は Mastodon / Misskey の PKCE
+    # フローと**同じストア**なので、見ないと**他系統で発行した state を Spotify の
+    # 認可に使い回せる**。
+    def verify_state!(state)
+      raise Ginseng::AuthError, 'Invalid OAuth state' if state.blank?
+      entry = OAuthHelper.consume_oauth_state(state)
+      raise Ginseng::AuthError, 'Invalid OAuth state' unless entry
+      raise Ginseng::AuthError, 'Invalid OAuth state' unless entry[:service] == SERVICE_NAME
+      # ⚠⚠ **発行したアカウント以外では使えない（PR #4714 の Codex P1）。**
+      return if entry[:account_id].present? && entry[:account_id] == account_id
+      raise Ginseng::AuthError, 'Invalid OAuth state'
+    end
 
     def redirect_uri
       return config['/service/spotify/oauth/redirect_uri']

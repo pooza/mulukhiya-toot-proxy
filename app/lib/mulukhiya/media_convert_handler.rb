@@ -10,8 +10,11 @@ module Mulukhiya
       payload[image_field][:tempfile] = @dest
       update_metadata(payload)
     rescue => e
+      # ⚠ **記録を先に積む。**`e.alert` は slack / line / mail を同期で回すので、
+      # 通知先が遅いと外側の締切（`Event#run_handler` の join）に kill され、
+      # 後ろに置いた `errors.push` へ届かない（#4722）。
+      errors.push(class: e.class.to_s, message: e.message, file: file&.path)
       e.alert
-      errors.push(class: e.class.to_s, message: e.message, file: file.path)
     end
 
     def handle_pre_thumbnail(payload, params = {})
