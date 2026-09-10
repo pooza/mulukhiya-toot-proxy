@@ -3329,9 +3329,21 @@ capsicum 側で先行運用しており、v1.18 のレビューでは 5 観点�
 
 ### Dependabot運用
 
-- `open-pull-requests-limit: 0` により、通常のバージョン更新PRは作成しない
-- セキュリティアラートのPRのみ自動生成される
-- 通常のgem更新は手動 `bundle update` で管理する
+⚠⚠ **5.37.0 (#4702 / PR #4716) で develop 側の方針が変わった。**
+
+| target-branch | version update | 備考 |
+| --- | --- | --- |
+| `v4` | ⚠ **無効**（`open-pull-requests-limit: 0`） | 保守はバックポート方針なので据え置き |
+| `develop` | ✅ **有効**（上限 2 本／日） | `groups` で **`ginseng`** と **`others`** の 2 本に束ねる |
+
+- ⚠ **`.github/dependabot.yml` は既定ブランチ（`main`）のものが読まれる。**`target-branch` は
+  PR の宛先で、設定の読み先ではない。**develop で変えても `main` に入るまで効かない**
+- ⚠ **`versioning-strategy: increase-if-necessary`**。`lockfile-only` だと ginseng の
+  `tag:` が上がらない（`Gemfile` の書き換えが要るため）
+- ⚠⚠ **`Gemfile` で `~>` の上限を置いた gem は `ignore` で据え置く**（json / rack / sinatra ほか 7 本）。
+  **上限を足した・外したら `ignore` も直す**——ずれは `test/unit/lib/dependabot_config.rb` が捕まえる
+- ⚠ `ignore` も `open-pull-requests-limit` も **security update には効かない**（脆弱性の PR は常に出る）
+- 上限の内側の版上げ・ginseng 以外の定例更新は、従来どおり手動 `bundle update` でもよい
 - セキュリティPRへの対応:
   - `bundle update` で既に対応済み → PRをCloseし「Already included via bundle update in commit xxxxx」とコメント
   - 未対応 → PRをマージ
