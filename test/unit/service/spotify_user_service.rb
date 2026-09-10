@@ -239,9 +239,6 @@ module Mulukhiya
       )
     end
 
-    # 実 Account/UserConfig (DB・Redis 依存) を避けるための最小ダブル。
-    # UserConfig は暗号化値をそのまま保持し read 時に復号しない仕様だが、本ダブルは
-    # 平文を保持する (service 側 decrypt は復号失敗時に値をそのまま返すため整合する)。
     # ⚠ `auth` は 5.37.0 (#4414) から `state` の検証を通る。テストでは
     # **そのアカウントで実際に発行した state** を使う（素の文字列や別アカウント
     # 発行のものは 403 になる）。
@@ -249,6 +246,9 @@ module Mulukhiya
       return SpotifyUserService.new(account).send(:create_state)
     end
 
+    # 実 Account/UserConfig (DB・Redis 依存) を避けるための最小ダブル。
+    # UserConfig は暗号化値をそのまま保持し read 時に復号しない仕様だが、本ダブルは
+    # 平文を保持する (service 側 decrypt は復号失敗時に値をそのまま返すため整合する)。
     # ⚠ `id` を持たせるのは、`state` が**発行したアカウントに縛られる**ため
     # （#4414・PR #4714 の Codex P1）。
     def account_double(store = {}, id = 4414)

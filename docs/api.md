@@ -1593,7 +1593,7 @@ Slack 互換のペイロードを投稿に変換する。`text` / `blocks` / `at
     "attachment_errors": [
       {
         "url": "https://example.com/big.png",
-        "message": "file too large (41.2MiB > 32MiB)"
+        "message": "Too large content"
       }
     ],
     "missing_attachments": 1

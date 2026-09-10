@@ -86,10 +86,15 @@ module Mulukhiya
 
     def auth_with_pkce(code, state)
       state_data = OAuthHelper.consume_oauth_state(state)
-      raise Ginseng::AuthError, 'Invalid OAuth state' unless state_data
+      # ⚠ **`code_verifier` を持つ state だけを通す。**同じ `OAuthStateStorage` に
+      # Spotify の state（`{service:, account_id:}`・#4414）も入るので、有無だけ見ると
+      # **`code_verifier` が nil のままトークン交換へ進み、PKCE の束縛が効かない**
+      # （5.37.0 リリース前レビュー・#4726 の関連）。
+      verifier = state_data&.dig(:code_verifier)
+      raise Ginseng::AuthError, 'Invalid OAuth state' unless verifier.present?
       return oauth_token_request(
         code,
-        code_verifier: state_data[:code_verifier],
+        code_verifier: verifier,
         redirect_uri: oauth_callback_uri,
       )
     end

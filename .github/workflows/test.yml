@@ -15,7 +15,7 @@ jobs:
         # 意図してテストを増やしたときは、この数値を実測に合わせて更新する。
         #
         # 2026-09-09 (#4428): webhook 投稿経路のインプロセス検証を足したので +4。
-        # ⚠ これらは **harness（実インスタンス）が要る**テストで、CI では走らない。
+        # ⚠ これらは **harness（実サーバー）が要る**テストで、CI では走らない。
         # 実測は CI と同じ config（`controller` + ダミーの url/password）を置いて
         # `rake test` を回した値: mastodon 326 / misskey 315。
         include:

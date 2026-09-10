@@ -6,7 +6,7 @@ module Mulukhiya
       required(:code).value(:string)
       # ⚠⚠ **`state` は必須 (#4414)。**認可レスポンスの取り違え・横取り（CSRF）への
       # 対策。⚠ `GET /spotify/oauth_uri` が返した URI の `state` をそのまま戻す。
-      # ⚠ **capsicum 側の code 捕捉フローに往復の追加が要る**（pooza/capsicum#570）。
+      # ⚠ **capsicum 側の code 捕捉フローに往復の追加が要る**（pooza/capsicum#737）。
       required(:state).value(:string)
     end
   end
