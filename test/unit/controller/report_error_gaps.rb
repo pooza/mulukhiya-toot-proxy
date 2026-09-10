@@ -94,17 +94,84 @@ module Mulukhiya
       clear_alert_throttle(RuntimeError)
     end
 
-    # ⚠⚠ **抑止できないなら鳴らす側へ倒さない。**ここへ来る主因が Redis 全断な
-    # ので、倒すとまさに避けたいスパムになる。Redis の死は `/health` が見る。
-    def test_falls_back_to_log_when_redis_is_unavailable
-      Redis.define_singleton_method(:new) {raise Ginseng::Redis::Error, 'refused'}
+    # 🔴 **Redis に印を書けなくても黙らない（5.37.0 リリース前レビューの赤）。**
+    #
+    # ⚠⚠ **当初はここで log へ倒していた**（「Redis の死は /health が見る」前提）。
+    # だが **書き込みを拒む Redis（ディスク満杯の MISCONF・OOM・READONLY）では
+    # `/health` の redis は OK のまま**（読みしか試さない）で、印が永遠に書けないので
+    # **全ルートのサーバー側失敗が 1 回も鳴らなくなっていた**（観測性の観点が再現）。
+    # → プロセス内の抑止へ倒す。**1 回目は鳴り、2 回目以降は抑える。**
+    def test_does_not_go_silent_when_redis_refuses_writes
+      refuse_redis_writes
+      error = RuntimeError.new('db is down')
 
-      assert_equal(:log, report(RuntimeError.new('db is down')))
+      assert_equal(:alert, report(error), 'Redis に書けないと 1 回も鳴らない（黙る）')
+      assert_equal(:log, report(error), 'Redis に書けないと毎回鳴る（連打する）')
     ensure
-      Redis.singleton_class.remove_method(:new)
+      restore_redis_client
+    end
+
+    # ⚠⚠ **`KEYS` を撃たない。**`Ginseng::Redis::Service#key?` の中身は `KEYS` で、
+    # DB 全体を O(N) で走査して Redis を塞ぐ。障害の最中に要求のたびに撃つと、
+    # Mastodon と共有しているインスタンスごと障害を悪化させる。
+    def test_does_not_scan_the_keyspace
+      scanned = false
+      Redis.define_method(:keys) do |*|
+        scanned = true
+        []
+      end
+      Redis.define_method(:key?) do |*|
+        scanned = true
+        false
+      end
+
+      report(RuntimeError.new('db is down'))
+
+      refute(scanned, 'KEYS（key? / keys）を撃っている')
+    ensure
+      Redis.send(:remove_method, :keys) if Redis.method_defined?(:keys, false)
+      Redis.send(:remove_method, :key?) if Redis.method_defined?(:key?, false)
+    end
+
+    # ⚠ **再送の sleep を払わない。**ginseng-redis の `setex` は失敗すると 1 秒ずつ
+    # 待って再送するので、書き込みを拒む Redis では 5xx のたびに約 2 秒止まっていた。
+    def test_does_not_sleep_when_redis_refuses_writes
+      refuse_redis_writes
+      started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
+      report(RuntimeError.new('db is down'))
+
+      assert_operator(Process.clock_gettime(Process::CLOCK_MONOTONIC) - started, :<, 0.5)
+    ensure
+      restore_redis_client
     end
 
     private
+
+    # **読みは通し、書きだけ拒む** Redis（MISCONF・OOM・READONLY の再現）。
+    #
+    # ⚠ **Redis クライアントの層で差し替える。**`Mulukhiya::Redis#acquire` を
+    # 差し替えると、`key?` → `setex` を使う旧実装の経路では何も起きず、
+    # **旧実装でもテストが通ってしまう**（実際に false negative を踏んだ）。
+    # 新旧どちらの実装も通る `redis.call` で拒めば、旧実装は実際に黙り・止まる。
+    def refuse_redis_writes
+      client = Object.new
+      client.define_singleton_method(:call) do |command, *_args|
+        raise RedisClient::CommandError, 'READONLY You can\'t write against a read only replica.' \
+          if ['SET', 'SETEX'].include?(command.to_s.upcase)
+        return [] if command.to_s.upcase == 'KEYS'
+        return nil
+      end
+      Redis.alias_method(:__orig_redis_client, :redis)
+      Redis.define_method(:redis) {client}
+    end
+
+    def restore_redis_client
+      return unless Redis.private_method_defined?(:__orig_redis_client) ||
+        Redis.method_defined?(:__orig_redis_client)
+      Redis.alias_method(:redis, :__orig_redis_client)
+      Redis.send(:remove_method, :__orig_redis_client)
+    end
 
     # 発生源（`sinatra.route`）を指定して呼ぶ。
     def report_from(error, route)
