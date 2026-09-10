@@ -116,12 +116,24 @@ module Mulukhiya
       return size
     end
 
+    # RSS 2.0 の item に**そのまま渡す**ハッシュ (#4639)。
+    #
+    # ⚠⚠ **キーはすべて `RSS::Maker` の item のセッターとして送られる。**
+    # `Ginseng::Web::RSS20FeedRenderer` は `entry.each {|k, v| item.send(:"#{k}=", v)}`
+    # なので、**item に無いキーを 1 つでも混ぜると例外になり、その後ろのキーが全部捨てられる。**
+    #
+    # 🔴 以前は `created_at:` を持っていた。`created_at=` は item に無いので、
+    # **`/feed/media` の全 item から `<pubDate>` が消え、item ごとに error 行が出ていた。**
+    # media_catalog は 5.23.0 (#4343) から既定で無効だったので誰も踏まず、
+    # **#4639 の Gate 2 の手順 3（dev26 で flip）で初めて表に出た。**
+    # ⚠ 放置して本番で flip すると、**リクエストごと × item ごとに syslog が 1 行ずつ**増える
+    # （#4549 の「日 2 万行」と同型）。
+    # ⚠ 日時は `date:`（→ `<pubDate>`）だけで足りる。
     def feed_entry
       return {
         link: uri.to_s,
         title: [name, "(#{size_str})", description].compact.join(' '),
         author: account.display_name,
-        created_at: date,
         date:,
       }
     end
