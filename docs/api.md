@@ -58,7 +58,7 @@ capsicum 等のクライアントアプリが、モロヘイヤ固有の機能�
 
 #### Not Found (404)
 
-**ルートが返した 404**（投稿が無い / 他人の投稿 / 機能が無効）:
+**ルートが返した 404**（投稿が無い / 機能が無効）。⚠ **他人の投稿は 404 ではなく 403**（`updatable_by?` で弾く）:
 
 ```json
 {"error": "Not Found"}
@@ -1119,7 +1119,7 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 |---|---|---|
 | 認証なし・トークン不正 | **403** | `{"error":"Unauthorized"}` |
 | **他人の投稿**（ID は存在するが所有者が違う） | **403** | `{"error":"Unauthorized"}` |
-| 存在しない ID | **404** | `{"package":"ginseng-core","class":"Ginseng::NotFoundError","message":"Resource /mulukhiya/api/status/tags not found."}` |
+| 存在しない ID | **404** | `{"error":"Not Found"}` |
 | `/{controller}/capabilities/repost` が false | **404** | 同上 |
 | `tags` 未指定・不正 | **422** | `{"errors":{"tags":["空欄です。"]}}` |
 | 上流 SNS のエラー | **上流のステータス**（422・400 等） | `{"error":"Bad response NNN"}` |
@@ -1128,9 +1128,11 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
   `status.updatable_by?(sns.account)` を見るので、**存在する他人の投稿は「無い」ではなく
   「権限が無い」になる**。クライアントは 404 を「消えた」、403 を「触れない」として扱ってよい。
 
-  ⚠ **404 の body だけ他と形が違う。**コントローラは `{"error":"Not Found"}` を組み立てているが、
-  Sinatra の `not_found` ハンドラがステータス 404 を見て body を差し替えるため、個別のメッセージが
-  失われる。**`error` キーを持たないので、クライアントは `error` の有無で分岐してはいけない**（#4520）。
+  ⚠ **5.37.0 (#4520) から 404 も `error` キーを持つ。**5.36.0 以前は Sinatra の `not_found`
+  ハンドラがルートの組み立てた body を差し替えていたため、404 だけ
+  `{"package":"ginseng-core","class":"Ginseng::NotFoundError","message":"Resource ... not found."}`
+  という `error` キーの無い形になっていた。**5.36.0 以前を相手にするクライアントは、
+  `error` の有無だけで分岐しないこと。**
 
 #### GET /mulukhiya/api/media
 
@@ -1254,10 +1256,17 @@ Spotify の OAuth 認可 URL を取得する。
 ⚠⚠ **`state` は発行したアカウントでしか使えない。**`GET /spotify/oauth_uri` を叩いた
 トークンと、`POST /spotify/auth` のトークンが同じである必要がある。
 
-⚠⚠ **これは 5.36.0 以前からの破壊的変更。**`state` を送らないクライアントは 422 になる。
+⚠⚠ **これは 5.36.0 以前からの破壊的変更で、壊れる箇所は 2 つある。**
+
+| 呼び出し | 5.36.0 以前 | 5.37.0 以降 |
+| --- | --- | --- |
+| `GET /spotify/oauth_uri` を **Bearer 無し**で叩く | 200 | ⚠ **403** `{"error":"Unauthorized"}` |
+| `POST /spotify/auth` に **`state` を付けない** | 200 | ⚠ **422**（`state` キー自体が無い） |
+
 本機能は `features.spotify_enabled` が既定で false（本番 4 台とも `client_id` 未設定で
 ルートごと 404）なので**稼働中の利用者はいない**が、capsicum 側の code 捕捉フローに
-往復の追加が要る（pooza/capsicum#570）。
+**Bearer の付与**と **`state` の往復**の両方が要る（申し送りは pooza/capsicum#737。
+⚠ #570 はクローズ済み）。
 
 ##### GET /mulukhiya/api/spotify/currently_playing
 
