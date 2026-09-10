@@ -1302,11 +1302,12 @@ DB 直読み層（account / status / attachment / postgres）も **omission 0 �
 | 1 | #4689 | 1 | 辞書ソースの間欠 404 を再送する |
 | 18 | **#4639** | 3 | 🎯 **メディアカタログ Gate 2 の overlay flip を zugoga で実施**（2026-09-09 追加） |
 
-### 進捗（2026-09-09 時点）
+### 進捗（2026-09-10 時点）
 
-**14 件のうち 11 件の実装が着地**（PR #4703〜#4714）。残るのは
-**#4428**（harness で webhook 検証）と **#4639**（メディアカタログの点灯）、
-および **#4699**（json 3.0 は調査のみ・版上げは harness ＋ステージング待ち）。
+⚠⚠ **実装はすべて着地した（PR #4703〜#4717・open PR 0 本）。**残るのは
+**#4639 の手順 4・5（zugoga の flip と 24 時間観測）だけで、これは 5.37.0 の本番
+デプロイ後に回す**（下の「#4639 の手順 3」参照）。#4699 は調査と前提の観測性までで、
+版上げ本体は harness ＋ステージング実走待ち（Issue は open）。
 
 | Issue | PR | 状態 |
 | --- | --- | --- |
@@ -1320,8 +1321,28 @@ DB 直読み層（account / status / attachment / postgres）も **omission 0 �
 | #4689 辞書の 404 再送 | #4710 | ✅ マージ |
 | #4597 schema の format | #4711 | ✅ マージ |
 | #4693 `report_error` の過不足 | #4712 | ✅ マージ |
-| #4694 webhook 応答の穴 | #4713 | レビュー中 |
-| #4414 Spotify の state | #4714 | レビュー中 |
+| #4694 webhook 応答の穴 | #4713 | ✅ マージ |
+| #4414 Spotify の state | #4714 | ✅ マージ・⚠ **capsicum#737 へ申し送り済み**（`oauth_uri` に Bearer が要るようになった） |
+| #4428 harness で webhook 検証 | #4715 | ✅ マージ・harness 側は pooza/chubo2#232 |
+| #4639 手順 3 で見つけた `/feed/media` の不具合 | #4717 | ✅ マージ |
+| #4702 dependabot の受け皿（マイルストーン外） | #4716 | ✅ マージ・⚠ **効くのは `main` に入ってから** |
+
+#### 🔴 #4639 の手順 3（dev26 で flip）で眠っていた不具合が出た
+
+flip すると `/feed/media` の全 item から **`<pubDate>` が消えていた**。`feed_entry` が
+`created_at:` を返し、ginseng-web の RSS 生成は**キーをすべて item のセッターとして送る**ので、
+`created_at=` で例外になって後ろの `date` が捨てられる。⚠ **レスポンスは 200 のまま**
+（item 単位で rescue される）。media_catalog は 5.23.0 から既定で無効だったので本番で誰も
+踏まなかった。⚠⚠ **このまま zugoga で flip していたら、リクエストごと × item ごとに syslog が
+1 行ずつ増えた**（#4549 の「日 2 万行」と同型）。→ PR #4717。
+
+⚠ **手順 4（zugoga の flip）は #4717 が本番に入るまで進めない。**dev26 は flip したまま
+（`config/local.yaml.bak-4639` にバックアップ）。
+
+#### ⚠ `.github/dependabot.yml` は `main` のものが読まれる
+
+`target-branch: develop` は「PR をどこへ出すか」で、**設定の読み先ではない**。#4716 の
+PR 本文で逆のことを書いてしまい、#4702 で訂正した。**リリースまで version update は出ない。**
 
 ⚠ **`Closes #NNNN` は効かない。**PR の宛先が `develop` で、**GitHub が自動クローズするのは
 既定ブランチ（`main`）へマージされたときだけ**。マイルストーンの Issue はリリースまで open
