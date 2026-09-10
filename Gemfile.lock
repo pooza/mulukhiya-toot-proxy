@@ -169,7 +169,7 @@ GEM
     crass (1.0.7)
     csv (3.3.6)
     date (3.5.1)
-    domain_name (0.6.20260902)
+    domain_name (0.6.20260907)
     drb (2.2.3)
     dry-configurable (1.4.0)
       dry-core (~> 1.0)
@@ -281,7 +281,7 @@ GEM
     mustermann (3.1.1)
     net-http (0.9.1)
       uri (>= 0.11.1)
-    net-imap (0.6.6)
+    net-imap (0.6.7)
       date
       net-protocol
     net-pop (0.1.2)
