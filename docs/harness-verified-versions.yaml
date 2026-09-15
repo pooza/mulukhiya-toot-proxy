@@ -29,15 +29,51 @@
 # 運用方針の詳細は MEMORY の feedback_upstream-release-harness-verification 参照。
 
 mastodon:
-  verified: v4.7.1
-  verified_at: '2026-09-02'
+  verified: v4.7.2
+  verified_at: '2026-09-16'
 
 misskey:
   verified: 2026.9.0
   verified_at: '2026-09-07'
 
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
-last_checked: '2026-09-07'
+last_checked: '2026-09-16'
+
+# 2026-09-16 チェック結果:
+#   - Mastodon: **v4.7.2（2026-09-15）を fedi-test-harness で実走し、`verified` を昇格した。**
+#     ⚠⚠ **Security リリース**（Temporarily disable HEIF support ＝ `config/initializers/vips.rb` の
+#     許可リストから `VipsForeignLoadHeif` を外した）。**本番 3 台＋ステージング 3 台へは
+#     ユーザーが 2026-09-16 に適用済み**で、harness 検証は後追い。
+#     実走はモロヘイヤ **5.37.1（ホットフィックス・#4733）のリリースゲート**を兼ねる。
+#   - **1447 tests / 2784 assertions / 0 failures / 0 errors / 159 omissions（100% passed）。**
+#     失敗が 1 件も無いので版間 diff は不要（従来と同じ判断）。
+#     `TestHarness: controller=mastodon url=http://localhost:3000` と `/api/v2/instance` の
+#     `version=4.7.2` を実走の頭で確認した。⚠ **omission 159 件は v4.7.1 / v4.7.0 と同数。**
+#     tests が 1291 → 1447 に増えたのはモロヘイヤ側の開発によるもので、**Mastodon 版の影響と
+#     読まないこと**。DB 直読みの `account` は 34 tests / **omission 0** で全緑。
+#   - 🔴 **HEIF の end-to-end を実機で確認した（#4733 / #4734 の核心）。**
+#     libvips の `heifsave` で**本物の HEIC**（641 bytes）を作り、harness の 4.7.2 へ直接投げた:
+#       PNG（対照）→ **200**（`{"id":…,"type":"image",…}`）
+#       HEIC        → 🔴 **500** `{"error":"Error processing thumbnail for uploaded media"}`
+#     Mastodon 側のログは
+#     `Paperclip::Error: Error while optimizing …: VipsForeignLoad: "….heic" is not a known file format`。
+#     ⚠⚠ **弾いているのは確かに 4.7.2 の `Vips.block` だが、Paperclip がそれを 500 に変換する。**
+#     つまり 5.37.1 を入れると、**利用者には 4xx ではなく 500 が返り、上流の ERROR ログが
+#     アップロードのたびに 1 行増える**。受け皿 #4734 の位置づけが「文面の親切さ」から
+#     「500 とログノイズの解消」へ変わった。
+#   - **モロヘイヤ側は想定どおり無音で素通し**する。同じ HEIC で
+#     `MediaFile#type`（Marcel）＝ `image/heic` / `ImageFile#type` ＝ `application/octet-stream` /
+#     `ImageFile#image?` ＝ **false** を実測（＝ `convertable?` が false で変換しない）。
+#   - Misskey: **2026.9.0 を同じモロヘイヤ HEAD で実走。verified は据え置き**（既に 2026.9.0）。
+#     **1450 tests / 2775 assertions / 0 failures / 0 errors / 145 omissions（100% passed）。**
+#     `TestHarness: controller=misskey url=http://localhost:3001` を確認。DB 直読みは
+#     `account` 34 tests / `status` 27 tests / `postgres` 11 tests が **3 本とも omission 0** で全緑。
+#     ⚠ **omission 145 は 09-07 の 146 とほぼ同じ**。母数の違いはモロヘイヤ側の開発による。
+#   - ⚠ 実走中に `TestHarness: DB 接続に失敗したためスキップ: … port 5433 … Connection refused`
+#     が 1 行出るが、**これは teardown 済みの Mastodon harness（5433）を探しに行っただけ**で
+#     Misskey 側（5434）は正常に読めている（上の DB 直読み 3 本が omission 0 なのが根拠）。
+#   - ⚠ **メモリ制約のため両系を同時に立てず、Mastodon → teardown → Misskey の順で回した**
+#     （15Gi 機で available が 2Gi まで落ちていたため）。
 
 # 2026-09-07 チェック結果:
 #   - Misskey: **stable 2026.9.0（2026-09-06 11:19Z）を fedi-test-harness で実走し、`verified` を昇格した。**
