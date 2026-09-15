@@ -55,6 +55,50 @@ module Mulukhiya
     return event
   end
 
+  # libvips に渡してよいローダ／セーバーを許可リストで絞る (#4733)。
+  #
+  # ⚠⚠ **モロヘイヤは利用者が上げたファイルを「最初にデコードする側」である。**
+  # nginx は `POST /api/v[0-9]+/media` をモロヘイヤへ回すので、上流（Mastodon）は
+  # 変換後の WebP を受け取るだけ。**上流の `config/initializers/vips.rb` は
+  # 別プロセスの設定なので、こちらには一切効かない。**Mastodon 4.7.2 が
+  # Security として HEIF を止めても、この経路は塞がらなかった。
+  #
+  # 🔴 **`Vips.block('VipsForeignLoadHeif', true)` だけでは塞がらない。**
+  # libvips は heif ローダを止めると **`magickload` にフォールバック**し、
+  # ImageMagick の HEIC デリゲート＝**同じ libheif** に渡る（実測で
+  # `magickload: Magick: ... @ error/heic.c/ReadHEICImage/661` まで到達した）。
+  # **必ず `VipsForeign` を全部止めてから、使うものだけ開ける。**
+  #
+  # ⚠⚠ **`VipsForeignSaveCgif` は上流の許可リストに無いが、こちらには要る。**
+  # `ImageResizeHandler#convertable?` は `animated?` を除外しないので、
+  # **アニメ GIF をリサイズして `.gif` へ書き戻す**。上流の並びをそのまま写すと
+  # `VipsForeignSave: ... is not a known file format` で GIF が壊れる。
+  #
+  # ⚠ **解除条件**: `libheif >= 1.23.4` が pkg / ports に来たら HEIF を戻す。
+  # 本番は `libheif-1.22.2_1`、ports は 2026-08-31 時点で `1.22.2_2` 止まり。
+  # 未修正の GHSA は GHSA-x8r2-mggj-j6wr (critical) ほか 3 件。
+  #
+  # ⚠ **ここは `Bundler.require` の後＝全エントリポイントとテストが通る場所**に
+  # 置いてある。`app/initializer/*.rb` へ置くと**起動時にしか走らず、CI 緑が
+  # 根拠にならない**（#4687）。
+  VIPS_ALLOWED_OPERATIONS = [
+    'VipsForeignLoadNsgif',
+    'VipsForeignLoadJpeg',
+    'VipsForeignLoadPng',
+    'VipsForeignLoadWebp',
+    'VipsForeignSaveCgif',
+    'VipsForeignSaveJpeg',
+    'VipsForeignSavePng',
+    'VipsForeignSaveSpng',
+    'VipsForeignSaveWebp',
+  ].freeze
+
+  def self.setup_vips
+    Vips.block('VipsForeign', true)
+    VIPS_ALLOWED_OPERATIONS.each {|operation| Vips.block(operation, false)}
+    Vips.block_untrusted(true)
+  end
+
   # ハンドラ計装 (#4464) の HTTP フックを仕込む。既定では
   # /profile/handler/enable が false のため、集計先が無く実質ノーオペになる。
   def self.setup_profile
@@ -141,6 +185,7 @@ module Mulukhiya
   loader.setup
   setup_sidekiq
   setup_sentry
+  setup_vips
   setup_profile
   setup_debug
   ENV['RACK_ENV'] ||= Environment.type
