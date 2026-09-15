@@ -622,6 +622,31 @@ location の `if` 3 行を落とした。
 - **#4699**（json 3.0）— ステージングで `detected duplicate key` を観測してから
 - **#4721〜#4727** — 5.37.0 のリリース前レビュー由来（引き金つき）
 
+## ホットフィックス: 5.37.1（2026-09-16・#4733）
+
+**HEIF の取り込みを止めた。**[PR #4735](https://github.com/pooza/mulukhiya-toot-proxy/pull/4735)
+（`hotfix/4733-heif-block` → `main`・5.32.1 と同じ形）。CI 両系 SUCCESS。
+
+⚠ **5.38.0 を待たなかった理由は「上流が Security と言ったから」ではなく到達性。**
+`verify_token_integrity!` は認証ではなく自己整合性検査なので、**無効トークンでも
+`pre_upload` まで到達して libheif に届く**。2026-08-17 に同エンドポイントへ
+無効トークンでの連打があった実績もある（32,247 req / pooza/chubo2#179）。
+パッケージで塞ぐ道も無い（本番 1.22.2 / 修正は >= 1.23.4 / ports は 1.22.2_2 止まり）。
+
+- **v4 へのバックポート**: [PR #4736](https://github.com/pooza/mulukhiya-toot-proxy/pull/4736)
+  （`dev/4.42.2` → `v4`）。4.x の受け入れ基準 4 つを満たす
+- **受け皿 #4734**: 弾いたことが利用者にも運用にも見えない（文面と件数の観測・周知の要否）
+- ⚠⚠ **受け皿 #4737: v4 の CI は `bundle install` で死んでいて、半年ちかくテストが
+  1 件も走っていない**（`Gemfile` の `ginseng-web` が消えた `branch: 'stable'` を指している）。
+  ⚠ **`bundle install` は lock の revision で通るので、ローカルで回ることを CI の根拠にしない**
+- ⚠ **デプロイ前に決めること**: この変更は**「今は無い壊れ」を作る**。いまは HEIC を上げても
+  モロヘイヤが WebP にして通していたので利用者から見れば成功していた。塞ぐと
+  **iPhone からの `.heic` 直上げが弾かれる**。⚠ 実際の HEIC トラフィック量は未計測
+- ⚠ **vulcan（ダイスキー）も同じ経路。**`pipeline.base.pre_upload` を Misskey 側も継承しており、
+  `MisskeyController` の `POST /api/v:version/media` も同じ `ImageFile` を通る。
+  vulcan の libheif 版はユーザーが確認中（2026-09-16）
+- **解除条件**: `libheif >= 1.23.4` が pkg / ports に来たら `VIPS_ALLOWED_OPERATIONS` へ戻す
+
 ### #4733 HEIF の取り込み停止 — 調査の結論（2026-09-16）
 
 **Issue 本文の見立ては実装どおりだった。**入口は `pre_upload` と `pre_thumbnail` の 2 つで、
