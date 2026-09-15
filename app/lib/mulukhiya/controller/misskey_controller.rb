@@ -103,6 +103,7 @@ module Mulukhiya
 
     post '/api/drive/files/create' do
       verify_token_integrity!
+      verify_upload_type!
       Event.new(:pre_upload, {reporter:, sns:}).dispatch(params)
       reporter.response = sns.upload(params.dig(:file, :tempfile), {
         name: params[:name],
