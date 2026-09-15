@@ -610,12 +610,71 @@ location の `if` 3 行を落とした。
 
 **マイルストーン外の積み残し（5.37.0 から）**:
 
-- 🎯 **#4639 の手順 5**（zugoga の 24 時間観測・〜2026-09-12 05:44）。⚠ #4639 は 5.37.0 のマイルストーンに
-  残したまま。観測が通ったら閉じる。rollback 条件に当たったら `/home/mastodon/local.yaml.bak-4639` を
-  2 か所へ `cat` で戻して再起動。観測ログの置き場所はメモリ（`project_4393-media-catalog-deprioritized`）
+- ✅ **#4639 は決着・クローズ（2026-09-16）**。24 時間観測は samples=2,220 / 非 200 が 0 /
+  max `cl_waiting` 0 / max `pool.waiting` 0 で完走（`total_wait_time_us` 増分 3,394,711）。
+  ⚠⚠ **観測窓は 09-11（金）〜09-12（土）でニチアサを含んでいなかった**ので、
+  **09-13（日）の実況を挟んだ後に確認し直してから閉じた**（`/feed/media` 200 / 0.59 秒、
+  `/health` 全項目 OK、`cl_waiting` 0 / `maxwait` 0）。⚠ **24 時間観測を組むときは
+  日曜 08:30-09:00 を窓に入れるか、通過後に見直すこと**（[[project_nichiasa-window-is-the-product]]）。
+  ⚠ 申し送り: `total_wait_time_us` が 23,038,201 → 5,001,973 と**減っていた**＝この間に
+  **pgbouncer が再起動している**（[[project_pgbouncer-restart-landmine]]・media_catalog とは無関係）
 - **手順 12 の掃除 → PR #4730 でマージ済み（develop）**。次のリリースで本番に届く
 - **#4699**（json 3.0）— ステージングで `detected duplicate key` を観測してから
 - **#4721〜#4727** — 5.37.0 のリリース前レビュー由来（引き金つき）
+
+### #4733 HEIF の取り込み停止 — 調査の結論（2026-09-16）
+
+**Issue 本文の見立ては実装どおりだった。**入口は `pre_upload` と `pre_thumbnail` の 2 つで、
+ハンドラは `image_format_convert` と `image_resize` の**両方**（`ImageResizeHandler#convertable?` も
+`file.image?` を呼ぶ）。`MediaConvertHandler#handle_pre_upload` が `ImageFile.new(tempfile.path)` を
+作り、`convertable?` → `file.image?` → `ImageFile#type` → `Vips::Image.new_from_file` で libheif に届く。
+⚠ **`ImageFile` は `MediaFile#type`（Marcel のマジックバイト判定）を上書きしている**ので、
+素性を見ないままいきなり vips に渡る。`Vips.block` はリポジトリに 1 行も無い。
+
+調査で出た、実装するときに踏む穴:
+
+- 🔴 **`Vips.block('VipsForeignLoadHeif', true)` だけでは塞がらない**（ローカル libvips 8.16.1 /
+  ruby-vips 2.3.0 で実測）。libvips は heif ローダを止めると **magickload にフォールバック**し、
+  ImageMagick の HEIC デリゲート＝**同じ libheif** に渡る
+  （`magickload: Magick: … @ error/heic.c/ReadHEICImage/661`）。
+  **許可リスト方式（`Vips.block('VipsForeign', true)` → 必要なものだけ `false`）でないと意味が無い**
+- ⚠ **Mastodon 4.7.2 の `config/initializers/vips.rb` をそのまま写すと GIF が壊れる。**
+  向こうの許可リストは saver に **cgif を入れていない**（`Nsgif` は loader のみ）。一方
+  モロヘイヤの `ImageResizeHandler#convertable?` は `animated?` を除外しないので、
+  **アニメ GIF をリサイズして `.gif` に書き戻す**。実測で `VipsForeignSave: … is not a known file format`
+  になった。**要るのは Mastodon の 8 本 ＋ `VipsForeignSaveCgif`**
+- 🔴 **`verify_token_integrity!` は認証ではない。**`Controller#token` は**リクエスト自身の
+  `Authorization` ヘッダ**を読み、それを `sns.token` と突き合わせるだけの**自己整合性検査**
+  （2025-10 のトークン汚染事故の再発検知）で、上流にトークンの有効性を問い合わせない。
+  ⚠⚠ **つまり無効トークン・トークン無しでも `Event.new(:pre_upload).dispatch` まで到達し、
+  libheif に届く。**実績もある — 2026-08-17 の Tencent ボット網が
+  `POST /api/v1/media` へ**無効トークンでアップロードを連打**した（32,247 req・chubo2 #179）
+- ⚠ **止めた後は「無音の素通し」になる。**`ImageFile#type` は `rescue return MIMEType::DEFAULT`
+  なので、ブロック後は例外が握り潰されて `application/octet-stream` → `image?` が false →
+  **ハンドラが黙って素通し**する。`errors.push` も `e.alert` も通らないので、ログにも Sentry にも
+  1 行も出ない（#4549 と同型）。HEIC は変換されずそのまま上流へ行き、**Mastodon 4.7.2 が弾く**＝
+  **利用者が見るエラー文面は Mastodon のもの**になる。モロヘイヤ側で文面を出すなら案 2 が要る
+- 案 2 のマジックバイト判定は**自前で書かなくてよい**。Marcel 2.1.0 は
+  `ftypheic` だけで `image/heic` を返す（実測）＝ `MediaFile#type` がすでにそれ
+- **置き場所は `app/lib/mulukhiya.rb` 末尾の `Bundler.require` 後のブロック**
+  （`setup_sidekiq` などが並ぶところ）。⚠ **ここは全エントリポイントとテストが通る**ので、
+  #4687 の「起動時だけ走る initializer は CI 緑を根拠にできない」を回避できる。
+  `app/initializer/*.rb`（config.ru / puma.rb / sidekiq.rb）に置くと踏む
+- **未確認**: 本番の `local.yaml` で `image_format_convert` / `image_resize` が無効化されていないか（SSH が要る）
+
+### ginseng-\* のピン判断（2026-09-16 の同期）
+
+- **`ginseng-fediverse` v1.8.31 → v2.0.0 は ② 次のマイルストーンで取り込む（保留）。**
+  中身は `escape_sigils` が `IDOLM@STER` → `IDOLM@ STER` のように**リンク化しない `@` / `#` まで
+  壊していた**のを直したもので、モロヘイヤは `NowplayingHandler` で曲名・アルバム名・
+  アーティスト名に `escape_toot` を通しているため**ナウプレの出力が直接良くなる**。
+  ⚠ **保留の理由は pooza/ginseng-fediverse#276（`escape_sigils` が BINARY 文字列で落ちる・
+  2.0.0 リリース前レビューの黄）が open のまま**だから。v2.0.1 を待つ。
+  ⚠ 取り込むときは `test/unit/lib/string.rb` の `assert_equal('IDOLM@ STER', ...)` が
+  **壊れた側を期待値に固定している**ので、必ず一緒に直す（上げるだけだと赤になる）
+- **`ginseng-web` v2.0.0 → v3.0.0 は取り込める。**Dependabot PR #4732 が open で CI は両系 SUCCESS、
+  移管された 5 本（`puma` / `rack` / `rack-session` / `sinatra` / `tilt`）は #4679 で
+  `Gemfile` に宣言済み。⚠ 2026-09-10 時点の「意図して保留」はもう成り立たない
 
 ## リリース済み: 5.37.0（2026-09-10）
 
