@@ -587,6 +587,20 @@ location の `if` 3 行を落とした。
 
 ## 開発中: 5.38.0
 
+⚠⚠ **5.38.0 は巻く方針（2026-09-16 ユーザー判断「止血はしたけど、5.38.0 はちょっと巻いたほうがよさそう」）。**
+理由は **#4728 が 5.37.1 に入らなかった**こと。`main` は 5.37.0 から切ったので修正（PR #4729）は
+`develop` にしか無く、**zugoga（`dqdai-vjump`）と gomander（`precure/petitcure`）の
+`rake config:lint` は本番で落ちたまま**、**Sentry の `MULUKHIYA-TOOT-PROXY-1X` は
+5.38.0 が出るまで鳴り続ける**。⚠ **起動は止まらない**（`config/validation/strict` は既定 false）ので、
+障害ではなく**ノイズの停止**が動機。
+
+⚠ **次のニチアサは 2026-09-20（日）。**巻くとしても**金曜までに本番へ入れるか、日曜の実況明けに回す**
+（[[project_nichiasa-window-is-the-product]]）。
+
+⚠ **巻く＝スコープを削る、ではない。**マイルストーンから外すものが出るなら理由を残し、
+受け皿を起票してから外す（[[feedback_defer-requires-followup-issue]] / [[feedback_defer-reason-is-not-priority]]）。
+
+
 [マイルストーン 5.38.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/636) 作成済み（2026-09-11）・**10 件 / 重み 26**。
 `config/application.yaml` は 5.38.0 へバンプ済み。
 
