@@ -30,6 +30,47 @@ module Mulukhiya
     end
   end
 
+  # libvips に渡してよいローダ／セーバーを許可リストで絞る (#4733)。
+  # 5.37.1 からのバックポート。
+  #
+  # ⚠⚠ **モロヘイヤは利用者が上げたファイルを「最初にデコードする側」である。**
+  # nginx は `POST /api/v[0-9]+/media` をモロヘイヤへ回すので、上流（Mastodon 等）は
+  # 変換後の WebP を受け取るだけ。**上流側の `Vips.block` は別プロセスの設定なので、
+  # こちらには一切効かない。**Mastodon 4.7.2 が Security として HEIF を止めても、
+  # この経路は塞がらなかった。
+  #
+  # ⚠ `POST /api/:version/media` の `verify_token_integrity!` は**認証ではなく
+  # 自己整合性検査**なので、**無効トークンでも `pre_upload` まで到達する**。
+  #
+  # 🔴 **`Vips.block('VipsForeignLoadHeif', true)` だけでは塞がらない。**
+  # libvips は heif ローダを止めると **`magickload` にフォールバック**し、
+  # ImageMagick の HEIC デリゲート＝**同じ libheif** に渡る。
+  # **必ず `VipsForeign` を全部止めてから、使うものだけ開ける。**
+  #
+  # ⚠⚠ **`VipsForeignSaveCgif` は Mastodon の許可リストに無いが、こちらには要る。**
+  # `ImageResizeHandler#convertable?` は `animated?` を除外しないので、
+  # **アニメ GIF をリサイズして `.gif` へ書き戻す**。
+  #
+  # ⚠ **解除条件**: `libheif >= 1.23.4` が pkg / ports に来たら HEIF を戻す。
+  # 未修正の GHSA は GHSA-x8r2-mggj-j6wr (critical) ほか 3 件。
+  VIPS_ALLOWED_OPERATIONS = [
+    'VipsForeignLoadNsgif',
+    'VipsForeignLoadJpeg',
+    'VipsForeignLoadPng',
+    'VipsForeignLoadWebp',
+    'VipsForeignSaveCgif',
+    'VipsForeignSaveJpeg',
+    'VipsForeignSavePng',
+    'VipsForeignSaveSpng',
+    'VipsForeignSaveWebp',
+  ].freeze
+
+  def self.setup_vips
+    Vips.block('VipsForeign', true)
+    VIPS_ALLOWED_OPERATIONS.each {|operation| Vips.block(operation, false)}
+    Vips.block_untrusted(true)
+  end
+
   def self.setup_debug
     Ricecream.disable
     return unless Environment.development?
@@ -69,6 +110,7 @@ module Mulukhiya
   Bundler.require
   loader.setup
   setup_sidekiq
+  setup_vips
   setup_debug
   ENV['RACK_ENV'] ||= Environment.type
   Environment.dbms_class&.connect
