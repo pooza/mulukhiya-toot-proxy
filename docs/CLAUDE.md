@@ -622,10 +622,54 @@ location の `if` 3 行を落とした。
 - **#4699**（json 3.0）— ステージングで `detected duplicate key` を観測してから
 - **#4721〜#4727** — 5.37.0 のリリース前レビュー由来（引き金つき）
 
-## ホットフィックス: 5.37.1（2026-09-16・#4733）
+## リリース済み: 5.37.1（ホットフィックス・2026-09-16・#4733）
 
-**HEIF の取り込みを止めた。**[PR #4735](https://github.com/pooza/mulukhiya-toot-proxy/pull/4735)
-（`hotfix/4733-heif-block` → `main`・5.32.1 と同じ形）。CI 両系 SUCCESS。
+**本番デプロイ: 4 台完了**（shallu → zugoga → gomander → vulcan の順。全台 version 5.37.1 /
+health 200（全項目 OK）/ `yjit_enabled: true` / Ruby 4.0.6 据え置き）。
+`main` の `ef33eb56` / [v5.37.1](https://github.com/pooza/mulukhiya-toot-proxy/releases/tag/v5.37.1)。
+
+### 本番デプロイで見たこと
+
+- 🔴 **#4728 は 5.37.1 に入っていない。**`config:lint` は zugoga（`dqdai-vjump`）と
+  gomander（`precure/petitcure`）で**依然として落ちる**。修正 PR #4729 は `develop` にしかなく、
+  ホットフィックスは `main`（5.37.0）から切ったため。⚠ **Sentry の
+  `MULUKHIYA-TOOT-PROXY-1X` は 5.38.0 まで鳴り続ける**
+- ⚠ **vulcan だけ再起動後に health 503**（`sidekiq: PID '...' was dead`）。sidekiq 本体は
+  正常稼働していたが `SidekiqDaemon.pid` が生成されておらず、health が古い PID を見ていた。
+  **sidekiq をもう一度 restart して 200 に復帰**（[[project_sidekiq-double-start-boot-race]]・
+  pooza/chubo-core#37 の起動順が未対処）。⚠ **他の 3 台では出ていない**
+- ⚠ `rake config:lint` の失敗は**パイプで握り潰されて次へ進む**。出力の最終行が
+  `config: OK` かを必ず目で見ること（5.37.0 と同じ）
+
+### 検証
+
+- **harness 実走（リリースゲート・省略不可）**: Mastodon **4.7.2** = 1454 tests / 0 failures /
+  0 errors / 159 omissions、Misskey **2026.9.0** = 1457 tests / 0 failures / 0 errors / 145 omissions
+- **ステージング 4 台（dev24-27）で end-to-end 確認**。PNG は `.webp` に変換されて 200
+  （＝モロヘイヤを通った証拠）、HEIC は **422**、アラートは **0 件**
+- ⚠ **最初の測定はモロヘイヤを迂回していた。**`X-Mulukhiya` を付けたのが誤りで、map は
+  **`default` → :3008（モロヘイヤ）/ ヘッダあり → :3000（本体直行）**（ループ防止）。
+  結果 URL が `.png` のままだったことで気づいた。**#4733 本文の「既定でモロヘイヤへ回す」が
+  実機で裏付けられた**形でもある
+- ⚠ **dev25 / dev26 は shallow clone で `origin/<branch>` を解決できない。**
+  `git fetch origin <branch>:refs/remotes/origin/<branch>` の明示 refspec が要る
+
+### 残件
+
+- **#4734**: AVIF / TIFF など今回ブロックした他の形式は 422 の対象外（実測していないので広げなかった）。
+  弾いた件数の集計もまだ無い（syslog に 1 行は残る）
+- **#4736**（v4 への 4.42.2 バックポート）は**本番の後に回す**（2026-09-16 ユーザー指示）。
+  ⚠ **#4737**: v4 の CI は半年ちかく `bundle install` で死んでいてテストが 1 件も走っていない
+- **解除条件**: `libheif >= 1.23.4` が pkg / ports に来たら `VIPS_ALLOWED_OPERATIONS` と
+  `BLOCKED_UPLOAD_TYPES` を戻す
+
+### 開発時のメモ
+
+⚠ **5.38.0 を待たなかった理由は「上流が Security と言ったから」ではなく到達性。**
+`verify_token_integrity!` は認証ではなく自己整合性検査なので、**無効トークンでも
+`pre_upload` まで到達して libheif に届く**。2026-08-17 に同エンドポイントへ
+無効トークンでの連打があった実績もある（32,247 req / pooza/chubo2#179）。
+パッケージで塞ぐ道も無い（本番 1.22.2 / 修正は >= 1.23.4 / ports は 1.22.2_2 止まり）。
 
 ⚠ **5.38.0 を待たなかった理由は「上流が Security と言ったから」ではなく到達性。**
 `verify_token_integrity!` は認証ではなく自己整合性検査なので、**無効トークンでも
