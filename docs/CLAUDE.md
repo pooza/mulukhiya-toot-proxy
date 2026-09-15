@@ -627,6 +627,7 @@ location の `if` 3 行を落とした。
 **本番デプロイ: 4 台完了**（shallu → zugoga → gomander → vulcan の順。全台 version 5.37.1 /
 health 200（全項目 OK）/ `yjit_enabled: true` / Ruby 4.0.6 据え置き）。
 `main` の `ef33eb56` / [v5.37.1](https://github.com/pooza/mulukhiya-toot-proxy/releases/tag/v5.37.1)。
+**#4733 はクローズ済み、マイルストーン 5.37.1 も閉じた。**
 
 ### 本番デプロイで見たこと
 
@@ -658,8 +659,11 @@ health 200（全項目 OK）/ `yjit_enabled: true` / Ruby 4.0.6 据え置き）�
 
 - **#4734**: AVIF / TIFF など今回ブロックした他の形式は 422 の対象外（実測していないので広げなかった）。
   弾いた件数の集計もまだ無い（syslog に 1 行は残る）
-- **#4736**（v4 への 4.42.2 バックポート）は**本番の後に回す**（2026-09-16 ユーザー指示）。
+- ✅ **v4 へのバックポートも出荷済み**: [v4.42.2](https://github.com/pooza/mulukhiya-toot-proxy/releases/tag/v4.42.2)（PR #4736）。
   ⚠ **#4737**: v4 の CI は半年ちかく `bundle install` で死んでいてテストが 1 件も走っていない
+  （`Gemfile` の `ginseng-web` が消えた `branch: 'stable'` を指している）。**マージの根拠は
+  ローカル実測**（変更前 7 failures / 138 errors → 変更後も同数＝新規の赤ゼロ）。
+  ⚠ **`bundle install` は lock の revision で通るので、ローカルで回ることを CI の根拠にしない**
 - **解除条件**: `libheif >= 1.23.4` が pkg / ports に来たら `VIPS_ALLOWED_OPERATIONS` と
   `BLOCKED_UPLOAD_TYPES` を戻す
 
