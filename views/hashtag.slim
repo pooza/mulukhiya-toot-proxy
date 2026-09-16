@@ -31,10 +31,10 @@ html lang='ja' data-theme='light'
           ul
             li
               strong パターン
-              code v-if='entry.regexp' = "/{{entry.regexp}}/"
+              code v-if='entry.regexp' = '/{{entry.regexp}}/'
             li
               strong タグ
-              code v-for='tag in entry.tags' = "{{tag}} "
+              code v-for='tag in entry.tags' = '{{tag}} '
       - if controller.favorite_tags?
         section.fav-entries
           h3 プロフィールに含まれるタグ
