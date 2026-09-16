@@ -594,8 +594,13 @@ location の `if` 3 行を落とした。
 5.38.0 が出るまで鳴り続ける**。⚠ **起動は止まらない**（`config/validation/strict` は既定 false）ので、
 障害ではなく**ノイズの停止**が動機。
 
-⚠ **次のニチアサは 2026-09-20（日）。**巻くとしても**金曜までに本番へ入れるか、日曜の実況明けに回す**
-（[[project_nichiasa-window-is-the-product]]）。
+🔴 **ニチアサ前の駆け込みリリースはしない（2026-09-16 ユーザー判断「巻くと言っても、ニチアサの前に
+どうしてもリリースしたいほどではないですよね」）。**⚠ **次のニチアサは 2026-09-20（日）なので、
+出荷は実況明け（09-20 以降）に置く。**⚠⚠ **#4728 は「起動が止まらないノイズ」でしかないので、
+これを理由に金曜までの駆け込みを組まない**（[[project_nichiasa-window-is-the-product]] /
+[[feedback_no-false-urgency]]）。
+
+⚠ **「巻く」はスコープの話であって、期日を前倒す話ではない。**
 
 ⚠ **巻く＝スコープを削る、ではない。**マイルストーンから外すものが出るなら理由を残し、
 受け皿を起票してから外す（[[feedback_defer-requires-followup-issue]] / [[feedback_defer-reason-is-not-priority]]）。
@@ -621,6 +626,18 @@ location の `if` 3 行を落とした。
 | 08-11 | #4578 | 1 | slim-lint が views 直下 16 本を検査していない |
 | 08-11 | #4579 | 3 | 409 の「恒久／一過性」をクライアントが判別できない |
 | 09-10 | #4728 | 1 | ✅ **修正済み（PR #4729・develop）**。5.37.0 の本番デプロイで発覚した `/feed/custom/*/path` の退行。リリースで本番に届く |
+
+**取り込み済み（5.38.0 で本番に届く）**:
+
+- ✅ **ginseng-web v2.0.0 → v3.0.0（PR #4732・`74c6252d`）** — 2026-09-16 にマージ。
+  Dependabot の PR をそのまま取った。**gem 側から `puma` / `rack` / `rack-session` / `sinatra` / `tilt` の
+  5 本が外れる**破壊的変更だが、**#4679 で 5 本とも `Gemfile` に宣言済み**なので実効の版は動かない
+  （`puma 8.0.2` / `sinatra 4.2.1` を据え置きで確認）。⚠ **新しく `erb (>= 6.0.4)` の床が入る**（lock は 6.0.7）。
+  ローカルで **`rake lint` 無指摘 / `rake test` 1383 tests・0 failures・0 errors**（[[feedback_gemfile-lock-routine]] とは
+  別物の「自走更新の取り込み」なので差分を読んでから上げた）
+- ⚠ **`ginseng-fediverse` v2.0.0 は引き続き保留**。pooza/ginseng-fediverse#276（`escape_sigils` が
+  BINARY 文字列で落ちる）が open のままなので **v2.0.1 待ち**。⚠ 取り込むときは
+  `test/unit/lib/string.rb` の `assert_equal('IDOLM@ STER', ...)` が**壊れた側を期待値に固定している**ので必ず一緒に直す
 
 **マイルストーン外の積み残し（5.37.0 から）**:
 
