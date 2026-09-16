@@ -84,19 +84,14 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: 9814f164d64658c94923c55b0e8a920b6c798960
-  tag: v2.0.0
+  revision: ac6fa4c84ab890286fd5a7eedada2c2633b4a12c
+  tag: v3.0.0
   specs:
-    ginseng-web (2.0.0)
-      erb
-      puma (>= 6.4.3)
-      rack (>= 3.1.14)
-      rack-session (>= 2.1.1)
+    ginseng-web (3.0.0)
+      erb (>= 6.0.4)
       rss
       sassc
-      sinatra (>= 4.1.0)
       slim
-      tilt (>= 2.1.0)
 
 GIT
   remote: https://github.com/pooza/ginseng-youtube.git
