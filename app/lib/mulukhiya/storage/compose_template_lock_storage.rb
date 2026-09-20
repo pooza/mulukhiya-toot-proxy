@@ -8,6 +8,8 @@ module Mulukhiya
   # クライアントに再取得 → 再試行させる（テンプレ CRUD は低頻度なのでキューイング
   # しない）。Redis 障害時はロックを諦めて実行を阻害しない (fail-open)。
   class ComposeTemplateLockStorage < Redis
+    include LockDegradationMethods
+
     # TTL 切れで自然解放後に別リクエストが同一 key を acquire したケースで、遅延
     # release が他者の新ロックを消さないよう compare-and-delete する。
     RELEASE_SCRIPT = <<~LUA.freeze
@@ -57,14 +59,16 @@ module Mulukhiya
     rescue Ginseng::ConflictError
       raise
     rescue => e
-      e.log(account_id:)
+      # ⚠⚠ **ロック無しで書いたことを残す (#4577 の 2)。**ProgramLockStorage と
+      # 同型の穴で、直すなら両方（片方だけだと次に踏んだときに同じ調査をする）。
+      note_fail_open(e, account_id:)
       return nil
     end
 
     def release(account_id, token)
       redis.call('EVAL', RELEASE_SCRIPT, 1, create_key(lock_key(account_id)), token)
     rescue => e
-      e.log(account_id:)
+      note_release_failure(e, account_id:)
     end
 
     def lock_key(account_id)

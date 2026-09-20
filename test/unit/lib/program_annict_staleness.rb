@@ -56,5 +56,97 @@ module Mulukhiya
     def test_rejects_without_episode_data
       assert_false(applicable?(prepared(episode_data: nil), entry))
     end
+
+    # --- ガードが効いたことの観測 (#4577 の 3) -------------------------------
+    #
+    # ⚠⚠ **載せなかった結果は `annict_episode_id: nil` ＝「Annict を引けなかった」
+    # ときと同じ状態**なので、ログが無いと両者を区別する手段がゼロになる。
+    # 運用者から見ると、どちらも「次話を押して 200 が返り、サブタイトルだけ
+    # 入らない」という同じ見え方をする。
+
+    # ⚠ **引けたのに載せられなかった回**だけがガードの発動。
+    def test_stale_only_when_data_was_fetched
+      assert(stale?(prepared, entry(episode: 6)))
+      assert_false(stale?(prepared, entry), '素直に載る回を stale と読んでいる')
+      assert_false(
+        stale?(prepared(episode_data: nil), entry(episode: 6)),
+        'Annict を引けなかった回を「ガードが効いた」と読んでいる',
+      )
+    end
+
+    # ⚠⚠ 本丸。ガードが効いた回が、**期待値と実値の両方**で残ること。
+    # Annict 側の障害なのか競合なのかで、運用者が「`PUT` でメタデータを補う」のか
+    # 「Annict の設定を見る」のかが変わる。
+    def test_stale_guard_is_logged_with_both_values
+      target = entry(episode: 6)
+      logged = capture_info {apply('nichiasa', prepared, target)}
+
+      assert_equal(1, logged.size)
+      payload = logged.first[:program_entry]
+
+      assert_equal('annict_stale', payload[:event])
+      assert_equal('nichiasa', payload[:key])
+      assert_equal(5, payload[:prepared_episode])
+      assert_equal(6, payload[:actual_episode])
+    end
+
+    # 作品を差し替えられた回も、どちらの ID だったかまで残す。
+    def test_stale_guard_records_work_ids
+      payload = capture_info {apply('k', prepared, entry(work_id: 43))}.first[:program_entry]
+
+      assert_equal(42, payload[:prepared_work_id])
+      assert_equal(43, payload[:actual_work_id])
+    end
+
+    # ⚠ Annict を引けなかった回は出さない。混ぜると、このログが
+    # 「ガードが効いた」の意味を失う。
+    def test_missing_episode_data_is_not_logged
+      assert_empty(capture_info {apply('k', prepared(episode_data: nil), entry)})
+    end
+
+    # 素直に載った回も出さない（毎回出ると観測点にならない）。
+    def test_applied_case_is_not_logged
+      target = entry
+      logged = capture_info {apply('k', prepared, target)}
+
+      assert_empty(logged)
+      assert_equal(123, target['annict_episode_id'])
+      assert_equal('サブタイトル', target['subtitle'])
+    end
+
+    # ⚠ 載せない回は `annict_episode_id` を必ず nil へ落とす。前回の値が残ると、
+    # **新しい話数に古い Annict の ID が付いたまま**になる。
+    def test_stale_clears_previous_annict_id
+      target = entry(episode: 6).merge('annict_episode_id' => 999)
+      capture_info {apply('k', prepared, target)}
+
+      assert_nil(target['annict_episode_id'])
+    end
+
+    private
+
+    def stale?(prepared, entry)
+      return Program.instance.send(:annict_stale?, prepared, entry)
+    end
+
+    def apply(key, prepared, entry)
+      return Program.instance.send(:apply_annict_increment, key, prepared, entry)
+    end
+
+    # ⚠ Program は singleton なので、差し替えた logger は必ず外して返す。
+    # 残すと以降のテストのログが全部ここへ流れ込む。
+    def capture_info
+      logged = []
+      double = Object.new
+      double.define_singleton_method(:info) {|payload| logged.push(payload)}
+      program = Program.instance
+      program.define_singleton_method(:logger) {double}
+      begin
+        yield
+      ensure
+        program.singleton_class.send(:remove_method, :logger)
+      end
+      return logged
+    end
   end
 end
