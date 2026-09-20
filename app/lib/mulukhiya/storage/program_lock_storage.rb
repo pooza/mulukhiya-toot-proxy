@@ -19,6 +19,8 @@ module Mulukhiya
   # （番組表の編集は低頻度なのでキューイングしない）。Redis 障害時はロックを
   # 諦めて実行を阻害しない (fail-open)。
   class ProgramLockStorage < Redis
+    include LockDegradationMethods
+
     # TTL 切れで自然解放後に別リクエストが同一 key を acquire したケースで、遅延
     # release が他者の新ロックを消さないよう compare-and-delete する。
     RELEASE_SCRIPT = <<~LUA.freeze
@@ -72,14 +74,18 @@ module Mulukhiya
     rescue Ginseng::ConflictError
       raise
     rescue => e
-      e.log
+      # ⚠⚠ **ロック無しで書いたことを残す (#4577 の 2)。**従来は e.log 止まりで
+      # Sentry に届かず、「ロックが黙って無効化された」ことを知る手段が無かった。
+      note_fail_open(e)
       return nil
     end
 
     def release(token)
       redis.call('EVAL', RELEASE_SCRIPT, 1, create_key(lock_key), token)
     rescue => e
-      e.log
+      # ⚠ EVAL だけ通らない構成だとここが毎回来る。放置すると TTL の 30 秒ぶん
+      # 番組表の編集が全部 409 になり続ける。
+      note_release_failure(e)
     end
 
     def lock_key

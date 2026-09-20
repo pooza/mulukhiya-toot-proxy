@@ -56,6 +56,36 @@ module Mulukhiya
       assert(@token)
     end
 
+    # ⚠⚠ **fail-open したことが観測できること (#4577 の 2)。**従来は `e.log` 止まりで
+    # Sentry に届かず、ロックが黙って無効化されたことを知る手段が無かった。
+    #
+    # ⚠ [LockDegradationTest](lock_degradation.rb) は mixin 単体しか見ていないので、
+    # **実クラスからの呼び出しを外しても向こうは緑のまま**になる。ここが call site の
+    # 検出点（#4578 で踏んだ「検査していないのに緑」と同じ型）。
+    def test_acquire_escalates_when_redis_is_unreachable
+      return if disable?
+      recorded = []
+      @storage.define_singleton_method(:redis) {raise Ginseng::Redis::Error, 'boom'}
+      @storage.define_singleton_method(:escalate) {|_error, state, _values| recorded.push(state)}
+
+      assert_nil(@storage.send(:acquire), 'fail-open しているのに token を返している')
+      assert_equal(['fail-open'], recorded)
+    end
+
+    # ⚠⚠ **`EVAL` だけ通らない構成（ACL / scripting 制限）を見る。**acquire は成功して
+    # release だけが毎回失敗するので、**すべての書き込みが TTL の 30 秒ぶんロックを
+    # 持ち逃げ**し、エディタが延々 409 を返す。fail-open より静かで痛い。
+    def test_release_escalates_when_eval_fails
+      return if disable?
+      recorded = []
+      @storage.define_singleton_method(:redis) {raise Ginseng::Redis::Error, 'boom'}
+      @storage.define_singleton_method(:escalate) {|_error, state, _values| recorded.push(state)}
+
+      @storage.send(:release, 'token')
+
+      assert_equal(['release-failed'], recorded)
+    end
+
     # 遅れて届いた release が、TTL 切れ後に他者が取り直したロックを消さないこと
     # （compare-and-delete）。
     def test_release_does_not_delete_others_lock

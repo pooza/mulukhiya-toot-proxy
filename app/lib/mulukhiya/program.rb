@@ -169,11 +169,7 @@ module Mulukhiya
         raise Ginseng::NotFoundError, "キー '#{key}' が見つかりません。" unless programs.key?(key)
         entry = programs[key]
         entry['episode'] = (entry['episode'] || 0).to_i + 1
-        entry['annict_episode_id'] = nil
-        if annict_applicable?(prepared, entry)
-          entry['annict_episode_id'] = prepared[:episode_data]['annictId']
-          entry['subtitle'] = prepared[:episode_data]['title'] if prepared[:episode_data]['title']
-        end
+        apply_annict_increment(key, prepared, entry)
         fetcher.save(programs)
         next entry
       end
@@ -373,6 +369,59 @@ module Mulukhiya
     def annict_applicable?(prepared, entry)
       return false unless prepared[:episode_data]
       return prepared.values_at(:episode, :work_id) == entry.values_at('episode', 'annict_work_id')
+    end
+
+    # ロックの中で確定したエントリへ、ロックの外で引いた Annict の結果を載せる。
+    #
+    # ⚠ **`annict_episode_id` は先に必ず nil へ落とす。**載せない回に前回の値が
+    # 残ると、新しい話数に古い Annict の ID が付いたままになる。
+    def apply_annict_increment(key, prepared, entry)
+      entry['annict_episode_id'] = nil
+      return log_annict_stale(key, prepared, entry) if annict_stale?(prepared, entry)
+      return nil unless annict_applicable?(prepared, entry)
+      entry['annict_episode_id'] = prepared[:episode_data]['annictId']
+      entry['subtitle'] = prepared[:episode_data]['title'] if prepared[:episode_data]['title']
+      return entry
+    end
+
+    # ⚠ **引けたのに載せられなかった回**だけ true。`episode_data` が無い回は
+    # 「Annict を引けなかった」であって、ガードの発動ではない。
+    def annict_stale?(prepared, entry)
+      return false unless prepared[:episode_data]
+      return !annict_applicable?(prepared, entry)
+    end
+
+    # ガードが実際に効いたことを残す (#4577 の 3)。
+    #
+    # ⚠⚠ **載せなかった結果は `annict_episode_id: nil` ＝「Annict を引けなかった」
+    # ときと同じ状態**なので、ログが無いと両者を区別する手段がゼロになる。
+    # 運用者から見ると、どちらも「次話を押して 200 が返り、サブタイトルだけ
+    # 入らない」という同じ見え方をする。**これは #4534 のガードが意図どおり
+    # 働いたことを示す唯一の観測点**になる。
+    #
+    # ⚠⚠ **「押し直すべきか」の材料ではない。答えは「押し直してはいけない」で
+    # 確定している。**`increment_episode` は話数の +1・`next_on` の前進・`save` を
+    # この判定より**前に無条件で**済ませているので、増分そのものは成功している。
+    # 押し直すと話数を飛ばして日付が 7 日ずれる。
+    #
+    # ⚠ **期待値と実値の両方を出す。**Annict 側の障害なのか、待っている間に
+    # 別の編集が入ってガードが正しく働いたのかで、運用者が
+    # 「`PUT` でメタデータを補う」のか「Annict の設定を見る」のかが変わる。
+    #
+    # ⚠ **`prepared[:episode_data]` が無い回はここへ来ない。**あれは Annict を
+    # 引けなかった（または作品が紐づいていない）回で、ガードの発動ではない。
+    #
+    # ⚠ `alert` ではなく `info`。⚠⚠ **ガードが働くのは正常な動作**なので、
+    # 上げると「クライアント起因なのに alert」（#4542 / #4534 で外してきた形）に戻る。
+    def log_annict_stale(key, prepared, entry)
+      logger.info(program_entry: {
+        event: 'annict_stale',
+        key: key,
+        prepared_episode: prepared[:episode],
+        actual_episode: entry['episode'],
+        prepared_work_id: prepared[:work_id],
+        actual_work_id: entry['annict_work_id'],
+      })
     end
 
     def next_annict_episode(annict, work_id, episode_number)
