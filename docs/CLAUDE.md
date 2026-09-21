@@ -836,7 +836,7 @@ Slack / LINE / メールには出なくなるが、**周期実行でメールを
 - ⚠ **観測の穴: `StandardError#alert` は付帯情報を Sentry に渡していない**
   （[refines.rb](../app/lib/mulukhiya/refines.rb) の `Sentry.capture_exception(self)` に `values` が無い）。
   syslog には出るが Sentry では空で、**-2Q の `sources` / `cached_entries` が見えず、他者サーバーの相談に
-  Sentry だけでは答えられなかった**。全 alert 共通。渡すなら資格情報の流出確認が要るので未着手・未起票
+  Sentry だけでは答えられなかった**。全 alert 共通。**#4745 として起票した**（extra は `scrub_sentry_event` を素通りするので `LogScrubber` を通してから渡す）
 - 3 件とも「いつの時点の count か」をコメントに残した
 
 #### ginseng-\* のピン判断（2026-09-21 の同期）
