@@ -621,7 +621,7 @@ location の `if` 3 行を落とした。
 | 07-19 | #4463 | 3 | DictionaryTagHandler の投稿同期スキャンの最適化 |
 | 07-21 | ~~#4471~~ | 3 | ✅ **棚卸しでクローズ（2026-09-16）。2026-07 に実装済みだった**（`7a2091cd` / `4bc57258` / `41353712`） |
 | 07-21 | ~~#4476~~ | 3 | ✅ **同上。**判定は参照との相対比＋`cc` 同一性検査まで入っていた |
-| 08-08 | #4543 | 3 | Sentry の未トリアージ unresolved の棚卸し。**群 1（Redis 接続系）は 2026-09-21 に完了**（27 / 2A を resolve）。残りは群 2 の **7 件**（上流 4xx / 5xx・2026-09-23 に `2Y` を `2X` と同一現象と判定して外した） |
+| 08-08 | ~~#4543~~ | 3 | ✅ **クローズ（2026-09-23）。**群 1 は 09-21（27 / 2A）、**群 2 は 09-23 に 6 件を resolve**。⚠ `28` は Sentry から消滅・追跡不能。**unresolved 26 件でコメント 0 は 0 件**になった |
 | 08-11 | #4570 | 3 | `Program` の編集系を別クラスへ（ClassLength 上限ちょうど） |
 | 08-11 | ~~#4577~~ | 3 | ✅ **PR #4744・`65fb33af`（2026-09-20）**。⚠ 5 / 6（緑・ついで）は入れず、残りは #4742 / #4743 へ切り出した |
 | 08-11 | ~~#4578~~ | 1 | ✅ **PR #4738・`8225353e`（2026-09-16）**。⚠ `LineLength` は数字を下げず**切って理由を残した** |
@@ -814,7 +814,7 @@ Slack / LINE / メールには出なくなるが、**周期実行でメールを
 - **chubo2**: `origin/main` と差分なし。§6-2 の Issue 棚卸しは **08-31（23 日経過・30 日未満）でスキップ**、
   §6-3 のドキュメント棚卸しは 09-08 実施済み
 - **harness upstream**: `last_checked` が **09-20（3 日経過・4 日未満）なのでスキップ**
-- **マイルストーン**: 5.38.0 は **open 6（Issue ベース）＋ draft PR #4739**、5.39.0 に **6 件**（#4749 / #4750 を同日に追加）、5.40.0 に 1 件
+- **マイルストーン**: 5.38.0 は **open 5（Issue ベース）＋ draft PR #4739**（#4543 を同日クローズ）、5.39.0 に **6 件**（#4749 / #4750 を同日に追加）、5.40.0 に 1 件
 
 #### 辞書台帳: 🔴 は 3 件で変化なし（chubo2 `9e82981`）
 
@@ -870,6 +870,35 @@ Slack / LINE / メールには出なくなるが、**周期実行でメールを
   辞書ソースの 🟡 間欠（#4659）と同じ面なので、**取り込み後に台帳の率を 1 回見る**
 - **`ginseng-fediverse` v3.1.0（#4748 / 5.40.0）・`ginseng-redis` v2.0.7（#4746 / 5.39.0）は 09-21 の判断のまま。**
   `ginseng-style` v1.1.13 は ③ 見送りのまま（docs・rubocop 追随のみ）
+
+#### ✅ 同日中に着地: #4543（Sentry の未トリアージ棚卸し）をクローズ
+
+同期のあと「進めてください」で 5.38.0 の #4543 に着手し、**群 2 の 6 件を判定して閉じた。**
+
+| Short ID | 判断 | 根拠 |
+| --- | --- | --- |
+| 9 | ✅ resolve | `AnnouncementWorker` が上流の 502 を受けたもの。07-29 を最後に 2 か月発生なし |
+| E / S / W | ✅ resolve | Misskey のドラフト API が 400。**保持イベントが全部 `sweep`** |
+| 29 | ✅ resolve | `MastodonController` の 404。`lbock` の単発 |
+| 17 | ✅ resolve | **利用者起因**（下記） |
+
+- ⚠⚠ **「機体が退役した」だけを根拠にしていない。**`E` / `S` / `W` の**コードは vulcan でも同じように
+  動いている**。**08-22 のカットオーバーから 1 か月、同じシグネチャが 1 件も出ていない**ことを
+  併せた上での判断で、**再発したら reopen してコードを疑う**旨を各コメントに残した
+- 🔴 **`17` は #4543 本文の推測（SSRF allowlist が弾いた結果）が外れていた。**
+  `ginseng-piefed` の `service.rb:92` の `uri.public?` は**ネットワーク的な到達性ではなく
+  トゥートの公開範囲**（`TootURI#public?` ＝ `visibility == 'public'`）で、実体は
+  **「公開でないトゥートを Piefed にクリップした」**。⚠ **動作は正しいのに例外にしているので、
+  Sidekiq の再試行で 1 操作が 4 件に膨らむ**（count=20 ＝ 実際は 5 回程度の操作）。
+  **gem 側で静かに諦める形にするのが本筋**なので、#4750 で piefed を触るときに上流へ提案する
+- ⚠ **`28`（`7571753939`）は Sentry から消えていた**（`The requested resource does not exist`）。
+  起票時の 16 件のうち 1 件は**追跡不能**
+- ✅ **完了条件の最後の 1 項目（§5 の手順に「コメント 0 の滞留も見る」を足すか判断する）も片付けた。**
+  **足した**うえで、**実行して 0 件であることを確かめる**形でスクリプトごと手順に置いた
+  （実際に動かして確認済み。2026-09-23 時点は unresolved 26 件・コメント 0 は 0 件）
+
+⚠ **監視を続けるものが 2 件残る**（どちらも障害ではなく外部依存のノイズ）:
+**`2X` + `2Y`（Annict・足して読む）**と **`2Q`（辞書全滅・新規は他者サーバー分）**。
 
 #### chubo2 側で動いたこと（こちらの作業ではない）
 
@@ -2985,6 +3014,33 @@ Issue #4233 の APIController 段階的リファクタは「1〜2 マイルス�
 - 判断結果や対応経緯はコメントとして記録する: `curl -sX POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"text":"コメント内容"}' https://sentry.io/api/0/issues/{issue_id}/comments/`
 - `$TOKEN` は `~/.sentryclirc` の `[auth]` セクションから取得する
 - Sentry 未導入のプロジェクトではこのステップをスキップする
+
+⚠⚠ **「新規」だけでなく「コメント 0 のまま滞留しているもの」も見る（2026-09-23 追加・#4543 の結論）。**
+この手順は長く**最終発生の新しい順にしか見ていなかった**ので、**静かに立った新種が
+一度も判断されないまま残り続けた**。#4543 の起票時点で **27 件中 16 件がコメント 0** だった。
+
+```sh
+# unresolved のうちコメント 0 のものを出す
+export TOK=$(awk -F= '/^token=/{print $2}' ~/.sentryclirc)
+export ORG=$(awk -F= '/^org=/{print $2}' ~/.sentryclirc)
+export PROJ=$(awk -F= '/^project=/{print $2}' ~/.sentryclirc)
+python3 - <<'EOS'
+import json, os, urllib.request
+tok = os.environ['TOK']
+def get(url):
+  req = urllib.request.Request(url, headers={'Authorization': f'Bearer {tok}'})
+  return json.load(urllib.request.urlopen(req))
+issues = get(f"https://sentry.io/api/0/projects/{os.environ['ORG']}/{os.environ['PROJ']}/issues/?query=is%3Aunresolved")
+print(len(issues), 'unresolved')
+for i in issues:
+  if not get(f"https://sentry.io/api/0/issues/{i['id']}/comments/"):
+    print('コメント0:', i['shortId'], f"count={i['count']}", i['lastSeen'])
+EOS
+```
+
+⚠ **0 件であることを毎回確かめる**（2026-09-23 時点は unresolved 26 件・コメント 0 は 0 件）。
+1 件でも出たら、その場で最新イベントの `server_name` / `release` / culprit を開いて判断を書く。
+⚠ **判断には必ず「いつの時点の count か」を書く**（[[feedback_sentry-triage-needs-count-snapshot]]）。
 
 ### 6. 外部リポジトリの同期確認（chubo2 / ginseng-*）
 
