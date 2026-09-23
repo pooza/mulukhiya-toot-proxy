@@ -19,8 +19,14 @@ module Mulukhiya
       return {'episode' => episode, 'annict_work_id' => work_id}
     end
 
+    # 判定の実体は #4570 で ProgramEditor へ移した。⚠ **Singleton ではない**ので
+    # テストごとに使い捨てのインスタンスを持てる。
+    def editor
+      @editor ||= ProgramEditor.new
+    end
+
     def applicable?(prepared, entry)
-      return Program.instance.send(:annict_applicable?, prepared, entry)
+      return editor.send(:annict_applicable?, prepared, entry)
     end
 
     # 素直な系列: 引いた時点と、ロックの中で確定した内容が一致する。
@@ -126,25 +132,26 @@ module Mulukhiya
     private
 
     def stale?(prepared, entry)
-      return Program.instance.send(:annict_stale?, prepared, entry)
+      return editor.send(:annict_stale?, prepared, entry)
     end
 
     def apply(key, prepared, entry)
-      return Program.instance.send(:apply_annict_increment, key, prepared, entry)
+      return editor.send(:apply_annict_increment, key, prepared, entry)
     end
 
-    # ⚠ Program は singleton なので、差し替えた logger は必ず外して返す。
-    # 残すと以降のテストのログが全部ここへ流れ込む。
+    # ⚠ 差し替え先は**このテスト専用の ProgramEditor**（#4570）。以前は
+    # `Program.instance` の singleton へ生やしており、外し忘れると以降のテストの
+    # ログが全部ここへ流れ込む形だった。使い捨てのインスタンスになったので
+    # その事故は起こらないが、対称性のため ensure で外すのは残す。
     def capture_info
       logged = []
       double = Object.new
       double.define_singleton_method(:info) {|payload| logged.push(payload)}
-      program = Program.instance
-      program.define_singleton_method(:logger) {double}
+      editor.define_singleton_method(:logger) {double}
       begin
         yield
       ensure
-        program.singleton_class.send(:remove_method, :logger)
+        editor.singleton_class.send(:remove_method, :logger)
       end
       return logged
     end
