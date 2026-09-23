@@ -814,7 +814,7 @@ Slack / LINE / メールには出なくなるが、**周期実行でメールを
 - **chubo2**: `origin/main` と差分なし。§6-2 の Issue 棚卸しは **08-31（23 日経過・30 日未満）でスキップ**、
   §6-3 のドキュメント棚卸しは 09-08 実施済み
 - **harness upstream**: `last_checked` が **09-20（3 日経過・4 日未満）なのでスキップ**
-- **マイルストーン**: 5.38.0 は **open 6（Issue ベース）＋ draft PR #4739**、5.39.0 に 4 件、5.40.0 に 1 件
+- **マイルストーン**: 5.38.0 は **open 6（Issue ベース）＋ draft PR #4739**、5.39.0 に **6 件**（#4749 / #4750 を同日に追加）、5.40.0 に 1 件
 
 #### 辞書台帳: 🔴 は 3 件で変化なし（chubo2 `9e82981`）
 
@@ -852,17 +852,22 @@ Slack / LINE / メールには出なくなるが、**周期実行でメールを
   style 追随のみ。**同じ面（pid ファイル）の続きなので v1.24.0 で止める理由が無い。**
   ⚠ **注意点はむしろ強まる**（書き込み方そのものが変わる）。**ステージングで起動・停止・再起動を
   実際に通してから**出す（[[project_latent-landmine-fires-on-next-restart]]）
-- 🆕 **`ginseng-web` v3.0.0 → v3.0.1 — 宛先未定。**`fix: Package に http_class を足し、
-  RSS20FeedRenderer の直書きをやめる`（pooza/ginseng-web#135 / #136）。
-  ⚠ **モロヘイヤが直接触る面**（`app/lib/mulukhiya/renderer/rss20_feed_renderer.rb` と
-  `media_feed_renderer.rb` が `Ginseng::Web::RSS20FeedRenderer` を継承している）
-- 🆕 **`ginseng-piefed` v0.1.1 → v0.1.2 — 宛先未定。**`fix: Service が http_class を無視して
-  Ginseng::HTTP を直に作る`（pooza/ginseng-piefed#15 / #16）。
-  ⚠ **`AccountMethods#piefed` が `Ginseng::Piefed::Service.new` を呼んでいる**ので当たる
+- 🆕 **`ginseng-web` v3.0.0 → v3.0.1 — ② #4749 として起票・5.39.0**（2026-09-23 ユーザー判断）。
+  `fix: Package に http_class を足し、RSS20FeedRenderer の直書きをやめる`（pooza/ginseng-web#135 / #136）
+- 🆕 **`ginseng-piefed` v0.1.1 → v0.1.2 — ② #4750 として起票・5.39.0**（同）。
+  `fix: Service が http_class を無視して Ginseng::HTTP を直に作る`（pooza/ginseng-piefed#15 / #16）
 - ⚠⚠ **上の 2 本は同じ型＝ [[feedback_fix-may-not-reach-through-ginseng]] の「gem がこちらの値を捨てる」。**
-  モロヘイヤは `Package#http_class` で自前の `Mulukhiya::HTTP`（`Ginseng::Web::HTTP` の薄い派生）を
-  返しているのに、**gem 側が `Ginseng::HTTP` を直に作っていたので届いていなかった。**
-  実害は UA とロガーの差なので急がないが、**「直したのに効いていない」の温床**なので放置しない
+  モロヘイヤは `Package#http_class` で自前の `Mulukhiya::HTTP` を返しているのに、
+  **gem 側が `Ginseng::HTTP` / `Ginseng::Web::HTTP` を直に作っていたので届いていなかった。**
+  🔴 **「UA とロガーの差」で済む話ではない。**向こうがモロヘイヤで取った実測では、
+  `Ginseng::HTTP#initialize` が `config_class` から設定を読むので、**フィード描画の HTTP だけ
+  再送上限が 3 ではなく gem の既定 5 で回り、syslog の identity が `ginseng-core` になり、
+  `Mulukhiya::Config` ではなく `Ginseng::Config` を見ていた**。
+  ⚠⚠ **ログのマスク設定（`/logger/mask_fields` と #4511 の `mask_query_params`）も
+  この経路には効いていなかった**ことになるので、**取り込み時に
+  [[project_log-credential-exposure]] の走査対象にこの経路が入っていたかを確かめる**
+- ⚠ **取り込むと再送上限が 5 → 3 に下がる**＝外部ソースの取得が今より早く諦める。
+  辞書ソースの 🟡 間欠（#4659）と同じ面なので、**取り込み後に台帳の率を 1 回見る**
 - **`ginseng-fediverse` v3.1.0（#4748 / 5.40.0）・`ginseng-redis` v2.0.7（#4746 / 5.39.0）は 09-21 の判断のまま。**
   `ginseng-style` v1.1.13 は ③ 見送りのまま（docs・rubocop 追随のみ）
 
