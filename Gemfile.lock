@@ -8,10 +8,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: b6e736db820caca781890fb134b937e7e37ca61c
-  tag: v1.23.7
+  revision: 442cf2867b3568bf37573480ce0fdccca4af4885
+  tag: v1.24.0
   specs:
-    ginseng-core (1.23.7)
+    ginseng-core (1.24.0)
       activesupport (>= 8.1.2.1)
       addressable (>= 2.9.0)
       cgi (>= 0.4.2)
@@ -42,10 +42,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 732c452a6712dd789cac22f4ae28fcffd0c59bf2
-  tag: v2.0.1
+  revision: 23acc7c64a7733770006e2775009541f08d13fd2
+  tag: v3.0.0
   specs:
-    ginseng-fediverse (2.0.1)
+    ginseng-fediverse (3.0.0)
 
 GIT
   remote: https://github.com/pooza/ginseng-piefed.git
@@ -65,10 +65,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-redis.git
-  revision: 0019c73ea1eed170ef40712f788171f1edf242c9
-  tag: v2.0.6
+  revision: ffc08b50acaa6a5035b46e242a91d52d872528ad
+  tag: v2.0.7
   specs:
-    ginseng-redis (2.0.6)
+    ginseng-redis (2.0.7)
       redis-client
 
 GIT
@@ -150,7 +150,7 @@ GEM
     auth-sanitizer (0.2.3)
       version_gem (~> 1.1, >= 1.1.14)
     base64 (0.3.0)
-    bigdecimal (4.1.2)
+    bigdecimal (4.1.3)
     builder (3.3.0)
     bundler-audit (0.9.3)
       bundler (>= 1.2.0)
@@ -281,7 +281,7 @@ GEM
       net-protocol
     net-pop (0.1.2)
       net-protocol
-    net-protocol (0.3.0)
+    net-protocol (0.4.0)
       timeout
     net-smtp (0.5.1)
       net-protocol
