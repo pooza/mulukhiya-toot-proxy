@@ -929,8 +929,8 @@ module Mulukhiya
         .slice(*ProgramEntryContract::WRITABLE_KEYS.map(&:to_s))
         .transform_keys(&:to_sym)
       key = params[:key].to_s
-      key = Program.instance.generate_key(attributes) if key.empty?
-      entry = Program.instance.add_entry(key, attributes)
+      key = Program.instance.editor.generate_key(attributes) if key.empty?
+      entry = Program.instance.editor.add_entry(key, attributes)
       @renderer.message = {key:, entry:}
       return @renderer.to_s
     rescue => e
@@ -952,7 +952,7 @@ module Mulukhiya
       attributes = params.to_h
         .slice(*ProgramEntryContract::WRITABLE_KEYS.map(&:to_s))
         .transform_keys(&:to_sym)
-      entry = Program.instance.update_entry(params[:key], attributes)
+      entry = Program.instance.editor.update_entry(params[:key], attributes)
       @renderer.message = {key: params[:key], entry:}
       return @renderer.to_s
     rescue => e
@@ -965,7 +965,7 @@ module Mulukhiya
     delete '/admin/program/entry/:key' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.livecure?
-      entry = Program.instance.delete_entry(params[:key])
+      entry = Program.instance.editor.delete_entry(params[:key])
       raise Ginseng::NotFoundError, "キー '#{params[:key]}' が見つかりません。" unless entry
       @renderer.message = {key: params[:key], entry:}
       return @renderer.to_s
@@ -980,7 +980,7 @@ module Mulukhiya
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.livecure?
       annict = sns.account&.annict || account_class.info_account&.annict
-      entry = Program.instance.increment_episode(params[:key], annict: annict)
+      entry = Program.instance.editor.increment_episode(params[:key], annict: annict)
       @renderer.message = {key: params[:key], entry:}
       return @renderer.to_s
     rescue => e
@@ -993,7 +993,7 @@ module Mulukhiya
     post '/admin/program/entry/:key/next_on/advance' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.livecure?
-      entry = Program.instance.advance_next_on(params[:key], days: params[:days])
+      entry = Program.instance.editor.advance_next_on(params[:key], days: params[:days])
       @renderer.message = {key: params[:key], entry:}
       return @renderer.to_s
     rescue => e

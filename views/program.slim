@@ -213,7 +213,7 @@ html lang='ja' data-theme='light'
         const TIME_FORMAT = /^([01]?\d|2[0-3]):[0-5]\d$/
         const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土']
         // 1 リクエストで進められる日数の上限 (#4585)。サーバー側の
-        // Program::NEXT_ON_ADVANCE_MAX_DAYS と揃える。
+        // ProgramEditor::NEXT_ON_ADVANCE_MAX_DAYS と揃える (#4570 で Program から移動)。
         const NEXT_ON_ADVANCE_MAX_DAYS = 366
 
         // 開始時刻を 0 時からの分に直す。HH:MM として読めない値はその日の末尾へ。
