@@ -70,7 +70,11 @@ module Mulukhiya
       key = create_key(lock_key)
       token = SecureRandom.uuid
       return token if redis.call('SET', key, token, 'NX', 'EX', ttl) == 'OK'
-      raise Ginseng::ConflictError, '別の更新が進行中です。少し待って再試行してください。'
+      raise ConflictError.new(
+        '別の更新が進行中です。少し待って再試行してください。',
+        code: :locked,
+        retry_after: ttl,
+      )
     rescue Ginseng::ConflictError
       raise
     rescue => e

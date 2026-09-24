@@ -10,8 +10,8 @@ module Mulukhiya
     EPISODE_DATA = {'annictId' => 123, 'title' => 'サブタイトル'}.freeze
 
     # ロックを取る前に引いた内容（話数・作品 ID・Annict の応答）。
-    def prepared(episode: 5, work_id: 42, episode_data: EPISODE_DATA)
-      return {episode:, work_id:, episode_data:}
+    def prepared(episode: 5, work_id: 42, episode_data: EPISODE_DATA, state: nil)
+      return {episode:, work_id:, episode_data:, state:}
     end
 
     # ロックの中で確定したエントリ。
@@ -70,14 +70,60 @@ module Mulukhiya
     # 運用者から見ると、どちらも「次話を押して 200 が返り、サブタイトルだけ
     # 入らない」という同じ見え方をする。
 
-    # ⚠ **引けたのに載せられなかった回**だけがガードの発動。
-    def test_stale_only_when_data_was_fetched
-      assert(stale?(prepared, entry(episode: 6)))
-      assert_false(stale?(prepared, entry), '素直に載る回を stale と読んでいる')
-      assert_false(
-        stale?(prepared(episode_data: nil), entry(episode: 6)),
-        'Annict を引けなかった回を「ガードが効いた」と読んでいる',
-      )
+    # ⚠ **引けたのに載せられなかった回**だけがガードの発動 (`superseded`)。
+    # 戻り値はレスポンスの `annict` になる (#4579)。
+    def test_state_is_superseded_only_when_data_was_fetched
+      capture_info do
+        assert_equal(:superseded, apply('k', prepared, entry(episode: 6)))
+        assert_equal(:applied, apply('k', prepared, entry), '素直に載る回を superseded と読んでいる')
+        assert_equal(
+          :not_found,
+          apply('k', prepared(episode_data: nil, state: :not_found), entry(episode: 6)),
+          'Annict を引けなかった回を「ガードが効いた」と読んでいる',
+        )
+      end
+    end
+
+    # --- 載せなかった理由の判定 (#4579) --------------------------------------
+    #
+    # ⚠⚠ 以前はレスポンスの形が 3 通りとも同じで、クライアントには区別がつかなかった。
+
+    def test_prepare_is_unconfigured_without_annict
+      stub_data('k' => {'episode' => 4, 'annict_work_id' => 42})
+
+      assert_equal(:unconfigured, prepare('k', nil)[:state])
+    end
+
+    def test_prepare_is_unconfigured_without_work_id
+      stub_data('k' => {'episode' => 4})
+
+      assert_equal(:unconfigured, prepare('k', annict_double([]))[:state])
+    end
+
+    def test_prepare_finds_the_next_episode
+      stub_data('k' => {'episode' => 4, 'annict_work_id' => 42})
+      result = prepare('k', annict_double([{'numberText' => '第5話', 'annictId' => 123}]))
+
+      assert_nil(result[:state])
+      assert_equal(123, result[:episode_data]['annictId'])
+    end
+
+    def test_prepare_is_not_found_when_annict_lacks_the_episode
+      stub_data('k' => {'episode' => 4, 'annict_work_id' => 42})
+
+      assert_equal(:not_found, prepare('k', annict_double([{'numberText' => '第4話'}]))[:state])
+    end
+
+    # ⚠ Annict の障害を `not_found` と混ぜない。クライアントが取る手が違う
+    # （`not_found` は Annict 側にまだ無い、`failed` は時間を置けば引ける）。
+    def test_prepare_is_failed_when_annict_raises
+      stub_data('k' => {'episode' => 4, 'annict_work_id' => 42})
+      error = RuntimeError.new('annict down')
+      error.define_singleton_method(:alert) {|*| nil}
+      annict = Object.new
+      annict.define_singleton_method(:episodes) {|_ids| raise error}
+
+      assert_equal(:failed, prepare('k', annict)[:state])
     end
 
     # ⚠⚠ 本丸。ガードが効いた回が、**期待値と実値の両方**で残ること。
@@ -131,8 +177,18 @@ module Mulukhiya
 
     private
 
-    def stale?(prepared, entry)
-      return editor.send(:annict_stale?, prepared, entry)
+    def prepare(key, annict)
+      return editor.send(:prepare_annict_increment, key, annict)
+    end
+
+    def stub_data(programs)
+      editor.define_singleton_method(:data) {programs}
+    end
+
+    def annict_double(episodes)
+      annict = Object.new
+      annict.define_singleton_method(:episodes) {|_ids| episodes}
+      return annict
     end
 
     def apply(key, prepared, entry)

@@ -46,7 +46,7 @@ module Mulukhiya
       raise Ginseng::ValidateError, 'キーが空です。' if key.empty?
       return lock.synchronize do
         programs = data
-        raise Ginseng::ConflictError, "キー '#{key}' は既に存在します。" if programs.key?(key)
+        raise ConflictError.new("キー '#{key}' は既に存在します。", code: :duplicate_key) if programs.key?(key)
         attrs = attributes.transform_keys(&:to_s).reject {|_, v| blank_value?(v)}
         programs[key] = attrs.to_h {|k, v| [k, normalize_value(k, v)]}
         fetcher.save(programs)
@@ -112,6 +112,21 @@ module Mulukhiya
     # 差し替えられた、ということなので、古い内容で上書きしてはいけない。載せなかった
     # 場合は annict_episode_id が nil のまま（Annict が引けなかったときと同じ状態）。
     def increment_episode(key, annict: nil)
+      return increment_episode_with_annict(key, annict:)[:entry]
+    end
+
+    # increment_episode と同じ。Annict のメタデータを載せたか・載せなかった理由も返す (#4579)。
+    #
+    # - `applied` — 載せた
+    # - `unconfigured` — Annict 未連携か、作品 ID が紐づいていない
+    # - `not_found` — 該当話数が Annict に無い
+    # - `failed` — Annict の呼び出しが失敗した
+    # - `superseded` — 引いている間に別の編集が入ったので載せなかった
+    #
+    # ⚠⚠ **どれでも話数の +1 は成功して保存されている。**`applied` 以外でも
+    # increment を送り直してはいけない（話数が飛ぶ）。足りないのは
+    # `annict_episode_id` と `subtitle` だけ。
+    def increment_episode_with_annict(key, annict: nil)
       raise auto_update_conflict if auto_update?
       key = key.to_s
       prepared = prepare_annict_increment(key, annict)
@@ -120,9 +135,9 @@ module Mulukhiya
         raise Ginseng::NotFoundError, "キー '#{key}' が見つかりません。" unless programs.key?(key)
         entry = programs[key]
         entry['episode'] = (entry['episode'] || 0).to_i + 1
-        apply_annict_increment(key, prepared, entry)
+        state = apply_annict_increment(key, prepared, entry)
         fetcher.save(programs)
-        next entry
+        next {entry:, annict: state}
       end
     end
 
@@ -231,7 +246,7 @@ module Mulukhiya
     # 書き込みは次の pull で上書き消失するので、書き込み API 自体を 409 で
     # 拒否し「auto_update を切ってから編集する」運用に倒す (#4272)。
     def auto_update_conflict
-      return Ginseng::ConflictError.new('自動更新が有効のため、編集できません。')
+      return ConflictError.new('自動更新が有効のため、編集できません。', code: :auto_update)
     end
 
     # ロックを取る前に Annict を引く。annict が無い / 作品 ID が紐づいていない
@@ -243,8 +258,14 @@ module Mulukhiya
       current = data[key] || {}
       episode = (current['episode'] || 0).to_i + 1
       work_id = current['annict_work_id']
-      return {episode:, work_id:} unless annict && work_id
-      return {episode:, work_id:, episode_data: next_annict_episode(annict, work_id, episode)}
+      return {episode:, work_id:, state: :unconfigured} unless annict && work_id
+      begin
+        episode_data = next_annict_episode(annict, work_id, episode)
+      rescue => e
+        e.alert
+        return {episode:, work_id:, state: :failed}
+      end
+      return {episode:, work_id:, episode_data:, state: episode_data ? nil : :not_found}
     end
 
     # ロックの外で引いた Annict の結果を、ロックの中で確定した話数に載せてよいか。
@@ -269,20 +290,19 @@ module Mulukhiya
     #
     # ⚠ **`annict_episode_id` は先に必ず nil へ落とす。**載せない回に前回の値が
     # 残ると、新しい話数に古い Annict の ID が付いたままになる。
+    #
+    # 戻り値は increment_episode_with_annict の `annict`。
     def apply_annict_increment(key, prepared, entry)
       entry['annict_episode_id'] = nil
-      return log_annict_stale(key, prepared, entry) if annict_stale?(prepared, entry)
-      return nil unless annict_applicable?(prepared, entry)
+      # `episode_data` が無い回は「Annict を引けなかった」であって、ガードの発動ではない。
+      return prepared[:state] unless prepared[:episode_data]
+      unless annict_applicable?(prepared, entry)
+        log_annict_stale(key, prepared, entry)
+        return :superseded
+      end
       entry['annict_episode_id'] = prepared[:episode_data]['annictId']
       entry['subtitle'] = prepared[:episode_data]['title'] if prepared[:episode_data]['title']
-      return entry
-    end
-
-    # ⚠ **引けたのに載せられなかった回**だけ true。`episode_data` が無い回は
-    # 「Annict を引けなかった」であって、ガードの発動ではない。
-    def annict_stale?(prepared, entry)
-      return false unless prepared[:episode_data]
-      return !annict_applicable?(prepared, entry)
+      return :applied
     end
 
     # ガードが実際に効いたことを残す (#4577 の 3)。
@@ -318,6 +338,7 @@ module Mulukhiya
       })
     end
 
+    # ⚠ 失敗は握らない。呼び出し元が `failed` と `not_found` を分けるため (#4579)。
     def next_annict_episode(annict, work_id, episode_number)
       episodes = annict.episodes([work_id.to_i]) || []
       target = episode_number.to_i
@@ -325,9 +346,6 @@ module Mulukhiya
         match = ep['numberText'].to_s.match(/(\d+)/)
         match && match[1].to_i == target
       end
-    rescue => e
-      e.alert
-      return nil
     end
   end
 end

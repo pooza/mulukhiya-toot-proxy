@@ -121,10 +121,11 @@ module Mulukhiya
       original = @program.data
       @program.save(key => {'series' => 'A'})
 
-      error = assert_raise(Ginseng::ConflictError) do
+      error = assert_raise(ConflictError) do
         @editor.add_entry(key, 'series' => 'B')
       end
       assert_equal(409, error.status)
+      assert_equal(:duplicate_key, error.code)
     ensure
       @program.save(original) if original
     end
@@ -458,47 +459,52 @@ module Mulukhiya
 
     def test_add_entry_rejected_when_auto_update_enabled
       with_auto_update(true) do
-        error = assert_raise(Ginseng::ConflictError) do
+        error = assert_raise(ConflictError) do
           @editor.add_entry('any_key', 'series' => 'A')
         end
         assert_equal(409, error.status)
+        assert_equal(:auto_update, error.code)
       end
     end
 
     def test_update_entry_rejected_when_auto_update_enabled
       with_auto_update(true) do
-        error = assert_raise(Ginseng::ConflictError) do
+        error = assert_raise(ConflictError) do
           @editor.update_entry('any_key', 'episode' => 1)
         end
         assert_equal(409, error.status)
+        assert_equal(:auto_update, error.code)
       end
     end
 
     def test_delete_entry_rejected_when_auto_update_enabled
       with_auto_update(true) do
-        error = assert_raise(Ginseng::ConflictError) do
+        error = assert_raise(ConflictError) do
           @editor.delete_entry('any_key')
         end
         assert_equal(409, error.status)
+        assert_equal(:auto_update, error.code)
       end
     end
 
     def test_advance_next_on_rejected_when_auto_update_enabled
       with_auto_update(true) do
-        error = assert_raise(Ginseng::ConflictError) do
+        error = assert_raise(ConflictError) do
           @editor.advance_next_on('any_key')
         end
 
         assert_equal(409, error.status)
+        assert_equal(:auto_update, error.code)
       end
     end
 
     def test_increment_episode_rejected_when_auto_update_enabled
       with_auto_update(true) do
-        error = assert_raise(Ginseng::ConflictError) do
+        error = assert_raise(ConflictError) do
           @editor.increment_episode('any_key')
         end
         assert_equal(409, error.status)
+        assert_equal(:auto_update, error.code)
       end
     end
 

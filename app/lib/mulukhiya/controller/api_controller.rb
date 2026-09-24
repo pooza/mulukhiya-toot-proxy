@@ -88,9 +88,7 @@ module Mulukhiya
       return @renderer.to_s
     rescue => e
       report_error(e)
-      @renderer.status = e.status
-      @renderer.message = {error: e.message}
-      return @renderer.to_s
+      return render_error(e)
     end
 
     put '/compose/templates/:id' do
@@ -107,9 +105,7 @@ module Mulukhiya
       return @renderer.to_s
     rescue => e
       report_error(e)
-      @renderer.status = e.status
-      @renderer.message = {error: e.message}
-      return @renderer.to_s
+      return render_error(e)
     end
 
     delete '/compose/templates/:id' do
@@ -120,9 +116,7 @@ module Mulukhiya
       return @renderer.to_s
     rescue => e
       report_error(e)
-      @renderer.status = e.status
-      @renderer.message = {error: e.message}
-      return @renderer.to_s
+      return render_error(e)
     end
 
     post '/mastodon/auth' do
@@ -675,7 +669,10 @@ module Mulukhiya
       lock = AnnictRecordLockStorage.new
       lock_token = lock.acquire(sns.account.id, episode_id)
       unless lock_token
-        raise Ginseng::ConflictError, 'Duplicate Annict record request is in progress'
+        raise ConflictError.new(
+          'Duplicate Annict record request is in progress',
+          code: :duplicate_request,
+        )
       end
       begin
         record = annict.create_record(
@@ -713,7 +710,10 @@ module Mulukhiya
       lock = AnnictReviewLockStorage.new
       lock_token = lock.acquire(sns.account.id, work_id)
       unless lock_token
-        raise Ginseng::ConflictError, 'Duplicate Annict review request is in progress'
+        raise ConflictError.new(
+          'Duplicate Annict review request is in progress',
+          code: :duplicate_request,
+        )
       end
       begin
         review = annict.create_review(
@@ -935,9 +935,7 @@ module Mulukhiya
       return @renderer.to_s
     rescue => e
       handle_program_entry_error(e, params[:key])
-      @renderer.status = e.status
-      @renderer.message = {error: e.message}
-      return @renderer.to_s
+      return render_error(e)
     end
 
     put '/admin/program/entry/:key' do
@@ -957,9 +955,7 @@ module Mulukhiya
       return @renderer.to_s
     rescue => e
       handle_program_entry_error(e, params[:key])
-      @renderer.status = e.status
-      @renderer.message = {error: e.message}
-      return @renderer.to_s
+      return render_error(e)
     end
 
     delete '/admin/program/entry/:key' do
@@ -971,23 +967,19 @@ module Mulukhiya
       return @renderer.to_s
     rescue => e
       handle_program_entry_error(e, params[:key])
-      @renderer.status = e.status
-      @renderer.message = {error: e.message}
-      return @renderer.to_s
+      return render_error(e)
     end
 
     post '/admin/program/entry/:key/episode/increment' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.livecure?
       annict = sns.account&.annict || account_class.info_account&.annict
-      entry = Program.instance.editor.increment_episode(params[:key], annict: annict)
-      @renderer.message = {key: params[:key], entry:}
+      result = Program.instance.editor.increment_episode_with_annict(params[:key], annict:)
+      @renderer.message = {key: params[:key], entry: result[:entry], annict: result[:annict].to_s}
       return @renderer.to_s
     rescue => e
       handle_program_entry_error(e, params[:key])
-      @renderer.status = e.status
-      @renderer.message = {error: e.message}
-      return @renderer.to_s
+      return render_error(e)
     end
 
     post '/admin/program/entry/:key/next_on/advance' do
@@ -998,9 +990,7 @@ module Mulukhiya
       return @renderer.to_s
     rescue => e
       handle_program_entry_error(e, params[:key])
-      @renderer.status = e.status
-      @renderer.message = {error: e.message}
-      return @renderer.to_s
+      return render_error(e)
     end
 
     get '/admin/handler/list' do
@@ -1149,9 +1139,7 @@ module Mulukhiya
       else
         error.alert
       end
-      @renderer.status = error.status
-      @renderer.message = {error: error.message}
-      return @renderer.to_s
+      return render_error(error)
     end
 
     # 冪等性ロック由来の 409 は info ログのみ。同一アカウントが 1 分間に
@@ -1216,14 +1204,36 @@ module Mulukhiya
     def handle_program_entry_error(error, key)
       case error
       when Ginseng::ConflictError
-        # 409 (auto_update? 有効時 / 重複キー / 書き込みロック競合 #4534)
-        Logger.new.info(program_entry: {event: 'conflict', key:, message: error.message})
+        # 409 (auto_update? 有効時 / 重複キー / 書き込みロック競合 #4534)。
+        # ⚠ reason で 3 種類を分ける (#4579)。message は自由文なので集計に使えない。
+        Logger.new.info(program_entry: {
+          event: 'conflict',
+          key:,
+          reason: (error.code.to_s if error.is_a?(ConflictError)),
+          message: error.message,
+        }.compact)
       when Ginseng::ValidateError
         # 422 (days が不正 等)
         Logger.new.info(program_entry: {event: 'invalid', key:, message: error.message})
       else
         report_error(error)
       end
+    end
+
+    # エラー応答の本文とステータス。
+    #
+    # ⚠ **409 には `code` を添え、ロック競合には `Retry-After` を付ける (#4579)。**
+    # 「待てば通る 409」と「何度送っても通らない 409」を、クライアントが文言の一致に
+    # 頼らず区別できるようにする。意味は ConflictError に書いてある。
+    def render_error(error)
+      body = {error: error.message}
+      if error.is_a?(ConflictError)
+        body[:code] = error.code.to_s
+        headers('Retry-After' => error.retry_after.to_s) if error.retry_after
+      end
+      @renderer.status = error.status
+      @renderer.message = body
+      return @renderer.to_s
     end
 
     def fetch_json(http, url, accept)

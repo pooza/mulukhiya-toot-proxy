@@ -32,7 +32,11 @@ module Mulukhiya
       @token = @storage.send(:acquire)
 
       assert(@token)
-      assert_raise(Ginseng::ConflictError) {@storage.send(:acquire)}
+      error = assert_raise(ConflictError) {@storage.send(:acquire)}
+
+      # 待てば通る 409 なので、理由と待ち時間をクライアントへ渡す (#4579)。
+      assert_equal(:locked, error.code)
+      assert_equal(ProgramLockStorage::LOCK_TTL_SECONDS, error.retry_after)
     end
 
     def test_release_allows_reacquire
@@ -95,7 +99,7 @@ module Mulukhiya
       @token = @storage.send(:acquire)
       @storage.send(:release, stale)
 
-      assert_raise(Ginseng::ConflictError) {@storage.send(:acquire)}
+      assert_raise(ConflictError) {@storage.send(:acquire)}
     end
   end
 end

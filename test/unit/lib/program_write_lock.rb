@@ -83,14 +83,15 @@ module Mulukhiya
 
     private
 
-    # ⚠ 例外クラスだけでなくメッセージまで見る。auto_update の 409 も
+    # ⚠ 例外クラスだけでなく理由まで見る。auto_update の 409 も
     # ConflictError なので、クラスだけだと**別の理由で緑になった**のを見逃す。
     def assert_locked(&)
       assert(@token, 'ロックを獲得できていない（Redis 不通か fail-open）')
-      error = assert_raise(Ginseng::ConflictError, &)
+      error = assert_raise(ConflictError, &)
 
       assert_equal(LOCKED_MESSAGE, error.message)
       assert_equal(409, error.status)
+      assert_equal(:locked, error.code)
     end
   end
 end
