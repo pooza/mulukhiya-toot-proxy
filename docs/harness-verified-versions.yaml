@@ -37,7 +37,16 @@ misskey:
   verified_at: '2026-09-07'
 
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
-last_checked: '2026-09-20'
+last_checked: '2026-09-24'
+
+# 2026-09-24 チェック結果:
+#   - 🔴 **Misskey 2026.9.1（2026-09-23・stable）が出た。verified（2026.9.0）より新しいので検証対象。**
+#     ⚠ **セキュリティリリース**で、**ダイスキー（vulcan）へは 2026-09-24 00:45 に適用済み**
+#     （chubo2 `3f543e7`・「fedi-test-harness は未実走」と明記）。harness 検証は後追いになる。
+#     マイグレーション無し。外から見える変化は `POST /api/federation/update-remote-user` の認証必須化と
+#     `/inbox` の 415 の 2 つで、どちらもモロヘイヤは呼んでいない（chubo2 の記録）。
+#     ⚠ chubo2 の作業ツリーで `fedi-test-harness/misskey` の版が 2026.9.1 へ書き換え途中（未コミット・別セッション）。
+#   - Mastodon: 最新 stable は **v4.7.2 ＝ verified と同じ**。v4.7.2 より新しい RC は無い。
 
 # 2026-09-20 チェック結果:
 #   - **新しいものは無い。実走・bump とも不要。**`last_checked` の更新のみ。
