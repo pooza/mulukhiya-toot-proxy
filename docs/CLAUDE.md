@@ -3177,6 +3177,8 @@ EOS
 ⚠⚠ **ginseng-\* は依頼が無くても自走で更新される**（2026-08-21 ユーザー明示）。
 `Gemfile.lock` は git gem の **revision 固定**なので、**向こうが直しても `bundle update` するまで
 こちらには 1 バイトも届かない**。「Issue が close された」は**取り込み済みを意味しない**。
+⚠⚠ **dependabot は `ginseng-*` の PR を出さない（#4702・2026-09-24）。ずれに気づく経路はこの節だけ**なので、
+同期のたびに必ず回す。
 
 ```sh
 # Gemfile で固定した版と、各リポジトリの最新タグを突き合わせる
@@ -3489,16 +3491,25 @@ capsicum 側で先行運用しており、v1.18 のレビューでは 5 観点�
 ### Dependabot運用
 
 ⚠⚠ **5.37.0 (#4702 / PR #4716) で develop 側の方針が変わった。**
+⚠⚠ **5.39.0（#4702 の決着・2026-09-24）で `ginseng-*` を version update の対象から外した。**
 
 | target-branch | version update | 備考 |
 | --- | --- | --- |
 | `v4` | ⚠ **無効**（`open-pull-requests-limit: 0`） | 保守はバックポート方針なので据え置き |
-| `develop` | ✅ **有効**（上限 2 本／日） | `groups` で **`ginseng`** と **`others`** の 2 本に束ねる |
+| `develop` | ✅ **有効**（上限 1 本） | `others` 1 本に束ねる。⚠ **`ginseng-*` は `ignore` で対象外** |
+
+- ⚠⚠ **`ginseng-*` の版上げは同期手順 §6-1 だけが受け皿。**dependabot の PR は「どの版を・どの回で」を
+  持てないので、**判断と一致すれば Issue と二重、一致しなければ閉じる**だけだった
+  （PR #4752 は core v1.24.0（宛先は v1.25.0）/ fediverse v3.0.0（v3.1.0 を 5.40.0）/ redis を 1 本に束ねていた）。
+  ginseng は自走でタグが頻繁に切られるので、**寝かせている間に作り直しと close が繰り返される**。
+  ⚠ **凍結はしない**（#4702 が心配した点）— §6-1 が毎回ずれを拾っている
+- ⚠ 止め方は **`ignore`（`update-types` 無し＝全種別）**。`allow` で絞ると security update まで止まる。
+  どちらも `test/unit/lib/dependabot_config.rb` が見ている
 
 - ⚠ **`.github/dependabot.yml` は既定ブランチ（`main`）のものが読まれる。**`target-branch` は
   PR の宛先で、設定の読み先ではない。**develop で変えても `main` に入るまで効かない**
-- ⚠ **`versioning-strategy: increase-if-necessary`**。`lockfile-only` だと ginseng の
-  `tag:` が上がらない（`Gemfile` の書き換えが要るため）
+- ⚠ **`versioning-strategy: increase-if-necessary`**。ginseng の `tag:` を上げるために入れた設定だが、
+  ginseng を外した後も実害が無いので据え置き
 - ⚠⚠ **`Gemfile` で `~>` の上限を置いた gem は `ignore` で据え置く**（json / rack / sinatra ほか 7 本）。
   **上限を足した・外したら `ignore` も直す**——ずれは `test/unit/lib/dependabot_config.rb` が捕まえる
 - ⚠ `ignore` も `open-pull-requests-limit` も **security update には効かない**（脆弱性の PR は常に出る）
