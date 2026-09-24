@@ -852,6 +852,8 @@ Slack / LINE / メールには出なくなるが、**周期実行でメールを
   ⚠⚠ **次の同期では `cd ~/repos/chubo2 && git log origin/main -- fedi-test-harness/misskey` で着地を確かめ、
   着地していれば harness を 2026.9.1 で建てて `rake test` を実走し、`misskey.verified` を昇格する。**
   未着地なら持ち越し。⚠ **使い終わったらすぐ teardown**（[[project_fedi-test-harness-usage]]）
+  - ✅ **同日中に消化。**chubo2 側が 2026.9.1 の harness を建てた時点で実走し、**1488 tests・0 failures・0 errors・
+    145 omissions**。`misskey.verified` を 2026.9.1 へ昇格した（詳細は台帳）
 - Mastodon は v4.7.2 のまま・新しい RC なし
 
 #### ginseng-* のピン: 09-23 の判断から変化なし

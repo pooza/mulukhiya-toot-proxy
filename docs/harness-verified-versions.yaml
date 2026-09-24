@@ -33,8 +33,8 @@ mastodon:
   verified_at: '2026-09-16'
 
 misskey:
-  verified: 2026.9.0
-  verified_at: '2026-09-07'
+  verified: 2026.9.1
+  verified_at: '2026-09-24'
 
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
 last_checked: '2026-09-24'
@@ -46,7 +46,14 @@ last_checked: '2026-09-24'
 #     マイグレーション無し。外から見える変化は `POST /api/federation/update-remote-user` の認証必須化と
 #     `/inbox` の 415 の 2 つで、どちらもモロヘイヤは呼んでいない（chubo2 の記録）。
 #     ⚠ chubo2 の作業ツリーで `fedi-test-harness/misskey` の版が 2026.9.1 へ書き換え途中（未コミット・別セッション）。
-#     📌 **chubo2 側の着地を待って、モロヘイヤ側で実走する（ユーザー指示・次セッション可）。**
+#     ✅ **同日中に fedi-test-harness（2026.9.1）で実走し、`verified` を昇格した。**
+#     モロヘイヤ develop `5e2346cd`。**1488 tests / 2861 assertions / 0 failures / 0 errors /
+#     145 omissions（100% passed）。**失敗が無いので版間 diff は不要。
+#     `TestHarness: controller=misskey url=http://localhost:3001` と `/api/meta` の version 2026.9.1 を確認。
+#     `MASTODON_*` は 0 本（`env -i` で系を分離）。DB 直読みは `account` 34 / `status` 27 / `postgres` 11 が
+#     **3 本とも omission 0** で全緑。⚠ omission 145 は 09-20 の 2026.9.0 実走と同数。
+#     ⚠ 5433（Mastodon harness・未起動）への DB 接続スキップが 1 行出るのは従来どおり。
+#     ⚠ harness は chubo2 側のセッションが建てたもの（版上げは同時点で chubo2 に未コミット）。
 #   - Mastodon: 最新 stable は **v4.7.2 ＝ verified と同じ**。v4.7.2 より新しい RC は無い。
 
 # 2026-09-20 チェック結果:
