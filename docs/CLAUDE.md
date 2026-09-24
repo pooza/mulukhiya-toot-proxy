@@ -847,6 +847,11 @@ Slack / LINE / メールには出なくなるが、**周期実行でメールを
 
 - 🔴 **Misskey 2026.9.1（09-23・stable）が出た。**セキュリティリリースで、**ダイスキーへは 09-24 00:45 に適用済み**
   （harness 未実走）。⚠ **検証は後追い**になる。台帳の `last_checked` を 09-24 に更新した
+- 📌 **宿題（2026-09-24 ユーザー指示「終わったらこちらでもテストをしたい。次セッションでも構わない」）**:
+  chubo2 側で harness の Misskey 版を 2026.9.1 へ上げる作業が進行中（同期時点で未コミット）。
+  ⚠⚠ **次の同期では `cd ~/repos/chubo2 && git log origin/main -- fedi-test-harness/misskey` で着地を確かめ、
+  着地していれば harness を 2026.9.1 で建てて `rake test` を実走し、`misskey.verified` を昇格する。**
+  未着地なら持ち越し。⚠ **使い終わったらすぐ teardown**（[[project_fedi-test-harness-usage]]）
 - Mastodon は v4.7.2 のまま・新しい RC なし
 
 #### ginseng-* のピン: 09-23 の判断から変化なし

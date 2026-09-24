@@ -46,6 +46,7 @@ last_checked: '2026-09-24'
 #     マイグレーション無し。外から見える変化は `POST /api/federation/update-remote-user` の認証必須化と
 #     `/inbox` の 415 の 2 つで、どちらもモロヘイヤは呼んでいない（chubo2 の記録）。
 #     ⚠ chubo2 の作業ツリーで `fedi-test-harness/misskey` の版が 2026.9.1 へ書き換え途中（未コミット・別セッション）。
+#     📌 **chubo2 側の着地を待って、モロヘイヤ側で実走する（ユーザー指示・次セッション可）。**
 #   - Mastodon: 最新 stable は **v4.7.2 ＝ verified と同じ**。v4.7.2 より新しい RC は無い。
 
 # 2026-09-20 チェック結果:
