@@ -97,9 +97,13 @@ module Mulukhiya
       lock = ComposeTemplateLockStorage.new
       token = lock.send(:acquire, account.id)
       begin
-        assert_raise(Ginseng::ConflictError) do
+        error = assert_raise(ConflictError) do
           @container.create(name: 'x', body: 'y')
         end
+
+        # 待てば通る 409 (#4579)。
+        assert_equal(:locked, error.code)
+        assert_equal(ComposeTemplateLockStorage::LOCK_TTL_SECONDS, error.retry_after)
       ensure
         lock.send(:release, account.id, token)
       end
@@ -150,9 +154,13 @@ module Mulukhiya
       account.user_config.update(compose: {templates:})
 
       assert_equal(ComposeTemplateContainer::MAX_COUNT, @container.all.size)
-      assert_raise(Ginseng::ConflictError) do
+      error = assert_raise(ConflictError) do
         @container.create(name: 'over', body: 'x')
       end
+
+      # ⚠ 何度送っても通らない 409。Retry-After を付けない (#4579)。
+      assert_equal(:template_limit, error.code)
+      assert_nil(error.retry_after)
     end
   end
 end

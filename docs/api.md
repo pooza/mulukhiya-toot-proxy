@@ -82,6 +82,29 @@ capsicum 等のクライアントアプリが、モロヘイヤ固有の機能�
 {"errors": {"field_name": ["エラーメッセージ"]}}
 ```
 
+#### 競合 (409)
+
+**5.38.0〜（#4579）: モロヘイヤ自身が返す 409 には `code` が付く。**再試行してよいかは `code` で判定する。
+
+```json
+{"error": "別の更新が進行中です。少し待って再試行してください。", "code": "locked"}
+```
+
+| `code` | 意味 | 再試行 | `Retry-After` |
+|---|---|---|---|
+| `locked` | 書き込みロックの競合（番組表の編集 5 ルート / 投稿テンプレートの作成・更新・削除） | **してよい**（一過性）。番組表は再取得してから送り直す | **付く**（秒。ロックの TTL で、待ち時間の上限） |
+| `auto_update` | 番組表の自動更新が有効（`/program/auto_update: true`） | **無駄**（設定を変えるまで通らない） | 付かない |
+| `duplicate_key` | 番組表のキーが既にある | **無駄**（入力を変える） | 付かない |
+| `template_limit` | 投稿テンプレートが上限（50 件） | **無駄**（どれかを消すまで通らない） | 付かない |
+| `duplicate_request` | Annict の同じ記録・レビューが直前に送られている | ⚠ **そのまま送り直さない**（下記） | 付かない |
+
+⚠⚠ **`duplicate_request` は一過性ではない。**冪等性ロックは**先の要求が成功すると TTL（既定 30 秒）まで残る**ので、
+待って送り直すと**先の要求が成功していた場合に二重に記録される**。先の要求の結果を確かめてから判断すること。
+（先の要求が失敗した場合はロックがすぐ外れるので、送り直してもそのまま通る。）
+
+⚠ **判定に `error` の文言を使わないこと。**文言は予告なく推敲する。5.37.x 以前は `code` が無く、文言でしか区別できなかった。
+`code` が無い 409（5.37.x 以前、または上流の SNS が返した 409 の透過）は、従来どおり「再試行は無駄」と扱うのが安全。
+
 #### ゲートウェイエラー (502等)
 
 SNS 本体への転送が失敗した場合、SNS が返したステータスコードをそのまま返す。
@@ -452,7 +475,7 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
 
 **`features.media_catalog`**: メディアカタログ機能の現在のオン/オフ状態。実体は `/{controller}/data/media_catalog` を `/about` で features 側に合流させたもの（discovery を features 一本に集約するため、`annict_linked` と同じ動的合流パターン、#4343）。5.23.0 から デフォルト `false`（実験的扱い）。`false` のとき `/media`・`/feed/media` はいずれも **404 ではなく 503** を返す。`/media`（JSON）は body に `{"available": false, "items": [], "has_next": false}` を含める。`/feed/media`（RSS 2.0）は body 形式維持のため空 channel のみを返し（JSON フィールドは付かない）、HTTP ステータスのみで状態を示す。capsicum 等のクライアントは本フラグを参照して「メンテナンス中」表示に切り替える（`pooza/capsicum#606`）。`Retry-After` ヘッダは付与しない（再開タイミングが運用判断ベースで見積もり不能なため、クライアントは `/about` を polling して features を見る）。「機能未提供」(404) と「現在 OFF」(503) の区別が目的。
 
-**`features.program_editable`**: 番組表エディタ（`/admin/program/entry/*` 5 ルート）の書き込み API が現在利用可能か。`livecure?` が `true`（番組表機能対応 controller）かつ `/program/auto_update` が `false`（自動更新無効）のときのみ `true`（#4272）。`true` でも管理者権限が必要なのは従来通り。`false` のとき書き込み 5 ルートは 409 Conflict（メッセージ「自動更新が有効のため、編集できません。」）を返す。WebUI 側は本フラグを見て編集ボタン類を非表示・案内表示に切り替える。`livecure?` 自体が `false` のサーバーでは番組表機能が無いので常に `false`。⚠ **`true` でも 409 は起こりうる**（5.33.0〜 / #4534 の書き込みロック競合）。**本フラグと 409 を「編集不可」として同一視しないこと**——ロック競合の 409 は一過性で、再試行すれば通る。
+**`features.program_editable`**: 番組表エディタ（`/admin/program/entry/*` 5 ルート）の書き込み API が現在利用可能か。`livecure?` が `true`（番組表機能対応 controller）かつ `/program/auto_update` が `false`（自動更新無効）のときのみ `true`（#4272）。`true` でも管理者権限が必要なのは従来通り。`false` のとき書き込み 5 ルートは 409 Conflict（メッセージ「自動更新が有効のため、編集できません。」）を返す。WebUI 側は本フラグを見て編集ボタン類を非表示・案内表示に切り替える。`livecure?` 自体が `false` のサーバーでは番組表機能が無いので常に `false`。⚠ **`true` でも 409 は起こりうる**（5.33.0〜 / #4534 の書き込みロック競合）。**本フラグと 409 を「編集不可」として同一視しないこと**——ロック競合の 409 は一過性で、再試行すれば通る。5.38.0〜 は 409 の `code` で区別できる（`auto_update` / `locked`、#4579）。
 
 **`features.nowplaying_resolver`**: ナウプレ enrich プロキシ（`POST /nowplaying/resolve`）の利用可否（#4382）。iTunes Search API が資格情報不要で常時利用可能なため恒常的に `true`。capsicum はこのフラグを見てナウプレ投稿時に URL 補完（enrich）を試みるか判定する。enrich なしでもクライアント整形のみで投稿は成立するため、フラグが無い旧サーバーでも degrade して動作する。プロバイダ既定は `/nowplaying/resolve/default_provider`（既定 `apple_music`）。
 
@@ -841,8 +864,8 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
   - `name`（必須・非空・最大100文字）
   - `body`（必須・空文字許容・最大5000文字）
   - `cw`（任意・最大200文字）
-- **上限**: 1ユーザーあたり50件。超過時は 409。
-- **ステータス**: 検証エラー 422 / 上限超過・同時更新の競合 409 / 保存の read-back 検証失敗 502。
+- **上限**: 1ユーザーあたり50件。超過時は 409（`code: template_limit`・再試行は無駄）。
+- **ステータス**: 検証エラー 422 / 上限超過・同時更新の競合 409 / 保存の read-back 検証失敗 502。同時更新の競合は `code: locked` と `Retry-After` 付きで、再試行してよい（5.38.0〜 / #4579。「[競合 (409)](#競合-409)」参照）。
 
 **レスポンス例**:
 
@@ -859,7 +882,7 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 
 - **認証**: 必須（`token` パラメータ・per-user）
 - **リクエストパラメータ**: POST と同一（`name` 必須非空 / `body` 必須空可 / `cw` 任意）。指定フィールドで全置換される。
-- **ステータス**: 検証エラー 422 / 該当なし 404 / 同時更新の競合 409 / read-back 検証失敗 502。
+- **ステータス**: 検証エラー 422 / 該当なし 404 / 同時更新の競合 409（`code: locked`）/ read-back 検証失敗 502。
 
 **レスポンス**: POST と同形（`{template, templates}`）。
 
@@ -869,7 +892,7 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 
 - **認証**: 必須（`token` パラメータ・per-user）
 - **パラメータ**: なし
-- **ステータス**: 該当なし 404（削除競合で起こりうる想定内）/ 同時更新の競合 409 / 削除失敗 502。
+- **ステータス**: 該当なし 404（削除競合で起こりうる想定内）/ 同時更新の競合 409（`code: locked`）/ 削除失敗 502。
 
 **レスポンス**: 削除したテンプレートと残存一覧（`{template, templates}`）。
 
@@ -1403,7 +1426,7 @@ JSON オブジェクトは仕様上「順序なし」だが、キーは SHA256 �
 
 - **`null` 値の扱い**: POST / PUT とも任意フィールドに `null` を渡すと保存前に `compact` で除去され、当該キーはエントリに保存されない。POST では「未設定」として、PUT では「既存キーの削除」（部分更新セマンティクス）として作用する
 - **レスポンス**: `{key, entry}` の JSON
-- **エラー**: 既存キー重複時は 409 Conflict（5.21.x までは 422 で返していた、5.22.0 から 409）。バリデーション違反は 422。`/program/auto_update: true` のとき (#4272) は 409 Conflict（メッセージ「自動更新が有効のため、編集できません。」）。書き込みが同時に走った場合も 409 Conflict（メッセージ「別の更新が進行中です。少し待って再試行してください。」、5.33.0〜 / #4534）。**こちらは一過性**なので、クライアントは再取得のうえ再試行してよい（ロック TTL は 30 秒）。`/program/auto_update: true` 由来の 409 は**恒久**なので、両者はメッセージで区別する
+- **エラー**: 既存キー重複時は 409 Conflict（5.21.x までは 422 で返していた、5.22.0 から 409）。バリデーション違反は 422。`/program/auto_update: true` のとき (#4272) は 409 Conflict（メッセージ「自動更新が有効のため、編集できません。」）。書き込みが同時に走った場合も 409 Conflict（メッセージ「別の更新が進行中です。少し待って再試行してください。」、5.33.0〜 / #4534）。**こちらは一過性**なので、クライアントは再取得のうえ再試行してよい（ロック TTL は 30 秒）。`/program/auto_update: true` 由来の 409 は**恒久**。両者は `code`（`locked` / `auto_update`）で区別する（5.38.0〜 / #4579。「[競合 (409)](#競合-409)」参照）
 
 #### PUT /mulukhiya/api/admin/program/entry/:key
 
@@ -1416,7 +1439,7 @@ JSON オブジェクトは仕様上「順序なし」だが、キーは SHA256 �
 - **任意キーのクリア**: 任意フィールド（`subtitle` 等）の値に `null` を渡すとそのキーがエントリから削除される
 - **`series` の扱い**: 送らなければ既存値を維持。送る場合は空文字 / `null` 不可（既存エントリの `series` をクリアする操作は提供しない。エントリ自体を削除する場合は DELETE を使う）
 - **レスポンス**: `{key, entry}`
-- **エラー**: 該当エントリなしの場合 404。`/program/auto_update: true` のとき (#4272) は 409 Conflict。書き込みが同時に走った場合も 409 Conflict（メッセージ「別の更新が進行中です。少し待って再試行してください。」、5.33.0〜 / #4534）。**こちらは一過性**なので、クライアントは再取得のうえ再試行してよい（ロック TTL は 30 秒）。`/program/auto_update: true` 由来の 409 は**恒久**なので、両者はメッセージで区別する
+- **エラー**: 該当エントリなしの場合 404。`/program/auto_update: true` のとき (#4272) は 409 Conflict。書き込みが同時に走った場合も 409 Conflict（メッセージ「別の更新が進行中です。少し待って再試行してください。」、5.33.0〜 / #4534）。**こちらは一過性**なので、クライアントは再取得のうえ再試行してよい（ロック TTL は 30 秒）。`/program/auto_update: true` 由来の 409 は**恒久**。両者は `code`（`locked` / `auto_update`）で区別する（5.38.0〜 / #4579。「[競合 (409)](#競合-409)」参照）
 
 #### DELETE /mulukhiya/api/admin/program/entry/:key
 
@@ -1426,7 +1449,7 @@ JSON オブジェクトは仕様上「順序なし」だが、キーは SHA256 �
 - **前提条件**: `livecure?` が `true`
 - **パスパラメータ**: `key` (string)
 - **レスポンス**: `{key, entry}` (削除した内容を返す)
-- **エラー**: 該当エントリなしの場合 404。`/program/auto_update: true` のとき (#4272) は 409 Conflict。書き込みが同時に走った場合も 409 Conflict（メッセージ「別の更新が進行中です。少し待って再試行してください。」、5.33.0〜 / #4534）。**こちらは一過性**なので、クライアントは再取得のうえ再試行してよい（ロック TTL は 30 秒）。`/program/auto_update: true` 由来の 409 は**恒久**なので、両者はメッセージで区別する
+- **エラー**: 該当エントリなしの場合 404。`/program/auto_update: true` のとき (#4272) は 409 Conflict。書き込みが同時に走った場合も 409 Conflict（メッセージ「別の更新が進行中です。少し待って再試行してください。」、5.33.0〜 / #4534）。**こちらは一過性**なので、クライアントは再取得のうえ再試行してよい（ロック TTL は 30 秒）。`/program/auto_update: true` 由来の 409 は**恒久**。両者は `code`（`locked` / `auto_update`）で区別する（5.38.0〜 / #4579。「[競合 (409)](#競合-409)」参照）
 
 #### POST /mulukhiya/api/admin/program/entry/:key/episode/increment
 
@@ -1443,15 +1466,25 @@ JSON オブジェクトは仕様上「順序なし」だが、キーは SHA256 �
 **この呼び出しで既に成功して保存されている**（`annict_applicable?` が閉じるのは Annict メタデータを載せるかどうかだけ）。
 再実行すると**話数がもう 1 つ進む**ため、話数を飛ばすことになる。
 不足しているのは `annict_episode_id` と `subtitle` だけなので、**`PUT /admin/program/entry/:key` で補う**。
-⚠ **レスポンス上は (1)(2)(3) を区別できない**ので、クライアントは 3 つとも「増分は成功、メタデータは未設定」として
-同じ扱いにするのが安全（構造の是正は #4579）。
+**5.38.0〜（#4579）: レスポンスの `annict` で区別できる。**⚠ **どの値でも話数の +1 は成功して保存されている**ので、
+`applied` 以外でも本エンドポイントを再実行しない（足りないメタデータは `PUT` で補う）。
+
+| `annict` | 意味 |
+|---|---|
+| `applied` | `annict_episode_id` と `subtitle` を載せた |
+| `unconfigured` | (1) Annict 未連携、または `annict_work_id` が無い |
+| `not_found` | (2) 該当話数が Annict に無い |
+| `failed` | Annict の呼び出しが失敗した（時間を置けば引ける可能性がある） |
+| `superseded` | (3) 引いている間に別の書き込みが入ったので載せなかった |
+
+⚠ 5.37.x 以前は `annict` キーが無く、(1)(2)(3) をレスポンスから区別できなかった。
 
 - **認証**: 必要（管理者のみ）
 - **前提条件**: `livecure?` が `true`
 - **パスパラメータ**: `key` (string)
 - **`next_on` は動かない**（**5.34.0〜 / #4585**）。⚠ **5.33.0 までは話数と同時に 7 日進んでいた**（#4373）。話数だけ直したいときに日付が巻き込まれるのと、上記 (3) の巻き戻し量が大きくなるのをやめるため、日付は `POST .../next_on/advance` へ分離した
-- **レスポンス**: `{key, entry}` (更新後)
-- **エラー**: 該当エントリなしの場合 404。`/program/auto_update: true` のとき (#4272) は 409 Conflict。書き込みが同時に走った場合も 409 Conflict（メッセージ「別の更新が進行中です。少し待って再試行してください。」、5.33.0〜 / #4534）。**こちらは一過性**なので、クライアントは再取得のうえ再試行してよい（ロック TTL は 30 秒）。`/program/auto_update: true` 由来の 409 は**恒久**なので、両者はメッセージで区別する
+- **レスポンス**: `{key, entry, annict}` (更新後。`annict` は上表・5.38.0〜)
+- **エラー**: 該当エントリなしの場合 404。`/program/auto_update: true` のとき (#4272) は 409 Conflict。書き込みが同時に走った場合も 409 Conflict（メッセージ「別の更新が進行中です。少し待って再試行してください。」、5.33.0〜 / #4534）。**こちらは一過性**なので、クライアントは再取得のうえ再試行してよい（ロック TTL は 30 秒）。`/program/auto_update: true` 由来の 409 は**恒久**。両者は `code`（`locked` / `auto_update`）で区別する（5.38.0〜 / #4579。「[競合 (409)](#競合-409)」参照）
 
 #### POST /mulukhiya/api/admin/program/entry/:key/next_on/advance
 
@@ -1468,7 +1501,7 @@ JSON オブジェクトは仕様上「順序なし」だが、キーは SHA256 �
 - **`next_on` を持たないエントリ（毎日枠）には日付を生やさない**（生やすと毎日枠が単発扱いになりイベントが消える）。エントリはそのまま返る
 - **不正な日付が入っているエントリは触らない**（壊れた値を別の壊れた値へ書き換えない）。エントリはそのまま返る
 - **レスポンス**: `{key, entry}` (更新後)
-- **エラー**: 該当エントリなしの場合 404。`days` が不正な場合 422。`/program/auto_update: true` のとき (#4272) は 409 Conflict。書き込みが同時に走った場合も 409 Conflict（メッセージ「別の更新が進行中です。少し待って再試行してください。」、#4534）。**こちらは一過性**なので、クライアントは再取得のうえ再試行してよい（ロック TTL は 30 秒）。`/program/auto_update: true` 由来の 409 は**恒久**なので、両者はメッセージで区別する
+- **エラー**: 該当エントリなしの場合 404。`days` が不正な場合 422。`/program/auto_update: true` のとき (#4272) は 409 Conflict。書き込みが同時に走った場合も 409 Conflict（メッセージ「別の更新が進行中です。少し待って再試行してください。」、#4534）。**こちらは一過性**なので、クライアントは再取得のうえ再試行してよい（ロック TTL は 30 秒）。`/program/auto_update: true` 由来の 409 は**恒久**。両者は `code`（`locked` / `auto_update`）で区別する（5.38.0〜 / #4579。「[競合 (409)](#競合-409)」参照）
 
 #### GET /mulukhiya/api/program/works
 
@@ -1784,7 +1817,7 @@ Annict にエピソード視聴記録（感想・レーティング）を投稿�
   - **422**（`Ginseng::ValidateError`）: リクエストバリデーション失敗（`episode_id` 不正など）、または Annict GraphQL `errors` が検証系（`extensions.code` が `ARGUMENT`/`VALIDATION`/`INVALID`/`UNPROCESSABLE`/`BAD_REQUEST` 系、もしくは message が `invalid`/`validation`/`argument`/`must be` に合致）
   - **403**（`Ginseng::AuthError`、本リポジトリの認証エラーは全て 403 で統一）: Annict 認証未設定、または Annict トークンの `write` スコープ不足・認可失効。Annict が HTTP 401/403 で返す場合・200 + GraphQL `errors`（`unauthorized`/`scope`/`token` 等）で返す場合の双方を 403 に正規化し、capsicum 側に「要（再）連携」を 403 一本で見せる
   - **404**（`Ginseng::NotFoundError`）: `episode_id` に対応する Annict エピソードがグローバルノード ID に解決できなかった（存在しない annictId 等）、または Annict GraphQL `errors` が not-found 系（`extensions.code` が `NOT_FOUND`、もしくは message が `not found`/`does not exist`/`no such` に合致）
-  - **409 Conflict**（`Ginseng::ConflictError`）: 同一 `(account, episode_id)` への record 投稿が短時間（既定 30 秒、`/service/annict/record/idempotency/ttl`）に重複した。network blip 等のリトライによる重複 record を抑止する冪等性ロック。クライアントは少し待ってからリトライする。直前の投稿が失敗した場合はロックを即時解放するため待たずにリトライ可能。本 409 は期待動作なので個別に Sentry に流さない（info ログのみ）が、同一アカウントが 1 分間に `/service/annict/record/idempotency/alert_threshold` 件（既定 10）に達した場合のみ「リトライループ等の異常」として Sentry alert に昇格する（#4346）
+  - **409 Conflict**（`Ginseng::ConflictError`）: 同一 `(account, episode_id)` への record 投稿が短時間（既定 30 秒、`/service/annict/record/idempotency/ttl`）に重複した。network blip 等のリトライによる重複 record を抑止する冪等性ロック。5.38.0〜 は本文に `code: duplicate_request` が付く（#4579）。⚠⚠ **待ってからそのまま送り直さないこと。**先の要求が成功していた場合、ロックは TTL まで残るので、TTL 後の送り直しは**二重の記録**になる（5.37.x 以前のこの節は「少し待ってからリトライする」と書いていたが誤り）。先の要求が失敗した場合はロックを即時解放するので、送り直してもそのまま通る。本 409 は期待動作なので個別に Sentry に流さない（info ログのみ）が、同一アカウントが 1 分間に `/service/annict/record/idempotency/alert_threshold` 件（既定 10）に達した場合のみ「リトライループ等の異常」として Sentry alert に昇格する（#4346）
   - **502 Bad Gateway**: 上記いずれにも分類されない Annict GraphQL `errors`（サーバー起因・不明）が返った／期待した構造の応答が得られなかった
 
 **リクエスト例**:
@@ -1833,7 +1866,7 @@ Annict に作品全体の感想（review）を投稿する。劇場版のよう�
 | `share_facebook` | boolean | 任意 | Annict 連携先（Facebook）への同時共有 |
 
 - **レスポンス**: `{review}` の JSON。`review` は Annict GraphQL の `Review` オブジェクト（`id`, `annictId`, `body`, `ratingOverallState`, `ratingAnimationState`, `ratingMusicState`, `ratingStoryState`, `ratingCharacterState`, `createdAt`）
-- **エラー**: record API と同様（403 認証 / 404 work 未解決・not-found 系 / 422 バリデーション / 409 冪等性ロック / 502 不明）。409 の冪等性ロックは同一 `(account, work_id)` 単位で、TTL は `/service/annict/review/idempotency/ttl`（既定 30 秒）、alert しきい値は `/service/annict/review/idempotency/alert_threshold`（既定 10）
+- **エラー**: record API と同様（403 認証 / 404 work 未解決・not-found 系 / 422 バリデーション / 409 冪等性ロック / 502 不明）。409 の冪等性ロックは同一 `(account, work_id)` 単位で（`code: duplicate_request`・送り直しの扱いは record と同じ）、TTL は `/service/annict/review/idempotency/ttl`（既定 30 秒）、alert しきい値は `/service/annict/review/idempotency/alert_threshold`（既定 10）
 
 **リクエスト例**:
 
