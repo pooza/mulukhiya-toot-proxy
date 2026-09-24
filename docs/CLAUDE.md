@@ -618,16 +618,60 @@ location の `if` 3 行を落とした。
 | 起票 | Issue | 重み | 主眼 |
 | --- | --- | ---: | --- |
 | 05-24 | 🎯 **#4352** | 3 | **media_catalog を shallu / gomander に横展開**。⚠⚠ **着手は 5.38.0 のリリース・デプロイが落ち着いてから**（2026-09-20 合意・下の節）。本文は 09-20 に書き直した |
-| 07-19 | #4463 | 3 | DictionaryTagHandler の投稿同期スキャンの最適化 |
+| 07-19 | ~~#4463~~ | 3 | ✅ **PR #4757・`d5037c29`（2026-09-25）**。short? の作り直しと並列化をやめた。案 B は #4756 へ |
 | 07-21 | ~~#4471~~ | 3 | ✅ **棚卸しでクローズ（2026-09-16）。2026-07 に実装済みだった**（`7a2091cd` / `4bc57258` / `41353712`） |
 | 07-21 | ~~#4476~~ | 3 | ✅ **同上。**判定は参照との相対比＋`cc` 同一性検査まで入っていた |
 | 08-08 | ~~#4543~~ | 3 | ✅ **クローズ（2026-09-23）。**群 1 は 09-21（27 / 2A）、**群 2 は 09-23 に 6 件を resolve**。⚠ `28` は Sentry から消滅・追跡不能。**unresolved 26 件でコメント 0 は 0 件**になった |
 | 08-11 | ~~#4570~~ | 3 | ✅ **PR #4751・`42507124`（2026-09-23）**。⚠ 起票時の「上限ちょうど」は既に「超えて `rubocop:disable` 済み」に進んでいた（`e4084d9e`） |
 | 08-11 | ~~#4577~~ | 3 | ✅ **PR #4744・`65fb33af`（2026-09-20）**。⚠ 5 / 6（緑・ついで）は入れず、残りは #4742 / #4743 へ切り出した |
 | 08-11 | ~~#4578~~ | 1 | ✅ **PR #4738・`8225353e`（2026-09-16）**。⚠ `LineLength` は数字を下げず**切って理由を残した** |
-| 08-11 | #4579 | 3 | 409 の「恒久／一過性」をクライアントが判別できない |
+| 08-11 | ~~#4579~~ | 3 | ✅ **PR #4758・`d0507a2d`（2026-09-25）**。409 に `code`、ロック競合に `Retry-After`、increment に `annict` 状態 |
 | 09-10 | #4728 | 1 | ✅ **修正済み（PR #4729・develop）**。5.37.0 の本番デプロイで発覚した `/feed/custom/*/path` の退行。リリースで本番に届く |
 | 09-20 | ~~#4740~~ | 1 | ✅ **PR #4741・`1628b267`（2026-09-20）**。`ginseng-fediverse` v2.0.1。⚠ **起票と同日に着地**（保留解除の判断がこの回で出たため） |
+
+#### 🔴 次回の入口: リリース前レビューの結果と残作業（2026-09-25）
+
+**リリース前に要る実装 Issue は全部消化した**（残る #4728 はリリース後にクローズ、#4352 はデプロイ後に着手）。
+5 観点レビューを `v5.37.1..<develop に main を合わせたツリー>` で実施した。**各観点は赤 0 だが、合わせて赤 2 件。**
+次回は「赤 2 件 → 掃除 → リリース手順（harness 両系 → ステージング 4 台 → PR #4739）」の順に進める。
+
+**🔴 赤 1: 5.37.1 の HEIF 遮断（#4733）が develop に入っていない。**ホットフィックスを main（5.37.0）から
+切ったあと develop へ戻していなかった（5.32.1 は戻っていた）。develop には `setup_vips` の許可リストも
+`BLOCKED_UPLOAD_TYPES` も無い＝**このまま harness・ステージングを回すと本番と別物を検証する。**
+- 対処: `git merge origin/main` を develop へ。**衝突は `config/application.yaml` の version 1 行だけ**（5.38.0 を採る）。
+  2026-09-25 に scratchpad で作って HEIF 処理が残ることを確認済み（未 push・捨ててよい）
+- ⚠ **PR #4739 が `CONFLICTING` なのもこの 1 行が原因**
+- 根本原因: 下の「ホットフィックス手順」に **develop へ戻す段が無い**。手順に足す
+
+**🔴 赤 2: ginseng-fediverse v2.0.1（#4740）で Misskey 向けのメンション無毒化が後退した。**
+`escape_sigils` が「`@`/`#` を無条件に区切る」から「`acct`/`hashtag` の抽出パターンに一致した所だけ」に変わり、
+和文字・`_` の直後の `@`、`)`・`/` の直後の `#` を拾わない。実測（v2.0.1）で `ラブ@pooza` / `_@admin` / `曲)#precure` は無変換、
+`曲 @admin` → `曲 @ admin`。**Misskey（mfm.js）は直前が `[a-z0-9]` のときしかメンションを除外しない**ので、
+ナウプレの曲名・アーティスト名（YouTube のタイトル等＝第三者が付ける）でメンション通知を撃たれ、`specified` 投稿では
+閲覧者が増える。Mastodon は `[[:word:]]` 判定なので影響なし。
+- 直し方は 2 択（**ユーザー判断待ち**）: gem 側で無毒化用の判定を抽出用と分けて広く取る（gem のコメント自身が
+  「無毒化は広く取るほうが安全」と書いている）／ひとまず v1.8.31 へ戻す
+
+**黄（Issue 候補・すべて S）**
+- 次話ボタンの Annict 失敗で**同期の `e.alert`**（`program_editor.rb` の `prepare_annict_increment`・既存）。
+  観測性と並行性の 2 観点が別々に指摘。通知先が遅いとクライアントが再送して**話数が 2 つ進む**おそれ。
+  同じリリースの `lock_degradation_methods` が避けた形そのもの
+- 番組表の取得全滅（`program_fetcher.rb` の `log_fetch_failure`）が syslog 1 行止まり。Sentry・`/health` に出ない
+- `annict_idempotency_lock_storage.rb` の fail-open が `e.log` 止まり（#4577 の取りこぼし）
+- 409 locked の `Retry-After` が残り時間でなく TTL 全体（30 秒）。案: `PTTL` の切り上げ
+- webhook `/:digest` で上流 4xx 由来の `GatewayError`（`Bad response 422`）まで `Internal Server Error` に丸まる
+- web UI（`views/program.slim`）が increment の `annict` を読まず、`failed` でも「+1 しました」だけ
+- 古いコメント: `program_editor.rb` の `log_annict_stale`、`lock_degradation_methods.rb` の「`next_on` が 7 日ずれる」（#4585 以降 `next_on` は動かない）
+
+**緑（大半は手順 12 の掃除 PR へ・極小）**: `docs/api.md` increment 節の「3 つ」→ 4 つ／ハッシュ短縮記法の混在
+（`key: key` など 3 か所）／`increment_episode` のロック説明コメントを実体側へ／`annict_applicable?` の到達しないガード／
+`conflict_code.rb` の `capture_info` は `remove_method` で戻す／`program_fetch_observability.rb` のコメントが実際の失敗経路と違う／
+increment の `annict` キーをコントローラ層で見るテストが無い／`slim_lint_coverage.rb` の継続行 +4／公開リポジトリから辿れない
+`[[project_log-credential-exposure]]` 参照／`render_error` と `/webhook/admin` が 5xx の原文を返す／`error do` を通った
+`ConflictError` は `code` が落ちる／`mail_alert.yaml` の `\A`/`\z` が `/admin/handler/list` 経由でブラウザへ出る／
+ロック劣化の Sentry に tag が無い／`/ffmpeg/timeout` 不正値の黙った既定化／取得失敗ログが毎分出る
+
+lint は rubocop（537 files, no offenses）・slim-lint ともクリーン。
 
 #### 2026-09-16 に消化した分（残り 7 件 / 重み 18）
 
