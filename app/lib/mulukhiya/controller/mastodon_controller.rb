@@ -58,6 +58,7 @@ module Mulukhiya
 
     post '/api/:version/media' do
       verify_token_integrity!
+      verify_upload_type!
       Event.new(:pre_upload, {reporter:, sns:}).dispatch(params)
       reporter.response = sns.upload(params.dig(:file, :tempfile), {
         version: api_version,
@@ -75,6 +76,7 @@ module Mulukhiya
 
     put '/api/:version/media/:id' do
       verify_token_integrity!
+      verify_upload_type!(:thumbnail)
       Event.new(:pre_thumbnail, {reporter:, sns:}).dispatch(params) if params[:thumbnail]
       reporter.response = sns.update_media(params[:id], params)
       Event.new(:post_thumbnail, {reporter:, sns:}).dispatch(params) if params[:thumbnail]
