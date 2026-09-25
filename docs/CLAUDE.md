@@ -681,10 +681,10 @@ increment の `annict` キーをコントローラ層で見るテストが無い
 lint は rubocop（537 files, no offenses）・slim-lint ともクリーン。
 
 ✅ **2026-09-26 の消化**: 緑の極小分は **PR #4767** に入れた。⚠ 黄は #4760〜#4765、緑の残りは #4766 に一度起票したが、
-**#4760（二重増加の bug）以外は同日に閉じた**（下の「3 つ目の軸は直す価値」）。閉じたものは**記録のみ**:
-番組表の全滅が syslog 止まり（#4761）／`AnnictIdempotencyLockStorage` の fail-open が `e.log` 止まり（#4762）／
-409 の `Retry-After` が TTL 全体（#4763）／webhook の上流 4xx が 500 に丸まる（#4764 → #4723 へ統合）／
-web UI が increment の `annict` を読まない（#4765）／緑の残り 5 件（#4766: 5xx 原文の返却・`mail_alert.yaml` の `\A`/`\z`・
+同日に整理した。✅ **その場で直せる 4 件は PR #4767 で直した**（#4760 同期 alert／#4762 冪等性ロックの fail-open／
+#4763 `Retry-After` を残り時間に／#4765 web UI の警告。⚠ #4765 はブラウザでの目視が未了）。
+残りは**記録のみ**で閉じた: 番組表の全滅が syslog 止まり（#4761・Sentry か `/health` かの設計判断が要る）／
+webhook の上流 4xx が 500 に丸まる（#4764 → #4723 へ統合）／緑の残り 5 件（#4766: 5xx 原文の返却・`mail_alert.yaml` の `\A`/`\z`・
 `/ffmpeg/timeout` の黙った既定化・取得失敗ログが毎分・increment ルートのテスト）。古いコメント 2 件（`log_annict_stale` / `lock_degradation_methods.rb`）は #4767 で直した。
 ⚠ 見送り 2 件: `slim_lint_coverage.rb` の +4 は rubocop が `return` 付き継続行に求める形／`annict_applicable?` のガードは
 `test_rejects_without_episode_data` が契約として押さえているので残した。
