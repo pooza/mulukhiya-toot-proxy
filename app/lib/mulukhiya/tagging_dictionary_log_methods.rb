@@ -26,13 +26,19 @@ module Mulukhiya
         signature:,
         generated_at: generated_at&.iso8601,
         sources: sources.size,
+        # ⚠ **実際に試した本数も出す (#4628 の 4 件目)。**`sources` は設定の本数で、
+        # `RemoteDictionary.create` が落ちた本（`type:` の打ち間違い等）は
+        # 試されないまま `empty_sources` にも入らず、「健全」に見える。
+        attempted_sources: @attempted_sources.to_i,
         empty_sources: empty.size,
         substituted_sources: substituted.size,
         entries: size,
         ttl: cache_ttl,
       }
       return logger.info(payload) if empty.empty?
-      logger.error(payload.merge(empty_source_urls: empty))
+      # どのソースを last-good で埋めたか (#4628 の 8 件目)。本数だけだと、
+      # 埋めた辞書の鮮度を台帳と突き合わせられない。
+      logger.error(payload.merge(empty_source_urls: empty, substituted_source_urls: substituted))
     end
 
     # 直近の good を残して戻った回の記録 (#4659)。
@@ -52,11 +58,33 @@ module Mulukhiya
         signature:,
         generated_at: generated_at&.iso8601,
         sources: sources.size,
+        attempted_sources: @attempted_sources.to_i,
         empty_sources: @empty_sources.to_a.size,
         substituted_sources: @substituted_sources.to_a.size,
         empty_source_urls: @empty_sources.to_a,
         entries: size,
       )
+    end
+
+    # `refresh` が例外で落ちた回の記録 (#4628 の 7 件目)。
+    #
+    # ⚠ **設定の読みは握る。**落ちた原因が設定の読み（`Handler.create` /
+    # `handler.all`）かもしれないので、`sources` / `signature` がここでもう一度
+    # 落ちうる。落ちた項目は nil にして、1 行は必ず残す。
+    def log_failure(error)
+      logger.error(
+        message: 'tagging dictionary refresh failed',
+        redis_key: TaggingDictionary::REDIS_KEY,
+        error: error.class.name,
+        signature: (signature rescue nil),
+        sources: (sources.size rescue nil),
+        attempted_sources: @attempted_sources,
+        empty_sources: @empty_sources&.size,
+        substituted_sources: @substituted_sources&.size,
+        entries: size,
+      )
+    rescue => e
+      e.log
     end
 
     def alert_empty_result
