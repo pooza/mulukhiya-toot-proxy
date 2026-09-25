@@ -264,10 +264,22 @@ module Mulukhiya
       begin
         episode_data = next_annict_episode(annict, work_id, episode)
       rescue => e
-        e.alert
+        report_annict_failure(key, e)
         return {episode:, work_id:, state: :failed}
       end
       return {episode:, work_id:, episode_data:, state: episode_data ? nil : :not_found}
+    end
+
+    # Annict の失敗を残す (#4760)。
+    #
+    # 🔴 **`e.alert` は使わない。**あれは Slack / LINE / メールの各ハンドラを
+    # timeout ぶん同期で待つので、次話ボタンの応答が通知先の遅さのぶん遅れ、
+    # **クライアントが先にタイムアウトして再送すると話数が 2 つ進む**（increment は非冪等）。
+    # ⚠ `LockDegradationMethods#report` と同じく、ログと Sentry へ直接積む
+    # （sentry-ruby は背景スレッドへ積むだけなので待たせない）。
+    def report_annict_failure(key, error)
+      error.log(program_entry: {event: 'annict_failed', key:})
+      Sentry.capture_exception(error) rescue nil if Sentry.initialized?
     end
 
     # ロックの外で引いた Annict の結果を、ロックの中で確定した話数に載せてよいか。

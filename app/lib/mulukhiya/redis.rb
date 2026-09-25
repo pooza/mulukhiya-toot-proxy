@@ -21,6 +21,20 @@ module Mulukhiya
       logger.info({storage: underscore}.merge(message))
     end
 
+    # 鍵の残り寿命を秒で返す（切り上げ・最低 1）。取れないときは `fallback` (#4763)。
+    #
+    # ⚠ ロック競合の 409 の `Retry-After` に使う。TTL 全体を返すと、先行の書き込みが
+    # 終わり近くでもクライアントを最大 TTL ぶん待たせる。⚠ **0 秒にはしない**
+    # （切り捨てると「今すぐ再送してよい」になり、まだ解けていない鍵へ撃ち直す）。
+    # ⚠ `key` は `create_key` 済みのものを渡す。
+    def remaining_seconds(key, fallback)
+      milliseconds = redis.call('PTTL', key).to_i
+      return fallback unless milliseconds.positive?
+      return [(milliseconds / 1000.0).ceil, 1].max
+    rescue
+      return fallback
+    end
+
     # 既に値があれば書き換えない SET (#4575)。獲得できたとき true。
     #
     # ⚠ **キャッシュを「温める」読み経路はこちらを使うこと。**素の SET だと、
