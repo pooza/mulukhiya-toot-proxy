@@ -71,10 +71,14 @@ module Mulukhiya
     #    走り続けたスレッドが**応答を組み立てた後**に `push` して孤児メディアを作る
     def run_workers(queue, payload, slots, inflight)
       counter = Thread.current[HandlerProfile::HTTP_KEY]
+      deadline = Thread.current[Event::HANDLER_DEADLINE_KEY]
       workers = [Parallel.processor_count, queue.size].min
       threads = Array.new(workers) do
         Thread.new do
           Thread.current[HandlerProfile::HTTP_KEY] = counter if counter
+          # ⚠ **締切も引き継ぐ (#4721)。**ワーカーの中の pre_upload の dispatch が
+          # これを親の締切として読み、自分の締切と近いほうを取る（`Event#nested_deadline`）。
+          Thread.current[Event::HANDLER_DEADLINE_KEY] = deadline if deadline
           consume(queue, payload, slots, inflight)
         end
       end
