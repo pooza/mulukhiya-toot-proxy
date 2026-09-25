@@ -626,7 +626,7 @@ Web Push サブスクリプションを解除する。
       "database": "mastodon",
       "cl_active": 12, "cl_waiting": 0, "maxwait": 0,
       "sv_active": 0, "sv_idle": 1,
-      "clients_used": 13, "clients_max": 500,
+      "clients_used": 12, "clients_max": 500,
       "total_wait_time_us": 29082533
     }
   },
@@ -659,7 +659,7 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 | `cl_waiting` | **サーバー接続を待っているクライアント数。これが本命** |
 | `maxwait` | **いまキューの先頭に居るクライアント**が待った秒数 |
 | `sv_active` / `sv_idle` | 使用中／待機中のサーバー接続数 |
-| `clients_used` | **箱全体**のクライアント数（全プール合計） |
+| `clients_used` | **箱全体**のクライアント数（全プール合計）。⚠ 5.39.0〜 **観測自身の admin コンソール接続 1 本を引いた値**（#4695） |
 | `clients_max` | `max_client_conn`。⚠ **2026-08-02 の gomander も 2026-08-08 の shallu も、枯れたのはプールごとの待ちではなくここ** |
 | `total_wait_time_us` | 起動からの**累計**待ち時間（マイクロ秒・単調増加）。`SHOW STATS` の `total_wait_time` |
 
@@ -678,11 +678,16 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 | DSN が 5432（pgbouncer を経由していない） | ⚠ **キーごと無い**（本番では vulcan がこれ） |
 | `/postgres/pgbouncer/enable` が `false` | ⚠ **キーごと無い** |
 | admin コンソールへ繋がらない | `{"error": "..."}` のみ。⚠ **`status` は動かない**（下記） |
-| プールの行がまだ無い（誰も繋いでいない） | `{"absent": true}` ＋ `clients_*`。⚠ **0 とは違う** |
+| プールの行がまだ無い（誰も繋いでいない） | `{"absent": true}` ＋ `database`・`clients_*`・`total_wait_time_us`。⚠ **0 とは違う** |
 
 ⚠⚠ **pgbouncer の観測は `status` を動かさない。**pgbouncer の停止と `max_client_conn` 枯渇は
 接続失敗からは区別できず、`status` を倒すと再起動のたびに health が揺れて信号として使えなくなる。
 **`pgbouncer.error` があっても `status` は `OK` のまま**なので、監視側はエラーの有無を別に見ること。
+⚠ ただし `/postgres/pgbouncer/enable` が引けない（設定の破損）場合は握らず、`postgres` が `NG` になる（5.39.0〜、#4695）。
+
+⚠ **観測点は `SELECT 1` の手前**（5.39.0〜、#4695）。`SELECT 1` 自身が待ち行列に並ぶので、後で読むと
+自分の前の待ちが捌けた後の値になる。`pool` も同じ理由で手前へ移してあり、⚠ **コールドプールでは
+`pool.allocated` が従来より 1 小さく出ることがある**。
 
 🔴 **`pool` も `waiting` も欠けることがある**（#4656）。⚠ **欠落は「正常」でも「異常」でもない**ので、
 監視側が直に読むと `nil` を掴む。
@@ -712,8 +717,17 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
   "redis": {"status": "OK"},
   "sidekiq": {"status": "OK"},
   "streaming": {"status": "OK"},
-  "postgres": {"status": "WARN", "reason": "pool_exhausted", "error": "...",
-               "pool": {"max": 10, "allocated": 10, "waiting": 3}},
+  "postgres": {
+    "status": "WARN", "reason": "pool_exhausted", "error": "...",
+    "pool": {"max": 10, "allocated": 10, "waiting": 3},
+    "pgbouncer": {
+      "database": "mastodon",
+      "cl_active": 40, "cl_waiting": 5, "maxwait": 2,
+      "sv_active": 20, "sv_idle": 0,
+      "clients_used": 45, "clients_max": 500,
+      "total_wait_time_us": 31582533
+    }
+  },
   "status": 200
 }
 ```
