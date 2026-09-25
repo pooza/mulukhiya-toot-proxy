@@ -112,12 +112,13 @@ module Mulukhiya
   # 3 回続けて漏れた。
   class ControllerRescueConsolidationTest < TestCase
     # 現地に理由が書いてある唯一の例外 (#4603)。署名検証の失敗 (`AuthError`) を
-    # 黙らせたくないので、4xx でも alert するのが正しい。
+    # 黙らせたくないので、4xx でも alert するのが正しい。⚠ 連打はデッドマンで
+    # 抑えるので、素の `e.alert` ではなく `throttled_alert` (#4723)。
     #
     # ⚠⚠ **ファイル単位で許すと同じファイルの他ルートまで素通しになる**（Codex P2）。
     # `webhook_controller.rb` には `post '/:digest'` / `get '/:digest'` も居て、
     # そちらが `e.alert` に戻されても気づけなくなる。**ルート単位で固定する。**
-    ALLOWED = {'webhook_controller.rb' => {"post '/admin'" => 'e.alert'}}.freeze
+    ALLOWED = {'webhook_controller.rb' => {"post '/admin'" => 'throttled_alert(e)'}}.freeze
 
     DIRECT_CALL = /\A(e\.log|e\.alert|e\.status < 500 \? e\.log : e\.alert)\z/
 
