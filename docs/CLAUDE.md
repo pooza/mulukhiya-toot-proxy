@@ -680,6 +680,12 @@ increment の `annict` キーをコントローラ層で見るテストが無い
 
 lint は rubocop（537 files, no offenses）・slim-lint ともクリーン。
 
+✅ **2026-09-26 の消化**: 緑の極小分は **PR #4767** に、黄は **#4760〜#4765**、緑の残り（挙動が変わる／harness が要る）は
+**#4766** に起票した（マイルストーンは未割り当て・ユーザー判断）。古いコメント 2 件（`log_annict_stale` / `lock_degradation_methods.rb`）は #4767 で直した。
+⚠ 見送り 2 件: `slim_lint_coverage.rb` の +4 は rubocop が `return` 付き継続行に求める形／`annict_applicable?` のガードは
+`test_rejects_without_episode_data` が契約として押さえているので残した。
+**残る出荷条件は赤 2（pooza/ginseng-fediverse#290 の着地と 2.0.x の扱い）だけ。**
+
 #### 2026-09-16 に消化した分（残り 7 件 / 重み 18）
 
 - ✅ **#4578（PR #4738）** — `rake slim:lint` がシェルの `views/**/*.slim` に頼っており、
