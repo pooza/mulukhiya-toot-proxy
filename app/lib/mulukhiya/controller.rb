@@ -107,6 +107,11 @@ module Mulukhiya
       # **要求した本人へ返すボディ**で、パスは相手が送ってきた値そのもの。
       # 丸めても秘匿にはならず、404 のボディ（api.md の契約）が変わるだけ。
       @renderer.message = Ginseng::NotFoundError.new("Resource #{request.path} not found.").to_h
+      # ⚠ **Content-Type も合わせ直す (#4725)。**ルートが返した 404 では `after` が
+      # この block より**先に**走っている（Sinatra はルートが返った後で
+      # `error_block!(response.status)` を呼ぶ）。レンダラだけ差し替えると、
+      # RSS / HTML のルートで**ヘッダはフィード・本文は JSON**になって食い違う。
+      content_type @renderer.type
       return @renderer.to_s
     end
 
