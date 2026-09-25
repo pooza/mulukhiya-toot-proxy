@@ -92,6 +92,18 @@ module Mulukhiya
 
       assert_raise(NotImplementedError) {klass.catalog_cursor_key}
     end
+
+    # ⚠ **`include` だけでクラスメソッドが生えること (#4698)。**`FakeAttachment` は
+    # `extend ClassMethods` を直に書いているので、実モデルが頼る `self.included` の
+    # 配線は見ていない。実モデルそのものは DB 無しで定数解決できないので、
+    # 実クラスでの疎通は `AttachmentTest#test_catalog_is_wired_on_the_real_class`。
+    def test_include_wires_the_class_methods
+      klass = Class.new {include AttachmentMethods}
+
+      assert_respond_to(klass, :catalog)
+      assert_respond_to(klass, :catalog_offset)
+      assert_respond_to(klass, :catalog_from_cache)
+    end
   end
 
   # 複写が戻っていないことを構造で押さえる (#4657)。
@@ -115,6 +127,16 @@ module Mulukhiya
       end
 
       assert_equal([], offenders, 'AttachmentMethods::ClassMethods へ寄せる (#4657)')
+    end
+
+    # ⚠ **実モデルが共有側を取り込んでいること (#4698)。**外れると `catalog` が
+    # 生えず、DB を持つテストは omit されるので気づけない。
+    def test_models_include_the_shared_module
+      TARGETS.each do |path|
+        source = File.read(File.join(Environment.dir, path))
+
+        assert_match(/^\s*include AttachmentMethods$/, source, File.basename(path))
+      end
     end
 
     # ⚠ **共有側に実体があることも確かめる。**両方から消えただけの状態を
