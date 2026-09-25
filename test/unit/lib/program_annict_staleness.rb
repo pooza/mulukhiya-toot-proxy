@@ -119,11 +119,27 @@ module Mulukhiya
     def test_prepare_is_failed_when_annict_raises
       stub_data('k' => {'episode' => 4, 'annict_work_id' => 42})
       error = RuntimeError.new('annict down')
-      error.define_singleton_method(:alert) {|*| nil}
+      error.define_singleton_method(:log) {|*| nil}
       annict = Object.new
       annict.define_singleton_method(:episodes) {|_ids| raise error}
 
       assert_equal(:failed, prepare('k', annict)[:state])
+    end
+
+    # 🔴 **同期の `alert` を撃たない (#4760)。**通知先を待つ間にクライアントが再送すると
+    # 話数が 2 つ進む。失敗はログに残ること。
+    def test_prepare_does_not_alert_when_annict_raises
+      stub_data('k' => {'episode' => 4, 'annict_work_id' => 42})
+      calls = []
+      error = RuntimeError.new('annict down')
+      error.define_singleton_method(:alert) {|*| calls.push(:alert)}
+      error.define_singleton_method(:log) {|payload| calls.push(payload)}
+      annict = Object.new
+      annict.define_singleton_method(:episodes) {|_ids| raise error}
+      prepare('k', annict)
+
+      assert_not_include(calls, :alert)
+      assert_equal('annict_failed', calls.first[:program_entry][:event])
     end
 
     # ⚠⚠ 本丸。ガードが効いた回が、**期待値と実値の両方**で残ること。

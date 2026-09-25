@@ -82,7 +82,7 @@ module Mulukhiya
     # ⚠ ここは `Controller#before` のログ行を組む途中なので、上げると
     # **request ログが丸ごと消え、`before` の rescue に落ちて `@sns` 未設定のまま
     # 経路が進む**（malformed な URL 1 本で 500 にできた）。
-    # ⚠ **[[project_log-credential-exposure]] と同型**（gem 側でも `mask_urls_in` が
+    # ⚠ **ログへの資格情報流出（#4511） と同型**（gem 側でも `mask_urls_in` が
     # 同じ理由でマスクごと外れていた。pooza/ginseng-core#587）。
     def test_tolerates_invalid_byte_sequence
       # `%FF` は `unescape_path` が **例外なしで不正な UTF-8 を返す**（rescue では捕まらない）。

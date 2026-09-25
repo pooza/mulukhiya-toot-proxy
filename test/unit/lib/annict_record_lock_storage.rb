@@ -132,5 +132,23 @@ module Mulukhiya
       config['/service/annict/record/idempotency/alert_threshold'] = original
       @storage.instance_variable_set(:@alert_threshold, nil)
     end
+
+    # ⚠ Redis 障害で冪等性を諦めたことが `e.log` 止まりにならないこと (#4762)。
+    # ProgramLockStorage と同じ LockDegradationMethods を通す。
+    def test_fail_open_is_escalated
+      noted = []
+      broken = Object.new
+      broken.define_singleton_method(:call) {|*| raise 'redis down'}
+      storage = AnnictRecordLockStorage.new
+      storage.define_singleton_method(:redis) {broken}
+      storage.define_singleton_method(:note_fail_open) {|_e, values| noted.push([:fail_open, values])}
+      storage.define_singleton_method(:note_release_failure) {|_e, values| noted.push([:release, values])}
+      token = storage.acquire(@account_id, @episode_id)
+      storage.release(@account_id, @episode_id, token)
+
+      assert_not_nil(token)
+      assert_equal([:fail_open, :release], noted.map(&:first))
+      assert_equal(@episode_id, noted.first[1][:episode_id])
+    end
   end
 end

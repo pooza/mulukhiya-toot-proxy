@@ -500,12 +500,28 @@ html lang='ja' data-theme='light'
               if (this.isBusy(key)) return
               this.busy[key] = true
               this.methods.incrementProgramEpisode(key)
-                .then(_ => {
-                  Swal.fire({title: '話数を+1しました。', toast: true, position: 'top-end', icon: 'success', showConfirmButton: false, timer: 2000})
+                .then(result => {
+                  const warning = this.annictWarning(result && result.annict)
+                  if (warning) {
+                    Swal.fire({title: '話数を+1しました。', text: warning, icon: 'warning'})
+                  } else {
+                    Swal.fire({title: '話数を+1しました。', toast: true, position: 'top-end', icon: 'success', showConfirmButton: false, timer: 2000})
+                  }
                   this.loadEntries()
                 })
                 .catch(e => Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'}))
                 .finally(_ => {delete this.busy[key]})
+            },
+            // increment の `annict` (#4579) を読み、サブタイトルが載らなかったことを伝える (#4765)。
+            // ⚠ どの値でも話数の +1 は成功している。押し直すと話数が飛ぶので、そう書く。
+            annictWarning (state) {
+              const reasons = {
+                not_found: 'Annict にこの話数がまだ無いため',
+                failed: 'Annict を引けなかったため',
+                superseded: '処理中に別の編集が入ったため',
+              }
+              if (!reasons[state]) return null
+              return `${reasons[state]}、サブタイトルは入っていません。もう一度押すと話数がさらに進むので、サブタイトルは編集で補ってください。`
             },
             // YYYY-MM-DD を days 日進める。⚠ 端末のタイムゾーンを混ぜない
             // （UTC で組んで UTC で取り出す）。読めない値はそのまま返す。

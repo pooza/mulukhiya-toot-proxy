@@ -26,5 +26,11 @@ module Mulukhiya
       @retry_after = retry_after
       super(message)
     end
+
+    # ⚠ ルートの rescue を抜けて `error do` の受け皿に落ちた場合も `code` を落とさない。
+    # あちらは `to_h` から本文を組むので、ここに載せないと 409 が `code` 無しで返る。
+    def to_h
+      return super.merge(code: code.to_s)
+    end
   end
 end
