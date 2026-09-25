@@ -50,6 +50,18 @@ module Mulukhiya
       assert_empty(forwarded({KEY => 'abc123'}, controller: 'misskey'))
     end
 
+    # ⚠ **判定は SNS の型で行う (#4635)。**コントローラ名で見ると、専用の
+    # コントローラクラスを持たない Mastodon 系（Akkoma・Fedibird）では
+    # `controller_class` が nil になって落ちる。Misskey 系も同様。
+    def test_forwards_on_mastodon_type
+      assert_equal({KEY => 'abc123'}, forwarded({KEY => 'abc123'}, controller: 'akkoma'))
+      assert_equal({KEY => 'abc123'}, forwarded({KEY => 'abc123'}, controller: 'fedibird'))
+    end
+
+    def test_does_not_forward_on_misskey_type
+      assert_empty(forwarded({KEY => 'abc123'}, controller: 'firefish'))
+    end
+
     # webhook 経路も同じ許可リストを通す。⚠ 引数が省略可能でないと、
     # AnnictService の `webhook.post(payload)` が壊れる。
     def test_webhook_post_accepts_forwarded_headers

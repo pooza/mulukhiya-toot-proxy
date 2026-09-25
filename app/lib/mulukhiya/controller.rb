@@ -186,8 +186,12 @@ module Mulukhiya
     # ⚠ **上流の畳み込みは TTL 1 時間・アカウント単位**（mastodon の
     # `PostStatusService` が `idempotency:status:<account>:<key>` を setex する）。
     # 秒〜分の再送には効くが、それを超える再実行では効かない。
+    #
+    # ⚠ **判定は SNS の型で行う (#4635)。**コントローラ名で見ると、専用の
+    # コントローラクラスを持たない Mastodon 系（Akkoma・Fedibird）で
+    # `controller_class` が nil になって落ちる（webhook 経路も通る）。
     def forwarded_headers
-      return {} unless controller_class.name == 'mastodon'
+      return {} unless Environment.mastodon_type?
       return @headers.to_h.slice(*FORWARDED_HEADERS)
     end
 
