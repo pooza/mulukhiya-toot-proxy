@@ -104,6 +104,30 @@ module Mulukhiya
       assert_equal('small', File.read(path_for(URL)))
     end
 
+    # ⚠ **プリフライトの失敗を無音にしない (#4635)。**HEAD 非対応 (403 / 405) は
+    # 想定内なので黙って GET へ倒すが、5xx・タイムアウト等の異常まで飲むと
+    # 相手の障害が syslog に 1 行も残らない。ProgramFetcher と同じ扱い (#4397)。
+    def test_preflight_failure_is_logged_except_head_not_supported
+      allow_all
+      stub_request(:get, URL).to_return(status: 200, body: 'small')
+      {500 => 1, 403 => 0, 405 => 0}.each do |status, count|
+        stub_request(:head, URL).to_return(status:)
+        logged = capture_errors {download(URL)}
+
+        assert_equal(count, logged.size, "HEAD #{status}")
+      end
+    end
+
+    def test_preflight_network_error_is_logged
+      allow_all
+      stub_request(:head, URL).to_timeout
+      stub_request(:get, URL).to_return(status: 200, body: 'small')
+      logged = capture_errors {download(URL)}
+
+      assert_equal(1, logged.size)
+      assert_equal(URL, logged.first[:url])
+    end
+
     def test_downloads_within_limit
       allow_all
       stub_request(:head, URL).to_return(status: 200, headers: {'Content-Length' => '5'})
@@ -150,6 +174,22 @@ module Mulukhiya
     end
 
     private
+
+    # Logger.new を差し替えて error の payload を集める。⚠ 必ず元へ戻すこと。
+    # gem の再試行ログ (`count` 付き) はここで見たいものではないので除く。
+    def capture_errors
+      logged = []
+      double = Object.new
+      double.define_singleton_method(:error) {|payload| logged.push(payload)}
+      double.define_singleton_method(:method_missing) {|*_args, **_kwargs| nil}
+      Logger.singleton_class.alias_method(:original_new_for_test, :new)
+      Logger.define_singleton_method(:new) {|*_args| double}
+      yield
+      return logged.reject {|v| v.key?(:count)}
+    ensure
+      Logger.singleton_class.alias_method(:new, :original_new_for_test)
+      Logger.singleton_class.remove_method(:original_new_for_test)
+    end
 
     def allow_all
       RemoteHost.validator = ->(_host) {'93.184.216.34'}
