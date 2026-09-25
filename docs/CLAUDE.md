@@ -847,6 +847,50 @@ Slack / LINE / メールには出なくなるが、**周期実行でメールを
 - 実測: `rake lint` 無指摘 / `rake test` **1413 tests・0 failures・0 errors**
   （develop ベースライン 1387 から **+26 ＝ 追加したぶんちょうど**）
 
+### 2026-09-26 セッション同期の記録
+
+**本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。
+
+- **ブランチ**: `develop` は `origin/develop` と同一・未コミット無し。**CI は直近 6 本とも `success`**
+- **Dependabot**: open アラート **0 件**
+- **Codex / 申し送り**: 前回以降のマージは **PR #4753 / #4754 / #4757 / #4758 の 4 本**。行コメント・PR 本体コメントとも
+  **Codex の指摘なし**。open PR は #4739（draft・`CONFLICTING` ＝上の赤 1 の version 1 行）だけで、新しいコメントなし
+- **PR #4752（dependabot の ginseng グループ）は 09-24 にクローズ済み**（宛先ずれの理由をコメント済み）。#4702 もクローズ
+- **マイルストーン**: 5.38.0 は **open 2**（#4352 / #4728）＋ draft PR #4739。**#4463 / #4579 は 09-25 に消化済み**で上の表どおり。
+  🔴 **次の入口は変わらず「赤 2 件」**（develop へ main を merge ／ fediverse v2.0.1 の無毒化後退はユーザー判断待ち）
+- **chubo2**: `origin/main` と差分なし・作業ツリーもクリーン。§6-2 は 08-31（26 日経過）でスキップ、§6-3 は 09-08 実施済み。
+  新しい Issue は **chubo2#254**（writersbase-tools v1.7.1 反映）の 1 件でモロヘイヤ非関係。
+  ✅ **前回の宿題「`fedi-test-harness/misskey` の着地確認」は `2acc483` で着地済み**（実走・昇格は 09-24 に消化済み）
+- **harness upstream**: `last_checked` 09-24（2 日）でスキップ。Mastodon v4.7.2 / Misskey 2026.9.1 とも verified と同版
+- **ginseng-\* のピン**: 09-23 の判断から変化なし（新しいタグなし。core v1.25.0 / fediverse v3.1.0 / piefed v0.1.2 /
+  redis v2.0.7 / web v3.0.1 / style v1.1.13 がずれとして既知）
+
+#### Sentry
+
+- unresolved **26 件**・**コメント 0 は 0 件**
+- **`-2X` は count=48 / lastSeen 09-25T15:10:07Z**（前回 41 → +7）。全件 `AnnictService#query` の ReadTimeout・5.37.1、
+  内訳は zugoga / gomander / 他者（`instance-20220704-2044`）。**判断は据え置き＝外部ノイズ**。count の時点つきでコメントを残した
+- **`-2Y` は count=5 のまま**（新規なし）、**`-1X` も新規なし**（最新は 09-22T22:38Z）
+
+#### 辞書台帳
+
+- **🔴 は前回と同じ 3 件**（直書き 1 / 台帳に無い 2）。**🔴 死亡は 0**（chubo2 `a9db002`）
+- 🟡 の最大は **gomander の `precure.ml/api/dic/v1/dic.json` 16/144** と **zugoga の `mstdn.delmulin.com/api/dic/v1/common.json` 12/144**。
+  ⚠ 前回 5/145 まで下がった vulcan の同ソースは 🟢 になったが、**同じ URL が zugoga で上がっている**＝ #4659 の間欠が機を変えて出ているだけと読む
+- 実探査で 404 text/html が 4 件・応答なし 1 件（`pronruby.json`）。⚠ **判定はログ主・探査は注記**（#249 以降のツールの設計）で、
+  該当ソースのログ上の判定は 🟢 / 🟡 のまま。#4659 の間欠 404 をたまたま踏んだものとして異常と読まない
+
+#### 🔧 ローカル環境: システムの redis-server が 09-23 から落ちている
+
+`Can't open the log file: Permission denied` で起動に失敗し、`disabled`。**`rake test` が 77 errors になる**（Redis 接続拒否）。
+このセッションでは scratchpad にユーザー権限の `redis-server` を上げてテストした。⚠ **恒久対処（ログファイルの権限）は sudo が要る**
+
+#### 赤 1 の対処: PR で main を develop へ戻した
+
+ブランチ `fix/merge-main-5.37.1` で `git merge origin/main`。衝突は予告どおり `config/application.yaml` の version 1 行だけで 5.38.0 を採った。
+`rake lint` 無指摘 / `rake test` **1441 tests・0 failures・0 errors**。`vips_block` / `blocked_upload_type` の 2 本は
+**読み込まれて実行されている**（omit 一覧に出ない）ことを確認した。あわせてホットフィックス手順に 9「develop へ戻す」を足した
+
 ### 2026-09-24 セッション同期の記録
 
 **本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。
