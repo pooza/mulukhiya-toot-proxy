@@ -115,9 +115,9 @@ module Mulukhiya
     # `/health` に番組表の鮮度は載っていないので、**実況当日に「話数が
     # 進んでいない」と人間が気づくまで誰も知らない**。
     #
-    # ⚠ URL 単位の `e.log` は出ていたが、**例外にならない失敗**
-    # （サイズ超過・スキーマ不一致）はそちらに出ないうえ、何本中何本が
-    # 死んでいるかは行を数えないと分からなかった。
+    # ⚠ URL 単位の行は出ていたが、**失敗の種類ごとに別の語**（例外は `e.log`、
+    # サイズ超過は `log_oversize`、スキーマ不一致は `valid_program_schema?`）で、
+    # 何本中何本が死んでいるかは行を数えないと分からなかった。
     #
     # ⚠⚠ **alert には上げない。**このワーカーは every 1m なので、載せると
     # 日 1,440 件のメール・Discord になる（#4573 で同じ判断をしている）。
@@ -127,7 +127,7 @@ module Mulukhiya
     def log_fetch_failure(attempted, failed)
       logger.error(
         message: failed.size >= attempted ? 'program fetch exhausted' : 'program fetch degraded',
-        attempted: attempted,
+        attempted:,
         failed: failed.size,
         failed_urls: failed,
       )

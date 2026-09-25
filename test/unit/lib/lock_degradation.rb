@@ -101,6 +101,13 @@ module Mulukhiya
       assert_equal('probe_lock', payload[:storage])
     end
 
+    # ⚠ Sentry 側でも事象とストレージで絞れること（例外クラスでは束ねられてしまう）。
+    def test_sentry_tags_name_the_state_and_storage
+      tags = @probe.send(:sentry_tags, {lock: 'fail-open', storage: 'probe_lock', account_id: 1})
+
+      assert_equal({lock: 'fail-open', lock_storage: 'probe_lock'}, tags)
+    end
+
     def test_release_failure_is_named
       note(:release_failure)
 

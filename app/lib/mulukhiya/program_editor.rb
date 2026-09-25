@@ -99,6 +99,23 @@ module Mulukhiya
       end
     end
 
+    # 話数を +1 したエントリを返す。本体と Annict の扱いは increment_episode_with_annict。
+    def increment_episode(key, annict: nil)
+      return increment_episode_with_annict(key, annict:)[:entry]
+    end
+
+    # increment_episode の本体。Annict のメタデータを載せたか・載せなかった理由も返す (#4579)。
+    #
+    # - `applied` — 載せた
+    # - `unconfigured` — Annict 未連携か、作品 ID が紐づいていない
+    # - `not_found` — 該当話数が Annict に無い
+    # - `failed` — Annict の呼び出しが失敗した
+    # - `superseded` — 引いている間に別の編集が入ったので載せなかった
+    #
+    # ⚠⚠ **どれでも話数の +1 は成功して保存されている。**`applied` 以外でも
+    # increment を送り直してはいけない（話数が飛ぶ）。足りないのは
+    # `annict_episode_id` と `subtitle` だけ。
+    #
     # ⚠ Annict の GraphQL 呼び出しは**ロックの外**で先に済ませる (#4534)。
     #
     # 当初はロックの内側に置いていたが、それだと **TTL を超えうる**（open と read で
@@ -111,21 +128,6 @@ module Mulukhiya
     # 一致したときだけ載せる**。一致しない = 待っている間に別の +1 が入ったか作品を
     # 差し替えられた、ということなので、古い内容で上書きしてはいけない。載せなかった
     # 場合は annict_episode_id が nil のまま（Annict が引けなかったときと同じ状態）。
-    def increment_episode(key, annict: nil)
-      return increment_episode_with_annict(key, annict:)[:entry]
-    end
-
-    # increment_episode と同じ。Annict のメタデータを載せたか・載せなかった理由も返す (#4579)。
-    #
-    # - `applied` — 載せた
-    # - `unconfigured` — Annict 未連携か、作品 ID が紐づいていない
-    # - `not_found` — 該当話数が Annict に無い
-    # - `failed` — Annict の呼び出しが失敗した
-    # - `superseded` — 引いている間に別の編集が入ったので載せなかった
-    #
-    # ⚠⚠ **どれでも話数の +1 は成功して保存されている。**`applied` 以外でも
-    # increment を送り直してはいけない（話数が飛ぶ）。足りないのは
-    # `annict_episode_id` と `subtitle` だけ。
     def increment_episode_with_annict(key, annict: nil)
       raise auto_update_conflict if auto_update?
       key = key.to_s
@@ -281,6 +283,9 @@ module Mulukhiya
     #
     # 載せなかった場合は annict_episode_id が nil のまま = Annict を引けなかった
     # ときと同じ状態になる。
+    #
+    # ⚠ `episode_data` が無い回は呼び出し元（apply_annict_increment）が先に返すが、
+    # 単体でも「載せない」と答える契約にしておく（test_rejects_without_episode_data）。
     def annict_applicable?(prepared, entry)
       return false unless prepared[:episode_data]
       return prepared.values_at(:episode, :work_id) == entry.values_at('episode', 'annict_work_id')
@@ -314,9 +319,9 @@ module Mulukhiya
     # 働いたことを示す唯一の観測点**になる。
     #
     # ⚠⚠ **「押し直すべきか」の材料ではない。答えは「押し直してはいけない」で
-    # 確定している。**`increment_episode` は話数の +1・`next_on` の前進・`save` を
+    # 確定している。**`increment_episode` は話数の +1 と `save` を
     # この判定より**前に無条件で**済ませているので、増分そのものは成功している。
-    # 押し直すと話数を飛ばして日付が 7 日ずれる。
+    # 押し直すと話数を飛ばす（⚠ #4585 以降 `next_on` は動かない）。
     #
     # ⚠ **期待値と実値の両方を出す。**Annict 側の障害なのか、待っている間に
     # 別の編集が入ってガードが正しく働いたのかで、運用者が
@@ -330,7 +335,7 @@ module Mulukhiya
     def log_annict_stale(key, prepared, entry)
       logger.info(program_entry: {
         event: 'annict_stale',
-        key: key,
+        key:,
         prepared_episode: prepared[:episode],
         actual_episode: entry['episode'],
         prepared_work_id: prepared[:work_id],

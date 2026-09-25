@@ -99,7 +99,7 @@ module Mulukhiya
       # `Controller#before` のログ行を組む途中なので、**上げると request ログが
       # 丸ごと消えるうえ、`before` の rescue に落ちて `@sns` が未設定のまま
       # 経路が進む**（malformed な URL 1 本で 500 にできた）。
-      # ⚠ **これは [[project_log-credential-exposure]] と同型**（gem 側でも
+      # ⚠ **これは ログへの資格情報流出（#4511） と同型**（gem 側でも
       # `mask_urls_in` が同じ理由でマスクごと外れていた。pooza/ginseng-core#587）。
       #
       # ⚠ 素通ししても鍵は漏れない。**64 桁の 16 進はすべて ASCII** なので、

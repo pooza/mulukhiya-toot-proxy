@@ -82,8 +82,7 @@ module Mulukhiya
     #
     # 🔴 **`release` 側はもっと悪い。書き込みはもう commit 済み**なので、ここで
     # 待たせるとクライアントが先にタイムアウトして再送し、
-    # **`increment_episode` のような非冪等な操作が二度走る**（話数が飛んで
-    # `next_on` が 7 日ずれる）。
+    # **`increment_episode` のような非冪等な操作が二度走る**（話数が飛ぶ）。
     #
     # ⚠ 代わりに **Sentry へ直接積む**。sentry-ruby は背景スレッドへ積むだけなので
     # 呼び出し側を待たせない。⚠ **「Sentry に出る」という目的はこれで果たせる**
@@ -92,7 +91,13 @@ module Mulukhiya
     # 望ましい**のは #4573 で決めたとおり。
     def report(error, payload)
       error.log(payload)
-      Sentry.capture_exception(error) rescue nil if Sentry.initialized?
+      Sentry.capture_exception(error, tags: sentry_tags(payload)) rescue nil if Sentry.initialized?
+    end
+
+    # ⚠ Sentry では例外クラスで束ねられるので、**どの事象・どのストレージか**を
+    # tag にしないと、fail-open と release 失敗、番組表と投稿テンプレが 1 件に混ざる。
+    def sentry_tags(payload)
+      return {lock: payload[:lock], lock_storage: payload[:storage]}
     end
 
     def throttle_key(state)

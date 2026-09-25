@@ -115,6 +115,7 @@ module Mulukhiya
       if e.is_a?(Ginseng::Error)
         @renderer.status = e.status
         @renderer.message = e.to_h.except(:backtrace).merge(error: e.message)
+        headers('Retry-After' => e.retry_after.to_s) if e.is_a?(ConflictError) && e.retry_after
         # ⚠ **ここは最後の受け皿で、どのルートから来たか分からない (#4654)。**
         # 判断材料はステータスしか無いので `report_error` に寄せる。従来は
         # 無条件 `e.alert` で、ルートのローカル rescue をすり抜けた 4xx——
