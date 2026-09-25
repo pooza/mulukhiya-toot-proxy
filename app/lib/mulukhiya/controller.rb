@@ -334,6 +334,17 @@ module Mulukhiya
       return BEFORE_ORIGIN
     end
 
+    # 利用者へ返してよい例外メッセージ。
+    #
+    # 🔴 **5xx の原文は返さない。**Redis や DB の接続エラーは接続先を含むので、
+    # そのまま画面や本文へ出すと内部の構成が漏れる（#4724 の 1 で OAuth state の
+    # 取り出し失敗を上げるようにしたら、`/oauth/callback` がこれを出しうるようになった）。
+    # ⚠ 4xx は利用者が直せる理由なので従来どおり返す。
+    def public_error_message(error)
+      return error.message if error.respond_to?(:status) && error.status < 500
+      return 'Internal Server Error'
+    end
+
     # ⚠ 見るのは `status`（モロヘイヤがクライアントへ返す値）。上流の
     # `source_status` ではない——`handle_gateway_error` が別に扱う。
     def client_error?(error)
