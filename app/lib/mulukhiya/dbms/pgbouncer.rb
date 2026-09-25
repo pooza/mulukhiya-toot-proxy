@@ -63,10 +63,11 @@ module Mulukhiya
         end
       end
 
-      # ⚠ 既定は `null` ＝ ポートによる自動判定。`true` / `false` で固定できる。
+      # ⚠ 既定は `auto` ＝ ポートによる自動判定。`true` / `false` で固定できる
+      # （⚠ `null` は Ginseng の config が「キーが無い」と同じに扱うので三値は文字列）。
       # config の参照を rescue で握り潰さないこと。既定値は application.yaml が
-      # 必ず持つので、引けない状態は設定の破損である
-      # (MEMORY feedback_fail-open-guard-footgun)。
+      # 必ず持つので、引けない状態は設定の破損である（fail-open の rescue が
+      # ガードを黙って無効化する型を作らない）。
       def enable?
         value = config['/postgres/pgbouncer/enable']
         return value if [true, false].include?(value)
