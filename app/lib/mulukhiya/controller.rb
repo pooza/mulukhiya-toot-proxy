@@ -208,6 +208,40 @@ module Mulukhiya
       raise NeverSilent.mark(e)
     end
 
+    # 取り込みを止めた形式を、**上流へ投げる前に**断る (#4733 / #4734)。
+    #
+    # ⚠⚠ **これが無いと、クライアント起因の入力で 500 とアラートが出る。**
+    # `setup_vips` の許可リストに入っていない形式は `ImageFile#type` の `rescue` に
+    # 飲まれて `image?` が false になり、**ハンドラが黙って素通し**する。上流へ届いた
+    # HEIC を Mastodon 4.7.2 も `Vips.block` で弾くが、Paperclip がそれを
+    # `Paperclip::Error` → **HTTP 500** に変換する（harness の 4.7.2 で実測）。
+    # その 500 は `handle_upload_gateway_error` → `handle_gateway_error` で
+    # 🔴 **`error.alert` を直接呼ぶ**（`report_error` の `throttled_alert` を経由しない）
+    # ので、**1 アップロード = 1 アラート**で slack / line / mail が同期で回る。
+    # 2026-08-17 にアラートメールが大量発生したのと同じ経路（pooza/chubo2#179 / #4594）。
+    #
+    # ⚠ **判定に vips を使わない。**`ImageFile#type` は `Vips::Image.new_from_file` を
+    # 呼ぶので、止めたい相手をデコードしてしまい本末転倒になる。`MediaFile#type` は
+    # Marcel ＝ **マジックバイトだけ**で `image/heic` を返す（実測）。
+    #
+    # ⚠ 422 は Mastodon が受け付けない形式に返すのと同じステータス
+    # （`Validation failed: File content type is invalid`）なので、クライアントは既に扱える。
+    # `Ginseng::ValidateError` は 4xx なので `report_error` が log 止めにする＝アラートは鳴らない。
+    #
+    # ⚠ **解除条件は #4733 と同じ**: `libheif >= 1.23.4` が pkg / ports に来たら
+    # `Mulukhiya::VIPS_ALLOWED_OPERATIONS` と一緒にここも戻す。
+    BLOCKED_UPLOAD_TYPES = ['image/heic', 'image/heif'].freeze
+
+    def verify_upload_type!(field = :file)
+      path = params.dig(field, :tempfile)&.path
+      return unless path
+      type = MediaFile.new(path).type
+      return unless BLOCKED_UPLOAD_TYPES.member?(type)
+      raise Ginseng::ValidateError,
+        'HEIF 形式（.heic / .heif）の画像は、セキュリティ上の理由で現在受け付けていません。' \
+          'JPEG・PNG・WebP のいずれかで保存し直してからお試しください。'
+    end
+
     def verify_token_integrity!
       expected = token
       return unless expected
