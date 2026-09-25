@@ -355,7 +355,11 @@ html lang='ja' data-theme='light'
               // 書き戻して、押したはずの ＋ が黙って消える。送信と再読込みを
               // 待ってから、サーバーの値で開き直す。
               if (this.pendingDays[key]) {
-                this.flushNextOn(key).then(_ => this.openEdit(key))
+                // ⚠ 送れなかったら開かない (#4635)。失敗時は保留が戻るので、
+                // ここで開き直すと送信と失敗を延々と繰り返す。
+                this.flushNextOn(key).then(sent => {
+                  if (sent) this.openEdit(key)
+                })
                 return
               }
               const entry = this.entries[key]
@@ -544,21 +548,27 @@ html lang='ja' data-theme='light'
             },
             // 溜めた日数をまとめて 1 回で送る。⚠ **Promise を返すこと。**
             // openEdit が「先に送り切ってから開く」ために待つ (PR #4588 の Codex P2)。
+            // 解決値は送り切れたか (#4635)。
             flushNextOn (key) {
               const days = this.pendingDays[key]
               delete this.pendingDays[key]
               clearTimeout(this.pendingTimers[key])
               delete this.pendingTimers[key]
-              if (!days) return Promise.resolve()
+              if (!days) return Promise.resolve(true)
               this.busy[key] = true
               return this.methods.advanceProgramNextOn(key, days)
                 .then(_ => {
                   Swal.fire({title: `次回放送日を+${days}日しました。`, toast: true, position: 'top-end', icon: 'success', showConfirmButton: false, timer: 2000})
-                  return this.loadEntries()
+                  return this.loadEntries().then(_ => true)
                 })
                 .catch(e => {
+                  // ⚠ **送れなかった日数は保留へ戻す (#4635)。**送信前に消しているので、
+                  // 他の行の書き込みと重なって 409 を踏むと、溜めたクリックが黙って
+                  // 消えていた。⚠ 自動では送り直さない（同じ競合を踏み直すだけ）。
+                  // 次の ＋ か編集で、戻した分も合わせて送る。
+                  this.pendingDays[key] = (this.pendingDays[key] || 0) + days
                   Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'})
-                  return this.loadEntries()
+                  return this.loadEntries().then(_ => false)
                 })
                 .finally(_ => {delete this.busy[key]})
             },

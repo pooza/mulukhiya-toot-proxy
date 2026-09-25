@@ -9,7 +9,7 @@ module Mulukhiya
     KEY = 'Idempotency-Key'.freeze
 
     def test_forwards_idempotency_key
-      assert_equal(expected(KEY => 'abc123'), forwarded(KEY => 'abc123'))
+      assert_equal({KEY => 'abc123'}, forwarded({KEY => 'abc123'}))
     end
 
     # ⚠ **丸投げしない。**Host / Content-Length / Cookie / X-Mulukhiya /
@@ -30,26 +30,36 @@ module Mulukhiya
     def test_keeps_only_the_allowed_header
       headers = {KEY => 'abc123', 'Cookie' => 'session=1', 'X-Mulukhiya' => 'true'}
 
-      assert_equal(expected(KEY => 'abc123'), forwarded(headers))
+      assert_equal({KEY => 'abc123'}, forwarded(headers))
     end
 
     # ⚠ **モロヘイヤ側で生成しない。**本文のハッシュ等から自前で作ると、実況で
     # 意図的に連投される同一本文を上流が畳んで投稿が黙って消える。
     def test_does_not_generate_key
       assert_empty(forwarded({}))
-      assert_empty(forwarded('User-Agent' => 'capsicum'))
+      assert_empty(forwarded({'User-Agent' => 'capsicum'}))
     end
 
     # ⚠ **Idempotency-Key は Mastodon API の仕様。**Misskey には相当物が無いので
     # 送らない（送っても無害だが「効いているつもり」を作らない）。
-    def test_forwards_only_on_mastodon
-      forwarded = forwarded(KEY => 'abc123')
+    def test_forwards_on_mastodon
+      assert_equal({KEY => 'abc123'}, forwarded({KEY => 'abc123'}, controller: 'mastodon'))
+    end
 
-      if controller_class.name == 'mastodon'
-        assert_equal({KEY => 'abc123'}, forwarded)
-      else
-        assert_empty(forwarded)
-      end
+    def test_does_not_forward_on_misskey
+      assert_empty(forwarded({KEY => 'abc123'}, controller: 'misskey'))
+    end
+
+    # ⚠ **判定は SNS の型で行う (#4635)。**コントローラ名で見ると、専用の
+    # コントローラクラスを持たない Mastodon 系（Akkoma・Fedibird）では
+    # `controller_class` が nil になって落ちる。Misskey 系も同様。
+    def test_forwards_on_mastodon_type
+      assert_equal({KEY => 'abc123'}, forwarded({KEY => 'abc123'}, controller: 'akkoma'))
+      assert_equal({KEY => 'abc123'}, forwarded({KEY => 'abc123'}, controller: 'fedibird'))
+    end
+
+    def test_does_not_forward_on_misskey_type
+      assert_empty(forwarded({KEY => 'abc123'}, controller: 'firefish'))
     end
 
     # webhook 経路も同じ許可リストを通す。⚠ 引数が省略可能でないと、
@@ -60,15 +70,23 @@ module Mulukhiya
 
     private
 
-    # Mastodon 以外の環境では常に空になる。
-    def expected(headers)
-      return controller_class.name == 'mastodon' ? headers : {}
+    # ⚠ **期待値を実装と同じ式で組まない (#4635)。**判定を環境から引くと、
+    # テストを走らせた環境の片側しか検証されず、判定式が壊れても両辺が一緒に
+    # 壊れて緑のまま残る。環境は差し替えて固定し、期待値はリテラルで書く。
+    def forwarded(headers, controller: 'mastodon')
+      with_controller(controller) do
+        instance = MastodonController.new!
+        instance.instance_variable_set(:@headers, headers)
+        return instance.forwarded_headers
+      end
     end
 
-    def forwarded(headers)
-      controller = MastodonController.new!
-      controller.instance_variable_set(:@headers, headers)
-      return controller.forwarded_headers
+    def with_controller(name)
+      Environment.singleton_class.alias_method(:controller_name_without_stub, :controller_name)
+      Environment.define_singleton_method(:controller_name) {name}
+      yield
+    ensure
+      Environment.singleton_class.alias_method(:controller_name, :controller_name_without_stub)
     end
   end
 end

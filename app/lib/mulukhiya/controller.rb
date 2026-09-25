@@ -107,6 +107,11 @@ module Mulukhiya
       # **要求した本人へ返すボディ**で、パスは相手が送ってきた値そのもの。
       # 丸めても秘匿にはならず、404 のボディ（api.md の契約）が変わるだけ。
       @renderer.message = Ginseng::NotFoundError.new("Resource #{request.path} not found.").to_h
+      # ⚠ **Content-Type も合わせ直す (#4725)。**ルートが返した 404 では `after` が
+      # この block より**先に**走っている（Sinatra はルートが返った後で
+      # `error_block!(response.status)` を呼ぶ）。レンダラだけ差し替えると、
+      # RSS / HTML のルートで**ヘッダはフィード・本文は JSON**になって食い違う。
+      content_type @renderer.type
       return @renderer.to_s
     end
 
@@ -115,18 +120,21 @@ module Mulukhiya
       if e.is_a?(Ginseng::Error)
         @renderer.status = e.status
         @renderer.message = e.to_h.except(:backtrace).merge(error: e.message)
-        # ⚠ **ここは最後の受け皿で、どのルートから来たか分からない (#4654)。**
-        # 判断材料はステータスしか無いので `report_error` に寄せる。従来は
-        # 無条件 `e.alert` で、ルートのローカル rescue をすり抜けた 4xx——
-        # `not_found` を通らない `AuthError` 等——まで Sentry と Event(:alert) に
-        # 落ちていた。⚠ **4 系統目**（#4542 / #4594 / #4603 / #4629）。
-        report_error(e)
       else
         @renderer.status = 500
         @renderer.message = {error: 'Internal Server Error'}
-        e.log(path: scrub_log_path(request.path))
-        Sentry.capture_exception(e) rescue nil if Sentry.initialized?
       end
+      # ⚠ **ここは最後の受け皿で、どのルートから来たか分からない (#4654)。**
+      # 判断材料はステータスしか無いので `report_error` に寄せる。従来は
+      # 無条件 `e.alert` で、ルートのローカル rescue をすり抜けた 4xx——
+      # `not_found` を通らない `AuthError` 等——まで Sentry と Event(:alert) に
+      # 落ちていた。⚠ **4 系統目**（#4542 / #4594 / #4603 / #4629）。
+      #
+      # ⚠ **Ginseng 以外の例外も同じ (#4724)。**従来はそちらだけ `e.log` ＋
+      # `Sentry.capture_exception` の直書きで、`Event(:alert)` にもデッドマンにも
+      # 乗っていなかった。ここに落ちるのはモロヘイヤ自身のバグ（`NoMethodError` 等）が
+      # 主なので、Sentry だけでなく通知まで届かないと気づけない。
+      report_error(e)
       return @renderer.to_s
     end
 
@@ -186,8 +194,12 @@ module Mulukhiya
     # ⚠ **上流の畳み込みは TTL 1 時間・アカウント単位**（mastodon の
     # `PostStatusService` が `idempotency:status:<account>:<key>` を setex する）。
     # 秒〜分の再送には効くが、それを超える再実行では効かない。
+    #
+    # ⚠ **判定は SNS の型で行う (#4635)。**コントローラ名で見ると、専用の
+    # コントローラクラスを持たない Mastodon 系（Akkoma・Fedibird）で
+    # `controller_class` が nil になって落ちる（webhook 経路も通る）。
     def forwarded_headers
-      return {} unless controller_class.name == 'mastodon'
+      return {} unless Environment.mastodon_type?
       return @headers.to_h.slice(*FORWARDED_HEADERS)
     end
 
@@ -231,7 +243,8 @@ module Mulukhiya
     # ⚠⚠ **コントローラ層の rescue はここ 1 本に寄せた (#4654)。**最上位の
     # `error` ブロックも含め、`e.log` / `e.alert` / `e.status < 500 ? ... : ...` の
     # 直書きは残さない。**唯一の例外は `WebhookController` の `post /admin`** で、
-    # 署名不一致（4xx）を黙らせたくないという理由が現地に書いてある。
+    # 署名不一致（4xx）を黙らせたくないという理由が現地に書いてある
+    # （そこも連打は `throttled_alert` で抑える・#4723）。
     #
     # ⚠⚠ **例外クラスの列挙で判定しない。**同じ方針が 3 系統で別々に書かれ、
     # そのたびに取りこぼした——#4603 は `NotFoundError`、#4629 は `AuthError` と
@@ -319,6 +332,17 @@ module Mulukhiya
       return request.env['sinatra.route'].presence || BEFORE_ORIGIN
     rescue StandardError
       return BEFORE_ORIGIN
+    end
+
+    # 利用者へ返してよい例外メッセージ。
+    #
+    # 🔴 **5xx の原文は返さない。**Redis や DB の接続エラーは接続先を含むので、
+    # そのまま画面や本文へ出すと内部の構成が漏れる（#4724 の 1 で OAuth state の
+    # 取り出し失敗を上げるようにしたら、`/oauth/callback` がこれを出しうるようになった）。
+    # ⚠ 4xx は利用者が直せる理由なので従来どおり返す。
+    def public_error_message(error)
+      return error.message if error.respond_to?(:status) && error.status < 500
+      return 'Internal Server Error'
     end
 
     # ⚠ 見るのは `status`（モロヘイヤがクライアントへ返す値）。上流の
