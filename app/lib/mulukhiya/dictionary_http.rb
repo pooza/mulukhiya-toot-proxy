@@ -44,12 +44,11 @@ module Mulukhiya
 
     private
 
+    # 既定値は config/application.yaml にある。設定ファイルが古い環境でも
+    # 再送回数が未定義にならないための定数フォールバック。
+    # ⚠ `handler_config` で読むので `/handler/default/retry/limit` も効く (#4635)。
     def configured_retry_limit
-      return config['/handler/dictionary_tag/retry/limit']
-    rescue Ginseng::ConfigError
-      # 既定値は config/application.yaml にある。設定ファイルが古い環境でも
-      # 再送回数が未定義にならないための定数フォールバック。
-      return DEFAULT_RETRY_LIMIT
+      return DictionaryTagHandler.handler_config(:retry, :limit) || DEFAULT_RETRY_LIMIT
     end
 
     # ⚠ **`super` を先に通す。**pinning / 上限超過 / 5xx / 接続断の判定は上流のまま。

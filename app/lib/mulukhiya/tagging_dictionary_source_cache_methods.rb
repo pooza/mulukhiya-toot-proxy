@@ -67,9 +67,8 @@ module Mulukhiya
     end
 
     def source_cache_ttl
-      return config['/handler/dictionary_tag/cache/source_ttl'] || TaggingDictionary::DEFAULT_SOURCE_CACHE_TTL
-    rescue Ginseng::ConfigError
-      return TaggingDictionary::DEFAULT_SOURCE_CACHE_TTL
+      ttl = DictionaryTagHandler.handler_config(:cache, :source_ttl)
+      return ttl || TaggingDictionary::DEFAULT_SOURCE_CACHE_TTL
     end
 
     # 全ソースが取得に失敗した回か。⚠ **last-good で埋まったかは見ない**

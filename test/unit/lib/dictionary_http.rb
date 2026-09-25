@@ -7,6 +7,7 @@ module Mulukhiya
   # 意図的な設計で、一般論としては正しい。404 が一時的なのは **GAS という相手の事情**。
   class DictionaryHTTPTest < TestCase
     RETRY_KEY = '/handler/dictionary_tag/retry/limit'.freeze
+    DEFAULT_RETRY_KEY = '/handler/default/retry/limit'.freeze
 
     def setup
       @dic = DictionaryHTTP.new
@@ -86,6 +87,17 @@ module Mulukhiya
       assert_raises(Ginseng::ConfigError) {config[RETRY_KEY]}
 
       assert_equal(DictionaryHTTP::DEFAULT_RETRY_LIMIT, DictionaryHTTP.new.retry_limit)
+    end
+
+    # ⚠ **`handler_config` の読み口で読む (#4635 の 2 件目)。**生の `config[...]` だと
+    # `/handler/default/...` へのフォールバックが効かない。
+    def test_falls_back_to_default_handler_config
+      config[RETRY_KEY] = nil
+      config[DEFAULT_RETRY_KEY] = 3
+
+      assert_equal(3, DictionaryHTTP.new.retry_limit)
+    ensure
+      config[DEFAULT_RETRY_KEY] = nil
     end
 
     # 🔴 **死にコードが復活していないこと。**`RemoteDictionary#retry_limit` は
