@@ -47,6 +47,13 @@ module Mulukhiya
       assert_nil(retry_after)
     end
 
+    # ⚠ `error do` の受け皿は `to_h` から本文を組むので、そちらでも `code` が残ること。
+    def test_code_survives_to_h
+      error = ConflictError.new('別の更新が進行中です。', code: :locked, retry_after: 30)
+
+      assert_equal('locked', error.to_h[:code])
+    end
+
     def test_unknown_code_is_rejected
       assert_raise(ArgumentError) {ConflictError.new('x', code: :whatever)}
     end
@@ -90,12 +97,13 @@ module Mulukhiya
       logged = []
       double = Object.new
       double.define_singleton_method(:info) {|payload| logged.push(payload)}
-      original = Logger.method(:new)
       Logger.define_singleton_method(:new) {|*| double}
       begin
         yield
       ensure
-        Logger.define_singleton_method(:new, original)
+        # ⚠ 元の `new` は `Class#new` で、特異メソッドではない。定義し直して戻すと
+        # 特異メソッドが残るので、外して `Class#new` へ戻す。
+        Logger.singleton_class.send(:remove_method, :new)
       end
       return logged
     end

@@ -58,7 +58,7 @@ module Mulukhiya
       raise ConflictError.new(
         '別の更新が進行中です。少し待って再試行してください。',
         code: :locked,
-        retry_after: ttl,
+        retry_after: remaining_seconds(key, ttl),
       )
     rescue Ginseng::ConflictError
       raise

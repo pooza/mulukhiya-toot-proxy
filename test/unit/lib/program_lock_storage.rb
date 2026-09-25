@@ -39,6 +39,18 @@ module Mulukhiya
       assert_equal(ProgramLockStorage::LOCK_TTL_SECONDS, error.retry_after)
     end
 
+    # ⚠ `Retry-After` は TTL 全体でなく残り時間 (#4763)。終わり近くのロックで
+    # クライアントを 30 秒待たせない。⚠ 0 秒にはしない（切り上げ）。
+    def test_retry_after_is_remaining_time
+      return if disable?
+
+      @token = @storage.send(:acquire)
+      @storage.redis.call('PEXPIRE', @storage.create_key(@storage.send(:lock_key)), 4200)
+      error = assert_raise(ConflictError) {@storage.send(:acquire)}
+
+      assert_equal(5, error.retry_after)
+    end
+
     def test_release_allows_reacquire
       return if disable?
 

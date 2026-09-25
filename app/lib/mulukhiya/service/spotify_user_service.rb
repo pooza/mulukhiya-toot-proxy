@@ -253,13 +253,13 @@ module Mulukhiya
     #
     # ⚠⚠ **本文をそのまま出さない。**token endpoint への要求・応答には
     # `refresh_token` が乗りうるので、`error` と `error_description` だけ採る
-    # （[[project_log-credential-exposure]] と同じ型の事故を作らない）。
+    # （ログへの資格情報流出（#4511） と同じ型の事故を作らない）。
     def log_undecidable_oauth_error(body)
       logger.error(
         message: 'spotify token refresh: undecidable oauth error',
         oauth_error: body['error'],
         oauth_error_description: body['error_description'],
-        account_id: account_id,
+        account_id:,
       )
     end
 
