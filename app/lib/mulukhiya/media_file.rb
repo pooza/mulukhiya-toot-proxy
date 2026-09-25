@@ -121,6 +121,15 @@ module Mulukhiya
 
     alias convert_format convert_type
 
+    # 変換の出力先。
+    #
+    # ⚠⚠ **呼び出しごとに一意にする (#4722)。**以前は内容の sha256 から決まる固定名で、
+    # 同じ動画・画像がほぼ同時に 2 回上がる（連投・webhook の再送）と、片方が
+    # アップロード中のファイルをもう片方の ffmpeg (`-y`) / vips が上書き・切り詰め
+    # えた。#4626 で取得側を `write_atomic` にしたのと同じ問題。出力を使い回す
+    # 呼び出し元は無いので、名前を分けるだけで足りる。
+    # ⚠ **拡張子は末尾に保つ。**ffmpeg も vips も拡張子で出力形式を決める。
+    # ⚠ ドット始まりにしない（`MediaFile.all` の掃除は `*` glob）。
     def create_dest_path(params = {})
       params[:extname] ||= MIMEType.extname(params[:type])
       params[:extname] ||= ".#{default_mediatype}"
@@ -128,7 +137,7 @@ module Mulukhiya
       return File.join(
         Environment.dir,
         'tmp/media',
-        "#{params[:content]}#{params[:extname]}",
+        "#{params[:content]}-#{SecureRandom.hex(8)}#{params[:extname]}",
       )
     end
 
