@@ -43,6 +43,28 @@ module Mulukhiya
       assert(@handler.errors.all? {|e| e[:class] == 'SlotExhausted'})
     end
 
+    # 🔴 **①-a' 枠が残っているのに取り出されなかった添付は「枠切れ」ではない (#4721)。**
+    # 以前の `drain` は枠の残りを見ずに一律 `SlotExhausted` と報告したので、
+    # タイムアウトで**一度も取り出されなかった**添付まで「上限超過」に見え、
+    # 送信側は枚数を減らせば通ると誤解した。枠の残りの分は `Timeout`、それを
+    # 超える分だけを `SlotExhausted` として分ける。
+    def test_untouched_attachments_within_slots_are_reported_as_timeout
+      @handler.define_singleton_method(:create_slots) {|*| Concurrent::AtomicFixnum.new(1)}
+      @handler.define_singleton_method(:run_workers) {|*| sleep(10)}
+      payload = {'attachments' => [
+        {'image_url' => 'https://example.com/a.png'},
+        {'image_url' => 'https://example.com/b.png'},
+        {'image_url' => 'https://example.com/c.png'},
+      ]}
+
+      thread = Thread.new {@handler.handle_pre_webhook(payload)}
+      sleep(0.1)
+      thread.kill
+      thread.join(3)
+
+      assert_equal(['SlotExhausted', 'SlotExhausted', 'Timeout'], @handler.errors.map {|e| e[:class]}.sort)
+    end
+
     # 🔴 **①-b 取り出し済みで処理中だった添付も残る（PR #4713 の Codex P1）。**
     #
     # ⚠⚠ `pop_attachment` はキューから**取り除いてから**アップロードに入るので、
