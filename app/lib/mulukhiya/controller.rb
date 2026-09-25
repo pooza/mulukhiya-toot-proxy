@@ -115,18 +115,21 @@ module Mulukhiya
       if e.is_a?(Ginseng::Error)
         @renderer.status = e.status
         @renderer.message = e.to_h.except(:backtrace).merge(error: e.message)
-        # ⚠ **ここは最後の受け皿で、どのルートから来たか分からない (#4654)。**
-        # 判断材料はステータスしか無いので `report_error` に寄せる。従来は
-        # 無条件 `e.alert` で、ルートのローカル rescue をすり抜けた 4xx——
-        # `not_found` を通らない `AuthError` 等——まで Sentry と Event(:alert) に
-        # 落ちていた。⚠ **4 系統目**（#4542 / #4594 / #4603 / #4629）。
-        report_error(e)
       else
         @renderer.status = 500
         @renderer.message = {error: 'Internal Server Error'}
-        e.log(path: scrub_log_path(request.path))
-        Sentry.capture_exception(e) rescue nil if Sentry.initialized?
       end
+      # ⚠ **ここは最後の受け皿で、どのルートから来たか分からない (#4654)。**
+      # 判断材料はステータスしか無いので `report_error` に寄せる。従来は
+      # 無条件 `e.alert` で、ルートのローカル rescue をすり抜けた 4xx——
+      # `not_found` を通らない `AuthError` 等——まで Sentry と Event(:alert) に
+      # 落ちていた。⚠ **4 系統目**（#4542 / #4594 / #4603 / #4629）。
+      #
+      # ⚠ **Ginseng 以外の例外も同じ (#4724)。**従来はそちらだけ `e.log` ＋
+      # `Sentry.capture_exception` の直書きで、`Event(:alert)` にもデッドマンにも
+      # 乗っていなかった。ここに落ちるのはモロヘイヤ自身のバグ（`NoMethodError` 等）が
+      # 主なので、Sentry だけでなく通知まで届かないと気づけない。
+      report_error(e)
       return @renderer.to_s
     end
 

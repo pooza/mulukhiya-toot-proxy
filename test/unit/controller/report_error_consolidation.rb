@@ -65,6 +65,35 @@ module Mulukhiya
       assert_equal(404, last_response.status)
     end
 
+    # ⚠⚠ **Ginseng 以外の例外も `report_error` を通す (#4724)。**従来は `e.log` ＋
+    # `Sentry.capture_exception` の直書きで、`Event(:alert)`（slack / line / mail）にも
+    # デッドマンにも乗っていなかった。モロヘイヤ自身のバグ（`NoMethodError` 等）は
+    # ここに落ちるので、黙らせてはいけない。
+    def test_non_ginseng_error_reaching_top_level_is_alerted
+      clear_alert_throttle(RuntimeError)
+      error = probe(RuntimeError.new('boom'))
+
+      assert_equal([:alert], error.mulukhiya_calls)
+    end
+
+    # 連続はデッドマンで抑える（#4693 と同じ扱い）。
+    def test_non_ginseng_error_reaching_top_level_is_throttled
+      clear_alert_throttle(RuntimeError)
+      probe(RuntimeError.new('boom'))
+      error = probe(RuntimeError.new('boom'))
+
+      assert_equal([:log], error.mulukhiya_calls)
+    end
+
+    # 応答は従来どおり。⚠ 例外メッセージは返さない（内部情報の露出）。
+    def test_non_ginseng_error_response_is_unchanged
+      clear_alert_throttle(RuntimeError)
+      probe(RuntimeError.new('boom'))
+
+      assert_equal(500, last_response.status)
+      assert_equal({'error' => 'Internal Server Error'}, JSON.parse(last_response.body))
+    end
+
     private
 
     def spy(error)
