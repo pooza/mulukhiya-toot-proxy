@@ -161,9 +161,13 @@ module Mulukhiya
 
     # リモートの URL を tmp/media へ落とす。
     #
-    # ⚠ **host_validator を渡すのは呼び出し元の責務 (#4576)。**ここで既定に
-    # するとダウンロード全般へ pinning が効き、複数 A レコードのフォールバックが
-    # 使えない相手 (大手 CDN) で取得できなくなる (#4524 のトレードオフ)。
+    # ⚠ **host_validator は必須キーワード (#4635)。**どの validator を使うか
+    # (pinning の有無) は呼び出し元が決める。ここで既定にするとダウンロード全般へ
+    # pinning が効き、複数 A レコードのフォールバックが使えない相手 (大手 CDN) で
+    # 取得できなくなる (#4524 のトレードオフ)。
+    # ⚠⚠ ただし**渡さないことは許さない。**以前は省略すると無検証の `{}` で撃って
+    # いたので、渡し忘れた呼び出しが黙って内部アドレスまで取りに行けた。省略は
+    # Ruby が、nil は下の raise が HTTP を撃つ前に弾く。
     #
     # ⚠ **サイズ上限を持つ。**以前は Content-Length も本文長も見ずに
     # `File.write(path, get(uri).body)` していたので、巨大な応答をそのまま
@@ -177,15 +181,16 @@ module Mulukhiya
     # webhook から第三者が指定できる**ので、ワーカーのメモリ枯渇に繋がりうる。
     # 受信中に打ち切るには `Ginseng::HTTP#get` 側の口が要る
     # (pooza/ginseng-core#526)。着地したら `max_bytes:` へ載せ替えること。
-    def self.download(uri, params = {})
+    def self.download(uri, host_validator:)
+      raise ArgumentError, 'host_validator is required' unless host_validator
       path = File.join(
         Environment.dir,
         'tmp/media',
         "#{uri.to_s.sha256}#{File.extname(uri.path)}",
       )
       raise_too_large!(uri, :content_length) unless
-        valid_content_length?(uri, request_options(params))
-      body = HTTP.new.get(uri, request_options(params)).body.to_s
+        valid_content_length?(uri, request_options(host_validator))
+      body = HTTP.new.get(uri, request_options(host_validator)).body.to_s
       raise_too_large!(uri, :body) if body.bytesize > download_max_bytes
       write_atomic(path, body)
       return new(path).file
@@ -234,9 +239,8 @@ module Mulukhiya
     # ⚠ **「プリフライトを足したせいで GET の検証が外れる」**という、#4523 が塞ごうとした
     # ものの裏返し。gem 側の是正は pooza/ginseng-core#528 で、こちらは**それが入っても
     # 壊れない書き方**にしておく。
-    def self.request_options(params)
-      return {} unless params[:host_validator]
-      return {host_validator: params[:host_validator]}
+    def self.request_options(host_validator)
+      return {host_validator:}
     end
 
     # 相手が申告した Content-Length が上限を超えていれば GET せずに弾く。
@@ -257,6 +261,8 @@ module Mulukhiya
     rescue Ginseng::GatewayError => e
       # ⚠ allowlist 拒否 (Rejected host) はここで飲まない。飲むと「プリフライトが
       # true = GET してよい」が成り立たなくなる (#4535)。
+      # ⚠ 文字列一致なのは、ginseng-core が拒否を専用の例外クラスでなく
+      # GatewayError のメッセージで表しているため (#4635)。
       raise if e.message.start_with?('Rejected host')
       return true
     rescue

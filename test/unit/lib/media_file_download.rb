@@ -35,6 +35,20 @@ module Mulukhiya
       assert_not_requested(get)
     end
 
+    # ⚠⚠ **SSRF ガードを呼び出し元任せにしない (#4635)。**以前は `params` に
+    # validator が無ければ無検証の `{}` で撃っていたので、渡し忘れた呼び出しが
+    # 黙って内部アドレスまで取りに行けた。省略も nil も HTTP を撃つ前に弾くこと。
+    def test_host_validator_is_required
+      head = stub_request(:head, INTERNAL).to_return(status: 200)
+      get = stub_request(:get, INTERNAL).to_return(status: 200, body: 'secret')
+      uri = Ginseng::URI.parse(INTERNAL)
+
+      assert_raise(ArgumentError) {MediaFile.download(uri)}
+      assert_raise(ArgumentError) {MediaFile.download(uri, host_validator: nil)}
+      assert_not_requested(head)
+      assert_not_requested(get)
+    end
+
     # 相手の申告が上限超えなら GET しない。
     def test_oversize_content_length_is_rejected_before_get
       allow_all
