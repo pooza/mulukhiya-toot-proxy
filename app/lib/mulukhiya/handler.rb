@@ -173,6 +173,8 @@ module Mulukhiya
       @break = false
       @reporter.clear
       @reporter.tags.clear
+      # ⚠ `Reporter#clear` は `Array#clear` なので #4649 の控えを残す (#4698)。
+      @reporter.errors.clear
       @reporter.parser = nil
     end
 
