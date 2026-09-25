@@ -113,12 +113,10 @@ module Mulukhiya
       return !self[key][:words]&.include?(key)
     end
 
+    # ⚠ 既定値は config/application.yaml にあるので、定数へ倒れるのは設定ファイルが
+    # 古い環境だけ。TTL 無しの素の SET へ退行させないための定数フォールバック。
     def cache_ttl
-      return config['/handler/dictionary_tag/cache/ttl'] || DEFAULT_CACHE_TTL
-    rescue Ginseng::ConfigError
-      # 既定値は config/application.yaml にあるので通常ここへは来ない。設定ファイル
-      # が古い環境でも TTL 無しの素の SET へ退行させないための定数フォールバック。
-      return DEFAULT_CACHE_TTL
+      return DictionaryTagHandler.handler_config(:cache, :ttl) || DEFAULT_CACHE_TTL
     end
 
     # キャッシュを捨てる。テスト・運用で「既知の状態から始める」ための入口。
