@@ -703,6 +703,8 @@ scheme を食う `詳細:https://…` など、区切った後もメンション
 `HTTPS://x/@admin` → `HTTPS://x/@ admin`、`https://example.com/_@admin`・`info@example.com`・`H@ppy Together!!!` は無変換。
 ⚠ 副作用: `詳細:https://mstdn.example/@user` の `@` も区切られる（mfm-js が URL と読まないので、区切らないと通知が飛ぶ）。
 ⚠ ハッシュタグ側の `/` の直後と対の括弧を含む URL は pooza/ginseng-fediverse#297 で向こう持ち（タグは通知を撃たない）。
+⚠ #4770 の Codex P2「Mastodon では `ラブ@pooza` はメンションにならないので境界を Misskey 限定に」は**採らない**（2026-09-26 ユーザー判断）。
+区切るのが安全側で、5.37.x の本番（`gsub!(/[@#]/, '\0 ')`＝全部区切る）より狭くなっただけ。全角「＠」はどの版も触らない。
 
 #### 2026-09-16 に消化した分（残り 7 件 / 重み 18）
 
