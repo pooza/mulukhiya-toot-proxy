@@ -578,12 +578,23 @@ html lang='ja' data-theme='light'
                   return this.loadEntries().then(_ => true)
                 })
                 .catch(e => {
-                  // ⚠ **送れなかった日数は保留へ戻す (#4635)。**送信前に消しているので、
-                  // 他の行の書き込みと重なって 409 を踏むと、溜めたクリックが黙って
-                  // 消えていた。⚠ 自動では送り直さない（同じ競合を踏み直すだけ）。
+                  // ⚠ **サーバーが断った (4xx) 日数だけ保留へ戻す (#4635)。**送信前に消して
+                  // いるので、他の行の書き込みと重なって 409 を踏むと、溜めたクリックが
+                  // 黙って消えていた。⚠ 自動では送り直さない（同じ競合を踏み直すだけ）。
                   // 次の ＋ か編集で、戻した分も合わせて送る。
-                  this.pendingDays[key] = (this.pendingDays[key] || 0) + days
-                  Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'})
+                  // ⚠⚠ **応答が無い・5xx のときは戻さない (PR #4768 の Codex P2)。**
+                  // 保存まで済んでから応答だけ失われた可能性があり、戻すと次の送信で
+                  // 同じ日数を二重に進める。サーバーの値を取り直して確かめてもらう。
+                  const status = this.methods.dig(e, 'response', 'status')
+                  if (status >= 400 && status < 500) {
+                    this.pendingDays[key] = (this.pendingDays[key] || 0) + days
+                    Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'})
+                  } else {
+                    Swal.fire({
+                      text: `${this.methods.createErrorMessage(e)}\n反映されたか確かめられなかったので、表示を取り直しました。次回放送日を確認してください。`,
+                      icon: 'error',
+                    })
+                  }
                   return this.loadEntries().then(_ => false)
                 })
                 .finally(_ => {delete this.busy[key]})
