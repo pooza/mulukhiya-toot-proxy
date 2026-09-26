@@ -334,10 +334,18 @@ html lang='ja' data-theme='light'
                 annict_episode_id: null,
               }
             },
+            // 解決値は取り直せたか。⚠ 失敗しても reject しない（呼び出し側の多くは
+            // 表示の更新だけが目的）。値を見るのは flushNextOn だけ（PR #4768 の Codex P2）。
             loadEntries () {
               return this.methods.getPrograms()
-                .then(e => {this.entries = e || {}})
-                .catch(e => Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'}))
+                .then(e => {
+                  this.entries = e || {}
+                  return true
+                })
+                .catch(e => {
+                  Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'})
+                  return false
+                })
             },
             openAdd () {
               this.form.editKey = null
@@ -564,7 +572,7 @@ html lang='ja' data-theme='light'
             },
             // 溜めた日数をまとめて 1 回で送る。⚠ **Promise を返すこと。**
             // openEdit が「先に送り切ってから開く」ために待つ (PR #4588 の Codex P2)。
-            // 解決値は送り切れたか (#4635)。
+            // 解決値は送り切れ、かつサーバーの値を取り直せたか (#4635・PR #4768 の Codex P2)。
             flushNextOn (key) {
               const days = this.pendingDays[key]
               delete this.pendingDays[key]
@@ -575,7 +583,8 @@ html lang='ja' data-theme='light'
               return this.methods.advanceProgramNextOn(key, days)
                 .then(_ => {
                   Swal.fire({title: `次回放送日を+${days}日しました。`, toast: true, position: 'top-end', icon: 'success', showConfirmButton: false, timer: 2000})
-                  return this.loadEntries().then(_ => true)
+                  // ⚠ 取り直せなかったら false（送れても、古い next_on のまま編集を開かせない）。
+                  return this.loadEntries()
                 })
                 .catch(e => {
                   // ⚠ **サーバーが断った (4xx) 日数だけ保留へ戻す (#4635)。**送信前に消して
