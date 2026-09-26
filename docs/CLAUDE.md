@@ -688,7 +688,7 @@ lint は rubocop（537 files, no offenses）・slim-lint ともクリーン。
 
 ✅ **2026-09-26 の消化**: 緑の極小分は **PR #4767** に入れた。⚠ 黄は #4760〜#4765、緑の残りは #4766 に一度起票したが、
 同日に整理した。✅ **その場で直せる 4 件は PR #4767 で直した**（#4760 同期 alert／#4762 冪等性ロックの fail-open／
-#4763 `Retry-After` を残り時間に／#4765 web UI の警告。⚠ #4765 はブラウザでの目視が未了）。
+#4763 `Retry-After` を残り時間に／#4765 web UI の警告。#4765 の目視は下の「ステージング」で済ませた）。
 残りは**記録のみ**で閉じた: 番組表の全滅が syslog 止まり（#4761・Sentry か `/health` かの設計判断が要る）／
 webhook の上流 4xx が 500 に丸まる（#4764 → #4723 へ統合）／緑の残り 5 件（#4766: 5xx 原文の返却・`mail_alert.yaml` の `\A`/`\z`・
 `/ffmpeg/timeout` の黙った既定化・取得失敗ログが毎分・increment ルートのテスト）。古いコメント 2 件（`log_annict_stale` / `lock_degradation_methods.rb`）は #4767 で直した。
@@ -705,6 +705,20 @@ scheme を食う `詳細:https://…` など、区切った後もメンション
 ⚠ ハッシュタグ側の `/` の直後と対の括弧を含む URL は pooza/ginseng-fediverse#297 で向こう持ち（タグは通知を撃たない）。
 ⚠ #4770 の Codex P2「Mastodon では `ラブ@pooza` はメンションにならないので境界を Misskey 限定に」は**採らない**（2026-09-26 ユーザー判断）。
 区切るのが安全側で、5.37.x の本番（`gsub!(/[@#]/, '\0 ')`＝全部区切る）より狭くなっただけ。全角「＠」はどの版も触らない。
+
+#### 検証（2026-09-26・develop `4e0a61e4`）
+
+- **harness 実走（リリースゲート）**: Mastodon = 1518 tests / 0 failures / 0 errors / 159 omissions、
+  Misskey = 1521 tests / 0 failures / 0 errors / 145 omissions（`controller=misskey url=http://localhost:3001` を確認）。
+  ⚠ Misskey 系は **`.env.test` を source して回す**。`MULUKHIYA_HARNESS_DIR` だけだと Mastodon の `.env.test` が
+  残っていれば `controller=mastodon` で走り、Misskey を検証しない（1 回目がそうなったので捨てた）
+- **ステージング 4 台（dev24-27）を `4e0a61e4` へ**: 4 台とも `config:lint` OK・health 200・version 5.38.0。
+  rc.d の差分はコメントだけなので配り直していない。dev27 の ginseng-fediverse は 2.0.4 で、`曲/@admin` → `曲/@ admin`
+- **#4765 の目視（ユーザー）**: dev25 の番組表に作品 ID 付きのエントリを置き、admin にダミーの Annict トークンを入れて
+  `failed` を起こした。黄色の警告ダイアログが出ることを確認し、番組表とトークンは元に戻した。
+  ⚠ **dev24 は本番の番組表を同期している（`program.urls`）ので編集ボタンが出ない**。編集の確認は dev25（`auto_update: false`）で行う
+  - ユーザーの心当たり: 放送直後に押すと、Annict に翌週の回が未登録で `not_found` になる（主に名探偵プリキュア！）。
+    今は半日待ってから押している → **#4771（5.39.0）で `not_found` のときは +1 を断る**。`failed` は今の警告のまま
 
 #### 2026-09-16 に消化した分（残り 7 件 / 重み 18）
 
