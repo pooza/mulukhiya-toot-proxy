@@ -163,7 +163,39 @@ module Mulukhiya
       assert_empty(none)
     end
 
+    # ⚠ **ハンドラ設定は `handler_config` の読み口で読む (#4635 の 2 件目)。**
+    # 生の `config[...]` だと `/handler/default/...` へのフォールバックが効かない。
+    def test_cache_ttls_fall_back_to_default_handler_config
+      with_config(
+        '/handler/dictionary_tag/cache/ttl' => nil,
+        '/handler/dictionary_tag/cache/source_ttl' => nil,
+        '/handler/default/cache/ttl' => 1234,
+        '/handler/default/cache/source_ttl' => 5678,
+      ) do
+        assert_equal(1234, @dic.cache_ttl)
+        assert_equal(5678, @dic.send(:source_cache_ttl))
+      end
+    end
+
+    def test_cache_ttls_fall_back_to_the_constants
+      with_config(
+        '/handler/dictionary_tag/cache/ttl' => nil,
+        '/handler/dictionary_tag/cache/source_ttl' => nil,
+      ) do
+        assert_equal(TaggingDictionary::DEFAULT_CACHE_TTL, @dic.cache_ttl)
+        assert_equal(TaggingDictionary::DEFAULT_SOURCE_CACHE_TTL, @dic.send(:source_cache_ttl))
+      end
+    end
+
     private
+
+    def with_config(values)
+      saved = values.keys.to_h {|key| [key, (config[key] rescue nil)]}
+      values.each {|key, value| config[key] = value}
+      yield
+    ensure
+      saved.each {|key, value| config[key] = value}
+    end
 
     def redis
       @redis ||= Redis.new

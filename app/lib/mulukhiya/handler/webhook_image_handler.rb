@@ -55,7 +55,7 @@ module Mulukhiya
       inflight = Concurrent::Hash.new.tap(&:compare_by_identity)
       run_workers(queue, payload, slots, inflight)
     ensure
-      drain(queue, inflight) if queue
+      drain(queue, inflight, slots) if queue
     end
 
     private
@@ -71,10 +71,14 @@ module Mulukhiya
     #    走り続けたスレッドが**応答を組み立てた後**に `push` して孤児メディアを作る
     def run_workers(queue, payload, slots, inflight)
       counter = Thread.current[HandlerProfile::HTTP_KEY]
+      deadline = Thread.current[Event::HANDLER_DEADLINE_KEY]
       workers = [Parallel.processor_count, queue.size].min
       threads = Array.new(workers) do
         Thread.new do
           Thread.current[HandlerProfile::HTTP_KEY] = counter if counter
+          # ⚠ **締切も引き継ぐ (#4721)。**ワーカーの中の pre_upload の dispatch が
+          # これを親の締切として読み、自分の締切と近いほうを取る（`Event#nested_deadline`）。
+          Thread.current[Event::HANDLER_DEADLINE_KEY] = deadline if deadline
           consume(queue, payload, slots, inflight)
         end
       end
@@ -124,9 +128,22 @@ module Mulukhiya
     # 取得失敗と上限超過だけ記録して枠切れを黙らせるのは、この Issue の趣旨に反する。
     # ⚠ `inflight` は**取り出し済みで処理中だった**もの（PR #4713 の Codex P1）。
     # 枠切れ（キューに残った）とは理由が違うので、別の `class` で残す。
-    def drain(queue, inflight = nil)
+    #
+    # ⚠⚠ **キューに残った = 枠切れ、ではない (#4721)。**正常に走り終えたなら
+    # キューが残るのは枠が尽きたときだけだが、締切で殺されたときは**枠が残って
+    # いても一度も取り出されない**添付が出る。一律 `SlotExhausted` にすると
+    # 送信側は「枚数を減らせば通る」と誤解する。**枠の残り（`slots`）までは
+    # 取り出されていれば付いたはずの添付**なので `Timeout`、超えた分だけを
+    # `SlotExhausted` として分ける。`slots` が無ければ従来どおり全部を枠切れとする。
+    def drain(queue, inflight = nil, slots = nil)
+      remaining = slots&.value.to_i
       while attachment = pop_attachment(queue)
-        record_drop('SlotExhausted', 'max media attachments exceeded', attachment)
+        if remaining.positive?
+          remaining -= 1
+          record_drop('Timeout', 'handler timed out before processing', attachment)
+        else
+          record_drop('SlotExhausted', 'max media attachments exceeded', attachment)
+        end
       end
       inflight&.each_value do |attachment|
         record_drop('Timeout', 'handler timed out while uploading', attachment)

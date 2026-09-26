@@ -80,10 +80,7 @@ module Mulukhiya
     end
 
     def handler_config(*keys)
-      path = keys.join('/')
-      value = config["/handler/#{underscore}/#{path}"] rescue nil
-      value = config["/handler/default/#{path}"] rescue nil if value.nil?
-      return value
+      return self.class.handler_config(*keys)
     end
 
     def to_h
@@ -173,6 +170,8 @@ module Mulukhiya
       @break = false
       @reporter.clear
       @reporter.tags.clear
+      # ⚠ `Reporter#clear` は `Array#clear` なので #4649 の控えを残す (#4698)。
+      @reporter.errors.clear
       @reporter.parser = nil
     end
 
@@ -282,6 +281,24 @@ module Mulukhiya
     def dictionary
       @params[:tagging_dictionary] ||= TaggingDictionary.new
       return @params[:tagging_dictionary]
+    end
+
+    def self.underscore
+      return to_s.split('::').last.sub(/Handler$/, '').underscore
+    end
+
+    # ハンドラ設定の読み口。`/handler/<名前>/...` が無ければ `/handler/default/...` へ倒す。
+    #
+    # ⚠ **クラスメソッドにしてあるのは、ハンドラのインスタンスを作らずに読むため
+    # (#4635 の 2 件目)。**`TaggingDictionary` / `DictionaryHTTP` は `dictionary_tag` の
+    # 設定を読むが、`Handler.create` は SNS サービスまで組み立てるので、設定を 1 つ
+    # 引くために作るものではない。生の `config[...]` で読むと `default` への
+    # フォールバックが効かず、他のハンドラと書き方も割れる。
+    def self.handler_config(*keys)
+      path = keys.join('/')
+      value = Config.instance["/handler/#{underscore}/#{path}"] rescue nil
+      value = Config.instance["/handler/default/#{path}"] rescue nil if value.nil?
+      return value
     end
 
     def self.create(name, params = {})

@@ -1,5 +1,18 @@
 module Mulukhiya
   class SidekiqDaemonTest < TestCase
+    # monit が /health の失敗から restart を撃つまでの窓（秒）(#4697)。
+    #
+    # ⚠ **値の出所はモロヘイヤの外にある**ので、ここでは定数として持つしかない。
+    # - `set daemon 30` … pooza/chubo-core の `cookbooks/monit/templates/monitrc.erb`
+    # - `for 3 cycles` … pooza/chubo2 の `app/cookbooks/mulukhiya/templates/monit.erb`
+    # どちらかを動かしたら、ここも合わせること。
+    MONIT_POLL_SECONDS = 30
+    MONIT_FAILURE_CYCLES = 3
+    MONIT_RESTART_WINDOW = MONIT_POLL_SECONDS * MONIT_FAILURE_CYCLES
+
+    # monit の restart が stop を鎖で呼ぶ順（monit.erb の `services`）。
+    RCD_SERVICES = ['mulukhiya-puma', 'mulukhiya-sidekiq', 'mulukhiya-listener'].freeze
+
     def setup
       @daemon = SidekiqDaemon.new
       config['/crypt/password'] = 'mulukhiya'
@@ -34,6 +47,20 @@ module Mulukhiya
       assert_operator(
         rcd_kill_wait, :>, SidekiqDaemon::SHUTDOWN_TIMEOUT,
         'rc.d の SIGKILL が Sidekiq の hard shutdown より先に撃たれる'
+      )
+    end
+
+    # ⚠⚠ **上限側も見る (#4697)。**monit は `service ... restart` を 3 本の鎖で撃つので、
+    # 停止待ちの最悪（`kill_wait` ＋ SIGKILL 後の `sleep`）の合計が monit の窓を超えると、
+    # 1 本目の restart の最中に次の restart が撃たれる（sidekiq 二重起動と同型）。
+    # 下限（`SHUTDOWN_TIMEOUT` より長いこと）だけを守って `kill_wait` を上げると、
+    # こちら側が黙って破れる。
+    def test_rcd_stop_chain_fits_in_the_monit_window
+      total = RCD_SERVICES.sum {|service| rcd_worst_stop_seconds(service)}
+
+      assert_operator(
+        total, :<, MONIT_RESTART_WINDOW,
+        "rc.d の停止待ちの合計 #{total} 秒が monit の窓 #{MONIT_RESTART_WINDOW} 秒を超える"
       )
     end
 
@@ -91,11 +118,24 @@ module Mulukhiya
       }
     end
 
-    def rcd_kill_wait
-      path = File.join(Environment.dir, 'config/sample/freebsd/mulukhiya-sidekiq')
-      matched = File.read(path)[/^mulukhiya_sidekiq_kill_wait=(\d+)$/, 1]
-      raise "mulukhiya_sidekiq_kill_wait not found in #{path}" unless matched
+    def rcd_kill_wait(service = 'mulukhiya-sidekiq')
+      path = rcd_path(service)
+      key = "#{service.tr('-', '_')}_kill_wait"
+      matched = File.read(path)[/^#{key}=(\d+)$/, 1]
+      raise "#{key} not found in #{path}" unless matched
       return matched.to_i
+    end
+
+    # 停止待ちの最悪。待ちループを走り切り、SIGKILL の後の `sleep` まで待つ場合。
+    def rcd_worst_stop_seconds(service)
+      path = rcd_path(service)
+      matched = File.read(path)[/^\s*pkill -9 .*\n\s*sleep (\d+)$/, 1]
+      raise "sleep after SIGKILL not found in #{path}" unless matched
+      return rcd_kill_wait(service) + matched.to_i
+    end
+
+    def rcd_path(service)
+      return File.join(Environment.dir, 'config/sample/freebsd', service)
     end
   end
 end

@@ -41,6 +41,33 @@ module Mulukhiya
         @renderer.status = 404
         return @renderer.to_s
       end
+
+      # フィード・HTML のルートが 404 を返す経路 (#4725)。
+      get '/feed' do
+        @renderer = TypedRenderer.new('application/rss+xml; charset=UTF-8')
+        @renderer.status = 404
+        return @renderer.to_s
+      end
+
+      get '/html' do
+        @renderer = TypedRenderer.new('text/html; charset=UTF-8')
+        @renderer.status = 404
+        return @renderer.to_s
+      end
+    end
+
+    # message を持たず、JSON 以外の Content-Type を名乗るレンダラ。
+    class TypedRenderer < Ginseng::Web::Renderer
+      attr_reader :type
+
+      def initialize(type)
+        super()
+        @type = type
+      end
+
+      def to_s
+        return ''
+      end
     end
 
     def app = NotFoundProbeController
@@ -87,6 +114,26 @@ module Mulukhiya
 
       assert_equal('Ginseng::NotFoundError', body['class'])
       assert_equal(404, last_response.status)
+    end
+
+    # 🔴 **ボディを JSON に差し替えたら Content-Type も合わせる (#4725)。**
+    # ⚠ `after` はこの block より**先に**走る（Sinatra はルートが返った後で
+    # `error_block!(response.status)` を呼ぶ）ので、ルートのレンダラの型が
+    # 残ったまま JSON のボディが返っていた。
+    def test_replaced_body_has_json_content_type
+      ['/feed', '/html', '/raw'].each do |path|
+        body = request(path)
+
+        assert_equal('Ginseng::NotFoundError', body['class'], path)
+        assert_equal('application/json', last_response.media_type, path)
+      end
+    end
+
+    # ルート未一致も JSON のまま。
+    def test_route_miss_has_json_content_type
+      request('/nonexistent')
+
+      assert_equal('application/json', last_response.media_type)
     end
 
     private

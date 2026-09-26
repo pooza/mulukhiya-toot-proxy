@@ -65,5 +65,17 @@ module Mulukhiya
 
       assert_equal([{message: 'first'}], @reporter.errors)
     end
+
+    # ⚠ **`Handler#clear` は Reporter の控えも消す (#4698)。**`Reporter#clear` は
+    # `Array#clear` なので `errors` を残す。残すと、同じ Reporter を使い回した次の
+    # 応答に**前の回の落ちた添付**が混ざる。
+    def test_handler_clear_also_clears_reporter_errors
+      handler = HandlerDouble.build(errors: [{message: 'dropped'}])
+      handler.instance_variable_set(:@reporter, @reporter)
+      @reporter.push(handler)
+      handler.clear
+
+      assert_empty(@reporter.errors)
+    end
   end
 end

@@ -87,12 +87,23 @@ module Mulukhiya
         log_retention
         return self
       end
-      redis.setex(REDIS_KEY, cache_ttl, Marshal.dump(build_payload(entries)))
-      update(cache.to_h)
+      payload = build_payload(entries)
+      redis.setex(REDIS_KEY, cache_ttl, Marshal.dump(payload))
+      # ⚠ **書いた値をそのまま使う。Redis から読み戻さない (#4628 の 3 件目)。**
+      # 読み戻しが外れると（Redis の瞬断・evict・別プロセスが別署名で上書き）、
+      # 取得は成功したのにインメモリの辞書が空になり、いま処理中の投稿だけ
+      # 辞書タグを丸ごと失う。
+      @cache = payload[:entries]
+      @generated_at = payload[:generated_at]
+      update(entries)
       log_generation
       return self
     rescue => e
       e.alert
+      # ⚠ **例外で落ちた回にも 1 行残す (#4628 の 7 件目)。**`e.alert` だけだと
+      # Sentry は鳴るが、内訳が syslog に残らない（早期 return で世代ログが飛んで
+      # いた 6 件目と同じ形）。
+      log_failure(e)
       return self
     end
 
@@ -102,12 +113,10 @@ module Mulukhiya
       return !self[key][:words]&.include?(key)
     end
 
+    # ⚠ 既定値は config/application.yaml にあるので、定数へ倒れるのは設定ファイルが
+    # 古い環境だけ。TTL 無しの素の SET へ退行させないための定数フォールバック。
     def cache_ttl
-      return config['/handler/dictionary_tag/cache/ttl'] || DEFAULT_CACHE_TTL
-    rescue Ginseng::ConfigError
-      # 既定値は config/application.yaml にあるので通常ここへは来ない。設定ファイル
-      # が古い環境でも TTL 無しの素の SET へ退行させないための定数フォールバック。
-      return DEFAULT_CACHE_TTL
+      return DictionaryTagHandler.handler_config(:cache, :ttl) || DEFAULT_CACHE_TTL
     end
 
     # キャッシュを捨てる。テスト・運用で「既知の状態から始める」ための入口。
@@ -224,11 +233,17 @@ module Mulukhiya
       return empty > @substituted_sources.to_a.size
     end
 
+    # ⚠ **`substituted_sources` は last-good で埋めた本数 (#4628 の 8 件目)。**
+    # 全ソースを埋めた回は最大 24 時間前の内容が `generated_at: Time.now` で書かれる
+    # ので、これが無いと鮮度が読めない。⚠ URL ではなく本数で持つ（辞書 URL は
+    # `?access_token=` を持つので、Redis の値にも残さない。#4511）。
+    # 足しただけで旧 payload も読めるので、形式の版は上げない。
     def build_payload(entries)
       return {
         version: CACHE_PAYLOAD_VERSION,
         signature:,
         generated_at: Time.now,
+        substituted_sources: @substituted_sources.to_a.size,
         entries:,
       }
     end
