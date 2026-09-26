@@ -219,7 +219,11 @@ Ruby 4.0.6 据え置き / FreeBSD 3 台は monit 復帰）。
 - ⚠ vulcan の `schema_coverage` は 41/42（5.38.0 と同じ既知の値）。`config: OK` なので止めていない
 - ⚠ gomander は `monit monitor` の直後が `Not monitored - monitor pending` だった。20 秒ほどで OK になる（異常ではない）
 - ⚠ 5.37.1 で出た vulcan の health 503（`SidekiqDaemon.pid`）は**今回は出ていない**
-- 🔴 **残: `main` を `develop` へ戻していない**（ホットフィックス手順の 9）。`develop` は `df83725b` で `resolv` の宣言を持たない
+- ✅ **ホットフィックス手順は 9 まで完了**（2026-09-26）。7 = Wiki は**更新不要**（設定・API・起動スクリプトの変更が無く、
+  「更新手順」ページの `bundle install` 必須の注意で足りる）／8 = chubo2 `docs/infra-history.md` に記録（`c1f1c96`）／
+  9 = `main` → `develop` は **PR #4774**（衝突は version 1 行で develop 側の 5.39.0 を採った）。マイルストーン 5.38.1 も閉じた
+- ⚠ **中断検知と vulcan の `bash -lc` は chubo2 の手順書にも入れた**（`infra-mastodon.md` / `infra-misskey.md`・`c1f1c96`）。
+  手順書のほうが正本なので、次のデプロイはそちらを読む
 - 攻撃者が決めたホスト名が届く経路（投稿の URL の画像取得・`is_cat`）はどちらもログイン済みアカウントが要る
 - **Mastodon 本体のほうが露出が大きい**（連合の名前解決・登録時の MX 検査が認証なし）→ pooza/mastodon#976 に起票済み（対応は Mastodon 側）
 - 0.8.0（2026-09-17 公開）は Ruby 4.0.7 にも入っていないので 0.7.x に留めた。dependabot も minor を無視
