@@ -694,7 +694,9 @@ webhook の上流 4xx が 500 に丸まる（#4764 → #4723 へ統合）／緑�
 `/ffmpeg/timeout` の黙った既定化・取得失敗ログが毎分・increment ルートのテスト）。古いコメント 2 件（`log_annict_stale` / `lock_degradation_methods.rb`）は #4767 で直した。
 ⚠ 見送り 2 件: `slim_lint_coverage.rb` の +4 は rubocop が `return` 付き継続行に求める形／`annict_applicable?` のガードは
 `test_rejects_without_episode_data` が契約として押さえているので残した。
-✅ **赤 2 は ginseng-fediverse v2.0.2 へのピン上げで対処した。出荷条件の赤は 0。**次はリリース手順（harness 両系 → ステージング 4 台 → PR #4739）。
+⚠ **赤 2 は v2.0.2 へのピン上げ（PR #4770）でも閉じきらなかった。**Codex P1: 境界 `(?<![a-z0-9\/])` の `/` が余計で、
+mfm-js は `曲/@admin` もメンションにする（実測 0.26.0）。`/` は URL を守るためだったが、#290 で URL を丸ごと除外したので不要。
+→ **pooza/ginseng-fediverse#295**（`/` を外す）と 2.0.x へのバックポート（v2.0.3）を依頼。**5.38.0 の出荷はこれ待ち**。
 
 #### 2026-09-16 に消化した分（残り 7 件 / 重み 18）
 
