@@ -182,6 +182,21 @@ git diff Gemfile.lock
 # 5. 問題なければコミット
 ```
 
+## 準備中: 5.38.1（ホットフィックス・#4772）
+
+**Ruby 同梱の `resolv` 0.7.0 の脆弱性（CVE-2026-80212 / 80213）。**Gemfile で `resolv ~> 0.7.2` を宣言する（PR #4773・main 向け）。
+2026-09-26 20:12 時点で CI 緑・Codex 指摘なし・harness 両系 0 failures / 0 errors（Mastodon 1519 / Misskey 1522）・
+ステージング 4 台は `hotfix/resolv-0.7.2`（`9a7cc0e3`）で version 5.38.1 / health 200 / `Resolv::VERSION` 0.7.2。
+
+- ⚠ **本番デプロイはユーザーの呼び出し待ち**（その日の 20:30〜の実況の後に呼ぶ、とのこと）。呼ばれたら:
+  PR #4773 のマージ → `gh release create v5.38.1` → 本番 4 台（5.38.0 と同じ手順・`bundle install` 必須）→ main を develop へ取り込む
+- 攻撃者が決めたホスト名が届く経路（投稿の URL の画像取得・`is_cat`）はどちらもログイン済みアカウントが要る
+- **Mastodon 本体のほうが露出が大きい**（連合の名前解決・登録時の MX 検査が認証なし）→ pooza/mastodon#976 に起票済み（対応は Mastodon 側）
+- 0.8.0（2026-09-17 公開）は Ruby 4.0.7 にも入っていないので 0.7.x に留めた。dependabot も minor を無視
+- ⚠ **Ruby 4.0.7 は同梱 `resolv` が 0.7.2**（リリースノートには載っていない）。`.ruby-version` を上げるのは 5.39.0 で。
+  ginseng-style から Ruby の版を配る案はユーザーが別件として持っている
+- PR #4768（develop 向け）もマージ待ち（CI 緑・Codex 3 回目は指摘なし）
+
 ## 開発中: 5.39.0
 
 [マイルストーン 5.39.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/637)。version は `0a40287b` で 5.39.0 へ上げた。
