@@ -129,8 +129,10 @@ module Mulukhiya
       deadline = handler_deadline(handler.timeout)
       thread = Thread.new do
         Thread.current[HandlerProfile::HTTP_KEY] = counter
-        # ⚠ **外側の `join` より手前で切れる締切を配る (#4696)。**時刻で配るので、
-        # ハンドラの中で何段ネストしても「残り」は一意に決まる。
+        # ⚠ **外側の `join` より手前で切れる締切を配る (#4696)。**
+        # ⚠⚠ **ネストした dispatch には引き継がれない**（ワーカースレッドへは渡しておらず、
+        # 内側の `run_handler` も親の締切と比べない）。webhook_image → pre_upload の経路では
+        # 内側が自分の締切を配り直す＝ #4721 の 2。
         Thread.current[HANDLER_DEADLINE_KEY] = deadline
         handler.send(method, payload, params)
       end

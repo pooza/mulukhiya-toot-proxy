@@ -32,7 +32,9 @@ module Mulukhiya
     def create(attributes)
       synchronize do
         templates = all
-        raise Ginseng::ConflictError, "テンプレートは最大 #{MAX_COUNT} 件までです。" if templates.size >= MAX_COUNT
+        if templates.size >= MAX_COUNT
+          raise ConflictError.new("テンプレートは最大 #{MAX_COUNT} 件までです。", code: :template_limit)
+        end
         template = normalize(attributes).merge('id' => SecureRandom.uuid)
         persist(templates + [template])
         saved = find(template['id'])

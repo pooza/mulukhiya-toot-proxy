@@ -65,6 +65,27 @@ module Mulukhiya
       config['/handler/video_format_convert/timeout'] = HANDLER_TIMEOUT
     end
 
+    # 🔴 **`/ffmpeg/timeout` に 0 以下を書いても「制限なし」にならない。**
+    # ⚠ schema でも弾くが、`strict` が既定で偽なので起動は止まらない。
+    # 設定 1 行で #4696 の穴が開き直すので、コードの側でも既定へ倒す。
+    def test_non_positive_limit_falls_back_to_the_default
+      Thread.current[Event::HANDLER_DEADLINE_KEY] = nil
+      [0, -1].each do |value|
+        config['/ffmpeg/timeout'] = value
+
+        assert_equal(VideoFile::DEFAULT_FFMPEG_TIMEOUT, timeout, "#{value} で制限が外れる")
+      end
+    ensure
+      config['/ffmpeg/timeout'] = VideoFile::DEFAULT_FFMPEG_TIMEOUT
+    end
+
+    # ⚠ schema でも 0 以下は誤りとして出る（`rake config:lint` で気づける）。
+    def test_schema_rejects_a_non_positive_limit
+      errors = JSON::Validator.fully_validate(config.schema, {'ffmpeg' => {'timeout' => 0}})
+
+      assert(errors.any? {|e| e.include?('#/ffmpeg/timeout')}, '0 を schema が通している')
+    end
+
     # 🔴 `Event#run_handler` が実際に締切をスレッドへ配ること。
     # ⚠ 配線が外れても VideoFile 側のテストだけでは緑のままになる（#4583 と同型）。
     def test_run_handler_publishes_the_deadline

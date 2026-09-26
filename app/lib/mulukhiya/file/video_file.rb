@@ -1,7 +1,7 @@
 module Mulukhiya
   class VideoFile < MediaFile
-    # ハンドラの外（rake・CLI・テスト）で ffmpeg を回すときの上限 (秒)。
-    # ⚠ ハンドラの中では `Event::HANDLER_DEADLINE_KEY` の残りのほうが短くなる。
+    # ffmpeg 1 回あたりの上限 (秒)。`/ffmpeg/timeout` が読めないときの既定。
+    # ⚠ ハンドラの中では `Event::HANDLER_DEADLINE_KEY` の残りと**短いほう**が効く。
     DEFAULT_FFMPEG_TIMEOUT = 90
 
     # 内側へ渡す下限 (秒)。⚠ **0 以下を渡さない** — `Timeout.timeout(0)` は
@@ -104,8 +104,8 @@ module Mulukhiya
     # ffmpeg にシグナルを送らないので、変換途中の `tmp/media/*.mp4` が残る。
     #
     # **ハンドラの締切から残りを逆算する**ので、内側が必ず先に切れ、かつ使える時間は
-    # 縮まない。⚠ ハンドラの外（rake・テスト・CLI）では締切が無いので、
-    # `/ffmpeg/timeout` の上限だけが効く。
+    # 縮まない。⚠ ハンドラの中でも `/ffmpeg/timeout` の上限は効く（短いほうを取る）。
+    # ハンドラの外（rake・テスト・CLI）では締切が無いので、上限だけが効く。
     def ffmpeg_timeout
       return [handler_deadline_remaining, ffmpeg_timeout_limit].compact.min
     end
@@ -121,8 +121,13 @@ module Mulukhiya
       return [remaining, MIN_FFMPEG_TIMEOUT].max
     end
 
+    # ⚠⚠ **0 以下は既定へ倒す。**schema でも弾くが、`strict` が既定で偽なので
+    # 起動は止まらない。`Timeout.timeout(0)` は「制限なし」なので、ここで塞がないと
+    # 設定 1 行で #4696 の穴が開き直す。
     def ffmpeg_timeout_limit
-      return Config.instance['/ffmpeg/timeout']
+      value = Config.instance['/ffmpeg/timeout']
+      return value if value.is_a?(Numeric) && value.positive?
+      return DEFAULT_FFMPEG_TIMEOUT
     rescue Ginseng::ConfigError
       # 既定値は config/application.yaml にある。設定ファイルが古い環境でも
       # 「制限なし」へ退行させないための定数フォールバック。

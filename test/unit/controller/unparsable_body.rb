@@ -8,9 +8,9 @@ module Mulukhiya
   # 送られた body が落ちた**ときも同じ穴に落ち、クライアントからは「投稿したのに
   # 内容が空」に見えてログに 1 行も残らない。
   #
-  # 🔴 **json 3.0 へ上げる前の前提**（#4699）。3.0 は `allow_duplicate_key` の既定が
-  # false になるので、**いままで「後勝ち」で通っていた重複キーの body が丸ごと
-  # ここへ落ちる**。無音のままだと版を上げた影響を切り分けられない。
+  # ⚠ **ここの `JSON.parse` は json gem ではなく Yajl**（ginseng-core が引く
+  # `yajl/json_gem` が差し替えている・#4699）。json の版を上げても、この経路の
+  # 解釈は変わらない。
   class UnparsableBodyTest < TestCase
     include Rack::Test::Methods
 
@@ -55,15 +55,13 @@ module Mulukhiya
       assert_equal('request body is not parsable as JSON', errors.first[:error])
     end
 
-    # 🔴 **json 3.0 で新たにここへ落ちる形**を、いまのうちに押さえておく。
-    # ⚠ json 2.x では通る（後勝ち）ので、この入力は 3.0 で初めて log に出る。
-    def test_duplicate_key_body_reaches_the_same_path
+    # ⚠ **重複キーの body は Yajl では後勝ちで通る**ので、ここへは落ちない。
+    # ⚠⚠ **パーサが json gem（3.0 以降）に戻ると落ちるようになる**＝このテストが
+    # 赤くなったら、`JSON.parse` の差し替えが外れたということ（#4699 の前提が変わる）。
+    def test_duplicate_key_body_is_parsed_by_yajl
       post_body('{"a": 1, "a": 2}')
 
-      # 2.x は通るので 0 件、3.0 は落ちるので 1 件。⚠ **どちらでも「無音ではない」**
-      # ことだけを固定する（版で分岐させない）。
-      assert_operator(errors.length, :<=, 1)
-      errors.each {|e| assert_equal('request body is not parsable as JSON', e[:error])}
+      assert_empty(errors, '重複キーの body が解釈できていない（パーサが変わった？）')
     end
 
     # ⚠ フォーム POST は正常な経路なので出さない。毎回出すと syslog が埋まる。
@@ -87,12 +85,10 @@ module Mulukhiya
     #   unexpected character: '秘密の本文}' at line 1 column 12
     #   expected ',' or '}' after object value, got: '秘密のトークンabc123}'
     #
-    # ⚠ **いまのアプリ内では反響しない。**`ginseng-core` が引く yajl-ruby の
-    # `yajl/json_gem` が `JSON.parse` を差し替えており、Yajl は
-    # `lexical error: invalid char in json text.` としか言わない。
-    # ⚠⚠ **だからこのテストは「いま」は素通りする。**それでも残すのは、
-    # **パーサが差し替わった瞬間に本文が漏れ出す**形だから
-    # （下の `test_log_carries_no_exception_message` が本命の歯止め）。
+    # ⚠⚠ **アプリ内の Yajl も反響する**（メッセージの 2 行目に入力がそのまま入る）。
+    # ⚠⚠ しかも **ASCII-8BIT** なので、`errors.to_s` では日本語が `\xE7\xA7...` に
+    # エスケープされ、**日本語の正規表現では漏れていても一致しない**（旧版のこのテストは
+    # それで false negative だった）。**ASCII 部分で見るのと、UTF-8 に戻して見るのを両方やる。**
     #
     # ⚠ `,,` のような入力だと反響部分が記号だけになるので、実際に本文が
     # 反響しうる入力で見ること。
@@ -100,9 +96,11 @@ module Mulukhiya
       ['{"status": 秘密の本文}', '{"a": "x" 秘密のトークンabc123}'].each do |body|
         @logged.clear
         post_body(body)
+        values = errors.flat_map {|e| e.values.map {|v| v.to_s.dup.force_encoding(Encoding::UTF_8)}}
 
         assert_equal(1, errors.length)
-        assert_not_match(/秘密の(本文|トークン)/, errors.to_s, '本文が反響している')
+        assert_not_match(/abc123/, errors.to_s, '本文（ASCII 部分）が反響している')
+        assert(values.none? {|v| v.scrub.match?(/秘密の(本文|トークン)/)}, '本文が反響している')
         assert_operator(errors.first[:bytesize], :>, 0)
       end
     end

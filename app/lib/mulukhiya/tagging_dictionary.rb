@@ -12,6 +12,7 @@ module Mulukhiya
     include SNSMethods
     include TaggingDictionaryLogMethods
     include TaggingDictionarySourceCacheMethods
+    include TaggingDictionaryMatchMethods
 
     REDIS_KEY = 'tagging_dictionary'.freeze
     # ソース単位の last-good キャッシュの接頭辞 (#4659 の ②)。
@@ -37,21 +38,6 @@ module Mulukhiya
       @cache = nil
       @generated_at = nil
       super
-    end
-
-    def matches(source)
-      text = source.dup
-      tags = Concurrent::Array.new
-      chunks.reverse_each do |chunk|
-        Parallel.each(chunk, in_threads: Parallel.processor_count * 2) do |entry|
-          next unless text.match?(entry[:pattern])
-          tags.concat(entry[:words])
-          text = text.gsub(entry[:pattern], '')
-        rescue => e
-          e.log(entry:)
-        end
-      end
-      return TagContainer.new(tags.uniq)
     end
 
     def concat(values)
@@ -108,12 +94,6 @@ module Mulukhiya
     rescue => e
       e.alert
       return self
-    end
-
-    def short?(word)
-      pattern = Regexp.new("^#{@handler.without_kanji_pattern}{,#{@handler.minimum_length - 1}}$")
-      return true if word.match?(pattern)
-      return word.length < @handler.minimum_length_kanji
     end
 
     def strict_key?(word)
@@ -285,18 +265,6 @@ module Mulukhiya
         end
       end
       return result.sort_by {|k, _| k.length}.to_h
-    end
-
-    def chunks
-      chunks = Concurrent::Hash.new
-      Parallel.each(keys, in_threads: Parallel.processor_count * 2) do |k|
-        next if short?(k)
-        chunks[k.length] ||= Concurrent::Array.new
-        chunks[k.length].push(self[k])
-      rescue => e
-        e.log(k:)
-      end
-      return chunks.to_h.values
     end
   end
 end

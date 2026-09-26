@@ -8,6 +8,9 @@ module Mulukhiya
     def setup
       return if disable?
       @program = Program.instance
+      # 編集系は ProgramEditor へ出した (#4570)。⚠ `Program#save` は残っている
+      # （エディタへ委譲する）ので、全体の差し替えは従来どおり @program を使う。
+      @editor = @program.editor
       # 既存テストは auto_update 無効を前提に書き込み系メソッドを呼ぶため、
       # デフォルト (auto_update=true) を一時的に false に倒す。auto_update=true
       # 配下の挙動を検証するテストは with_auto_update(true) で局所的に切り替える。
@@ -104,7 +107,7 @@ module Mulukhiya
       key = "test_add_#{Time.now.to_i}"
       original = @program.data
       @program.save({})
-      entry = @program.add_entry(key, 'series' => 'TestSeries', 'episode' => 1)
+      entry = @editor.add_entry(key, 'series' => 'TestSeries', 'episode' => 1)
 
       assert_equal('TestSeries', entry['series'])
       assert_equal(1, entry['episode'])
@@ -118,10 +121,11 @@ module Mulukhiya
       original = @program.data
       @program.save(key => {'series' => 'A'})
 
-      error = assert_raise(Ginseng::ConflictError) do
-        @program.add_entry(key, 'series' => 'B')
+      error = assert_raise(ConflictError) do
+        @editor.add_entry(key, 'series' => 'B')
       end
       assert_equal(409, error.status)
+      assert_equal(:duplicate_key, error.code)
     ensure
       @program.save(original) if original
     end
@@ -130,7 +134,7 @@ module Mulukhiya
       key = "test_update_#{Time.now.to_i}"
       original = @program.data
       @program.save(key => {'series' => 'A', 'episode' => 1})
-      entry = @program.update_entry(key, 'episode' => 5)
+      entry = @editor.update_entry(key, 'episode' => 5)
 
       assert_equal('A', entry['series'])
       assert_equal(5, entry['episode'])
@@ -147,7 +151,7 @@ module Mulukhiya
       key = "test_nexton_#{Time.now.to_i}"
       original = @program.data
       @program.save(key => {'series' => 'A', 'episode' => 1, 'next_on' => '2026-08-08'})
-      entry = @program.increment_episode(key)
+      entry = @editor.increment_episode(key)
 
       assert_equal(2, entry['episode'])
       assert_equal('2026-08-08', entry['next_on'])
@@ -160,7 +164,7 @@ module Mulukhiya
       key = "test_advance_#{Time.now.to_i}"
       original = @program.data
       @program.save(key => {'series' => 'A', 'episode' => 1, 'next_on' => '2026-08-08'})
-      entry = @program.advance_next_on(key)
+      entry = @editor.advance_next_on(key)
 
       assert_equal('2026-08-09', entry['next_on'])
       assert_equal(1, entry['episode'])
@@ -173,7 +177,7 @@ module Mulukhiya
       key = "test_advance_days_#{Time.now.to_i}"
       original = @program.data
       @program.save(key => {'series' => 'A', 'next_on' => '2026-08-30'})
-      entry = @program.advance_next_on(key, days: 7)
+      entry = @editor.advance_next_on(key, days: 7)
 
       assert_equal('2026-09-06', entry['next_on'])
     ensure
@@ -187,8 +191,8 @@ module Mulukhiya
       original = @program.data
       @program.save(key => {'series' => 'A', 'next_on' => '2026-08-08'})
 
-      ['abc', 0, -1, Program::NEXT_ON_ADVANCE_MAX_DAYS + 1, '1.5'].each do |days|
-        assert_raise(Ginseng::ValidateError) {@program.advance_next_on(key, days:)}
+      ['abc', 0, -1, ProgramEditor::NEXT_ON_ADVANCE_MAX_DAYS + 1, '1.5'].each do |days|
+        assert_raise(Ginseng::ValidateError) {@editor.advance_next_on(key, days:)}
       end
 
       assert_equal('2026-08-08', @program.data[key]['next_on'])
@@ -202,7 +206,7 @@ module Mulukhiya
       key = "test_nonexton_#{Time.now.to_i}"
       original = @program.data
       @program.save(key => {'series' => 'A', 'episode' => 1})
-      entry = @program.advance_next_on(key)
+      entry = @editor.advance_next_on(key)
 
       # ⚠ キーの有無では見ない。`coerce_scalars` が読み込み時に next_on を必ず
       # materialize する（未設定なら nil で生える）ので、キーは常に存在する。
@@ -218,7 +222,7 @@ module Mulukhiya
       key = "test_badnexton_#{Time.now.to_i}"
       original = @program.data
       @program.save(key => {'series' => 'A', 'episode' => 1, 'next_on' => 'not a date'})
-      entry = @program.advance_next_on(key)
+      entry = @editor.advance_next_on(key)
 
       assert_equal('not a date', entry['next_on'])
     ensure
@@ -226,7 +230,7 @@ module Mulukhiya
     end
 
     def test_advance_next_on_raises_when_missing
-      assert_raise(Ginseng::NotFoundError) {@program.advance_next_on('does_not_exist')}
+      assert_raise(Ginseng::NotFoundError) {@editor.advance_next_on('does_not_exist')}
     end
 
     # ⚠ YAML を手書きしてクォートを忘れた場合の受け。permitted_classes に Date を
@@ -283,11 +287,11 @@ module Mulukhiya
       key = "test_enable_#{Time.now.to_i}"
       original = @program.data
       @program.save(key => {'series' => 'A', 'enable' => true})
-      entry = @program.update_entry(key, 'enable' => false)
+      entry = @editor.update_entry(key, 'enable' => false)
 
       assert_includes(entry.keys, 'enable')
       assert_false(entry['enable'])
-      assert_true(@program.update_entry(key, 'enable' => true)['enable'])
+      assert_true(@editor.update_entry(key, 'enable' => true)['enable'])
     ensure
       @program.save(original) if original
     end
@@ -296,7 +300,7 @@ module Mulukhiya
       original = @program.data
 
       assert_raise(Ginseng::NotFoundError) do
-        @program.update_entry('does_not_exist', 'series' => 'X')
+        @editor.update_entry('does_not_exist', 'series' => 'X')
       end
     ensure
       @program.save(original) if original
@@ -306,7 +310,7 @@ module Mulukhiya
       key = "test_clear_#{Time.now.to_i}"
       original = @program.data
       @program.save(key => {'series' => 'A', 'subtitle' => 'old', 'episode' => 3})
-      entry = @program.update_entry(key, 'subtitle' => nil)
+      entry = @editor.update_entry(key, 'subtitle' => nil)
 
       assert_not_includes(entry.keys, 'subtitle')
       assert_equal('A', entry['series'])
@@ -319,7 +323,7 @@ module Mulukhiya
       key = "test_addnil_#{Time.now.to_i}"
       original = @program.data
       @program.save({})
-      entry = @program.add_entry(key, 'series' => 'A', 'subtitle' => nil, 'episode' => 1)
+      entry = @editor.add_entry(key, 'series' => 'A', 'subtitle' => nil, 'episode' => 1)
 
       assert_equal('A', entry['series'])
       assert_equal(1, entry['episode'])
@@ -332,7 +336,7 @@ module Mulukhiya
       key = "test_addblank_#{Time.now.to_i}"
       original = @program.data
       @program.save({})
-      entry = @program.add_entry(key, 'series' => 'A', 'start_time' => '', 'episode' => 1)
+      entry = @editor.add_entry(key, 'series' => 'A', 'start_time' => '', 'episode' => 1)
 
       assert_equal('A', entry['series'])
       assert_equal(1, entry['episode'])
@@ -345,7 +349,7 @@ module Mulukhiya
       key = "test_updateblank_#{Time.now.to_i}"
       original = @program.data
       @program.save(key => {'series' => 'A', 'start_time' => '21:00', 'episode' => 3})
-      entry = @program.update_entry(key, 'start_time' => '')
+      entry = @editor.update_entry(key, 'start_time' => '')
 
       assert_not_includes(entry.keys, 'start_time')
       assert_equal('A', entry['series'])
@@ -358,7 +362,7 @@ module Mulukhiya
       key = "test_addzeropad_#{Time.now.to_i}"
       original = @program.data
       @program.save({})
-      entry = @program.add_entry(key, 'series' => 'A', 'start_time' => '9:00')
+      entry = @editor.add_entry(key, 'series' => 'A', 'start_time' => '9:00')
 
       assert_equal('09:00', entry['start_time'])
     ensure
@@ -369,7 +373,7 @@ module Mulukhiya
       key = "test_addpadded_#{Time.now.to_i}"
       original = @program.data
       @program.save({})
-      entry = @program.add_entry(key, 'series' => 'A', 'start_time' => '21:00')
+      entry = @editor.add_entry(key, 'series' => 'A', 'start_time' => '21:00')
 
       assert_equal('21:00', entry['start_time'])
     ensure
@@ -380,7 +384,7 @@ module Mulukhiya
       key = "test_updatezeropad_#{Time.now.to_i}"
       original = @program.data
       @program.save(key => {'series' => 'A'})
-      entry = @program.update_entry(key, 'start_time' => '9:30')
+      entry = @editor.update_entry(key, 'start_time' => '9:30')
 
       assert_equal('09:30', entry['start_time'])
     ensure
@@ -391,7 +395,7 @@ module Mulukhiya
       key = "test_delete_#{Time.now.to_i}"
       original = @program.data
       @program.save(key => {'series' => 'A'})
-      removed = @program.delete_entry(key)
+      removed = @editor.delete_entry(key)
 
       assert_equal('A', removed['series'])
       assert_not_includes(@program.data.keys, key)
@@ -402,7 +406,7 @@ module Mulukhiya
     def test_delete_entry_returns_nil_when_missing
       original = @program.data
 
-      assert_nil(@program.delete_entry('does_not_exist'))
+      assert_nil(@editor.delete_entry('does_not_exist'))
     ensure
       @program.save(original) if original
     end
@@ -411,7 +415,7 @@ module Mulukhiya
       key = "test_inc_#{Time.now.to_i}"
       original = @program.data
       @program.save(key => {'series' => 'A', 'episode' => 3, 'annict_episode_id' => 100})
-      entry = @program.increment_episode(key)
+      entry = @editor.increment_episode(key)
 
       assert_equal(4, entry['episode'])
       assert_nil(entry['annict_episode_id'])
@@ -423,7 +427,7 @@ module Mulukhiya
       key = "test_inc0_#{Time.now.to_i}"
       original = @program.data
       @program.save(key => {'series' => 'A'})
-      entry = @program.increment_episode(key)
+      entry = @editor.increment_episode(key)
 
       assert_equal(1, entry['episode'])
     ensure
@@ -431,16 +435,16 @@ module Mulukhiya
     end
 
     def test_generate_key_returns_12_chars_hex
-      key = @program.generate_key('series' => 'TestSeries')
+      key = @editor.generate_key('series' => 'TestSeries')
 
       assert_match(/\A[0-9a-f]{12}\z/, key)
     end
 
     def test_generate_key_avoids_collision
       original = @program.data
-      existing = @program.generate_key('series' => 'X')
+      existing = @editor.generate_key('series' => 'X')
       @program.save(existing => {'series' => 'X'})
-      generated = @program.generate_key('series' => 'X')
+      generated = @editor.generate_key('series' => 'X')
 
       assert_not_equal(existing, generated)
     ensure
@@ -455,47 +459,52 @@ module Mulukhiya
 
     def test_add_entry_rejected_when_auto_update_enabled
       with_auto_update(true) do
-        error = assert_raise(Ginseng::ConflictError) do
-          @program.add_entry('any_key', 'series' => 'A')
+        error = assert_raise(ConflictError) do
+          @editor.add_entry('any_key', 'series' => 'A')
         end
         assert_equal(409, error.status)
+        assert_equal(:auto_update, error.code)
       end
     end
 
     def test_update_entry_rejected_when_auto_update_enabled
       with_auto_update(true) do
-        error = assert_raise(Ginseng::ConflictError) do
-          @program.update_entry('any_key', 'episode' => 1)
+        error = assert_raise(ConflictError) do
+          @editor.update_entry('any_key', 'episode' => 1)
         end
         assert_equal(409, error.status)
+        assert_equal(:auto_update, error.code)
       end
     end
 
     def test_delete_entry_rejected_when_auto_update_enabled
       with_auto_update(true) do
-        error = assert_raise(Ginseng::ConflictError) do
-          @program.delete_entry('any_key')
+        error = assert_raise(ConflictError) do
+          @editor.delete_entry('any_key')
         end
         assert_equal(409, error.status)
+        assert_equal(:auto_update, error.code)
       end
     end
 
     def test_advance_next_on_rejected_when_auto_update_enabled
       with_auto_update(true) do
-        error = assert_raise(Ginseng::ConflictError) do
-          @program.advance_next_on('any_key')
+        error = assert_raise(ConflictError) do
+          @editor.advance_next_on('any_key')
         end
 
         assert_equal(409, error.status)
+        assert_equal(:auto_update, error.code)
       end
     end
 
     def test_increment_episode_rejected_when_auto_update_enabled
       with_auto_update(true) do
-        error = assert_raise(Ginseng::ConflictError) do
-          @program.increment_episode('any_key')
+        error = assert_raise(ConflictError) do
+          @editor.increment_episode('any_key')
         end
         assert_equal(409, error.status)
+        assert_equal(:auto_update, error.code)
       end
     end
 

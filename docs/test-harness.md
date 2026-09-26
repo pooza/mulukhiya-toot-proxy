@@ -69,6 +69,9 @@ bundle exec rake test
 
 # 2b. もしくはハーネスのルートを渡して実行（source 不要）
 MULUKHIYA_HARNESS_DIR=~/repos/chubo2/fedi-test-harness bundle exec rake test
+
+# 3. 後片付け（省略しない。下記「後片付け」）
+~/repos/chubo2/fedi-test-harness/mastodon/scripts/stop.sh
 ```
 
 ## 手順（Misskey）
@@ -91,6 +94,7 @@ cd ~/repos/chubo2/fedi-test-harness/misskey && ./scripts/setup.sh
 cd ~/repos/mulukhiya-toot-proxy
 set -a; source ~/repos/chubo2/fedi-test-harness/misskey/.env.test; set +a
 bundle exec rake test
+~/repos/chubo2/fedi-test-harness/misskey/scripts/stop.sh   # 後片付け（省略しない）
 ```
 
 ## リリースゲートとしての実走（省略不可）
@@ -209,11 +213,34 @@ harness のアカウントは webhook トークンを持たないので、`Webho
 ⚠ **入れてから取る**（`Webhook#initialize` がそのとき `@sns.token` を固定するため）。
 ⚠ teardown で必ず戻す（他のテストが同じアカウントを見る）。
 
-## 後片付け
+## 後片付け（省略しない）
+
+**実走が終わったら、起動した系ごとに必ず `stop.sh` を回す。**開発機のメモリが厳しく、
+ハーネスは常駐させない（pooza/chubo2 の fedi-test-harness README）。
 
 ```sh
-cd ~/repos/chubo2/fedi-test-harness/mastodon && ./scripts/teardown.sh
+~/repos/chubo2/fedi-test-harness/mastodon/scripts/stop.sh
+~/repos/chubo2/fedi-test-harness/misskey/scripts/stop.sh
 ```
+
+- `stop.sh` はコンテナを止めるだけで、ボリュームと `.env.test` は残す。次回は `setup.sh` で
+  同じトークンのまま再開できる
+- `teardown.sh` は `.env` / `.env.test` まで消す完全削除。作り直すときだけ使う
+
+### モロヘイヤ自身の Redis もハーネスが上げ下げする
+
+モロヘイヤのテストは Mastodon / Misskey 側とは別に、**自分用の Redis を `127.0.0.1:6379`
+に要求する**（`config/application.yaml` の `redis.dsn`）。以前は開発機に常駐する
+redis-server に頼っていたが、**常駐させない方針になり、ハーネスが持つ**ようにした
+（chubo2 `fedi-test-harness/mulukhiya-redis/`）。
+
+- 各系の `setup.sh` が起動し、`stop.sh` / `teardown.sh` が止める
+  （もう一方の系が動いている間は残す）
+- ⚠ **開発機で redis-server を手で上げない。**6379 をハーネス外の Redis が使っていると
+  `setup.sh` はそこで止まる
+- ⚠ 2026-09-24 には、落ちていた開発機の redis-server のせいで Misskey の実走が
+  **6 failures / 155 errors**（大半が `127.0.0.1:6379` への Connection refused）になった。
+  **製品の退行と読み違えない**
 
 ## 関連
 

@@ -7,6 +7,8 @@ module Mulukhiya
   # 実装し、サブクラスは prefix / config_key / id_label を与えるだけ
   # (#4330 / #4342 / #4345 / #4346)。
   class AnnictIdempotencyLockStorage < Redis
+    include LockDegradationMethods
+
     # release で誤って他人のロックを削除しないため compare-and-delete する。
     # TTL 切れで A の自然解放後に B が同一 key で acquire したケースで、A の遅延
     # rescue が呼ぶ release が B の新ロックを消さないようにする (#4345)。
@@ -28,7 +30,9 @@ module Mulukhiya
       return token if redis.call('SET', key, token, 'NX', 'EX', ttl) == 'OK'
       return nil
     rescue => e
-      e.log(account_id:, id_label => target_id)
+      # ⚠ **冪等性を諦めたことを Sentry まで残す (#4762)。**`e.log` 止まりだと、
+      # Annict の二重記録を防ぐガードが黙って外れていても気づけない。
+      note_fail_open(e, {account_id:, id_label => target_id})
       # Redis 障害時は冪等性を諦め、本来の投稿を阻害しない (fail-open)。戻り値の
       # token を持ったまま release が呼ばれても、Redis 側にエントリはないため
       # compare-and-delete は no-op で害がない。
@@ -43,7 +47,7 @@ module Mulukhiya
       key = create_key(lock_key(account_id, target_id))
       redis.call('EVAL', RELEASE_SCRIPT, 1, key, token)
     rescue => e
-      e.log(account_id:, id_label => target_id)
+      note_release_failure(e, {account_id:, id_label => target_id})
     end
 
     # 直近 1 分間の冪等性ロック衝突回数をアカウント単位で計上し、しきい値

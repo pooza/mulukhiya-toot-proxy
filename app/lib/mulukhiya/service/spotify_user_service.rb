@@ -25,21 +25,41 @@ module Mulukhiya
     TOKEN_PATH = '/api/token'.freeze
     CURRENTLY_PLAYING_PATH = '/v1/me/player/currently-playing'.freeze
 
+    # ⚠⚠ **発生源が判定できない OAuth error (#4577 の 4)。**
+    #
+    # RFC 6749 の `invalid_request` は「必須パラメータ欠落・値が不正・その他
+    # malformed」**全般**で、**発生源が運用側とは限らない**。Basic ヘッダの
+    # 組み立てミス（#4537 が入れた理由）もここだが、🔴 **保存済み
+    # `refresh_token` が壊れている**（復号結果が空白のみ・途中で切れている等）
+    # ケースも同じ `invalid_request` に落ちうる。
+    #
+    # 後者だと、**再連携すれば直るのに** 502 + Sentry alert になって
+    # `AuthError` へ倒れないので、🔴 **capsicum の再連携導線が出ない**。
+    # 当人のナウプレは黙って死んだまま（本人には「サーバーエラー」としか
+    # 見えない）で、運用者には**自分では直しようのない alert** が届く。
+    # ⚠ **誤誘導を嫌って入れた #4537 が、逆方向の誤誘導を作っている。**
+    #
+    # ⚠ **それでも倒す先は運用側不備のまま据え置く。**`error_description` の
+    # 文面は Spotify の契約ではないので、文字列一致で振り分けると
+    # **#4537 で塞いだ側の誤誘導**（何度再連携しても直らない）が戻る。
+    # 代わりに **判定不能であることと `error_description` を残し**、
+    # 実データが貯まってから倒す先を決める。受け皿は #4743。
+    UNDECIDABLE_OAUTH_ERRORS = ['invalid_request'].freeze
+
     # token endpoint が返す OAuth 2.0 の error のうち、**こちら側の設定ミス**を
     # 指すもの。ユーザーが再連携しても直らないので「要再認証」に倒さない (#4480)。
-    # ⚠ `invalid_request` を落とさない (#4537)。Basic ヘッダの組み立てミス等の
-    # **運用側の不備**もこれで返るので、抜けていると「再連携してください」と
-    # ユーザーに誤誘導したうえ、何度やっても直らない。
-    OPERATOR_FAULT_OAUTH_ERRORS = [
+    # ⚠ `UNDECIDABLE_OAUTH_ERRORS` を含めてあるのは**判定できないから**であって、
+    # 運用側不備だと分かっているからではない。上の注記を読むこと。
+    OPERATOR_FAULT_OAUTH_ERRORS = ([
       'invalid_client',
-      'invalid_request',
       'unauthorized_client',
       'unsupported_grant_type',
       'invalid_scope',
-    ].freeze
+    ] + UNDECIDABLE_OAUTH_ERRORS).freeze
 
-    # account は currently_playing / auth / unlink で必要 (refresh したトークンを
-    # UserConfig へ書き戻すため)。oauth_uri のみ account なしでも使える。
+    # account は全メソッドで必要。currently_playing / auth / unlink は refresh した
+    # トークンを UserConfig へ書き戻すため、⚠ `oauth_uri` も 5.37.0 (#4414) から
+    # 発行する `state` をアカウントに縛るので、account が無いと `AuthError` になる。
     def initialize(account = nil)
       @account = account
     end
@@ -56,38 +76,6 @@ module Mulukhiya
         state: create_state,
       }
       return uri
-    end
-
-    # ⚠⚠ **発行したアカウントに縛る（PR #4714 の Codex P1）。**縛らないと、
-    # 🔴 **攻撃者が自分の Spotify を認可して得た code/state の組を、ログイン中の
-    # 被害者の callback へ流し込める**。`POST /spotify/auth` は「どこかで発行された
-    # 有効な state」を受け入れてしまい、**攻撃者のトークンが被害者の `UserConfig` に
-    # 入る**（セッション固定と同型）。
-    def create_state
-      raise Ginseng::AuthError, 'Unauthorized' unless account_id
-      state = OAuthHelper.generate_state
-      OAuthHelper.storage.set(state, {service: SERVICE_NAME, account_id:})
-      return state
-    end
-
-    def account_id
-      return @account&.id
-    end
-
-    # ⚠ **一度きり。**`consume` が読み出しと同時に消すので、同じ `state` での再送は
-    # 通らない（リプレイ防止）。⚠ TTL は `OAuthStateStorage::TTL`（600 秒）。
-    #
-    # ⚠⚠ **`service` の印を見る。**`OAuthStateStorage` は Mastodon / Misskey の PKCE
-    # フローと**同じストア**なので、見ないと**他系統で発行した state を Spotify の
-    # 認可に使い回せる**。
-    def verify_state!(state)
-      raise Ginseng::AuthError, 'Invalid OAuth state' if state.blank?
-      entry = OAuthHelper.consume_oauth_state(state)
-      raise Ginseng::AuthError, 'Invalid OAuth state' unless entry
-      raise Ginseng::AuthError, 'Invalid OAuth state' unless entry[:service] == SERVICE_NAME
-      # ⚠⚠ **発行したアカウント以外では使えない（PR #4714 の Codex P1）。**
-      return if entry[:account_id].present? && entry[:account_id] == account_id
-      raise Ginseng::AuthError, 'Invalid OAuth state'
     end
 
     # authorization code を access_token + refresh_token に交換し保管する。
@@ -158,6 +146,38 @@ module Mulukhiya
 
     private
 
+    # ⚠⚠ **発行したアカウントに縛る（PR #4714 の Codex P1）。**縛らないと、
+    # 🔴 **攻撃者が自分の Spotify を認可して得た code/state の組を、ログイン中の
+    # 被害者の callback へ流し込める**。`POST /spotify/auth` は「どこかで発行された
+    # 有効な state」を受け入れてしまい、**攻撃者のトークンが被害者の `UserConfig` に
+    # 入る**（セッション固定と同型）。
+    def create_state
+      raise Ginseng::AuthError, 'Unauthorized' unless account_id
+      state = OAuthHelper.generate_state
+      OAuthHelper.storage.set(state, {service: SERVICE_NAME, account_id:})
+      return state
+    end
+
+    def account_id
+      return @account&.id
+    end
+
+    # ⚠ **一度きり。**`consume` が読み出しと同時に消すので、同じ `state` での再送は
+    # 通らない（リプレイ防止）。⚠ TTL は `OAuthStateStorage::TTL`（600 秒）。
+    #
+    # ⚠⚠ **`service` の印を見る。**`OAuthStateStorage` は Mastodon / Misskey の PKCE
+    # フローと**同じストア**なので、見ないと**他系統で発行した state を Spotify の
+    # 認可に使い回せる**。
+    def verify_state!(state)
+      raise Ginseng::AuthError, 'Invalid OAuth state' if state.blank?
+      entry = OAuthHelper.consume_oauth_state(state)
+      raise Ginseng::AuthError, 'Invalid OAuth state' unless entry
+      raise Ginseng::AuthError, 'Invalid OAuth state' unless entry[:service] == SERVICE_NAME
+      # ⚠⚠ **発行したアカウント以外では使えない（PR #4714 の Codex P1）。**
+      return if entry[:account_id].present? && entry[:account_id] == account_id
+      raise Ginseng::AuthError, 'Invalid OAuth state'
+    end
+
     def redirect_uri
       return config['/service/spotify/oauth/redirect_uri']
     end
@@ -200,8 +220,47 @@ module Mulukhiya
       # 出す (#4480)。上流の error は OAuth 2.0 の `{"error": "..."}` 形式。
       raise unless HTTPStatus.client_error?(e.source_status)
       body = e.source_body
-      raise if body.is_a?(Hash) && OPERATOR_FAULT_OAUTH_ERRORS.include?(body['error'])
+      log_undecidable_oauth_error(body) if undecidable_oauth_failure?(body)
+      raise if classify_oauth_failure(body) == :operator_fault
       raise Ginseng::AuthError, 'Spotify re-authentication required'
+    end
+
+    # token endpoint の 4xx をどちらへ倒すか。
+    #
+    # - `:operator_fault` → `GatewayError`(502) のまま上げて Sentry に出す
+    # - `:reauth` → `AuthError`(403)。capsicum が再連携フローを出す
+    #
+    # ⚠⚠ **`body` が Hash でない回（HTML のエラーページ等）は `:reauth`。**
+    # `error` が nil になり include? が外れる。ここを
+    # 「Hash でなければ運用側不備」と書くと**倒す先が 502 に変わり、
+    # 再連携導線が消える**。
+    def classify_oauth_failure(body)
+      error = body['error'] if body.is_a?(Hash)
+      return :operator_fault if OPERATOR_FAULT_OAUTH_ERRORS.include?(error)
+      return :reauth
+    end
+
+    def undecidable_oauth_failure?(body)
+      return false unless body.is_a?(Hash)
+      return UNDECIDABLE_OAUTH_ERRORS.include?(body['error'])
+    end
+
+    # 判定不能だったことを残す (#4577 の 4)。
+    #
+    # ⚠ **倒す先を決めるには実データが要る。**`invalid_request` が実際に
+    # どんな `error_description` で来ているかが分からないまま振り分けを変えると、
+    # #4537 と同じ形で逆向きの誤誘導を作る。まず観測点を置く。
+    #
+    # ⚠⚠ **本文をそのまま出さない。**token endpoint への要求・応答には
+    # `refresh_token` が乗りうるので、`error` と `error_description` だけ採る
+    # （ログへの資格情報流出（#4511） と同じ型の事故を作らない）。
+    def log_undecidable_oauth_error(body)
+      logger.error(
+        message: 'spotify token refresh: undecidable oauth error',
+        oauth_error: body['error'],
+        oauth_error_description: body['error_description'],
+        account_id:,
+      )
     end
 
     def token_request(params)

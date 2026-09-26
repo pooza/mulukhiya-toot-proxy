@@ -66,8 +66,32 @@ module Mulukhiya
     def test_blank_is_not_an_error
       config[@key] = nil
       ENV['SSL_CERT_FILE'] = ''
+      logged = capture_errors
 
       assert_nil(@listener.root_cert_file)
+      # ⚠ 戻り値の nil だけだと、`blank?` のガードを消しても
+      # （`File.exist?('')` が false で）通ってしまう。見るのは「error を出さない」こと。
+      assert_empty(logged, '空文字で error ログを出している')
+    end
+
+    # 逆に、存在しないパスは黙って落とさない（運用者が気付けるように error を出す）。
+    def test_missing_path_is_logged
+      config[@key] = '/nonexistent/cacert.pem'
+      logged = capture_errors
+
+      @listener.root_cert_file
+
+      assert_equal(1, logged.length)
+    end
+
+    private
+
+    def capture_errors
+      logged = []
+      double = Object.new
+      double.define_singleton_method(:error) {|payload| logged.push(payload)}
+      @listener.define_singleton_method(:logger) {double}
+      return logged
     end
   end
 end

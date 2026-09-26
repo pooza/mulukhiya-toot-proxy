@@ -2,8 +2,7 @@ module Mulukhiya
   # `.github/dependabot.yml` の `ignore` が `Gemfile` の上限と対になっていること (#4702)。
   #
   # ⚠⚠ **`versioning-strategy: increase-if-necessary` は、上限の外の版で manifest を動かす。**
-  # `lockfile-only` のままでは ginseng の `tag:` が上がらない（PR #4716 の Codex P1）ので
-  # 切り替えたが、そのままでは **json 3.0 / rack 3.3 / sinatra 4.3 のような、意図して
+  # そのままでは **json 3.0 / rack 3.3 / sinatra 4.3 のような、意図して
   # 据え置いている gem まで制約を広げる PR が出る**。`ignore` で止めている。
   #
   # 🔴 **`Gemfile` に上限を足したのに `ignore` を足し忘れると、据え置きの判断が黙って
@@ -12,6 +11,7 @@ module Mulukhiya
   class DependabotConfigTest < TestCase
     MAJOR = 'version-update:semver-major'.freeze
     MINOR = 'version-update:semver-minor'.freeze
+    GINSENG = 'ginseng-*'.freeze
 
     def setup
       @config = YAML.load_file(File.join(Environment.dir, '.github/dependabot.yml'))
@@ -34,20 +34,23 @@ module Mulukhiya
 
     # ⚠ 逆向き。上限を外したのに `ignore` が残っていると、版上げが黙って止まる。
     def test_no_stale_ignores
-      stale = @ignores.keys - capped_gems.keys
+      stale = @ignores.keys - capped_gems.keys - [GINSENG]
 
       assert_empty(stale, "Gemfile に上限が無いのに ignore が残っている: #{stale.join(', ')}")
     end
 
-    # ⚠⚠ **ginseng の `tag:` が上がる設定であること。**`lockfile-only` に戻ると、
-    # ginseng グループから PR が 1 本も出なくなる（PR #4716 の Codex P1）。
-    def test_strategy_permits_manifest_updates
-      assert_not_equal('lockfile-only', @develop['versioning-strategy'])
+    # ⚠⚠ **ginseng-* は version update の対象外であること**（#4702）。版上げは同期手順
+    # （docs/CLAUDE.md §6-1）で gem ごとに判断する。`update-types` を付けると一部の版上げが
+    # 素通りするので、**全種別を止める（`update-types` 無し）**形であることまで見る。
+    def test_ginseng_is_ignored_entirely
+      assert(@ignores.key?(GINSENG), 'ginseng-* を ignore していない')
+      assert_nil(@ignores[GINSENG], 'ginseng-* の ignore に update-types が付いている（一部が素通りする）')
     end
 
-    # ⚠ ginseng を止めていないこと（ここを止めると #4701 の固定が凍結に変わる）。
-    def test_ginseng_is_not_ignored
-      assert(@ignores.keys.none? {|name| name.start_with?('ginseng')}, 'ginseng を ignore している')
+    # ⚠ 止め方は `ignore` であって `allow` ではないこと。`allow` は security update にも効くので、
+    # 他の gem の脆弱性 PR まで止まる。
+    def test_no_allow
+      assert_nil(@develop['allow'])
     end
 
     private

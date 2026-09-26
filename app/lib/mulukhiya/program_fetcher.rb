@@ -81,27 +81,56 @@ module Mulukhiya
 
     def fetch_remote
       programs = {}
-      success = 0
-      uris.each do |v|
+      targets = uris
+      failed = []
+      targets.each do |v|
         # allowlist 拒否は HEAD を撃つ前に確定させる。プリフライトの rescue へ
         # 渡すと「判定不能」として GET へ倒れてしまう (#4535)。
         RemoteHost.validate!(v)
-        next unless valid_content_length?(v)
+        next failed.push(v.to_s) unless valid_content_length?(v)
         response = @http.get(v, timeout: fetch_timeout, host_validator: RemoteHost.validator)
-        next unless valid_response_size?(response, v)
+        next failed.push(v.to_s) unless valid_response_size?(response, v)
         parsed = response.parsed_response
-        next unless valid_program_schema?(parsed, v)
+        next failed.push(v.to_s) unless valid_program_schema?(parsed, v)
         programs.merge!(parsed)
-        success += 1
       rescue => e
         # 単一 URL の取得失敗 (HTTP error / parse error 等) で update 全体が落ちる
         # のを防ぐ。失敗した URL のみ skip し、他の URL の取り込みは続ける
         e.log(url: v.to_s)
+        failed.push(v.to_s)
       end
+      log_fetch_failure(targets.size, failed) if failed.present?
       # 全 URL が失敗した場合は last-known-good を保持するため nil を返し
       # 上位の update() で save をスキップする (一過性障害で YAML 全消失を防ぐ)
-      return nil if success.zero?
+      return nil if failed.size >= targets.size
       return programs
+    end
+
+    # 取れなかった URL を 1 行で残す (#4577 の 1)。
+    #
+    # ⚠⚠ **従来、全滅しても syslog に「全滅した」と読める行が 1 本も無かった。**
+    # `fetch_remote` は黙って nil を返し、`update` は save をスキップし、
+    # ProgramUpdateWorker はその後 `programs: 42` を出す。⚠ **この件数は
+    # last-known-good なので、成功した回と出力が完全に同一**になる。
+    # `/health` に番組表の鮮度は載っていないので、**実況当日に「話数が
+    # 進んでいない」と人間が気づくまで誰も知らない**。
+    #
+    # ⚠ URL 単位の行は出ていたが、**失敗の種類ごとに別の語**（例外は `e.log`、
+    # サイズ超過は `log_oversize`、スキーマ不一致は `valid_program_schema?`）で、
+    # 何本中何本が死んでいるかは行を数えないと分からなかった。
+    #
+    # ⚠⚠ **alert には上げない。**このワーカーは every 1m なので、載せると
+    # 日 1,440 件のメール・Discord になる（#4573 で同じ判断をしている）。
+    # ⚠ 5.33.0 以降は **A レコードが複数あって先頭が落ちているホスト**や、
+    # `http_proxy` がある環境の `PinningError` で**全件 fail-closed** しうるので、
+    # 踏んだときに 1 行で読めることのほうが効く。
+    def log_fetch_failure(attempted, failed)
+      logger.error(
+        message: failed.size >= attempted ? 'program fetch exhausted' : 'program fetch degraded',
+        attempted:,
+        failed: failed.size,
+        failed_urls: failed,
+      )
     end
 
     # HTTParty がレスポンス本文を丸ごとメモリへ読み込む前に、相手が申告した

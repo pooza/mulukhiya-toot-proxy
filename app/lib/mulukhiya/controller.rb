@@ -47,9 +47,9 @@ module Mulukhiya
         # ⚠ **JSON らしい body のときだけ残す。**毎リクエスト出すとフォーム POST で
         # syslog が埋まる（#4549 の型）。
         #
-        # 🔴 **json 3.0 へ上げる前の前提。**3.0 は `allow_duplicate_key` の既定が
-        # false になるので、**いままで「後勝ち」で通っていた重複キーの body が
-        # 丸ごとここへ落ちる**。無音のままだと版を上げた影響を切り分けられない。
+        # ⚠ **ここの `JSON.parse` は json gem ではなく Yajl**（ginseng-core が引く
+        # `yajl/json_gem` が差し替えている・#4699）。json 3.0 の `allow_duplicate_key`
+        # の既定変更は**この経路には届かない**（重複キーは今も後勝ち）。
         log_unparsable_body(e)
         @params = Sinatra::IndifferentHash[params]
       end
@@ -115,6 +115,7 @@ module Mulukhiya
       if e.is_a?(Ginseng::Error)
         @renderer.status = e.status
         @renderer.message = e.to_h.except(:backtrace).merge(error: e.message)
+        headers('Retry-After' => e.retry_after.to_s) if e.is_a?(ConflictError) && e.retry_after
         # ⚠ **ここは最後の受け皿で、どのルートから来たか分からない (#4654)。**
         # 判断材料はステータスしか無いので `report_error` に寄せる。従来は
         # 無条件 `e.alert` で、ルートのローカル rescue をすり抜けた 4xx——
@@ -140,8 +141,9 @@ module Mulukhiya
     #   JSON::ParserError: unexpected character: '秘密の本文}' at line 1 column 12
     #   JSON::ParserError: expected ',' or '}' after object value, got: '秘密のトークンabc123}'
     #
-    # ⚠ json 3 の重複キーエラーは**キー名そのもの**を含む。どちらも利用者由来の
-    # 値なので、`message` を出した時点で「本文は出さない」が破れる（#4394 / #4630）。
+    # ⚠⚠ **アプリ内の `JSON.parse` は Yajl** で、Yajl のメッセージも **2 行目に入力を
+    # そのまま含む**（ASCII-8BIT なので日本語の正規表現では見つからない・#4699）。
+    # どちらも利用者由来の値なので、`message` を出した時点で「本文は出さない」が破れる（#4394 / #4630）。
     # ⚠ 長さの上限も無いので、**巨大なログ 1 行**にもなりうる。
     #
     # **残すのは型と大きさだけ。**「どこで落ちたか」は class と path で足りる。
@@ -254,7 +256,7 @@ module Mulukhiya
       # ⚠⚠ **これは「クライアントが悪い」ではない (#4693)。**リクエスト間で
       # トークンが混線した＝**セキュリティ不変条件の破れ**で、2025-10 のトークン
       # 汚染事故（`Gemfile` が rack / sinatra に上限を書いている理由そのもの）の
-      # 再発検知がここに掛かっている。401 なので既定では log 止めになる。
+      # 再発検知がここに掛かっている。`AuthError` は 403 なので既定では log 止めになる。
       raise NeverSilent.mark(Ginseng::AuthError.new('Token integrity check failed'))
     end
 
@@ -283,7 +285,7 @@ module Mulukhiya
     def report_error(error)
       # ⚠⚠ **① 印が付いていればステータスに依らず必ず鳴らす (#4693)。**
       # 「403 だがこちらの設定が壊れている」型（`Ginseng::CryptError`）や
-      # 「401 だがセキュリティ不変条件の破れ」型（`token_mismatch`）が、
+      # 「403 だがセキュリティ不変条件の破れ」型（`token_mismatch`・`AuthError`）が、
       # ステータスだけの判定では丸ごと無音になっていた。
       return error.alert if never_silent?(error)
       # ② クライアント起因は従来どおり log 止め。
