@@ -4,6 +4,14 @@ module Mulukhiya
       return ->(_host) {addresses}
     end
 
+    # 🔴 **脆弱な resolv を掴んでいないこと (#4772)。**`resolve_addresses` が
+    # `Resolv::DNS` を直に呼ぶ。Ruby 4.0.6 同梱の 0.7.0 は CVE-2026-80212（未知の
+    # レコード種別で解放されないクラスが増え続ける）/ 80213 を抱えている。
+    # ⚠ Gemfile の宣言が外れても、同梱版が先に読まれても、ここで落ちる。
+    def test_resolv_is_patched
+      assert_operator(Gem::Version.new(Resolv::VERSION), :>=, Gem::Version.new('0.7.2'))
+    end
+
     # pinning する / しない 2 種の validator (#4576)。
     #
     # ⚠ **既定 (Handler#upload) は pinning しないほう。**ImageHandler#upload の
