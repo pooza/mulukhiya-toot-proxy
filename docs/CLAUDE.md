@@ -658,6 +658,12 @@ location の `if` 3 行を落とした。
   URL を守るための意図した限界として残っている
   - ⚠⚠ **こちらは v2.0.1 固定なので、2.0.x へのバックポートを依頼した（判断は向こう）。**出なければ
     v3.x の早期取り込み（#4748 を 5.38.0 へ前倒し）か v1.8.31 へ戻すかを改めて決める。**5.38.0 の出荷はこれ待ち**
+- ✅ **2026-09-26 に #290 がマージ、2.0.x へは `v2.0.2`（`release/2.0.x`・pooza/ginseng-fediverse#292）が出た。**
+  `@` 側と URL の除外だけを移した版で、**ピンを v2.0.1 → v2.0.2 へ**上げて対処した（実測: `ラブ@pooza` → `ラブ@ pooza`、
+  `_@admin` → `_@ admin`、`https://example.com/_@admin` は無変換）。2.0.1 にあった URL のフラグメント破壊
+  （`?a=#frag` → `?a=# frag`）もこの版で直っている
+  - ⚠ **ハッシュタグ側は 2.0.1 のまま**（`曲)#precure` は無変換＝Misskey ではタグになる）。タグは通知を撃たないので
+    赤 2 の範囲外とした。v3.x の #275 で広がるので、#4748（v3.x 取り込み）で片付く
 
 **黄（Issue 候補・すべて S）**
 - 次話ボタンの Annict 失敗で**同期の `e.alert`**（`program_editor.rb` の `prepare_annict_increment`・既存）。
@@ -688,7 +694,17 @@ webhook の上流 4xx が 500 に丸まる（#4764 → #4723 へ統合）／緑�
 `/ffmpeg/timeout` の黙った既定化・取得失敗ログが毎分・increment ルートのテスト）。古いコメント 2 件（`log_annict_stale` / `lock_degradation_methods.rb`）は #4767 で直した。
 ⚠ 見送り 2 件: `slim_lint_coverage.rb` の +4 は rubocop が `return` 付き継続行に求める形／`annict_applicable?` のガードは
 `test_rejects_without_episode_data` が契約として押さえているので残した。
-**残る出荷条件は赤 2（pooza/ginseng-fediverse#290 の着地と 2.0.x の扱い）だけ。**
+⚠ **赤 2 は v2.0.2 へのピン上げ（PR #4770）でも閉じきらなかった。**Codex P1: 境界 `(?<![a-z0-9\/])` の `/` が余計で、
+mfm-js は `曲/@admin` もメンションにする（実測 0.26.0）。`/` は URL を守るためだったが、#290 で URL を丸ごと除外したので不要。
+→ **pooza/ginseng-fediverse#295**（`/` を外す）と 2.0.x へのバックポート（v2.0.3）を依頼。**5.38.0 の出荷はこれ待ち**。
+✅ **同日に v2.0.3（#295）と v2.0.4（#298 のバックポート・#300）が出たので、ピンを v2.0.4 へ上げた（PR #4770）。**
+v2.0.4 は URL とみなす範囲を mfm-js に揃えたセキュリティ修正（大文字 scheme `HTTPS://x/@admin`・手前のトークンが
+scheme を食う `詳細:https://…` など、区切った後もメンションに残っていた形）。実測: `曲/@admin` → `曲/@ admin`、
+`HTTPS://x/@admin` → `HTTPS://x/@ admin`、`https://example.com/_@admin`・`info@example.com`・`H@ppy Together!!!` は無変換。
+⚠ 副作用: `詳細:https://mstdn.example/@user` の `@` も区切られる（mfm-js が URL と読まないので、区切らないと通知が飛ぶ）。
+⚠ ハッシュタグ側の `/` の直後と対の括弧を含む URL は pooza/ginseng-fediverse#297 で向こう持ち（タグは通知を撃たない）。
+⚠ #4770 の Codex P2「Mastodon では `ラブ@pooza` はメンションにならないので境界を Misskey 限定に」は**採らない**（2026-09-26 ユーザー判断）。
+区切るのが安全側で、5.37.x の本番（`gsub!(/[@#]/, '\0 ')`＝全部区切る）より狭くなっただけ。全角「＠」はどの版も触らない。
 
 #### 2026-09-16 に消化した分（残り 7 件 / 重み 18）
 
