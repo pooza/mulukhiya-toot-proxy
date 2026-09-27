@@ -195,7 +195,10 @@ git diff Gemfile.lock
   5.38.0 の出荷後に develop を取り込んで ready にした（1501 tests・0 failures）
 - **#4352**（media_catalog を shallu / gomander へ横展開）は 5.38.0 から移した。⚠ リリースと束ねない。
   shallu の本番 `EXPLAIN` → flip → 24 時間観測 → gomander（日曜午前を外す）。flip の前にユーザーの確認を取る
-- ginseng-\* の版上げ（#4746 / #4747 / #4749 / #4750）
+- ginseng-\* の版上げ（#4746 / #4747 / #4749 / #4750）。⚠ **2026-09-28 時点の宛先**: core **v1.25.1**（pooza/makoto2 の依頼）/
+  redis **v2.0.8** / web **v3.0.3** / piefed v0.1.2（下の 09-28 の同期記録）
+- 📥 **#4775（pooza/makoto2 からの依頼・マイルストーン未割り当て）**: 上流の 429 を透過するときに
+  `X-RateLimit-Reset` 等のヘッダを中継していない。**#4747（v1.25.1）と対になる**ので、入れるかはユーザー判断
 
 ## リリース済み: 5.38.1（ホットフィックス・2026-09-26・#4772）
 
@@ -552,6 +555,53 @@ Slack / LINE / メールには出なくなるが、**周期実行でメールを
 - ⚠ `Program` は singleton なので、差し替えた `logger` は `ensure` で必ず外す
 - 実測: `rake lint` 無指摘 / `rake test` **1413 tests・0 failures・0 errors**
   （develop ベースライン 1387 から **+26 ＝ 追加したぶんちょうど**）
+
+### 2026-09-28 セッション同期の記録
+
+**本番には触っていない**（辞書台帳の生成と、shallu の Redis の uptime・ログを読んだだけ）。
+
+- **ブランチ**: `develop` は `origin/develop` と同一・未コミット無し。**CI は直近 6 本とも `success`**
+- **Dependabot**: open アラート **0 件**
+- **open PR**: #4774（main → develop の戻し・5.38.1 の `resolv`）と #4768（レビュー残件）。**どちらも MERGEABLE でマージ待ち**
+- **Codex / 申し送り**: 前回以降のマージは PR #4759 / #4767 / #4770 / #4773。
+  修正コミットを確かめて **+1 を 3 件付けた**（#4768 の P2 ×2＝`20683748` / `22b44fda`、#4770 の P1＝`289609a6`）。
+  ⚠ **#4770 の P2「MFM のメンション境界を Misskey だけに絞る」は返信で「後退ではない・別途判断」とした未修正のまま**
+  （Mastodon のナウプレで `ラブ@pooza` が `ラブ@ pooza` になる。5.37.1 以前はもっと広く区切っていた）。直すかはユーザー判断
+- **chubo2**: `origin/main` と差分なし。§6-2 は 08-31（28 日）でスキップ。新 Issue は #258 / #259 / #260（いずれもモロヘイヤの実装に非関係）
+- **harness upstream**: Mastodon v4.7.2 / Misskey 2026.9.1 とも verified と同版。`last_checked` を 09-28 に更新
+- **辞書台帳**（chubo2 `4dfae45`）: **🔴 は前回と同じ 3 件**（直書き 1 / 台帳に無い 2）・**🔴 死亡 0**。
+  🟡 の最大は gomander の `precure.ml/api/dic/v1/dic.json` **30/144**（前回 16/144）。#4659 の間欠の範囲と読む
+
+#### 📥 pooza/makoto2 からの依頼 2 件（#4775 / #4747）
+
+- **#4747**: 宛先を **v1.25.0 → v1.25.1** に差し替え、タイトルも直した。差は pooza/ginseng-core#657 の 1 commit・3 ファイル
+  （タグで確認）。**読んだ効き方**: 429 に `Retry-After` が無ければ `X-RateLimit-Reset` を使うが、
+  **`/http/retry/max_seconds`（60 秒）を超える待ちは叩き直さず即座に上げる**。→ 投稿の 3 時間窓では 1 回で諦めて 429 を透過する。
+  ⚠ 窓が 60 秒以内なら puma のスレッドを持ったまま最大 60 秒眠るので、#4775 と合わせて 429 を実際に起こして確かめる
+- **#4775**: `handle_gateway_error`（`controller.rb`）が上流の 429 のステータスと本文は透過するが、
+  `Retry-After` / `X-RateLimit-*` を中継していない。**コードで確認した**（ヘッダを付けているのは `ConflictError` の `Retry-After` だけ）。
+  size:S・マイルストーン未割り当て
+
+#### ginseng-\* のピン判断（2026-09-28 の同期）
+
+09-26 に各 gem で新しいタグが出ていた。**判断は宛先の差し替えだけで、マイルストーンは動かさない**:
+
+- **core v1.25.1** → #4747（上）
+- **redis v2.0.7 → v2.0.8**（`key?` を EXISTS で引き、キーをパターンとして読まない）→ #4746 の宛先を v2.0.8 に。
+  ⚠ モロヘイヤは `metadata_storage.key?(uri)` 等で **`?` を含みうる URI をキーにしている**ので、効く側の修正
+- **web v3.0.1 → v3.0.3**（`fetch_image` を既定で公開アドレスだけに・SlimRenderer）→ #4749 の宛先を v3.0.3 に。
+  `Rss20FeedRenderer#fetch_image` は上書きしているので、既定の変更がそのまま効くかは取り込み時に確かめる
+- **fediverse v3.1.0 → v3.1.4**（`escape_sigils` の境界 3 本・`TagContainer#member?`）→ #4748（5.40.0）の宛先を v3.1.4 に。
+  固定中は v2.0.4（PR #4770）
+- **youtube v3.0.1 → v3.0.2**（`search_channels` の失敗を GatewayError に）→ ③ 見送り。モロヘイヤは `search_channels` を使っていない
+
+#### Sentry
+
+- unresolved **26 件**・**コメント 0 は 0 件**
+- 🆕 **`-2F`（Redis 接続拒否）count=29 と `-C`（`LOADING`）count=38 に、shallu で 09-26T03:02:50Z（JST 12:02）の新イベント。**
+  Redis の uptime から再起動は同時刻。**同じ時間帯に pooza/chubo2#251（`4400d01`・12:10）で shallu に `redis` レシピを当てている**ので、
+  その適用による再起動と読む。**判断は計画作業の一過性**。両方にコメントを残した
+- **`-2X` は count=49 / lastSeen 09-26T06:40:07Z**（前回 48 → +1）。判断は据え置き＝外部ノイズ
 
 ### 2026-09-26 セッション同期の記録
 
