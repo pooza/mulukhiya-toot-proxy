@@ -116,6 +116,13 @@ module Mulukhiya
     # increment を送り直してはいけない（話数が飛ぶ）。足りないのは
     # `annict_episode_id` と `subtitle` だけ。
     #
+    # ⚠ **`not_found` は返らない (#4771)。**Annict に次の話数がまだ無いときは
+    # +1 せずに `ConflictError`（`annict_not_found`）で断る。放送直後に押すと
+    # 翌週の回が未登録で、話数だけ進んでサブタイトルを手で補うことになっていた。
+    # 断っておけば、時間を置いて押し直すだけで話数とサブタイトルが一度に入る。
+    # ⚠ `failed` は断らない。Annict の障害で番組表の作業が止まらないように
+    # （2026-09-26 ユーザー判断）。
+    #
     # ⚠ Annict の GraphQL 呼び出しは**ロックの外**で先に済ませる (#4534)。
     #
     # 当初はロックの内側に置いていたが、それだと **TTL を超えうる**（open と read で
@@ -136,6 +143,8 @@ module Mulukhiya
         programs = data
         raise Ginseng::NotFoundError, "キー '#{key}' が見つかりません。" unless programs.key?(key)
         entry = programs[key]
+        # ⚠ 断るのは**キーの存在を確かめた後**。外で断ると、無いキーにも 409 を返してしまう。
+        raise annict_not_found_conflict if prepared[:state] == :not_found
         entry['episode'] = (entry['episode'] || 0).to_i + 1
         state = apply_annict_increment(key, prepared, entry)
         fetcher.save(programs)
@@ -249,6 +258,13 @@ module Mulukhiya
     # 拒否し「auto_update を切ってから編集する」運用に倒す (#4272)。
     def auto_update_conflict
       return ConflictError.new('自動更新が有効のため、編集できません。', code: :auto_update)
+    end
+
+    def annict_not_found_conflict
+      return ConflictError.new(
+        'Annict にまだ登録されていません。時間を置いて押し直してください。',
+        code: :annict_not_found,
+      )
     end
 
     # ロックを取る前に Annict を引く。annict が無い / 作品 ID が紐づいていない

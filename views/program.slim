@@ -505,14 +505,23 @@ html lang='ja' data-theme='light'
                   }
                   this.loadEntries()
                 })
-                .catch(e => Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'}))
+                .catch(e => {
+                  // Annict に次の話数がまだ無いので断られた (#4771)。話数は進んでいないので、
+                  // エラーではなく「待って押し直す」案内として出す。⚠ 判定は文言でなく `code`。
+                  const annictPending = this.methods.dig(e, 'response', 'data', 'code') === 'annict_not_found'
+                  Swal.fire({
+                    title: annictPending ? '話数は進めていません。' : undefined,
+                    text: this.methods.createErrorMessage(e),
+                    icon: annictPending ? 'info' : 'error',
+                  })
+                })
                 .finally(_ => {delete this.busy[key]})
             },
             // increment の `annict` (#4579) を読み、サブタイトルが載らなかったことを伝える (#4765)。
             // ⚠ どの値でも話数の +1 は成功している。押し直すと話数が飛ぶので、そう書く。
+            // ⚠ `not_found` は 5.39.0 から 409 で断るので、ここへは来ない (#4771)。
             annictWarning (state) {
               const reasons = {
-                not_found: 'Annict にこの話数がまだ無いため',
                 failed: 'Annict を引けなかったため',
                 superseded: '処理中に別の編集が入ったため',
               }
