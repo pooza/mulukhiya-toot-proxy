@@ -1211,8 +1211,13 @@ NowPlaying 情報を除去して再投稿する。
 
 - **プロバイダ優先順位（3 段連鎖）**: ① 明示 `prefer` → ② `source_app_name` ヒント → ③ サーバー既定 `/nowplaying/resolve/default_provider`（既定値 `apple_music`）。優先側でヒットしなければもう一方のプロバイダへフォールバックして URL を返す。
 - **レスポンス**:
-  - ヒット時: `{ "url": "https://music.apple.com/...", "provider": "apple_music", "normalized": { "title": "...", "artist": "...", "album": "..." } }`（`normalized` は外部 API が返した値のみ。欠落要素は省く）
-  - ヒットなし: `{ "url": null }`（404 ではなく 200）
+  - ヒット時: `{ "url": "https://music.apple.com/...", "provider": "apple_music", "normalized": { "title": "...", "artist": "...", "album": "..." }, "artwork_url": "https://.../480x480bb.jpg" }`（`normalized` は外部 API が返した値のみ。欠落要素は省く）
+  - ヒットなし: `{ "url": null, "artwork_url": null }`（404 ではなく 200）
+  - **`artwork_url`（5.39.0〜 / #4769）**: ジャケット画像の URL。**キーは常に返す**（取れなければ `null`）。
+    一辺は `itunes_image` ハンドラの `pixel`（既定 480）に揃える。Apple Music は `artworkUrl100` のサイズ指定を差し替え、
+    Spotify は任意サイズを作れないので、アルバム画像のうち `pixel` 以上で最小のもの（無ければ最大のもの）。
+    ⚠ 画像の取得・添付・リサイズはしない（URL を返すだけ）。⚠ Mastodon は添付のある投稿にプレビューカードを出さないので、
+    ジャケットを添付するとリンク先のカードは出ない
 - **設定キー**:
   - `/nowplaying/resolve/default_provider`: 優先指定・ヒントが無いときの既定プロバイダ（`apple_music` / `spotify`、既定 `apple_music`）
 - **備考**: Spotify は `/service/spotify` の資格情報が設定済みのときのみ候補。iTunes Search API は資格情報不要のため常時利用可能。capsicum は `features.nowplaying_resolver`（下記）で enrich を試みるか判定する。
