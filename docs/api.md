@@ -1478,6 +1478,7 @@ JSON オブジェクトは仕様上「順序なし」だが、キーは SHA256 �
 | `annict` | 意味 |
 |---|---|
 | `applied` | `annict_episode_id` と `subtitle` を載せた |
+| `untitled` | 該当話数は Annict にあるが、サブタイトルがまだ無い。`annict_episode_id` だけ載せた（5.39.0〜 / #4771） |
 | `unconfigured` | (1) Annict 未連携、または `annict_work_id` が無い |
 | `not_found` | (2) 該当話数が Annict に無い。⚠ **5.39.0〜 は返らない**（409 `annict_not_found` で断る・#4771） |
 | `failed` | (4) Annict の呼び出しが失敗した（時間を置けば引ける可能性がある） |

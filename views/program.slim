@@ -522,6 +522,7 @@ html lang='ja' data-theme='light'
             // ⚠ `not_found` は 5.39.0 から 409 で断るので、ここへは来ない (#4771)。
             annictWarning (state) {
               const reasons = {
+                untitled: 'Annict にこの回のサブタイトルがまだ無いため',
                 failed: 'Annict を引けなかったため',
                 superseded: '処理中に別の編集が入ったため',
               }

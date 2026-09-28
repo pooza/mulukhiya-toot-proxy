@@ -121,7 +121,7 @@ module Mulukhiya
       error = RuntimeError.new('annict down')
       error.define_singleton_method(:log) {|*| nil}
       annict = Object.new
-      annict.define_singleton_method(:episodes) {|_ids| raise error}
+      annict.define_singleton_method(:episodes) {|_ids, **| raise error}
 
       assert_equal(:failed, prepare('k', annict)[:state])
     end
@@ -135,7 +135,7 @@ module Mulukhiya
       error.define_singleton_method(:alert) {|*| calls.push(:alert)}
       error.define_singleton_method(:log) {|payload| calls.push(payload)}
       annict = Object.new
-      annict.define_singleton_method(:episodes) {|_ids| raise error}
+      annict.define_singleton_method(:episodes) {|_ids, **| raise error}
       prepare('k', annict)
 
       assert_not_include(calls, :alert)
@@ -215,7 +215,7 @@ module Mulukhiya
       error = RuntimeError.new('annict down')
       error.define_singleton_method(:log) {|*| nil}
       annict = Object.new
-      annict.define_singleton_method(:episodes) {|_ids| raise error}
+      annict.define_singleton_method(:episodes) {|_ids, **| raise error}
       result = editor.increment_episode_with_annict('k', annict:)
 
       assert_equal(:failed, result[:annict])
@@ -247,7 +247,7 @@ module Mulukhiya
     def test_increment_does_not_refuse_on_stale_miss
       programs = stub_increment('k' => {'episode' => 4, 'annict_work_id' => 42})
       annict = Object.new
-      annict.define_singleton_method(:episodes) do |_ids|
+      annict.define_singleton_method(:episodes) do |_ids, **|
         programs['k']['episode'] = 5 # 引いている間に別の +1 が入った
         next [{'numberText' => '第4話'}]
       end
@@ -262,7 +262,7 @@ module Mulukhiya
     def test_increment_does_not_refuse_when_work_was_swapped
       programs = stub_increment('k' => {'episode' => 4, 'annict_work_id' => 42})
       annict = Object.new
-      annict.define_singleton_method(:episodes) do |_ids|
+      annict.define_singleton_method(:episodes) do |_ids, **|
         programs['k']['annict_work_id'] = 43
         next []
       end
@@ -270,6 +270,24 @@ module Mulukhiya
 
       assert_equal(:superseded, @result[:annict])
       assert_equal(5, @result[:entry]['episode'])
+    end
+
+    # ⚠ 回は登録済みだがサブタイトルがまだ無い（PR #4776 の Codex P2）。断ると、
+    # サブタイトルを持たない作品では「話数 ＋」がずっと通らなくなる。+1 して `untitled` を返す。
+    def test_increment_proceeds_when_episode_has_no_title
+      programs = stub_increment('k' => {'episode' => 4, 'annict_work_id' => 42, 'subtitle' => '前の回'})
+      calls = []
+      annict = Object.new
+      annict.define_singleton_method(:episodes) do |_ids, **opts|
+        calls.push(opts)
+        next [{'numberText' => '第5話', 'annictId' => 123, 'title' => nil}]
+      end
+      result = editor.increment_episode_with_annict('k', annict:)
+
+      assert_equal(:untitled, result[:annict])
+      assert_equal(5, programs['k']['episode'])
+      assert_equal(123, programs['k']['annict_episode_id'])
+      assert_equal([{untitled: true}], calls, 'サブタイトルの無い回を落として引いている')
     end
 
     def test_increment_applies_when_annict_has_the_episode
@@ -310,7 +328,7 @@ module Mulukhiya
 
     def annict_double(episodes)
       annict = Object.new
-      annict.define_singleton_method(:episodes) {|_ids| episodes}
+      annict.define_singleton_method(:episodes) {|_ids, **| episodes}
       return annict
     end
 

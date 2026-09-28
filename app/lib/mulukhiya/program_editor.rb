@@ -107,6 +107,7 @@ module Mulukhiya
     # increment_episode の本体。Annict のメタデータを載せたか・載せなかった理由も返す (#4579)。
     #
     # - `applied` — 載せた
+    # - `untitled` — 該当話数は Annict にあるが、サブタイトルがまだ無い（`annict_episode_id` だけ載せた）
     # - `unconfigured` — Annict 未連携か、作品 ID が紐づいていない
     # - `not_found` — 該当話数が Annict に無い
     # - `failed` — Annict の呼び出しが失敗した
@@ -350,7 +351,9 @@ module Mulukhiya
         return :superseded
       end
       entry['annict_episode_id'] = prepared[:episode_data]['annictId']
-      entry['subtitle'] = prepared[:episode_data]['title'] if prepared[:episode_data]['title']
+      # 回はあるがサブタイトルがまだ無い (#4771)。+1 は通し、サブタイトルは手で補ってもらう。
+      return :untitled unless prepared[:episode_data]['title']
+      entry['subtitle'] = prepared[:episode_data]['title']
       return :applied
     end
 
@@ -390,7 +393,8 @@ module Mulukhiya
 
     # ⚠ 失敗は握らない。呼び出し元が `failed` と `not_found` を分けるため (#4579)。
     def next_annict_episode(annict, work_id, episode_number)
-      episodes = annict.episodes([work_id.to_i]) || []
+      # ⚠ サブタイトルの無い回も含めて引く。回の有無で断るかを決めるため (#4771)。
+      episodes = annict.episodes([work_id.to_i], untitled: true) || []
       target = episode_number.to_i
       return episodes.find do |ep|
         match = ep['numberText'].to_s.match(/(\d+)/)
