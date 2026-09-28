@@ -144,7 +144,7 @@ module Mulukhiya
         raise Ginseng::NotFoundError, "キー '#{key}' が見つかりません。" unless programs.key?(key)
         entry = programs[key]
         # ⚠ 断るのは**キーの存在を確かめた後**。外で断ると、無いキーにも 409 を返してしまう。
-        raise annict_not_found_conflict if prepared[:state] == :not_found
+        raise annict_not_found_conflict if annict_miss_current?(prepared, entry)
         entry['episode'] = (entry['episode'] || 0).to_i + 1
         state = apply_annict_increment(key, prepared, entry)
         fetcher.save(programs)
@@ -319,6 +319,19 @@ module Mulukhiya
       return prepared.values_at(:episode, :work_id) == entry.values_at('episode', 'annict_work_id')
     end
 
+    # ロックの外で引いた「Annict に無い」が、**いまのエントリの次の話数**についての答えか (#4771)。
+    #
+    # ⚠ 引いている間に別の +1 や作品の差し替えが入っていたら、その答えは古い話数・別作品の
+    # もので、**これから進める話数が Annict にあるかは分からない**（PR #4776 の Codex P2）。
+    # そこで断ると、押し直すまで通らない誤った案内になる。一致しないときは断らずに
+    # 今までどおり +1 し、`apply_annict_increment` が `superseded` として報告する。
+    # ⚠ 比べるのは **+1 する前**のエントリ（`annict_applicable?` は +1 した後と比べる）。
+    def annict_miss_current?(prepared, entry)
+      return false unless prepared[:state] == :not_found
+      current = [(entry['episode'] || 0).to_i + 1, entry['annict_work_id']]
+      return prepared.values_at(:episode, :work_id) == current
+    end
+
     # ロックの中で確定したエントリへ、ロックの外で引いた Annict の結果を載せる。
     #
     # ⚠ **`annict_episode_id` は先に必ず nil へ落とす。**載せない回に前回の値が
@@ -328,7 +341,10 @@ module Mulukhiya
     def apply_annict_increment(key, prepared, entry)
       entry['annict_episode_id'] = nil
       # `episode_data` が無い回は「Annict を引けなかった」であって、ガードの発動ではない。
-      return prepared[:state] unless prepared[:episode_data]
+      # ⚠ ただし `not_found` はここへ来た時点で**古い話数・別作品についての答え**
+      # （いまのエントリについての `not_found` は `annict_miss_current?` で断っている・#4771）
+      # なので、下のガードへ渡して `superseded` として残す。
+      return prepared[:state] unless prepared[:episode_data] || prepared[:state] == :not_found
       unless annict_applicable?(prepared, entry)
         log_annict_stale(key, prepared, entry)
         return :superseded
@@ -355,8 +371,9 @@ module Mulukhiya
     # 別の編集が入ってガードが正しく働いたのかで、運用者が
     # 「`PUT` でメタデータを補う」のか「Annict の設定を見る」のかが変わる。
     #
-    # ⚠ **`prepared[:episode_data]` が無い回はここへ来ない。**あれは Annict を
+    # ⚠ **`prepared[:episode_data]` が無い回は、原則ここへ来ない。**あれは Annict を
     # 引けなかった（または作品が紐づいていない）回で、ガードの発動ではない。
+    # 例外は**古い話数についての `not_found`**（#4771）で、これはガードの発動そのもの。
     #
     # ⚠ `alert` ではなく `info`。⚠⚠ **ガードが働くのは正常な動作**なので、
     # 上げると「クライアント起因なのに alert」（#4542 / #4534 で外してきた形）に戻る。

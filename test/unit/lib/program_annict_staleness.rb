@@ -77,8 +77,8 @@ module Mulukhiya
         assert_equal(:superseded, apply('k', prepared, entry(episode: 6)))
         assert_equal(:applied, apply('k', prepared, entry), '素直に載る回を superseded と読んでいる')
         assert_equal(
-          :not_found,
-          apply('k', prepared(episode_data: nil, state: :not_found), entry(episode: 6)),
+          :failed,
+          apply('k', prepared(episode_data: nil, state: :failed), entry(episode: 6)),
           'Annict を引けなかった回を「ガードが効いた」と読んでいる',
         )
       end
@@ -239,6 +239,37 @@ module Mulukhiya
       assert_raise(Ginseng::NotFoundError) do
         editor.increment_episode_with_annict('nothing', annict: annict_double([]))
       end
+    end
+
+    # ⚠ 引いている間に別の +1 が入っていたら、`not_found` は古い話数についての答え。
+    # 断らずに +1 し、`superseded` として報告する（PR #4776 の Codex P2）。
+    # ここでは「引いた後にエントリが 5 へ進んだ」を、data の差し替えで再現する。
+    def test_increment_does_not_refuse_on_stale_miss
+      programs = stub_increment('k' => {'episode' => 4, 'annict_work_id' => 42})
+      annict = Object.new
+      annict.define_singleton_method(:episodes) do |_ids|
+        programs['k']['episode'] = 5 # 引いている間に別の +1 が入った
+        next [{'numberText' => '第4話'}]
+      end
+      result = capture_info {@result = editor.increment_episode_with_annict('k', annict:)}
+
+      assert_equal(:superseded, @result[:annict])
+      assert_equal(6, @result[:entry]['episode'])
+      assert_equal('annict_stale', result.first[:program_entry][:event])
+    end
+
+    # 作品を差し替えられた場合も同じ。
+    def test_increment_does_not_refuse_when_work_was_swapped
+      programs = stub_increment('k' => {'episode' => 4, 'annict_work_id' => 42})
+      annict = Object.new
+      annict.define_singleton_method(:episodes) do |_ids|
+        programs['k']['annict_work_id'] = 43
+        next []
+      end
+      capture_info {@result = editor.increment_episode_with_annict('k', annict:)}
+
+      assert_equal(:superseded, @result[:annict])
+      assert_equal(5, @result[:entry]['episode'])
     end
 
     def test_increment_applies_when_annict_has_the_episode
