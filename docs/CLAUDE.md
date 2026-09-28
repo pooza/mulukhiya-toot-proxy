@@ -200,11 +200,13 @@ git diff Gemfile.lock
     #4765 のダミーのトークンでは `failed` しか出せない）
 - ✅ **PR #4777（#4775・2026-09-28）**: 上流のステータスを透過するとき `Retry-After` / `X-RateLimit-*` を許可リストで中継する。
   Controller が ClassLength を超えたので `upstream_error_code` と合わせて `UpstreamErrorMethods` へ切り出した。
-  Codex 指摘なし。📌 実際の 429 での確認は #4747 と合わせて行う（未実施・やり方はユーザーと相談）
+  Codex 指摘なし。✅ **dev26 で実際の 429 を起こして確認**（#4777 + #4778 を手元で合わせたブランチ・301 本目で 429）:
+  修正前は**モロヘイヤが 1 秒おきに 3 回叩き直して 2.92 秒・ヘッダなし**、修正後は**1 回で諦めて 0.63 秒・`X-RateLimit-*` が届く**。
+  結果は #4775 / PR #4777 / PR #4778 にコメント済み
 - ✅ **PR #4778（#4747・2026-09-28）**: ginseng-core v1.25.1。**dev26（rc.d）/ dev27（systemd）で 3 サービスの stop / start / restart を実走**して
   全部 rc=0・二重起動なし・health 200。dev26 で sidekiq を `kill -9` → start も pid ファイルが入れ替わって通った。
   ⚠ その直後 約 45 秒は health 503（`Sidekiq::ProcessSet` に旧プロセスが生存通知の期限まで残る・以前からの挙動）。
-  Codex 指摘なし。📌 **dev26 / dev27 はこのブランチのまま**（マージ後に develop へ戻す）
+  Codex 指摘なし。📌 **dev27 はこのブランチのまま**（マージ後に develop へ戻す）。dev26 は 429 の検証の後 develop に戻した
 - **機能が前へ進む枠は #4769**（ナウプレ enrich に `artwork_url`）
 - **PR #4768**（レビュー由来の残件約 30 項目・#4635 / #4697 / #4698 / #4721 / #4723 / #4724 / #4725 を閉じる）。
   5.38.0 の出荷後に develop を取り込んで ready にした（1501 tests・0 failures）
