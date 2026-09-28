@@ -206,7 +206,17 @@ git diff Gemfile.lock
 - ✅ **PR #4778（#4747・2026-09-28）**: ginseng-core v1.25.1。**dev26（rc.d）/ dev27（systemd）で 3 サービスの stop / start / restart を実走**して
   全部 rc=0・二重起動なし・health 200。dev26 で sidekiq を `kill -9` → start も pid ファイルが入れ替わって通った。
   ⚠ その直後 約 45 秒は health 503（`Sidekiq::ProcessSet` に旧プロセスが生存通知の期限まで残る・以前からの挙動）。
-  Codex 指摘なし。📌 **dev27 はこのブランチのまま**（マージ後に develop へ戻す）。dev26 は 429 の検証の後 develop に戻した
+  Codex 指摘なし。📌 **dev27 はこのブランチのまま**（マージ後に develop へ戻す）
+- ✅ **PR #4779（#4746・2026-09-28）**: ginseng-redis v2.0.8。`key?` が EXISTS になり、**`[]` を含む URL のキーで格納済みなのに false**
+  だったのが直る（手元で v2.0.6 false → v2.0.8 true を実測）＝フィードの画像メタデータのキャッシュが効いていなかった
+- ✅ **PR #4780（#4749・2026-09-28）**: ginseng-web v3.0.3。🔴 **gem が塞いだフィード画像の SSRF はモロヘイヤに届かない**
+  （`fetch_image` を上書きして `MediaMetadataStorage#push` へ委譲しており、そちらは無検証で GET していた）→
+  `push(uri, host_validator:)` を足し、フィードの enclosure からだけ `RemoteHost.unpinned_validator` を渡す。添付には掛けない。
+  dev26 で画面 3 ページが前後一致。📌 **dev26 はこのブランチ**
+- ✅ **PR #4781（#4750・2026-09-28）**: ginseng-piefed v0.1.2。⚠ **版だけでは no-op**（`Ginseng::Piefed::Service` を直に作っていた）→
+  `http_class` だけ上書きする `PiefedService`。`include Package` は gem の設定が引けなくなるのでしない。
+  後半（非公開トゥートの clip を例外にしない）は **pooza/ginseng-piefed#18** にたたき台。着地したら取り込み、
+  `PiefedClippingWorker` の `clipped` ログと `raise Ginseng::ConfigError "..."`（カンマ抜けで NoMethodError）を直す
 - **機能が前へ進む枠は #4769**（ナウプレ enrich に `artwork_url`）
 - **PR #4768**（レビュー由来の残件約 30 項目・#4635 / #4697 / #4698 / #4721 / #4723 / #4724 / #4725 を閉じる）。
   5.38.0 の出荷後に develop を取り込んで ready にした（1501 tests・0 failures）
