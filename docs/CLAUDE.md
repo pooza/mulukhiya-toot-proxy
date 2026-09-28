@@ -191,16 +191,20 @@ git diff Gemfile.lock
   #4765 の警告をステージングで見てもらった場で、放送直後に押すと Annict が未登録で `not_found` になる、という
   心当たりが出てきた（ユーザーは半日待ってから押して回避していた）。`failed` は今の警告のまま +1 する
   - ✅ **PR #4776（2026-09-28）**: `not_found` のときは +1 も保存もせず 409（`code: annict_not_found`）で断る。
-    画面は `code` を見て info の案内に切り替える。1452 tests・0 failures。
-    📌 **dev25 をこのブランチにしてある**（`490c94d7`）。**目視はユーザーが後で**（admin に本物の Annict トークンが要る。
+    画面は `code` を見て info の案内に切り替える。
+    Codex P2 × 3 に対処（`40b9a1d7` / `764ac823`）: ① 引いている間に別の編集が入った `not_found` では断らない（`superseded`）
+    ② api.md の置換が他の節にも当たっていた ③ 🔴 **`AnnictService#episodes` がサブタイトルの無い回を落とすので、登録済みでも
+    `not_found` に化けていた** → `episodes(untitled: true)` で回の有無を引き、サブタイトルが無ければ +1 して新しい状態 `untitled`（画面は警告）。
+    1457 tests・0 failures。
+    📌 **dev25 をこのブランチにしてある**（`764ac823`）。**目視はユーザーが後で**（admin に本物の Annict トークンが要る。
     #4765 のダミーのトークンでは `failed` しか出せない）
 - ✅ **PR #4777（#4775・2026-09-28）**: 上流のステータスを透過するとき `Retry-After` / `X-RateLimit-*` を許可リストで中継する。
   Controller が ClassLength を超えたので `upstream_error_code` と合わせて `UpstreamErrorMethods` へ切り出した。
-  📌 実際の 429 での確認は #4747 と合わせて harness で行う（未実施）
+  Codex 指摘なし。📌 実際の 429 での確認は #4747 と合わせて行う（未実施・やり方はユーザーと相談）
 - ✅ **PR #4778（#4747・2026-09-28）**: ginseng-core v1.25.1。**dev26（rc.d）/ dev27（systemd）で 3 サービスの stop / start / restart を実走**して
   全部 rc=0・二重起動なし・health 200。dev26 で sidekiq を `kill -9` → start も pid ファイルが入れ替わって通った。
   ⚠ その直後 約 45 秒は health 503（`Sidekiq::ProcessSet` に旧プロセスが生存通知の期限まで残る・以前からの挙動）。
-  📌 **dev26 / dev27 はこのブランチのまま**（マージ後に develop へ戻す）
+  Codex 指摘なし。📌 **dev26 / dev27 はこのブランチのまま**（マージ後に develop へ戻す）
 - **機能が前へ進む枠は #4769**（ナウプレ enrich に `artwork_url`）
 - **PR #4768**（レビュー由来の残件約 30 項目・#4635 / #4697 / #4698 / #4721 / #4723 / #4724 / #4725 を閉じる）。
   5.38.0 の出荷後に develop を取り込んで ready にした（1501 tests・0 failures）
