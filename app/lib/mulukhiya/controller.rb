@@ -8,6 +8,7 @@ module Mulukhiya
     attr_reader :sns, :reporter
 
     include LogScrubber
+    include UpstreamErrorMethods
 
     # 上流へそのまま中継してよい受信ヘッダ (#4598)。
     #
@@ -413,6 +414,7 @@ module Mulukhiya
       # クライアントは `{"error": ...}` を期待しているので配列を渡すと読めない。
       body = error.source_body
       @renderer.message = body.is_a?(Hash) ? body : {error: error.message}
+      relay_upstream_headers(error)
       return @renderer.status = error.source_status
     end
 
@@ -421,19 +423,6 @@ module Mulukhiya
     # 側へ倒すため。
     def never_silent?(error)
       return error.respond_to?(:never_silent?) && error.never_silent?
-    end
-
-    # 上流の `{"error": {"code": "..."}}` から code を取る。取れなければ nil。
-    #
-    # ⚠ Mastodon の包絡は `{"error": "Validation failed: ..."}` で error が
-    # **文字列**。Hash 前提で dig すると TypeError になる。上流の形を決め打ち
-    # できないので、各段で型を確かめる。
-    def upstream_error_code(error)
-      body = error.source_body
-      return nil unless body.is_a?(Hash)
-      envelope = body['error']
-      return nil unless envelope.is_a?(Hash)
-      return envelope['code']
     end
 
     def verify_account_integrity!(response)
