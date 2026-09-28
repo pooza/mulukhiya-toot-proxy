@@ -217,7 +217,10 @@ git diff Gemfile.lock
   `http_class` だけ上書きする `PiefedService`。`include Package` は gem の設定が引けなくなるのでしない。
   後半（非公開トゥートの clip を例外にしない）は **pooza/ginseng-piefed#18** にたたき台。着地したら取り込み、
   `PiefedClippingWorker` の `clipped` ログと `raise Ginseng::ConfigError "..."`（カンマ抜けで NoMethodError）を直す
-- **機能が前へ進む枠は #4769**（ナウプレ enrich に `artwork_url`）
+- ✅ **PR #4782（#4769・機能が前へ進む枠・2026-09-28）**: ナウプレ enrich に `artwork_url`（キーは常に返す）。
+  一辺は `itunes_image` の `pixel`（480）。Spotify は `pixel` 以上で最小の画像。
+  dev24 の実データで Apple Music 480×480・Spotify 640×640 の画像が取れることを確認。📌 **dev24 はこのブランチ**。
+  マージ後に pooza/capsicum#1133 へ知らせる
 - **PR #4768**（レビュー由来の残件約 30 項目・#4635 / #4697 / #4698 / #4721 / #4723 / #4724 / #4725 を閉じる）。
   5.38.0 の出荷後に develop を取り込んで ready にした（1501 tests・0 failures）
 - **#4352**（media_catalog を shallu / gomander へ横展開）は 5.38.0 から移した。⚠ リリースと束ねない。
