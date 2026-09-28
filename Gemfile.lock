@@ -84,10 +84,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: ac6fa4c84ab890286fd5a7eedada2c2633b4a12c
-  tag: v3.0.0
+  revision: db3270ddf9322513771b2b5cfa48e90608c913a0
+  tag: v3.0.3
   specs:
-    ginseng-web (3.0.0)
+    ginseng-web (3.0.3)
       erb (>= 6.0.4)
       rss
       sassc

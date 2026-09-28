@@ -89,9 +89,14 @@ module Mulukhiya
     # (base_uri を持たない別の HTTP) へ委譲したので、その解決だけが落ちていた。
     # サイト相対の画像 URL を返すフィード (dqdai-anime) は **サムネイルが全滅**したうえ、
     # 5 分おきに `base_uri undefined` をエントリ数ぶん吐き続けていた (日 2 万行)。
+    #
+    # 🔴 **enclosure の URL はフィードの提供元が決める値**なので、内部アドレスへ向けさせない (#4749)。
+    # ⚠ pinning はしない。フィードの画像はたいてい CDN にある（`Handler#upload` と同じ判断・#4576）。
     def fetch_image(uri)
       return nil unless uri = absolute_uri(uri)
-      metadata_storage.push(uri) unless metadata_storage.key?(uri)
+      unless metadata_storage.key?(uri)
+        metadata_storage.push(uri, host_validator: RemoteHost.unpinned_validator)
+      end
       return metadata_storage[uri]
     rescue => e
       e.log(uri: uri.to_s)
