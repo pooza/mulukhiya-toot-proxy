@@ -11,9 +11,13 @@ module Mulukhiya
       return if disable?
       initialize_params(params)
       unless piefed = account_class[params[:account_id]]&.piefed
-        raise Ginseng::ConfigError "Piefed undefined (Account #{params[:account_id]})"
+        raise Ginseng::ConfigError, "Piefed undefined (Account #{params[:account_id]})"
       end
-      piefed.clip(url: create_status_uri(params[:uri]))
+      # ginseng-piefed 0.2.0 から、公開でないトゥートは例外でなく nil で返る (#4750)。
+      # 利用者の操作として正常な結果なので、再試行も Sentry もさせず、ログだけ分ける。
+      unless piefed.clip(url: create_status_uri(params[:uri]))
+        return log(account_id: params[:account_id], message: 'not public', uri: params[:uri].to_s)
+      end
       log(account_id: params[:account_id], message: 'clipped')
     end
   end
