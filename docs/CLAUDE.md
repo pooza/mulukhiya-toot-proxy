@@ -225,6 +225,9 @@ git diff Gemfile.lock
   マージ後に pooza/capsicum#1133 へ知らせる。
   ✅ **Codex P2 に対処（2026-09-29・`6ba7d3bc`）**: `width` が null の画像を 0 扱いで並べて、先頭の最大画像を取り逃していた →
   サイズ不明は「足りる候補」から外し、足りなければ Spotify の並びの先頭を返す
+- ✅ **PR #4785（#4745・2026-09-29）**: `alert(values)` の values を Sentry の extra へ。新しい `SentryExtra` が
+  `LogScrubber` → `Logger#create_message`（syslog と同じマスク）を通す（`scrub_sentry_event` は extra を伏せないため）。
+  fail closed（`{scrub_failed: true}`）。`LockDegradationMethods#report` の payload も同じ扱い。1454 tests・0 failures
 - **PR #4768**（レビュー由来の残件約 30 項目・#4635 / #4697 / #4698 / #4721 / #4723 / #4724 / #4725 を閉じる）。
   5.38.0 の出荷後に develop を取り込んで ready にした（1501 tests・0 failures）
 - **#4352**（media_catalog を shallu / gomander へ横展開）は 5.38.0 から移した。⚠ リリースと束ねない。
