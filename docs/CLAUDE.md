@@ -215,18 +215,22 @@ git diff Gemfile.lock
   dev26 で画面 3 ページが前後一致。📌 **dev26 はこのブランチ**
 - ✅ **PR #4781（#4750・2026-09-28）**: ginseng-piefed v0.1.2。⚠ **版だけでは no-op**（`Ginseng::Piefed::Service` を直に作っていた）→
   `http_class` だけ上書きする `PiefedService`。`include Package` は gem の設定が引けなくなるのでしない。
-  後半（非公開トゥートの clip を例外にしない）は **pooza/ginseng-piefed#18** にたたき台。着地したら取り込み、
-  `PiefedClippingWorker` の `clipped` ログと `raise Ginseng::ConfigError "..."`（カンマ抜けで NoMethodError）を直す
+  ✅ **後半も同じ PR に載せた（2026-09-29・`44d37ec3`）**: 宛先を **piefed v0.2.0**（pooza/ginseng-piefed#18 の着地）へ。
+  `PiefedClippingWorker` は `clip` の戻り値 `nil` を `not public` としてログに残して終わる（再試行・Sentry なし）。
+  `raise Ginseng::ConfigError "..."` のカンマ抜けも直した。テスト `piefed_clipping_worker_result`（修正を外すと 2 件落ちる）。
+  1451 tests・0 failures。PR 本文は `Closes #4750` に変えた
 - ✅ **PR #4782（#4769・機能が前へ進む枠・2026-09-28）**: ナウプレ enrich に `artwork_url`（キーは常に返す）。
   一辺は `itunes_image` の `pixel`（480）。Spotify は `pixel` 以上で最小の画像。
   dev24 の実データで Apple Music 480×480・Spotify 640×640 の画像が取れることを確認。📌 **dev24 はこのブランチ**。
-  マージ後に pooza/capsicum#1133 へ知らせる
+  マージ後に pooza/capsicum#1133 へ知らせる。
+  ✅ **Codex P2 に対処（2026-09-29・`6ba7d3bc`）**: `width` が null の画像を 0 扱いで並べて、先頭の最大画像を取り逃していた →
+  サイズ不明は「足りる候補」から外し、足りなければ Spotify の並びの先頭を返す
 - **PR #4768**（レビュー由来の残件約 30 項目・#4635 / #4697 / #4698 / #4721 / #4723 / #4724 / #4725 を閉じる）。
   5.38.0 の出荷後に develop を取り込んで ready にした（1501 tests・0 failures）
 - **#4352**（media_catalog を shallu / gomander へ横展開）は 5.38.0 から移した。⚠ リリースと束ねない。
   shallu の本番 `EXPLAIN` → flip → 24 時間観測 → gomander（日曜午前を外す）。flip の前にユーザーの確認を取る
 - ginseng-\* の版上げ（#4746 / #4747 / #4749 / #4750）。⚠ **2026-09-28 時点の宛先**: core **v1.25.1**（pooza/makoto2 の依頼）/
-  redis **v2.0.8** / web **v3.0.3** / piefed v0.1.2（下の 09-28 の同期記録）
+  redis **v2.0.8** / web **v3.0.3** / piefed ~~v0.1.2~~ **v0.2.0**（09-29 に差し替え）。⚠ core **v2.0.0**（破壊的変更）は判断待ち
 - 📥 **#4775（pooza/makoto2 からの依頼・2026-09-28 に 5.39.0 へ）**: 上流の 429 を透過するときに
   `X-RateLimit-Reset` 等のヘッダを中継していない。**#4747（v1.25.1）と対になる**ので、429 を実際に起こして一緒に確かめる
 
