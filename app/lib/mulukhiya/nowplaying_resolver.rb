@@ -47,13 +47,15 @@ module Mulukhiya
     end
 
     # Spotify のアルバム画像（大きい順に 640 / 300 / 64 など）から、`pixel` 以上で最小のものを
-    # 選ぶ。足りるものが無ければ最大のもの (#4769)。
+    # 選ぶ。足りるものが無ければ Spotify の並びの先頭（＝最大）(#4769)。
     # ⚠ Spotify は任意サイズを作れないので、Apple Music と同じ一辺には揃わない。
+    # ⚠ `width` が null の画像もある。0 扱いで並べ替えると先頭の最大画像を取り逃すので、
+    # サイズ不明のものは「足りる候補」から外し、フォールバックは並び順に任せる。
     def self.spotify_artwork_url(images, pixel)
       images = Array(images).map {|v| v.to_h.transform_keys(&:to_s)}.select {|v| v['url'].present?}
       return nil if images.empty?
-      sorted = images.sort_by {|v| v['width'].to_i}
-      return (sorted.find {|v| v['width'].to_i >= pixel} || sorted.last)['url']
+      sufficient = images.select {|v| v['width'].to_i >= pixel}.min_by {|v| v['width'].to_i}
+      return (sufficient || images.first)['url']
     end
 
     # Apple Music の `artworkUrl100` のサイズ指定を差し替える（`ItunesURI#image_uri` と同じ・#4769）。

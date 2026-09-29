@@ -65,6 +65,18 @@ module Mulukhiya
       assert_equal('https://i.scdn.co/300', NowplayingResolver.spotify_artwork_url(images, 480))
     end
 
+    def test_spotify_artwork_url_with_unknown_width
+      images = [
+        {'url' => 'https://i.scdn.co/unknown', 'width' => nil},
+        {'url' => 'https://i.scdn.co/300', 'width' => 300},
+        {'url' => 'https://i.scdn.co/64', 'width' => 64},
+      ]
+
+      assert_equal('https://i.scdn.co/unknown', NowplayingResolver.spotify_artwork_url(images, 480))
+      assert_equal('https://i.scdn.co/300', NowplayingResolver.spotify_artwork_url(images, 300))
+      assert_equal('https://i.scdn.co/only', NowplayingResolver.spotify_artwork_url([{'url' => 'https://i.scdn.co/only'}], 480))
+    end
+
     def test_spotify_artwork_url_without_images
       assert_nil(NowplayingResolver.spotify_artwork_url([], 480))
       assert_nil(NowplayingResolver.spotify_artwork_url(nil, 480))
