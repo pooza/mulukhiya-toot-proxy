@@ -586,6 +586,53 @@ Slack / LINE / メールには出なくなるが、**周期実行でメールを
 - 実測: `rake lint` 無指摘 / `rake test` **1413 tests・0 failures・0 errors**
   （develop ベースライン 1387 から **+26 ＝ 追加したぶんちょうど**）
 
+### 2026-09-29 セッション同期の記録
+
+**本番には触っていない**（vulcan のログを読んだだけ）。辞書台帳・harness upstream は前回（09-28）から 1 日なので回していない。
+
+- **ブランチ**: `develop` は `origin/develop` と同一・未コミット無し。**CI は直近とも `success`**
+- **Dependabot**: open アラート **0 件**
+- **open PR**: #4768 / #4774 / #4776〜#4782（前回の記録どおり）＋ 🆕 **#4783（Ruby 4.0.7 へ追従・pooza/ginseng-style#114 の配布分）**。
+  `.ruby-version` だけの変更で CI 緑。サーバー側には 4.0.7 を追加済み（pooza/chubo2#259）。デプロイ時に `bundle install` が要る
+- **Codex / 申し送り**: 前回以降のマージは **0 本**。⚠ **PR #4782 に Codex の P2 が 1 件、未対処**
+  （Spotify の画像で `width` が null のものがフォールバックで落ちる）。09-28 の記録を書いた直後に付いた
+- **chubo2**: `origin/main` と差分なし。新 Issue なし
+- **vulcan は 09-29 05:45 JST に再起動している**（`uptime` 5:09）。モロヘイヤへの影響はログ上は見ていない
+
+#### ginseng-\* の新しいタグ（2026-09-29 の同期）
+
+⚠ **判断はユーザー待ち。宛先はまだ差し替えていない:**
+
+- **core v2.0.0**（09-28 21:51Z・**破壊的変更**）: Slack / LINE がリダイレクトを追わない・`host_validator` 付きが
+  `follow_redirects: false` を尊重・`Daemon#save_config` が `tmp/cache` の symlink / 不在で `ConfigError`。
+  #4747（PR #4778）の宛先は v1.25.1 のまま
+- **piefed v0.2.0**（09-28 21:33Z）: `Service#clip` が非公開で `RequestError` を上げず `nil` を返す（pooza/ginseng-piefed#18 の着地）。
+  **PR #4781 の「後半」の前提がこれ**（`PiefedClippingWorker` は戻り値の `nil` を「弾かれた」と扱う必要がある）
+
+#### Sentry
+
+- unresolved **26 件**。**`-2X` は count=61 / lastSeen 09-29T01:00:29Z**（前回 49 → +12）。内訳は zugoga / gomander / 他者で、
+  **vulcan は 0**。判断は据え置き＝外部ノイズ
+
+#### 📣 ダイスキーの「モロヘイヤ重い」（2026-09-28 22:36 JST・misskey.delmulin.com/notes/arouuogqya）
+
+**モロヘイヤ側の処理は全部速かった。**vulcan の mulukhiya-toot-proxy.log と nginx のアクセスログで、この人の IP を追った:
+
+| 時刻（JST） | 操作 | モロヘイヤ内の所要 |
+|---|---|---|
+| 22:29:52 | `/mulukhiya/app/status/aroul0c8xl`（タグづけ画面）を開く | 約 0.03 秒 |
+| 22:30:20 / :30 / :41 | Misskey のクライアントが丸ごと読み直される（`sw.js`・同じ画像群を 3 回） | ―（モロヘイヤを通らない） |
+| 22:30:29 | `notes/delete`（元ノート）＝**削除して編集** | ―（モロヘイヤを通らない） |
+| 22:30:51 | `notes/drafts/create`（`scheduledAt` = 22:31:00・`isActuallyScheduled`） | 約 0.23 秒（Misskey 0.023 秒） |
+| 22:31:00 | リプ元 `arounzp3wq` を **Misskey のキュー（`PostScheduledNoteProcessorService`）が投稿** | ―（HTTP を経ない） |
+| 22:33:12 / 22:36:11 | 返信 2 本の `notes/create` | 約 0.27 秒ずつ |
+
+- リプ元の本文は **22:30:51 の `drafts/create` でモロヘイヤを通っている**（pre_toot はここで掛かる）。
+  22:31:00 の実投稿は Misskey 内部の予約投稿ジョブなので、**モロヘイヤのログに `notes/create` が無いのは正常**
+- 同時間帯の 1 秒超はタグ辞書・読み辞書の更新（sidekiq・10 分おき）だけで、投稿の経路ではない。puma の遅延・エラーなし
+- **体感の重さの候補**: タグづけ画面（`/mulukhiya/app/...`）は Misskey の SPA の外なので、**行って戻ると Misskey のクライアントが
+  丸ごと読み直される**（22:30 台に 3 回）。サーバー側の遅さではない
+
 ### 2026-09-28 セッション同期の記録
 
 **本番には触っていない**（辞書台帳の生成と、shallu の Redis の uptime・ログを読んだだけ）。
