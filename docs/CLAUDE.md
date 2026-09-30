@@ -235,6 +235,13 @@ git diff Gemfile.lock
   5.38.0 の出荷後に develop を取り込んで ready にした（1501 tests・0 failures）
 - **#4352**（media_catalog を shallu / gomander へ横展開）は 5.38.0 から移した。⚠ リリースと束ねない。
   shallu の本番 `EXPLAIN` → flip → 24 時間観測 → gomander（日曜午前を外す）。flip の前にユーザーの確認を取る
+  - ✅ **shallu を flip した（2026-09-30 11:44 JST・ユーザー承認済み）**。EXPLAIN は `bin/diag/media_catalog_rollout.sql`
+    （現行の B 案だけ・読み取り専用・`statement_timeout` 30s）。⚠ `media_catalog_subsecond.sql` は旧クエリ入りなので本番で流さない。
+    **partial index 無しでも zugoga と同じ B 案のプラン**。page1 3,876ms（冷えた初回）→ flip 後 36ms、only_person 20→24ms、cursor 19→21ms。
+    比較は #4323 にコメント済み。📌 **24 時間観測中（〜10-01 11:45）**、日曜を過ぎたところで再確認
+  - ⚠ **shallu は `config/local.yaml`（リポジトリ内）が効いている**（`/usr/local/etc` より先に読まれる）。2 つは同一内容なので**両方を書き換えた**
+    （バックアップは各 `.bak-4352`）。rollback は両方を `false` に戻して sidekiq → puma を再起動
+  - ⚠ Claude Code の自動モードでは、本番の flag の書き換え後の再起動が「機能フラグの書き込み」として止められた。手動モードで続行した
 - ginseng-\* の版上げ（#4746 / #4747 / #4749 / #4750）。⚠ **2026-09-28 時点の宛先**: core **v1.25.1**（pooza/makoto2 の依頼）/
   redis **v2.0.8** / web **v3.0.3** / piefed ~~v0.1.2~~ **v0.2.0**（09-29 に差し替え）。core **v2.0.0**（破壊的変更）は **#4784 として 5.40.0 へ**（09-29 ユーザー判断: 緊急性が無いので準備したマイルストーンで。#4748 と対）
 - 📥 **#4775（pooza/makoto2 からの依頼・2026-09-28 に 5.39.0 へ）**: 上流の 429 を透過するときに
