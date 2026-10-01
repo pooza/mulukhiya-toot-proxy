@@ -3031,228 +3031,9 @@ Issue #4233 の APIController 段階的リファクタは「1〜2 マイルス�
 
 ## セッション開始時の同期手順
 
-会話の最初に「進捗を同期してください」等の指示があった場合、以下の手順を実行する。
-
-### 1. プロジェクトガイドの読み込み
-
-- `docs/CLAUDE.md` を読む（プロジェクトのルール・構造・履歴の正本）
-- `MEMORY.md` は自動ロードされるので、両者の整合性を意識する
-
-### 2. リモートとの同期・状態確認
-
-- `git fetch origin` — **最初に必ず実行**。リモートが正本であり、ローカルの状態を信用しない
-- `git log HEAD..origin/develop --oneline` — リモートに未取り込みのコミットがないか確認。差分があればpullを検討
-- `git log --oneline -10` — 直近のコミット履歴
-- `gh issue list --state open` — open Issue一覧
-- `gh pr list --state open` — open PR一覧
-
-### 3. Dependabotセキュリティアラート
-
-- `gh api repos/pooza/mulukhiya-toot-proxy/dependabot/alerts` で open アラートを確認
-- 0件なら対応不要、あれば提案
-
-### 4. Codexレビューコメントの確認
-
-- 最近マージされたPR（`gh pr list --state merged --limit 5`）を取得
-- 各PRに対して `gh api repos/pooza/mulukhiya-toot-proxy/pulls/{number}/comments` でCodex（`chatgpt-codex-connector[bot]`）のコメントを確認
-- 各コメントについて以下を判定する:
-  1. **未返信** → 指摘内容を確認し、対応が必要か判断。必要なら修正コミットまたは Issue 起票、返信してリアクション付与
-  2. **返信済みだがリアクション未付与** → 修正コミットの存在を確認し、+1 リアクションを付与
-  3. **返信済み・リアクション済み** → 完了。報告不要
-- 判定方法: `gh api repos/pooza/mulukhiya-toot-proxy/pulls/{number}/comments --jq` で全コメントを取得し、Codex コメントの `id` に対する `in_reply_to_id` を持つ返信の有無、および Codex コメントへのリアクション（`reactions`）を確認する
-
-⚠ **`pulls/{number}/comments` は行に紐づくレビューコメントしか返さない。**PR 本体のコメントは
-`gh api repos/pooza/mulukhiya-toot-proxy/issues/{number}/comments` で別に取る。**open PR も対象に含めること。**
-
-- 他リポジトリ（`ginseng-*` / chubo2）の作業をしている**別セッションが、こちらの PR へ申し送りを置く**ことがある。
-  投稿者は Codex ではなく `pooza` なので、bot だけを見ていると丸ごと落ちる
-- 2026-08-20 の同期で実際に落とした: PR #4602 に「正本側（pooza/ginseng-style#11 / #12）で 4 cop を無効化したので
-  `Minitest/RefutePathExists` の固有緩和を落とせる」という申し送りが 08-19 から置かれていた（b77dd308 で消化）
-
-### 5. Sentry の新規イシュー確認
-
-- `sentry-cli issues list` で未解決イシューを確認する（`~/.sentryclirc` に認証トークンとデフォルトプロジェクトが設定済み）
-- 各イシューの過去コメント（対応経緯）を確認する: `curl -sH "Authorization: Bearer $TOKEN" https://sentry.io/api/0/issues/{issue_id}/comments/ | python3 -m json.tool`
-- 新規・未解決のイシューがあれば内容を確認し、対応が必要か判断する（対応が必要なら GitHub Issue を起票）
-- 判断結果や対応経緯はコメントとして記録する: `curl -sX POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"text":"コメント内容"}' https://sentry.io/api/0/issues/{issue_id}/comments/`
-- `$TOKEN` は `~/.sentryclirc` の `[auth]` セクションから取得する
-- Sentry 未導入のプロジェクトではこのステップをスキップする
-
-⚠⚠ **「新規」だけでなく「コメント 0 のまま滞留しているもの」も見る（2026-09-23 追加・#4543 の結論）。**
-この手順は長く**最終発生の新しい順にしか見ていなかった**ので、**静かに立った新種が
-一度も判断されないまま残り続けた**。#4543 の起票時点で **27 件中 16 件がコメント 0** だった。
-
-```sh
-# unresolved のうちコメント 0 のものを出す
-export TOK=$(awk -F= '/^token=/{print $2}' ~/.sentryclirc)
-export ORG=$(awk -F= '/^org=/{print $2}' ~/.sentryclirc)
-export PROJ=$(awk -F= '/^project=/{print $2}' ~/.sentryclirc)
-python3 - <<'EOS'
-import json, os, urllib.request
-tok = os.environ['TOK']
-def get(url):
-  req = urllib.request.Request(url, headers={'Authorization': f'Bearer {tok}'})
-  return json.load(urllib.request.urlopen(req))
-issues = get(f"https://sentry.io/api/0/projects/{os.environ['ORG']}/{os.environ['PROJ']}/issues/?query=is%3Aunresolved")
-print(len(issues), 'unresolved')
-for i in issues:
-  if not get(f"https://sentry.io/api/0/issues/{i['id']}/comments/"):
-    print('コメント0:', i['shortId'], f"count={i['count']}", i['lastSeen'])
-EOS
-```
-
-⚠ **0 件であることを毎回確かめる**（2026-09-23 時点は unresolved 26 件・コメント 0 は 0 件）。
-1 件でも出たら、その場で最新イベントの `server_name` / `release` / culprit を開いて判断を書く。
-⚠ **判断には必ず「いつの時点の count か」を書く**（[[feedback_sentry-triage-needs-count-snapshot]]）。
-
-### 6. 外部リポジトリの同期確認（chubo2 / ginseng-*）
-
-対象は `pooza/chubo2`（インフラ）と `pooza/ginseng-*`（モロヘイヤが依存する自作 gem 群）。
-
-⚠ **ginseng-\* には専任のセッションがある**（2026-08-20 ユーザー明示）。**こちらが当番のように「担当」しない。**
-向こうの open Issue を棚卸ししたり、こちらのマイルストーンへ引き取ったりしない。
-
-⚠⚠ **ただし「Issue を投げて待つ」だけにしない（2026-08-20 ユーザー指示）。**
-**ginseng への修正・提案は、なるべく**たたき台を PR として**出す。**Issue だけ出すと、向こうは
-「依頼元が PR を出す」と読んで `waiting:pr` で止まる（pooza/ginseng-core#526 で実際に起きた）。
-判断・作り直しは向こうに委ねたうえで、動くコードとテストを添える。
-
-- **やること**: たたき台 PR の作成、送った Issue / PR の状況確認、リリースされた gem の
-  `bundle update` 追随、申し送りコメントの消化（§4 の PR 本体コメント）
-- **やらないこと**: ginseng-\* の open Issue の生死判定・優先度付け・こちらのマイルストーンへの取り込み
-- **たたき台 PR の作法**（pooza/ginseng-core#533 / #534 の形）:
-  - ⚠ **他セッションのチェックアウトを奪わない。**`~/repos/ginseng-*` は向こうが別ブランチを
-    開いていることがあるので、`git worktree add` で隔離した作業ツリーを使う
-  - ⚠ **既存の赤と比較して出す。**ginseng-core は実通信・ローカル環境依存で
-    **5 failures / 12 errors が常態**（pooza/ginseng-core#508）。「新規の赤ゼロ」を
-    main との対比で示す
-  - ⚠ **修正前の main で新テストが落ちることを確認**してから出す（回帰テストとして機能するか）
-  - 設計判断は「変えて構わない」と明示する。向こうの gem の設計はあちらのもの
-- ⚠ **モロヘイヤ側だけ直しても gem が値を捨てて届かないことがある**（#4589 / #4594 で 2 回踏んだ）。
-  その場合は「gem へ Issue/PR → 向こうで着地 → `bundle update` → 本体 PR」の順で、**依頼側として**回す
-
-#### 6-1. 毎セッション
-
-- `cd ~/repos/chubo2 && git fetch origin` + `git log HEAD..origin/main --oneline` でリモートとの差分を確認
-- `docs/infra-note.md` に変更があれば MEMORY.md のインフラセクションに反映が必要か判断
-- chubo2 の `gh issue list --state open` で open Issue の変動を確認
-- ginseng-\* は**こちらが送った Issue / PR の進捗**と、**下の「ピンのずれ」**だけ見る（一覧の棚卸しはしない）
-- **辞書エンドポイントの台帳を回す**（2026-08-27 追加・pooza/chubo2#205）:
-
-  ```sh
-  cd ~/repos/chubo2 && ruby tools/dictionary-registry.rb shallu zugoga gomander vulcan --write
-  ```
-
-  差分が出たら読む。⚠ **見るのは 🔴 の 2 つだけでよい** — **🔴 直書き**（設定が
-  `script.google.com` を直接引いている＝**台帳から辿れないので腐っても気づけない**）と
-  **🔴 死亡**（ログ上ずっと空）。**#4658 はこの 2 つが重なった状態**で 2 週間以上
-  気づかれなかった。🟡 間欠は #4659 の既知（毎回出る）、⚪ 取得のみは読み辞書の
-  正常な姿なので**異常と読まない**
-
-  ⚠⚠ **台帳そのものの整備（スプレッドシートの是正・GAS の V8 移行と再デプロイ）は
-  ユーザーが進める（2026-08-28 明示）。**⚠ **生成と差分の報告まではこちらの仕事**だが、
-  **是正の段取りを先回りして提案しない。**#4658 の進め方も同じ扱い
-
-##### ginseng-\* のピンのずれを見る（2026-08-21 追加）
-
-⚠⚠ **ginseng-\* は依頼が無くても自走で更新される**（2026-08-21 ユーザー明示）。
-`Gemfile.lock` は git gem の **revision 固定**なので、**向こうが直しても `bundle update` するまで
-こちらには 1 バイトも届かない**。「Issue が close された」は**取り込み済みを意味しない**。
-⚠⚠ **dependabot は `ginseng-*` の PR を出さない（#4702・2026-09-24）。ずれに気づく経路はこの節だけ**なので、
-同期のたびに必ず回す。
-
-```sh
-# Gemfile で固定した版と、各リポジトリの最新タグを突き合わせる
-ruby -e 'File.read("Gemfile").scan(/gem .(ginseng-[\w-]+).,\s+github: \S+,\s+(tag|ref): .(\w[\w.]*)./) {|n, kind, pin|
-  tags = `git ls-remote --tags --sort=-v:refname https://github.com/pooza/#{n}.git "v*"`
-  latest = tags[%r{refs/tags/(v[\d.]+)$}, 1]
-  ok = kind == "tag" ? pin == latest : tags.match?(/^#{pin}\trefs\/tags\/#{Regexp.escape(latest)}(\^\{\})?$/)
-  puts "#{n}\t#{ok ? "最新 #{latest}" : "ずれ #{pin[0, 12]} -> #{latest}"}" }'
-```
-
-⚠⚠ **5.37.0（#4702 / PR #4716）から `Gemfile` は版（タグ）で固定している**
-（`ginseng-style` だけは SHA・pooza/ginseng-style#75）。以前のスクリプトは
-**lock の revision と main HEAD** を比べていたので、タグで固定した後は
-**main にタグ未満のコミットが 1 本でもあると毎回「ずれ」を出す**（ノイズ）。
-⚠ 2026-09-10 時点の既知: **ginseng-web だけ v2.0.0 → v3.0.0 のずれ**（破壊的変更・意図して保留）。
-⚠ **タグが切られていない main のコミットはこのスクリプトには出ない。**依頼した修正が
-着地したかを見るときは `gh api repos/pooza/ginseng-X/compare/<最新タグ>...main` を読む。
-
-- **ずれていたら「何が変わったか」を読む**: `gh api repos/pooza/ginseng-X/compare/<固定中の版>...<最新タグ> --jq '.commits[].commit.message'`。
-  ⚠ **モロヘイヤが触る面**（`HTTP` / `Logger` / `Controller` / `TagContainer` / `Environment`）に
-  当たるかで判断する
-- **判断は 3 択**: ① すぐ取り込む（実害がある・依頼した修正の着地）② 次のマイルストーンで取り込む
-  ③ 見送る。**②③ は理由を台帳に 1 行残す**（次の同期で同じ調査をしないため）
-- ⚠ **`bundle update`（引数なし）は 8 本まとめて動く。**依頼した修正の取り込みは
-  **`bundle update <gem>` と gem 単位で**行う（赤が出たときの切り分けができなくなる）
-- ⚠ **取り込んだら `rake lint` と `rake test` を必ず通す。**「向こうが直した」は
-  「こちらで動く」ではない。逆向き（gem がこちらの値を捨てる）で 2 回踏んでいる（#4589 / #4594）
-- ⚠ **`Gemfile.lock` のルーチン最新化とは別物として扱う。**ルーチンは PR 不要（[[feedback_gemfile-lock-routine]]）
-  だが、**自走更新が混じるようになったので差分を読まずに上げない**
-
-#### 6-2. 30 日ごとの棚卸し
-
-chubo2 の [docs/infra-note.md](https://github.com/pooza/chubo2/blob/main/docs/infra-note.md) 冒頭にある
-「最終棚卸し」の日付を見る。**当日から 30 日以上経過していれば**以下を実行（経過していなければスキップ）。
-
-- **対象は chubo2（インフラ）のみ。**⚠ **ginseng-\* は専任セッションの持ち物なので棚卸ししない**（上の注記）
-- chubo2 の open Issue を 1 件ずつ、**コード・コミット・実機と突き合わせて**生死を判定する
-- **一覧を眺めるだけでは不十分。** 2026-07-31 の初回棚卸しでは 30 件中 6 件が「既に終わっている」
-  または「対象が消滅している」状態で、最古は 5 か月放置されていた（#4488）。実装が chubo-core 側の
-  コミットで着地していると、タイトルからは終わっているか分からない
-- 判定の取り方の例:
-  - レシピ化系 → 該当 cookbook を開いて実装の有無を確認（`git log -- <path>` でコミットも辿る）
-  - 移行・撤退系 → 実機に SSH、または `curl` / DNS 解決で新旧の状態を確認
-  - ステージング関連 → `docs/infra-note.md` の現況表と突き合わせる。**旧ステージング
-    （`drime` + dev04/15/22/23）は退役済み**なので、これらを対象とする Issue は陳腐化している
-- close 候補は**証拠を添えて提示する**。close するかどうかの判断はユーザーに残す
-- 棚卸しが済んだら `docs/infra-note.md` の「最終棚卸し」を当日に更新してコミット（close 候補が 0 件でも更新する）
-- 専用の cloud/cron ジョブは使わない（§8 と同じ理由。スケジュール実行は途中で止まって手で起こす運用に
-  なりがちで、セッションに織り込むほうが確実に回る）
-
-#### 6-3. ドキュメント・メモリの棚卸し
-
-**インフラ作業は「Mastodon / Misskey / モロヘイヤに触るか」で本セッションと chubo2 セッションに
-分かれて依頼されている。セッションメモリは共有されないので、片方のメモリにだけ事実が残ると
-もう片方が同じ調査を繰り返す。**
-
-- **一次対策は棚卸しではない。**インフラの調査・変更を終えたら、**その作業の一部として**
-  chubo2 の `docs/infra-note.md`（現在の状態・手順・罠・運用方針）または
-  `docs/infra-history.md`（日付のある出来事）に落とす。Issue とメモリだけで済ませない。
-  「リリース運用 → 通常リリース手順」の「リリース後の更新」と同じ扱いにする
-- 取りこぼしの回収は chubo2 の [docs/doc-maintenance.md](https://github.com/pooza/chubo2/blob/main/docs/doc-maintenance.md) の手順で行う。
-  `docs/infra-note.md` 冒頭の「最終ドキュメント棚卸し」が起点。**§6-2 の Issue 棚卸しとは軸が違う**
-  （あちらは open Issue の生死、こちらは知見の置き場所）。大きめの作業トラックが終わったとき、
-  またはユーザーの指示で回す
-- 昇格の判定は**目視でなく grep**。メモリの中の固有名詞を `infra-note.md` / `infra-history.md` に
-  投げ、ヒット 0 のものが対象。2026-08-03 の初回実施では `loop6` / `delmulin-misskey` /
-  `index_tags_on_name_lower` がいずれもヒット 0 だった（#4512、pooza/chubo2#129）
-- 昇格したメモリは**削除せずポインタに書き換える**（正本のパス＋なぜ非自明か）。
-  メモリは git 管理外なので消すと復元できない
-- **昇格しないもの**: 進め方の好み、提案の抑制（「〇〇を勧めない」）、私的判断。
-  これらはセッションごとの作業ルールなので docs に上げない
-
-### 7. マイルストーンの状態確認
-
-- `docs/CLAUDE.md` と MEMORY.md に記載された次期マイルストーンの Issue が、実際の GitHub 上の状態（open/closed）と一致しているか確認
-- クローズ済みの Issue があれば MEMORY.md から除外し、`docs/CLAUDE.md` も必要に応じて更新
-
-### 8. fedi-test-harness の upstream バージョンチェック
-
-- [harness-verified-versions.yaml](harness-verified-versions.yaml) の `last_checked` を見る。**当日から 4 日以上経過していれば**以下を実行（経過していなければスキップ）:
-  - `gh api 'repos/mastodon/mastodon/releases?per_page=15'` と `gh api 'repos/misskey-dev/misskey/releases?per_page=15'` で最新リリースを取得（ローカル `gh` は認証済み）
-  - 台帳の `mastodon.verified` / `misskey.verified` より**厳密に新しい** stable、または Mastodon の新しい RC（`vX.Y.Z-rc.N`、ベース版が verified より新しいもの）があるか判定
-  - 新しいものがあれば、検証を促す（Mastodon RC=約1週間の RC 期間中／Mastodon stable=リリース直後／Misskey=リリース後数日でデプロイ前）。検証フローは台帳ファイル冒頭参照。実検証・bump はその場で着手するか Issue 化するかを相談する
-  - 確認したら台帳の `last_checked` を当日に更新してコミット（新規が無くても更新する）
-- 専用の cloud/cron ジョブは使わず、この同期手順に織り込む方式（モロヘイヤは作業頻度が高いため十分）。詳細は MEMORY の `feedback_upstream-release-harness-verification`
-
-### 9. MEMORY.md の更新
-
-- 上記で検出した差分（Issue 状態、リリース日の誤り、件数のズレ等）を反映
-
-### 10. 同期結果の報告
-
-- 現在のブランチ・状態、マイルストーンの状況、各確認項目の結果をまとめて報告する
+⚠ **手順は `sync` スキル（[.claude/skills/sync/SKILL.md](../.claude/skills/sync/SKILL.md)）へ移した**（#4731・2026-09-29）。
+「進捗を同期してください」で起動する。ginseng-\* のピンのずれと Sentry のコメント 0 件の確認は、スキルに同梱したスクリプトで回す。
+⚠ 履歴の中の「同期手順 §6-1」などの節番号は、スキルの番号のまま通る。
 
 ## 情報の記載先ルール
 
@@ -3270,6 +3051,15 @@ chubo2 の [docs/infra-note.md](https://github.com/pooza/chubo2/blob/main/docs/i
 - [ginseng-config-internals.md](ginseng-config-internals.md) — Ginseng::Config 内部構造
 - [test-harness.md](test-harness.md) — #4379 chubo2 fedi-test-harness を使った実サーバーテストの手順
 - [capsicum-requirements.md](capsicum-requirements.md) — capsicum プロジェクトからの依頼事項
+
+### 手順（Claude Code のスキル・`.claude/skills/`）
+
+名前のついた手順書は #4731 でスキルへ移した。**正本はスキル**で、docs の同名の節はポインタ。
+
+- [sync](../.claude/skills/sync/SKILL.md) — セッション開始時の同期（「進捗を同期してください」で起動）。スクリプト 2 本を同梱
+- [release](../.claude/skills/release/SKILL.md) — 通常リリース・ホットフィックス（`/release` でのみ起動）
+- [release-review](../.claude/skills/release-review/SKILL.md) — リリース前の 5 観点並列レビュー（`/release-review` でのみ起動）
+- [harness-gate](../.claude/skills/harness-gate/SKILL.md) — harness 実走（リリースゲート）と upstream 版の検証
 - ⚠ **`media-catalog-index-plan.md` は 2026-09-08 に [media_catalog.md](media_catalog.md) の「性能トラックの記録」へ統合した**（正本を 1 本にするため）。内容は削らず全量を移してある
 
 ### アーカイブ (docs/archive/)
@@ -3357,116 +3147,20 @@ test/
 
 ### 通常リリース手順
 
-1. **マイルストーンのIssueをすべて消化**
-2. **リリース前レビュー**: 下記「リリース前レビュー」の 5 観点並列レビューを実施。⚠ **指摘の行き先は深刻度と工数の 2 軸で決める**（下記「指摘の行き先」節）。本リリースで直すのは必修（赤）のみ
-3. **セキュリティレビュー**: Dependabotアラート確認、`bundle update`、bundler-audit実行。問題があれば修正コミット
-4. **harness 実走（省略不可）**: chubo2 fedi-test-harness で `develop` の HEAD を実走し、**Mastodon 系・Misskey 系の両方で 0 failures / 0 errors** を確認する。手順は [test-harness.md](test-harness.md)「リリースゲートとしての実走」節。**CI の緑はこのゲートの代わりにならない**（CI は実サーバーを持たないため、アカウント依存のテスト 300 件超が omission のまま `100% passed` と出る。#4503）
-5. **ステージング検証（省略不可）**: `develop` をステージング全4台（dev24 美食丼 / dev25 キュアスタ！ / dev26 デルムリン丼 = Mastodon、dev27 ダイスキー = Misskey）にデプロイし、ヘルスチェック・`/mulukhiya/api/about`・WebUI を目視確認する。緊急ホットフィックス以外で省略しない（5.7.0 で省略 → #4159 が発生した教訓）。※旧ステージング（dev04/15/22/23 + drime）は退役済み。現行の Proxmox ステージング構成は chubo2 `docs/infra-note.md`「ステージング」節を正とする
-6. **バージョンバンプ**: `config/application.yaml` の `/mulukhiya/version` を更新
-7. **リリースPR作成**: `develop` → `main` へPRを作成
-8. **CI緑を確認してマージ**: `gh run list` でステータス確認、`in_progress` なら `gh run watch` で待つ。コードが同一でも CI 結果を踏んでからマージする
-9. **タグ・リリースノート作成**: `gh release create vX.Y.Z --target main --title "X.Y.Z"`。フォーマットは [release-notes-template.md](release-notes-template.md) 参照
-10. **本番デプロイ**: 全サーバーにデプロイ（sidekiq → puma → listener の順で再起動。monit停止 → restart → monit開始）
-11. **リリース後の更新**:
-    - docs/CLAUDE.md: 「開発中」→「リリース済み」に変更、次バージョンのセクション追加。**直近 3 マイナーのみ残し、4 マイナー前以前は [archive/release-history.md](archive/release-history.md) へ移動する**（例: 5.20.0 リリース時に 5.17.x をアーカイブへ）
-    - Wiki: リリース内容に応じて [Wiki](https://github.com/pooza/mulukhiya-toot-proxy/wiki) の更新が必要か確認（設定変更、API追加、廃止機能など）。**当該バージョンだけでなく直近 2〜3 バージョン分の反映漏れも合わせてチェックする**
-    - インフラノート（`pooza/chubo2` の `docs/infra-note.md`）: 作業履歴セクションにデプロイ記録を追記（デプロイ日・バージョン・主な変更内容・特記事項）
-    - MEMORY.md: リリース履歴・インフラセクションを同期
-12. **小粒の掃除**: 上記「指摘の行き先」の②（その場で直せる規模・`size:S`）に溜めたものを **1 PR** で落とす。⚠ **リリース準備の最中にやらないこと**——触ればステージング検証と harness をやり直しになる（5.36.0 で赤 1 件を直したときに実際に踏んだ）。⚠ **次のマイルストーンが始まる前**なら、その周回のステージング検証で一緒に見られる
+⚠ **手順は `release` スキル（[.claude/skills/release/SKILL.md](../.claude/skills/release/SKILL.md)）へ移した**（#4731）。
+モデルからは起動しない（`disable-model-invocation`）。`/release` で呼ぶ。
+⚠ harness 実走（`harness-gate` スキル）とステージング 4 台の検証は**省略不可**。「リリース後の更新」4 項目も全部踏む。
 
 ### リリース前レビュー
 
-各マイルストーンの Issue が消化済みになった後、バージョンバンプに入る前に実施する。**単一のセキュリティレビューだけでは実用上の問題が取りこぼされる**ため、以下 5 観点を独立したサブエージェントで並列に走らせ、指摘を合流させる。
-
-| 観点 | 焦点 |
-| --- | --- |
-| セキュリティ | `/security-review` スキル。認証・Bearer トークン取り扱い・シークレット scrub・入力検証 |
-| API 契約 | モロヘイヤ固有エンドポイント（`/mulukhiya/api/*`）、Mastodon/Misskey 本家 API 呼び出しの正確性、ginseng-fediverse interface 整合、`docs/api.md` との齟齬 |
-| 並行性・ライフサイクル | Sidekiq worker、Sequel 接続プール、Redis 接続、listener の WebSocket 再接続、systemd 前提の daemon 駆動 |
-| エラー処理・観測性 | Sentry 計装、`Ginseng::Error` の scrub、`/health` 応答の WARN/NG 判定、ログ出力の個人情報漏洩チェック |
-| コーディングスタイル・規約整合性 | rubocop / slim_lint / erb_lint、`handler_config(:key)` 記法、設定のスラッシュ記法、廃止語（「インスタンス」→「サーバー」など） |
-
-対象範囲は `v<前リリース>..develop` の差分。Codex（`chatgpt-codex-connector[bot]`）は PR ready 時に走るので併走させ、重複しない指摘だけを拾う。
-
-#### 指摘の行き先
-
-まず深刻度で分類する。⚠⚠ **この 3 段階は深刻度の軸しか言っていない。**「緑だから小さい」ではない（#4382 は性質としては構造改善だが `size:L` の大案件）。**工数は `size:S/M/L` という別の軸**で、行き先は 2 軸で決める。
-
-- **赤（必修）**: データ破損・セキュリティ・ユーザー可視の機能不全
-- **黄**: 単一の edge case、観測性ギャップ
-- **緑**: 将来の拡張時に顕在化しうる構造改善
-
-| | 深刻度 | 工数 | 行き先 |
-| --- | --- | --- | --- |
-| | 赤 | 問わず | **本リリースで直す** |
-| ① | 黄・緑 | 問わず | **起票しない**と決めてよい。受け入れる判断なら**該当箇所にコメント 1 行**。⚠ コメントが正しいのは「直さないと決めた理由がある」ときだけで、todo の置き場ではない |
-| ② | 黄・緑 | **その場で直せる規模**（`size:S`。⚠ 動作が変わってよい。テストを足して押さえる） | 🔴 **先送りしない。**手順 12 の掃除 PR へ。⚠ **Issue にしない** |
-| ③ | 黄・緑 | 中〜大 | Issue。⚠ **引き金（いつ・何が起きたら顕在化するか）を本文に書けることを条件にする。**書けないなら①へ倒す |
-
-#### 🔴 3 つ目の軸は「直す価値」で、決めるのはユーザー（2026-09-26）
-
-⚠⚠ **深刻度と工数では「直す価値があるか」は決まらない。**しかも価値は**指摘ごとにしか判断できない**
-（ユーザー「一概に決められない」）。上の表は分類であって、起票の許可ではない。
-
-- 🔴🔴 **まず②。その場で直せる規模なら、価値を問わず直す**（ユーザーの依頼「軽いものはなるべく近くで処理する」の本来の範囲）。
-  ⚠⚠ **2026-09-08 にこの依頼を手順へ落とすとき、Claude が「極小＝動作を変えないもの」と狭めて書いていた。**
-  そのため「数行だが動作は変わる」黄が②から漏れて Issue に流れ、消化期でも棚が減らなかった（2026-09-26 に是正）
-- ⚠ 「その場」は**同じリリースの掃除 PR で、ステージング検証より前**。リリース準備の最中（harness・ステージングの後）に直すと検証をやり直すことになる
-- **Claude は（②で直せない）黄・緑を単独で起票しない。**レビュー結果は、各指摘に
-  **「直さないと何が起きるか・誰に・どのくらいの頻度で」を 1 行**添えた一覧で出し、行き先（本リリース／掃除 PR／Issue／記録のみ）は
-  **ユーザーが指摘ごとに決める**
-- ⚠ **判断が付かないものは「記録のみ」**（このファイルのリリース前レビューの記録に 1 行）。Issue にして棚に積まない
-- 🔴 **発端**: 5.38.0 の消化に専念した回で、レビューの黄 6 件と緑の残り 1 件を**その場で 7 本起票した**
-  （#4760〜#4766）。open は 09-08 の 48 件から 55 件へ増えていた。#4760（二重増加の bug）以外の 6 本は同日に閉じた（#4764 は #4723 へ統合）
-- **既存の棚にも同じ形で当てる。**レビュー由来で open のものは、同じ 1 行の材料を付けてユーザーに判断を仰ぐ
-
-#### ⚠⚠ 「見つけたものは全部直す」を規則にしないこと
-
-**リリースが収束しなくなる。**修正それ自体が新しいコードなので、直す → 差分が増える → レビュー対象が増える → 直す、で止まらない。⚠ 5.36.0 では**赤 1 件を直しただけで** `rake lint` → harness 両系の実走 → **ステージング 4 台の再デプロイと再検証**を踏み直している。赤/黄/緑の三段は**リリースを終わらせるため**にある。
-
-⚠ **棚が増えているように見えても、まず数える。**5.36.0 の実績は「閉じた 16 / レビューが生んだ 6」で差し引き **-9**。レビューの産出は 5.32.0 から 4 回とも **4〜6 件でほぼ一定**で、**閉じた数ではなく新しく書いたコードの面積に比例する**。open 総数 48・180 日超 2 件は、増加ではなく**入れ替わりながらの横ばい**。
-
-⚠⚠ **生成そのものを減らそうとしないこと。**5.36.0 のレビューは #4691 を、09-07 のステージングは #4687（**本番 4 台の sidekiq が全滅する回帰**）を捕まえている。**触ってよいのは行き先の分岐であって、検出の量ではない。**
-
-#### 棚を減らす弁は 3 つある
-
-先送りの可否だけで考えない。
-
-- ① **入口を絞る** — レビュー時点で「受け入れる」と決めて起票しない
-- ② **極小は先送りしない** — 掃除 PR で消す（[[feedback_milestone-less-issue-handling]] の「軽いものはなるべく近くで処理する」がこれ）
-- ③ **やらないと決めて閉じる** — 理由を書いて閉じる。⚠ **情報は Issue に残って検索できる。**消えるのは「やる約束」のほうだけ。⚠ 「無意味な指摘ではない」と「やる価値がある」は別
-
-#### 消化を目的にしたマイルストーン
-
-テーマで選ぶのをやめ、**年齢と重みで選ぶ**回を置いてよい（「主軸宣言（任意）」のとおりテーマレス回は既定の形）。⚠ **先に `size` 未付与の Issue にラベルを貼ること**——貼らないと重み予算が機能しない。
-
-⚠ **簡単なものから減るので、残る棚の平均難度は上がる。**件数は速く落ちても重みはそこまで落ちない。⚠ **運用由来の起票（障害・Sentry triage・ステージング検証）は止まらないし、止めるべきでもない。**
-
-capsicum 側で先行運用しており、v1.18 のレビューでは 5 観点でセキュリティ単独では見つからなかった実害バグを複数検出した実績がある（[pooza/capsicum #325](https://github.com/pooza/capsicum/issues/325) の enrichNotifications unread フラグ欠落など）。Codex 停滞時の保険としても機能する。
+⚠ **手順は `release-review` スキル（[.claude/skills/release-review/SKILL.md](../.claude/skills/release-review/SKILL.md)）へ移した**（#4731）。
+5 観点の並列レビュー、指摘の行き先（深刻度 × 工数、⚠⚠ 黄・緑を単独で起票しない）、棚を減らす弁はスキルにある。
 
 ### ホットフィックス手順
 
-緊急パッチリリースの手順。通常リリースと異なり、develop → main マージではなく main に直接コミットする場合がある。
-
-1. **バージョンバンプ**: `config/application.yaml` の `/mulukhiya/version`（410行目付近）を更新
-2. **コミット・プッシュ**: develop（またはmain）にコミットしてプッシュ
-3. **mainへマージ**: developで作業した場合は main へPRを作成しマージ
-4. **タグ・リリースノート作成**: `gh release create vX.Y.Z --target main --title "X.Y.Z"`
-5. **本番デプロイ**: 全サーバーにデプロイ（monit停止 → restart → monit開始）
-6. **docs/CLAUDE.md 更新**: リリース済みセクションに追記
-7. **Wiki 確認**: リリース内容に応じて [Wiki](https://github.com/pooza/mulukhiya-toot-proxy/wiki) の更新が必要か確認する（設定変更、API追加、廃止機能など）
-8. **インフラノート更新**: `pooza/chubo2` の `docs/infra-note.md` 作業履歴セクションにデプロイ記録を追記
-9. **develop へ戻す**: main から切った場合は `main` を `develop` へマージする PR を出す。
-   衝突は `config/application.yaml` の version 行だけになるのが普通で、**develop 側の版を採る**
-
-⚠⚠ **9 を飛ばすと、次のリリースでホットフィックスが消える。**5.37.1（#4733 の HEIF 遮断）は
-develop へ戻しておらず、5.38.0 のリリース前レビューで初めて気づいた（2026-09-25）。そのまま進めていれば
-**harness もステージングも本番と別物を検証**し、`develop → main` のマージで遮断が外れていた。
-5.32.1 は戻っていたので、手順ではなく記憶に頼っていたことになる。
-
-バージョンが記載されている場所:
-
-- **`config/application.yaml`** `/mulukhiya/version` — **唯一の正本**。`/mulukhiya/api/about` 等で参照される
+⚠ **手順は `release` スキル（[.claude/skills/release/SKILL.md](../.claude/skills/release/SKILL.md)）へ移した**（#4731）。
+⚠⚠ main から切ったら **develop へ戻す**のを飛ばさない（5.37.1 で踏んだ。詳細はスキル）。
+バージョンの正本は `config/application.yaml` の `/mulukhiya/version`。
 
 ### マイルストーン管理
 
@@ -3528,20 +3222,8 @@ develop へ戻しておらず、5.38.0 のリリース前レビューで初め�
 
 ### Codexレビュー確認
 
-PRマージ後にCodex（chatgpt-codex-connector[bot]）のレビューコメントが遅れて届くことがある。セッション開始時に最近マージされたPRのレビューコメントを確認し、未対応の有益な指摘があれば対応すること。
-
-対応後はCodexのコメントに**返信とリアクションの両方を付与する**: 返信で対応内容（コミットハッシュやIssue番号等）を明記し、コメントに `+1` リアクションを付ける。**両方揃って「完了」**。片方だけではセッション同期時に未完了と判定される。
-
-```bash
-# 最近マージされたPRのCodexレビューコメントを確認
-gh api repos/pooza/mulukhiya-toot-proxy/pulls/{number}/comments \
-  --jq '.[] | select(.user.login == "chatgpt-codex-connector[bot]") | {id, body: .body[:200], path: .path, reactions: .reactions.total_count}'
-
-# リアクション付与（対応済み確定時）
-gh api repos/pooza/mulukhiya-toot-proxy/pulls/comments/{comment_id}/reactions -X POST -f content=+1
-```
-
-Codex が一時的に停滞して自動指摘が出ないことがある。その場合は前述「リリース前レビュー」の 5 観点並列レビューが代替・補完として機能する。
+⚠ **手順は `sync` スキル（[.claude/skills/sync/SKILL.md](../.claude/skills/sync/SKILL.md)）の §4 へ移した**（#4731）。
+要点: Codex のコメントには**返信と `+1` リアクションの両方**を付けて「完了」。
 
 ## 既知の注意事項
 

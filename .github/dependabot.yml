@@ -13,7 +13,7 @@ updates:
   target-branch: v4
   versioning-strategy: lockfile-only
 # ⚠⚠ **develop は version update を開けている。ただし `ginseng-*` は対象外 (#4702)。**
-# ginseng の版上げは、同期手順（docs/CLAUDE.md §6-1）でずれを拾い、gem ごとに
+# ginseng の版上げは、同期手順（.claude/skills/sync/SKILL.md §6-1）でずれを拾い、gem ごとに
 # 「すぐ / 次のマイルストーン / 見送り」を決めて Issue にする。dependabot の PR は
 # その判断（どの版を・どの回で）を持てないので、**二重になるか、判断とずれて閉じるか**の
 # どちらかにしかならなかった（2026-09-24 の PR #4752 は版も宛先もずれていた）。

@@ -51,7 +51,7 @@ harness が用意しないもの（`crypt.password` 等）のみ。
 
 > ⚠ **かつて**「ローカル Mastodon の status は `uri` カラムが null のことがあり
 > `StatusTest#test_uri` が落ちる」という既知の失敗があったが、**pooza/chubo2#48 は
-> クローズ済みで再現しない**（下記「リリースゲートとしての実走」の判定基準も
+> クローズ済みで再現しない**（`harness-gate` スキルの判定基準も
 > 「既知例外は無い」を前提にしている）。落ちたら例外を作らず原因を切り分けること。
 
 ## 手順（Mastodon）
@@ -86,7 +86,7 @@ Misskey ハーネス（`fedi-test-harness/misskey`）でも同様。コントロ
 `config/local.yaml` を編集しなくても自動で Misskey が選択される。Mastodon と Misskey の
 両方を同時に source した場合は `config['/controller']` の値が優先される。
 
-⚠ **これはリリースゲートの取り違えの原因になる。**後述「リリースゲートとしての実走」の
+⚠ **これはリリースゲートの取り違えの原因になる。**`harness-gate` スキル（リリースゲートとしての実走）の
 「系ごとにシェルを分ける」を必ず読むこと（#4559）。
 
 ```sh
@@ -99,82 +99,8 @@ bundle exec rake test
 
 ## リリースゲートとしての実走（省略不可）
 
-**この実走はリリース手順の必須ステップ**（docs/CLAUDE.md「リリース運用 → 通常リリース手順」）。
-CI には実サーバーが無く、アカウント依存のテスト 300 件超が omission のまま
-`100% passed` と出るため、**CI の緑はこのゲートの代わりにならない**（#4503）。
-
-### ⚠ 系ごとにシェルを分ける（同じシェルで両系を source しない）
-
-`source .env.test` した変数は**シェルに残る**。Mastodon → Misskey の順に同じシェルで
-source すると `MASTODON_*` と `MISSKEY_*` が両方揃い、コントローラ選択は
-`config['/controller']`（既定 `mastodon`）に倒れる。つまり **Misskey のつもりで
-Mastodon をもう一度走らせたまま「両系緑」とゲートを通せてしまう**（#4559）。
-
-- 系ごとに**別のシェル**（別タブ・`bash -c` の中・`env -i`）で回す
-  - ⚠ **`env -i` を使うなら `LANG` / `LC_ALL` を残す**（2026-08-11 に踏んだ）。落とすと Ruby の
-    外部エンコーディングが US-ASCII になり、**製品と無関係な
-    `invalid byte sequence in US-ASCII` が 1 failures / 5 errors 出る**。退行と読み違える。
-    `env -i HOME="$HOME" PATH="$PATH" TERM=dumb LANG="$LANG" LC_ALL="$LC_ALL" bash -c ...` で足りる
-  - 分離できたかは実走の前に `env | grep -c '^MASTODON_'` などで数えると確実（0 であること）
-- 実走の頭で `TestHarness` が **選択したコントローラを stderr に出す**ので、source した
-  `.env.test` と一致しているかを毎回見る:
-
-  ```text
-  TestHarness: controller=misskey url=http://localhost:3001
-  ```
-
-  **`url=` も判別に使える**（2026-08-16 実走確認）。Mastodon が `localhost:3000`、
-  Misskey が `localhost:3001`（pooza/chubo2#165 で `MISSKEY_PORT` の既定が 3001 になった）。
-  ⚠ ただし**判定の主は `controller=` の側**のままにする。`url=` はポート設定に依存し、
-  下記のとおり古い `.env` を持つ環境では両系とも 3000 を出すため。
-
-**両ハーネスは同時に起動できる**（Mastodon 3000 / Misskey 3001、DB も 5433 / 5434 で非衝突。
-2026-08-16 に同時稼働と両系実走を確認）。片方ずつ `teardown.sh` → `setup.sh` する必要は無くなった。
-
-⚠ **既定の変更は `.env.example` にしか入っていない。**`.env` は gitignore されていて更新の導線が
-無いため、**pooza/chubo2#165 より前に構築した環境は `MISSKEY_PORT=3000` のまま**で、従来どおり
-衝突する。`grep MISSKEY_PORT .env` で確かめ、3000 なら `teardown.sh` → `setup.sh` で作り直す
-（`.env` ごと消えて `.env.example` から作り直され、`.config/default.yml` の `url` も揃う。8〜9 分）。
-⚠ **ポート衝突で proxy の起動に失敗した後は、`docker compose up -d` では復旧しない。**
-ネットワーク未接続のコンテナが再利用され `host not found in upstream "web"` を繰り返すので、
-`docker compose rm -sf proxy` で作り直す（pooza/chubo2#178）。
-
-- 結果を記録するときは、この行もセットで残す（後から取り違えを検証できる）
-
-判定基準:
-
-- **Mastodon 系・Misskey 系の両方で `0 failures / 0 errors`。**片系だけでは不可
-- **実走ごとの `TestHarness: controller=...` が、狙った系と一致している**
-- 両系とも `develop` の同一 HEAD で走らせる
-- omission は許容する（harness が構造的に提供しない範囲 = デーモン層・webhook・streaming・
-  nodeinfo・seed 等を `harness?` で omit しているため）。ただし**件数が前回から大きく増えて
-  いたら中身を見る**。無害な omit の増加と、前提が壊れて実行されなくなった退行は区別がつかない
-
-**既知例外は無い。**両系とも 0 failures / 0 errors を実際に満たしている（#4492 を 2026-08-09 に
-解消したため）。落ちたら例外を作らず原因を切り分ける。
-
-参考値（2026-08-09 実測・両系とも同一 HEAD、クリーン再構築した harness）:
-
-| 系 | 結果 |
-| --- | --- |
-| Mastodon（harness v4.6.5） | 1001 tests / 2007 assertions / **0 failures / 0 errors** / 152 omissions |
-| Misskey（harness 2026.7.0） | 1004 tests / 2062 assertions / **0 failures / 0 errors** / 141 omissions |
-
-⚠ **assertion 数は同一 HEAD でも数件ぶれる**（seed データ量に依存するテストがあるため）。
-tests / failures / errors / omissions の 4 つで見る。
-
-⚠ **Mastodon と Misskey で `harness?` omit の対象が違う**（Misskey harness は nginx を挟まない、
-`access_token` 行を持たない等）。件数が両系で揃わないのは正常。
-
-失敗が出たときの切り分け:
-
-- **product の退行か、検証側の前提ズレか**を先に決める。2026-08-09 の 5 件（#4516 / #4552）は
-  **5 件とも検証側**だった。「harness で落ちた = 本番が壊れている」ではない
-- 疑わしいときは、**上流バージョンを 1 つ落として同一 HEAD でクリーン再構築**し、失敗集合が
-  一致するかを見る（2026-08-09 の Mastodon v4.6.5 検証で使った手）。一致すれば上流起因ではない
-
-記録先: [harness-verified-versions.yaml](harness-verified-versions.yaml)。上流バージョンの
-`verified` 昇格を伴う実走は、この台帳に日付つきで残す。
+⚠ **手順は `harness-gate` スキル（[.claude/skills/harness-gate/SKILL.md](../.claude/skills/harness-gate/SKILL.md)）へ移した**（#4731）。
+判定は **Mastodon 系・Misskey 系の両方で 0 failures / 0 errors**。⚠ 系ごとにシェルを分ける（#4559）。CI の緑はこのゲートの代わりにならない（#4503）。
 
 ## webhook 投稿経路の検証（#4428）
 
