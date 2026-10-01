@@ -8,7 +8,7 @@ gem 'ginseng-fediverse', github: 'pooza/ginseng-fediverse', tag: 'v2.0.4',
   require: 'ginseng/fediverse'
 gem 'ginseng-piefed', github: 'pooza/ginseng-piefed', tag: 'v0.1.1', require: 'ginseng/piefed'
 gem 'ginseng-postgres', github: 'pooza/ginseng-postgres', tag: 'v2.0.1'
-gem 'ginseng-redis', github: 'pooza/ginseng-redis', tag: 'v2.0.6', require: 'ginseng/redis'
+gem 'ginseng-redis', github: 'pooza/ginseng-redis', tag: 'v2.0.8', require: 'ginseng/redis'
 gem 'ginseng-web', github: 'pooza/ginseng-web', tag: 'v3.0.0', require: 'ginseng/web'
 gem 'ginseng-youtube', github: 'pooza/ginseng-youtube', tag: 'v3.0.1', require: 'ginseng/you_tube'
 gem 'icalendar'

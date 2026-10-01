@@ -65,10 +65,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-redis.git
-  revision: 0019c73ea1eed170ef40712f788171f1edf242c9
-  tag: v2.0.6
+  revision: 3a15d90f862116ef6b5d5274bb92d8003fa7312e
+  tag: v2.0.8
   specs:
-    ginseng-redis (2.0.6)
+    ginseng-redis (2.0.8)
       redis-client
 
 GIT
