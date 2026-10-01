@@ -19,8 +19,8 @@
 # 運用方針の詳細は MEMORY の feedback_upstream-release-harness-verification 参照。
 
 mastodon:
-  verified: v4.7.2
-  verified_at: '2026-09-16'
+  verified: v4.7.3
+  verified_at: '2026-10-02'
 
 misskey:
   verified: 2026.9.1
@@ -34,7 +34,15 @@ last_checked: '2026-10-02'
 #     Security は依存更新。アセットの再コンパイルが要る。4.6.9 / 4.5.19 / 4.4.26 と同時リリース。
 #   - 🔴 **Misskey 2026.10.0（2026-10-01・stable）が出た。verified（2026.9.1）より新しいので検証対象。**
 #     「セキュリティに関する修正」を含む。HTTP Signatures の `(request-target)` にクエリ文字列を含める修正あり。
-#   - 検証は harness-gate スキルで行う（着手時期はユーザー判断）。
+#   - ✅ **Mastodon は同日中に fedi-test-harness（v4.7.3・`reset.sh` でクリーン再構築）で実走し、`verified` を昇格した。**
+#     モロヘイヤ develop `6fb5092a`。**1613 tests / 3222 assertions / 0 failures / 0 errors /
+#     159 omissions（100% passed）。**失敗が無いので版間 diff は不要。
+#     `TestHarness: controller=mastodon url=http://localhost:3000` と `/api/v1/instance` の version 4.7.3 を確認。
+#     `MISSKEY_*` は 0 本（`env -i` で系を分離）。⚠ **omission 159 件は v4.7.2 と同数。**
+#     ⚠ `TestHarness: DB 接続に失敗したためスキップ: … user "u"` が 1 行出るが、**TestHarness の単体テストが
+#     わざと入れるダミー DSN（`postgres://u:p@…`・test/unit/lib/test_harness.rb）由来で無害**。
+#     chubo2 のピンは `2f6b45a`。実走後に teardown 済み。
+#   - Misskey は別セッションが対応中（ユーザー指示）。こちらでは実走していない。
 
 # 2026-09-24 チェック結果:
 #   - 🔴 **Misskey 2026.9.1（2026-09-23・stable）が出た。verified（2026.9.0）より新しいので検証対象。**
