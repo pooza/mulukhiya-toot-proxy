@@ -9,6 +9,7 @@ module Mulukhiya
 
     include LogScrubber
     include ControllerErrorMethods
+    include UpstreamErrorMethods
 
     # 上流へそのまま中継してよい受信ヘッダ (#4598)。
     #
