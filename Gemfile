@@ -48,6 +48,9 @@ gem 'puma', '~> 8.0'
 # `sinatra/base` 経由で入るので、`require: false` でも解決できる（実測）。
 gem 'rack', '~> 3.2.5', require: false # 2026-02 の同時アクセステスト (500 req × 2 並列・不整合 0、#4055) が通った版
 gem 'rack-session', '>= 2.1.1', require: false # ⚠ ginseng-web の床をそのまま移すだけ。事故との関係は無い
+# 🔴 CVE-2026-80212 / 80213 (#4772)。Ruby 4.0.6 同梱は 0.7.0。
+# 4.0.7 同梱と同じ 0.7.x に留める（0.8.0 は 2026-09-17 公開で未検証）
+gem 'resolv', '~> 0.7.2', require: false
 gem 'rspotify', github: 'pooza/rspotify', branch: 'master.pooza'
 gem 'ruby-progressbar'
 gem 'ruby-vips', require: 'vips'

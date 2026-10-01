@@ -51,6 +51,9 @@ updates:
     # 🔴 事故版は 4.2.0。4.2.1 は本番 4 台で無事故（#4508）
     - dependency-name: sinatra
       update-types: ['version-update:semver-major', 'version-update:semver-minor']
+    # #4772: CVE-2026-80212 / 80213 のホットフィックス。Ruby 4.0.7 同梱と同じ 0.7.x に留める
+    - dependency-name: resolv
+      update-types: ['version-update:semver-major', 'version-update:semver-minor']
     - dependency-name: sidekiq-scheduler
       update-types: ['version-update:semver-major', 'version-update:semver-minor']
     - dependency-name: parallel
