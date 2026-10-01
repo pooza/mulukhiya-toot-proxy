@@ -618,7 +618,7 @@ Slack / LINE / メールには出なくなるが、**周期実行でメールを
 - **Codex / 申し送り**: 前回以降のマージは **0 本**。PR #4782 の P2 は返信＋ +1 で完了。
   🆕 **PR #4786 に Codex の P2 が 1 件、未返信**（09-29T10:59Z）: `/release` が必須の `/release-review` を呼べない
   （`disable-model-invocation: true` なので Skill ツールから起動できず、手順が止まるかレビューを飛ばす）。
-  対処案は「呼べるようにする / 本文を取り込む / 明示的に止めてユーザーに `/release-review` を打たせる」。⚠ **直すかはユーザー判断待ち**
+  → **「明示的に止める」で対処（ユーザー判断・`9145f121`）**。`/release` の手順 2 で必ず止まり、ユーザーに `/release-review` を頼む。返信＋ +1 済み
 - **chubo2**: `origin/main` と差分なし。🆕 **#261（Mastodon 3 台で古いリモート投稿を削除し、ハッシュタグリレーを戻す）**。
   モロヘイヤの実装には非関係（`tootctl` の改修は pooza/mastodon#977）
 - **ginseng-\* のピン**: 前回から**新しいタグなし**（core v2.0.0 / fediverse v3.1.4 / piefed v0.2.0 / redis v2.0.8 / web v3.0.3 /
