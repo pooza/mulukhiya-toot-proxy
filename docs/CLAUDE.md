@@ -608,6 +608,34 @@ Slack / LINE / メールには出なくなるが、**周期実行でメールを
 - 実測: `rake lint` 無指摘 / `rake test` **1413 tests・0 failures・0 errors**
   （develop ベースライン 1387 から **+26 ＝ 追加したぶんちょうど**）
 
+### 2026-10-01 セッション同期の記録
+
+**本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。harness upstream は `last_checked` 09-28 から 3 日なのでスキップ。
+
+- **ブランチ**: `develop` は `origin/develop` と同一・未コミット無し。**CI は直近とも `success`**
+- **Dependabot**: open アラート **0 件**
+- **open PR**: 前回の記録どおり＋ 🆕 **#4787（dependabot・icalendar 2.12.4 → 2.12.5・MERGEABLE）**
+- **Codex / 申し送り**: 前回以降のマージは **0 本**。PR #4782 の P2 は返信＋ +1 で完了。
+  🆕 **PR #4786 に Codex の P2 が 1 件、未返信**（09-29T10:59Z）: `/release` が必須の `/release-review` を呼べない
+  （`disable-model-invocation: true` なので Skill ツールから起動できず、手順が止まるかレビューを飛ばす）。
+  対処案は「呼べるようにする / 本文を取り込む / 明示的に止めてユーザーに `/release-review` を打たせる」。⚠ **直すかはユーザー判断待ち**
+- **chubo2**: `origin/main` と差分なし。🆕 **#261（Mastodon 3 台で古いリモート投稿を削除し、ハッシュタグリレーを戻す）**。
+  モロヘイヤの実装には非関係（`tootctl` の改修は pooza/mastodon#977）
+- **ginseng-\* のピン**: 前回から**新しいタグなし**（core v2.0.0 / fediverse v3.1.4 / piefed v0.2.0 / redis v2.0.8 / web v3.0.3 /
+  youtube v3.0.2 / style v1.1.13）。各 PR・Issue の宛先は前回の判断どおり
+- **辞書台帳**（chubo2 `ee61bd7`）: **🔴 は前回と同じ 3 件**（直書き 1 / 台帳に無い 2）・**🔴 死亡 0**。
+  🟡 が広がった（gomander `precure.json` 23/144・`annict/episodes` 16/144、vulcan `annict/episodes` 14/144・`service.json` 11/144）。
+  `annict/episodes` は下の Annict 遅延と同時期
+- **#4352 の 24 時間観測は 10-01 11:45（shallu）/ 11:53（gomander）まで**。同期時点（09:11）では未了。日曜（10-04）明けに見直す予定は据え置き
+
+#### Sentry
+
+- unresolved **25 件**（前回 26）・**コメント 0 は 0 件**
+- 🔴 **`-2X` が count=126 / lastSeen 10-01T00:10:29Z**（前回 61 → +65）。**JST 10-01 06:00〜09:00 の 3 時間で 44 件**に集中。
+  zugoga / gomander / 他者（instance-20220704-2044・5.37.1）の 3 機で同時に、全件 `AnnictService#query` の ReadTimeout。
+  **他者の機体でも同時刻に増えているので Annict 側の応答遅延**と読む。判断は据え置き＝外部ノイズ。`-2Y`（count=7・他者 +2）も同じ。
+  両方にコメント済み。📌 **次の同期で密度が平常（1 日数件）へ戻ったかを見る**
+
 ### 2026-09-29 セッション同期の記録
 
 **本番には触っていない**（vulcan のログを読んだだけ）。辞書台帳・harness upstream は前回（09-28）から 1 日なので回していない。
