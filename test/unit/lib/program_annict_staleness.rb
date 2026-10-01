@@ -77,8 +77,8 @@ module Mulukhiya
         assert_equal(:superseded, apply('k', prepared, entry(episode: 6)))
         assert_equal(:applied, apply('k', prepared, entry), '素直に載る回を superseded と読んでいる')
         assert_equal(
-          :not_found,
-          apply('k', prepared(episode_data: nil, state: :not_found), entry(episode: 6)),
+          :failed,
+          apply('k', prepared(episode_data: nil, state: :failed), entry(episode: 6)),
           'Annict を引けなかった回を「ガードが効いた」と読んでいる',
         )
       end
@@ -121,7 +121,7 @@ module Mulukhiya
       error = RuntimeError.new('annict down')
       error.define_singleton_method(:log) {|*| nil}
       annict = Object.new
-      annict.define_singleton_method(:episodes) {|_ids| raise error}
+      annict.define_singleton_method(:episodes) {|_ids, **| raise error}
 
       assert_equal(:failed, prepare('k', annict)[:state])
     end
@@ -135,7 +135,7 @@ module Mulukhiya
       error.define_singleton_method(:alert) {|*| calls.push(:alert)}
       error.define_singleton_method(:log) {|payload| calls.push(payload)}
       annict = Object.new
-      annict.define_singleton_method(:episodes) {|_ids| raise error}
+      annict.define_singleton_method(:episodes) {|_ids, **| raise error}
       prepare('k', annict)
 
       assert_not_include(calls, :alert)
@@ -191,7 +191,132 @@ module Mulukhiya
       assert_nil(target['annict_episode_id'])
     end
 
+    # --- Annict にまだ無い話数では断る (#4771) --------------------------------
+    #
+    # ⚠ 放送直後に押すと翌週の回が Annict に未登録で、以前は話数だけ進んで
+    # サブタイトルを手で補うことになっていた。断れば、押し直すだけで一度に入る。
+
+    def test_increment_refuses_when_annict_lacks_the_episode
+      programs = stub_increment('k' => {'episode' => 4, 'annict_work_id' => 42})
+      error = assert_raise(ConflictError) do
+        editor.increment_episode_with_annict('k', annict: annict_double([{'numberText' => '第4話'}]))
+      end
+
+      assert_equal(:annict_not_found, error.code)
+      assert_nil(error.retry_after, 'Annict に載る時刻は分からないので Retry-After を付けない')
+      assert_equal(4, programs['k']['episode'], '断ったのに話数が進んでいる')
+      assert_empty(@saved, '断ったのに保存している')
+    end
+
+    # ⚠ Annict の障害では断らない（2026-09-26 ユーザー判断）。作業が止まらないように、
+    # 今までどおり +1 して `failed` を返す。
+    def test_increment_proceeds_when_annict_fails
+      stub_increment('k' => {'episode' => 4, 'annict_work_id' => 42})
+      error = RuntimeError.new('annict down')
+      error.define_singleton_method(:log) {|*| nil}
+      annict = Object.new
+      annict.define_singleton_method(:episodes) {|_ids, **| raise error}
+      result = editor.increment_episode_with_annict('k', annict:)
+
+      assert_equal(:failed, result[:annict])
+      assert_equal(5, result[:entry]['episode'])
+      assert_equal(1, @saved.size)
+    end
+
+    # 作品 ID が無い番組は Annict を見ないので、今までどおり +1 する。
+    def test_increment_proceeds_without_work_id
+      stub_increment('k' => {'episode' => 4})
+      result = editor.increment_episode_with_annict('k', annict: annict_double([]))
+
+      assert_equal(:unconfigured, result[:annict])
+      assert_equal(5, result[:entry]['episode'])
+    end
+
+    # ⚠ 無いキーは 404 のまま。断る判定をロックの外に置くと、ここが 409 に化ける。
+    def test_increment_on_missing_key_is_still_not_found
+      stub_increment({})
+
+      assert_raise(Ginseng::NotFoundError) do
+        editor.increment_episode_with_annict('nothing', annict: annict_double([]))
+      end
+    end
+
+    # ⚠ 引いている間に別の +1 が入っていたら、`not_found` は古い話数についての答え。
+    # 断らずに +1 し、`superseded` として報告する（PR #4776 の Codex P2）。
+    # ここでは「引いた後にエントリが 5 へ進んだ」を、data の差し替えで再現する。
+    def test_increment_does_not_refuse_on_stale_miss
+      programs = stub_increment('k' => {'episode' => 4, 'annict_work_id' => 42})
+      annict = Object.new
+      annict.define_singleton_method(:episodes) do |_ids, **|
+        programs['k']['episode'] = 5 # 引いている間に別の +1 が入った
+        next [{'numberText' => '第4話'}]
+      end
+      result = capture_info {@result = editor.increment_episode_with_annict('k', annict:)}
+
+      assert_equal(:superseded, @result[:annict])
+      assert_equal(6, @result[:entry]['episode'])
+      assert_equal('annict_stale', result.first[:program_entry][:event])
+    end
+
+    # 作品を差し替えられた場合も同じ。
+    def test_increment_does_not_refuse_when_work_was_swapped
+      programs = stub_increment('k' => {'episode' => 4, 'annict_work_id' => 42})
+      annict = Object.new
+      annict.define_singleton_method(:episodes) do |_ids, **|
+        programs['k']['annict_work_id'] = 43
+        next []
+      end
+      capture_info {@result = editor.increment_episode_with_annict('k', annict:)}
+
+      assert_equal(:superseded, @result[:annict])
+      assert_equal(5, @result[:entry]['episode'])
+    end
+
+    # ⚠ 回は登録済みだがサブタイトルがまだ無い（PR #4776 の Codex P2）。断ると、
+    # サブタイトルを持たない作品では「話数 ＋」がずっと通らなくなる。+1 して `untitled` を返す。
+    def test_increment_proceeds_when_episode_has_no_title
+      programs = stub_increment('k' => {'episode' => 4, 'annict_work_id' => 42, 'subtitle' => '前の回'})
+      calls = []
+      annict = Object.new
+      annict.define_singleton_method(:episodes) do |_ids, **opts|
+        calls.push(opts)
+        next [{'numberText' => '第5話', 'annictId' => 123, 'title' => nil}]
+      end
+      result = editor.increment_episode_with_annict('k', annict:)
+
+      assert_equal(:untitled, result[:annict])
+      assert_equal(5, programs['k']['episode'])
+      assert_equal(123, programs['k']['annict_episode_id'])
+      assert_equal([{untitled: true}], calls, 'サブタイトルの無い回を落として引いている')
+    end
+
+    def test_increment_applies_when_annict_has_the_episode
+      stub_increment('k' => {'episode' => 4, 'annict_work_id' => 42})
+      annict = annict_double([{'numberText' => '第5話', 'annictId' => 123, 'title' => 'サブタイトル'}])
+      result = editor.increment_episode_with_annict('k', annict:)
+
+      assert_equal(:applied, result[:annict])
+      assert_equal(5, result[:entry]['episode'])
+      assert_equal('サブタイトル', result[:entry]['subtitle'])
+    end
+
     private
+
+    # increment_episode_with_annict を Redis・YAML 抜きで通すための差し替え。
+    # ロックは素通し、保存は記録するだけ。
+    def stub_increment(programs)
+      stub_data(programs)
+      @saved = []
+      saved = @saved
+      editor.define_singleton_method(:auto_update?) {false}
+      lock = Object.new
+      lock.define_singleton_method(:synchronize) {|&block| block.call}
+      editor.define_singleton_method(:lock) {lock}
+      fetcher = Object.new
+      fetcher.define_singleton_method(:save) {|values| saved.push(values)}
+      editor.define_singleton_method(:fetcher) {fetcher}
+      return programs
+    end
 
     def prepare(key, annict)
       return editor.send(:prepare_annict_increment, key, annict)
@@ -203,7 +328,7 @@ module Mulukhiya
 
     def annict_double(episodes)
       annict = Object.new
-      annict.define_singleton_method(:episodes) {|_ids| episodes}
+      annict.define_singleton_method(:episodes) {|_ids, **| episodes}
       return annict
     end
 

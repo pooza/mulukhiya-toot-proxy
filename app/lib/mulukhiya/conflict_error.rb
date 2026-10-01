@@ -13,10 +13,15 @@ module Mulukhiya
   # - `duplicate_request` — Annict の同じ記録・レビューが直前に送られている。
   #   ⚠ **一過性ではない。**先の要求が成功していればロックは TTL まで残るので、
   #   待って送り直すと**二重に記録される**。先の結果を確かめてから判断する
+  # - `annict_not_found` — 番組表の「話数 ＋」で、次の話数が Annict にまだ無い (#4771)。
+  #   **話数は進めていない**ので、時間を置いて送り直してよい（放送直後は未登録のことがある）。
+  #   ⚠ `Retry-After` は付けない。Annict に載る時刻はこちらからは分からない
   #
   # ⚠ `Ginseng::ConflictError` の派生にしてあるので、既存の `rescue` はそのまま効く。
   class ConflictError < Ginseng::ConflictError
-    CODES = [:locked, :auto_update, :duplicate_key, :template_limit, :duplicate_request].freeze
+    CODES = [
+      :locked, :auto_update, :duplicate_key, :template_limit, :duplicate_request, :annict_not_found
+    ].freeze
 
     attr_reader :code, :retry_after
 
