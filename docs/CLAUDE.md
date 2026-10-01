@@ -636,7 +636,9 @@ Slack / LINE / メールには出なくなるが、**周期実行でメールを
   **Misskey 2026.10.0**（10-01・「セキュリティに関する修正」・HTTP Signatures の `(request-target)` にクエリ文字列を含める修正・verified は 2026.9.1）。
   どちらもセキュリティを含むリリースなので harness 検証を促した
   - ✅ **Mastodon v4.7.3 を同日中に実走して `verified` へ昇格した**（develop `6fb5092a`・1613 tests・0 failures / 0 errors・159 omissions ＝ v4.7.2 と同数。
-    chubo2 `2f6b45a`・実走後に teardown 済み）。**Misskey は別セッションが対応中**（ユーザー指示）なのでこちらでは走らせていない
+    chubo2 `2f6b45a`・実走後に teardown 済み）
+  - ✅ **Misskey 2026.10.0 も実走して `verified` へ昇格した**（pooza/misskey #457 でマージ済み・本番デプロイ前。develop `f490b091`・1616 tests・0 failures / 0 errors・145 omissions ＝ 2026.9.1 と同数。
+    chubo2 `2bdbc8a`）。⚠ harness は upstream イメージなので fork 固有の差分は検証範囲外
 
 #### chubo2 の Issue 棚卸し（§6-2・同日に実施・chubo2 `200e217`）
 

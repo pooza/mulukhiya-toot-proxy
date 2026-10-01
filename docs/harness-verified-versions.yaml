@@ -23,8 +23,8 @@ mastodon:
   verified_at: '2026-10-02'
 
 misskey:
-  verified: 2026.9.1
-  verified_at: '2026-09-24'
+  verified: 2026.10.0
+  verified_at: '2026-10-02'
 
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
 last_checked: '2026-10-02'
@@ -42,7 +42,13 @@ last_checked: '2026-10-02'
 #     ⚠ `TestHarness: DB 接続に失敗したためスキップ: … user "u"` が 1 行出るが、**TestHarness の単体テストが
 #     わざと入れるダミー DSN（`postgres://u:p@…`・test/unit/lib/test_harness.rb）由来で無害**。
 #     chubo2 のピンは `2f6b45a`。実走後に teardown 済み。
-#   - Misskey は別セッションが対応中（ユーザー指示）。こちらでは実走していない。
+#   - ✅ **Misskey 2026.10.0 も同日中に実走し、`verified` を昇格した**（pooza/misskey は #457 で取り込み・マージ済み、
+#     ダイスキーへの本番デプロイは未了の時点。harness は upstream の `misskey/misskey:2026.10.0` イメージなので
+#     **fork 固有の差分は検証範囲外**）。モロヘイヤ develop `f490b091`。
+#     **1616 tests / 3213 assertions / 0 failures / 0 errors / 145 omissions（100% passed）。**omission は 2026.9.1 と同数。
+#     `TestHarness: controller=misskey url=http://localhost:3001`・`/api/meta` の version 2026.10.0・`MASTODON_*` 0 本を確認。
+#     5433 への DB 接続スキップ 1 行は上と同じダミー DSN 由来（Mastodon harness 停止中なので refused になる）。
+#     chubo2 のピンは `2bdbc8a`。実走後に teardown 済み。
 
 # 2026-09-24 チェック結果:
 #   - 🔴 **Misskey 2026.9.1（2026-09-23・stable）が出た。verified（2026.9.0）より新しいので検証対象。**
