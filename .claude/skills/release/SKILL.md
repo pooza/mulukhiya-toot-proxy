@@ -13,7 +13,9 @@ disable-model-invocation: true
 ## 通常リリース手順
 
 1. **マイルストーンのIssueをすべて消化**
-2. **リリース前レビュー**: `/release-review` の 5 観点並列レビューを実施。⚠ **指摘の行き先は深刻度と工数の 2 軸で決める**（`release-review` スキルの「指摘の行き先」）。本リリースで直すのは必修（赤）のみ
+2. **リリース前レビュー**: `/release-review` の 5 観点並列レビューを実施。⚠ **指摘の行き先は深刻度と工数の 2 軸で決める**（`release-review` スキルの「指摘の行き先」）。本リリースで直すのは必修（赤）のみ。
+   ⚠⚠ **ここで必ず止まる。**`release-review` は `disable-model-invocation: true` なので、この手順からは起動できない。
+   ユーザーに `/release-review` の実行を頼み、レビューが終わって赤が片付くまで 3 以降へ進まない。**レビューを飛ばして先へ進むことはしない**
 3. **セキュリティレビュー**: Dependabotアラート確認、`bundle update`、bundler-audit実行。問題があれば修正コミット
 4. **harness 実走（省略不可）**: chubo2 fedi-test-harness で `develop` の HEAD を実走し、**Mastodon 系・Misskey 系の両方で 0 failures / 0 errors** を確認する。手順は `harness-gate` スキル。**CI の緑はこのゲートの代わりにならない**（CI は実サーバーを持たないため、アカウント依存のテスト 300 件超が omission のまま `100% passed` と出る。#4503）
 5. **ステージング検証（省略不可）**: `develop` をステージング全4台（dev24 美食丼 / dev25 キュアスタ！ / dev26 デルムリン丼 = Mastodon、dev27 ダイスキー = Misskey）にデプロイし、ヘルスチェック・`/mulukhiya/api/about`・WebUI を目視確認する。緊急ホットフィックス以外で省略しない（5.7.0 で省略 → #4159 が発生した教訓）。※旧ステージング（dev04/15/22/23 + drime）は退役済み。現行の Proxmox ステージング構成は chubo2 `docs/infra-note.md`「ステージング」節を正とする
