@@ -49,10 +49,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-piefed.git
-  revision: ec2bf39fd0c706c33a9d159fb13fd8006b001927
-  tag: v0.1.1
+  revision: 04caa62eb12aad48f414eb53fa8691a1a52a5ae6
+  tag: v0.2.0
   specs:
-    ginseng-piefed (0.1.1)
+    ginseng-piefed (0.2.0)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
