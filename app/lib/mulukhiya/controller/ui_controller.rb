@@ -44,7 +44,7 @@ module Mulukhiya
       report_error(e)
       @renderer = SlimRenderer.new
       @renderer.template = 'token_error'
-      @renderer[:error] = e.message
+      @renderer[:error] = public_error_message(e)
       @renderer.status = e.respond_to?(:status) ? e.status : 500
       return @renderer.to_s
     end

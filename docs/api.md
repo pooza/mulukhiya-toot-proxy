@@ -76,6 +76,8 @@ capsicum 等のクライアントアプリが、モロヘイヤ固有の機能�
 `errors` キーを持つのに **404 だけキーの形が違い、クライアントがキーの有無で
 分岐できなかった**。404 の理由も全部同じボディに潰れていた。
 
+⚠ **下の形は RSS / HTML のルートでも JSON で返り、Content-Type も `application/json`（5.39.0〜、#4725）。**それ以前はルートの Content-Type（`application/rss+xml` 等）のまま JSON の本文が返っていた。
+
 #### バリデーションエラー (422)
 
 ```json
@@ -97,6 +99,7 @@ capsicum 等のクライアントアプリが、モロヘイヤ固有の機能�
 | `duplicate_key` | 番組表のキーが既にある | **無駄**（入力を変える） | 付かない |
 | `template_limit` | 投稿テンプレートが上限（50 件） | **無駄**（どれかを消すまで通らない） | 付かない |
 | `duplicate_request` | Annict の同じ記録・レビューが直前に送られている | ⚠ **そのまま送り直さない**（下記） | 付かない |
+| `annict_not_found` | 番組表の「話数 ＋」で、次の話数が Annict にまだ無い（5.39.0〜 / #4771）。**話数は進めていない** | **してよい**（時間を置いて。放送直後は未登録のことがある） | 付かない（Annict に載る時刻は分からない） |
 
 ⚠⚠ **`duplicate_request` は一過性ではない。**冪等性ロックは**先の要求が成功すると TTL（既定 30 秒）まで残る**ので、
 待って送り直すと**先の要求が成功していた場合に二重に記録される**。先の要求の結果を確かめてから判断すること。
@@ -632,7 +635,7 @@ Web Push サブスクリプションを解除する。
       "database": "mastodon",
       "cl_active": 12, "cl_waiting": 0, "maxwait": 0,
       "sv_active": 0, "sv_idle": 1,
-      "clients_used": 13, "clients_max": 500,
+      "clients_used": 12, "clients_max": 500,
       "total_wait_time_us": 29082533
     }
   },
@@ -665,7 +668,7 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 | `cl_waiting` | **サーバー接続を待っているクライアント数。これが本命** |
 | `maxwait` | **いまキューの先頭に居るクライアント**が待った秒数 |
 | `sv_active` / `sv_idle` | 使用中／待機中のサーバー接続数 |
-| `clients_used` | **箱全体**のクライアント数（全プール合計） |
+| `clients_used` | **箱全体**のクライアント数（全プール合計）。⚠ 5.39.0〜 **観測自身の admin コンソール接続 1 本を引いた値**（#4695） |
 | `clients_max` | `max_client_conn`。⚠ **2026-08-02 の gomander も 2026-08-08 の shallu も、枯れたのはプールごとの待ちではなくここ** |
 | `total_wait_time_us` | 起動からの**累計**待ち時間（マイクロ秒・単調増加）。`SHOW STATS` の `total_wait_time` |
 
@@ -684,11 +687,16 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 | DSN が 5432（pgbouncer を経由していない） | ⚠ **キーごと無い**（本番では vulcan がこれ） |
 | `/postgres/pgbouncer/enable` が `false` | ⚠ **キーごと無い** |
 | admin コンソールへ繋がらない | `{"error": "..."}` のみ。⚠ **`status` は動かない**（下記） |
-| プールの行がまだ無い（誰も繋いでいない） | `{"absent": true}` ＋ `clients_*`。⚠ **0 とは違う** |
+| プールの行がまだ無い（誰も繋いでいない） | `{"absent": true}` ＋ `database`・`clients_*`・`total_wait_time_us`。⚠ **0 とは違う** |
 
 ⚠⚠ **pgbouncer の観測は `status` を動かさない。**pgbouncer の停止と `max_client_conn` 枯渇は
 接続失敗からは区別できず、`status` を倒すと再起動のたびに health が揺れて信号として使えなくなる。
 **`pgbouncer.error` があっても `status` は `OK` のまま**なので、監視側はエラーの有無を別に見ること。
+⚠ ただし `/postgres/pgbouncer/enable` が引けない（設定の破損）場合は握らず、`postgres` が `NG` になる（5.39.0〜、#4695）。
+
+⚠ **観測点は `SELECT 1` の手前**（5.39.0〜、#4695）。`SELECT 1` 自身が待ち行列に並ぶので、後で読むと
+自分の前の待ちが捌けた後の値になる。`pool` も同じ理由で手前へ移してあり、⚠ **コールドプールでは
+`pool.allocated` が従来より 1 小さく出ることがある**。
 
 🔴 **`pool` も `waiting` も欠けることがある**（#4656）。⚠ **欠落は「正常」でも「異常」でもない**ので、
 監視側が直に読むと `nil` を掴む。
@@ -718,8 +726,17 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
   "redis": {"status": "OK"},
   "sidekiq": {"status": "OK"},
   "streaming": {"status": "OK"},
-  "postgres": {"status": "WARN", "reason": "pool_exhausted", "error": "...",
-               "pool": {"max": 10, "allocated": 10, "waiting": 3}},
+  "postgres": {
+    "status": "WARN", "reason": "pool_exhausted", "error": "...",
+    "pool": {"max": 10, "allocated": 10, "waiting": 3},
+    "pgbouncer": {
+      "database": "mastodon",
+      "cl_active": 40, "cl_waiting": 5, "maxwait": 2,
+      "sv_active": 20, "sv_idle": 0,
+      "clients_used": 45, "clients_max": 500,
+      "total_wait_time_us": 31582533
+    }
+  },
   "status": 200
 }
 ```
@@ -1217,8 +1234,13 @@ NowPlaying 情報を除去して再投稿する。
 
 - **プロバイダ優先順位（3 段連鎖）**: ① 明示 `prefer` → ② `source_app_name` ヒント → ③ サーバー既定 `/nowplaying/resolve/default_provider`（既定値 `apple_music`）。優先側でヒットしなければもう一方のプロバイダへフォールバックして URL を返す。
 - **レスポンス**:
-  - ヒット時: `{ "url": "https://music.apple.com/...", "provider": "apple_music", "normalized": { "title": "...", "artist": "...", "album": "..." } }`（`normalized` は外部 API が返した値のみ。欠落要素は省く）
-  - ヒットなし: `{ "url": null }`（404 ではなく 200）
+  - ヒット時: `{ "url": "https://music.apple.com/...", "provider": "apple_music", "normalized": { "title": "...", "artist": "...", "album": "..." }, "artwork_url": "https://.../480x480bb.jpg" }`（`normalized` は外部 API が返した値のみ。欠落要素は省く）
+  - ヒットなし: `{ "url": null, "artwork_url": null }`（404 ではなく 200）
+  - **`artwork_url`（5.39.0〜 / #4769）**: ジャケット画像の URL。**キーは常に返す**（取れなければ `null`）。
+    一辺は `itunes_image` ハンドラの `pixel`（既定 480）に揃える。Apple Music は `artworkUrl100` のサイズ指定を差し替え、
+    Spotify は任意サイズを作れないので、アルバム画像のうち `pixel` 以上で最小のもの（無ければ最大のもの）。
+    ⚠ 画像の取得・添付・リサイズはしない（URL を返すだけ）。⚠ Mastodon は添付のある投稿にプレビューカードを出さないので、
+    ジャケットを添付するとリンク先のカードは出ない
 - **設定キー**:
   - `/nowplaying/resolve/default_provider`: 優先指定・ヒントが無いときの既定プロバイダ（`apple_music` / `spotify`、既定 `apple_music`）
 - **備考**: Spotify は `/service/spotify` の資格情報が設定済みのときのみ候補。iTunes Search API は資格情報不要のため常時利用可能。capsicum は `features.nowplaying_resolver`（下記）で enrich を試みるか判定する。
@@ -1461,8 +1483,12 @@ JSON オブジェクトは仕様上「順序なし」だが、キーは SHA256 �
 
 エントリの `episode` を +1 する。`annict_work_id` が設定済みなら Annict
 から該当話数のエピソードを自動取得し、`annict_episode_id` と `subtitle`
-を更新する。Annict が未設定または該当エピソードが見つからない場合は
-`annict_episode_id` のみクリアする（subtitle は手動更新）。
+を更新する。Annict が未設定の場合は `annict_episode_id` のみクリアする（subtitle は手動更新）。
+
+⚠⚠ **5.39.0〜（#4771）: 該当話数が Annict にまだ無いときは +1 しない。**409 Conflict（`code: annict_not_found`）を返し、
+話数・サブタイトルとも変えない。放送直後は翌週の回が Annict に未登録のことがあり、以前は話数だけ進んで
+サブタイトルを手で補うことになっていた。**時間を置いて送り直せば、話数とサブタイトルが一度に入る。**
+⚠ Annict の呼び出しが**失敗した**とき（`failed`）は断らず、今までどおり +1 する（Annict の障害で作業が止まらないように）。
 
 ⚠ **`annict_episode_id` がクリアされたまま返るケースは 4 つある。**(1) Annict 未連携、(2) 該当話数が Annict に無い、
 (3) **5.33.0〜 / #4534**: Annict の解決はロックの外で先に行うため、その間に別の書き込みが割り込むと
@@ -1479,8 +1505,9 @@ JSON オブジェクトは仕様上「順序なし」だが、キーは SHA256 �
 | `annict` | 意味 |
 |---|---|
 | `applied` | `annict_episode_id` と `subtitle` を載せた |
+| `untitled` | 該当話数は Annict にあるが、サブタイトルがまだ無い。`annict_episode_id` だけ載せた（5.39.0〜 / #4771） |
 | `unconfigured` | (1) Annict 未連携、または `annict_work_id` が無い |
-| `not_found` | (2) 該当話数が Annict に無い |
+| `not_found` | (2) 該当話数が Annict に無い。⚠ **5.39.0〜 は返らない**（409 `annict_not_found` で断る・#4771） |
 | `failed` | (4) Annict の呼び出しが失敗した（時間を置けば引ける可能性がある） |
 | `superseded` | (3) 引いている間に別の書き込みが入ったので載せなかった |
 
@@ -1491,7 +1518,7 @@ JSON オブジェクトは仕様上「順序なし」だが、キーは SHA256 �
 - **パスパラメータ**: `key` (string)
 - **`next_on` は動かない**（**5.34.0〜 / #4585**）。⚠ **5.33.0 までは話数と同時に 7 日進んでいた**（#4373）。話数だけ直したいときに日付が巻き込まれるのと、上記 (3) の巻き戻し量が大きくなるのをやめるため、日付は `POST .../next_on/advance` へ分離した
 - **レスポンス**: `{key, entry, annict}` (更新後。`annict` は上表・5.38.0〜)
-- **エラー**: 該当エントリなしの場合 404。`/program/auto_update: true` のとき (#4272) は 409 Conflict。書き込みが同時に走った場合も 409 Conflict（メッセージ「別の更新が進行中です。少し待って再試行してください。」、5.33.0〜 / #4534）。**こちらは一過性**なので、クライアントは再取得のうえ再試行してよい（ロック TTL は 30 秒）。`/program/auto_update: true` 由来の 409 は**恒久**。両者は `code`（`locked` / `auto_update`）で区別する（5.38.0〜 / #4579。「[競合 (409)](#競合-409)」参照）
+- **エラー**: 該当エントリなしの場合 404。`/program/auto_update: true` のとき (#4272) は 409 Conflict。書き込みが同時に走った場合も 409 Conflict（メッセージ「別の更新が進行中です。少し待って再試行してください。」、5.33.0〜 / #4534）。**こちらは一過性**なので、クライアントは再取得のうえ再試行してよい（ロック TTL は 30 秒）。`/program/auto_update: true` 由来の 409 は**恒久**。両者は `code`（`locked` / `auto_update`）で区別する（5.38.0〜 / #4579。「[競合 (409)](#競合-409)」参照）。該当話数が Annict にまだ無いときも 409（`code: annict_not_found`・5.39.0〜 / #4771）で、**話数は進んでいない**ので時間を置いて再試行してよい
 
 #### POST /mulukhiya/api/admin/program/entry/:key/next_on/advance
 

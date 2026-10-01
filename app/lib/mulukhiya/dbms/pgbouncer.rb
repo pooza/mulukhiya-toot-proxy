@@ -45,22 +45,29 @@ module Mulukhiya
     class << self
       # `{pgbouncer: {...}}` を返す。⚠ **観測が取れないこと自体で health を落とさない**
       # （`Postgres.pool` と同じ設計）。status は呼び側で触らない。
+      #
+      # ⚠⚠ **`enable?` は rescue の外に置く (#4695 の 2 件目)。**内側にあると
+      # `Ginseng::ConfigError` まで `{pgbouncer: {error: ...}}` に化けて status は
+      # OK のまま＝設定の破損を握り潰す（`enable?` のコメントどおり）。
       def health
         return {} unless enable?
-        return {pgbouncer: probe}
-      rescue => e
-        # ⚠ **繋がらないこと自体が信号になりうる**（`max_client_conn` 枯渇なら
-        # 「no more connections allowed」が返る）。潰さずメッセージを出す。
-        # ⚠ ただし status は動かさない。pgbouncer の停止と枯渇を接続失敗からは
-        # 区別できず、health を WARN に倒すと再起動のたびに揺れる。
-        e.log
-        return {pgbouncer: {error: e.message}}
+        begin
+          return {pgbouncer: probe}
+        rescue => e
+          # ⚠ **繋がらないこと自体が信号になりうる**（`max_client_conn` 枯渇なら
+          # 「no more connections allowed」が返る）。潰さずメッセージを出す。
+          # ⚠ ただし status は動かさない。pgbouncer の停止と枯渇を接続失敗からは
+          # 区別できず、health を WARN に倒すと再起動のたびに揺れる。
+          e.log
+          return {pgbouncer: {error: e.message}}
+        end
       end
 
-      # ⚠ 既定は `null` ＝ ポートによる自動判定。`true` / `false` で固定できる。
+      # ⚠ 既定は `auto` ＝ ポートによる自動判定。`true` / `false` で固定できる
+      # （⚠ `null` は Ginseng の config が「キーが無い」と同じに扱うので三値は文字列）。
       # config の参照を rescue で握り潰さないこと。既定値は application.yaml が
-      # 必ず持つので、引けない状態は設定の破損である
-      # (MEMORY feedback_fail-open-guard-footgun)。
+      # 必ず持つので、引けない状態は設定の破損である（fail-open の rescue が
+      # ガードを黙って無効化する型を作らない）。
       def enable?
         value = config['/postgres/pgbouncer/enable']
         return value if [true, false].include?(value)
@@ -125,11 +132,18 @@ module Mulukhiya
       # （FeedUpdateWorker 全滅）と 2026-08-08 の shallu はどちらも
       # `no more connections allowed (max_client_conn)`** で、枯れたのは
       # プールごとの待ちではなく**箱全体のクライアント数**だった。
+      #
+      # ⚠ **`clients_used` から観測自身の 1 本を引く (#4695 の 5 件目)。**`used_clients`
+      # は admin コンソールへ張ったこの接続も数える（`SHOW CLIENTS` にも出る）ので、
+      # 素のままだと `/health` のたびに観測対象を 1 だけ押した値になる。引いた値は
+      # 「観測していない平常時のクライアント数」で、`clients_max` と比べる相手はこちら。
+      # ⚠ 上限に達していれば観測自体が `no more connections allowed` で繋がらない
+      # ので、ここへ来る時点で `used_clients` は必ず自分を含む。
       def clients(connection)
         used = connection.exec('SHOW LISTS').find {|row| row['list'] == 'used_clients'}
         max = connection.exec('SHOW CONFIG').find {|row| row['key'] == 'max_client_conn'}
         return {
-          clients_used: used && used['items'].to_i,
+          clients_used: used && [used['items'].to_i - 1, 0].max,
           clients_max: max && max['value'].to_i,
         }.compact
       end

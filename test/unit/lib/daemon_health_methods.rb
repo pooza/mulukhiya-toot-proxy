@@ -33,6 +33,17 @@ module Mulukhiya
       assert_not_match(/dead/, error.message)
     end
 
+    # ⚠⚠ **0 以下の pid を生きていると言わない (#4635 の 6 件目)。**壊れた pid ファイルは
+    # `to_i` で 0 になり、`Process.kill(0, 0)` は自プロセスグループへの存在確認として
+    # 成功する。負の pid もプロセスグループ宛てになる。
+    def test_non_positive_pid_is_rejected
+      [0, -1].each do |pid|
+        error = assert_raise(RuntimeError) {Subject.assert_pid_alive!(pid)}
+
+        assert_match(/invalid/, error.message)
+      end
+    end
+
     private
 
     def unused_pid

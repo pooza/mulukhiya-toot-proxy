@@ -190,13 +190,65 @@ git diff Gemfile.lock
   （2026-09-26 ユーザー「この様な、運用に直結する修正こそ優先順位を上げたいですね」）。
   #4765 の警告をステージングで見てもらった場で、放送直後に押すと Annict が未登録で `not_found` になる、という
   心当たりが出てきた（ユーザーは半日待ってから押して回避していた）。`failed` は今の警告のまま +1 する
-- **機能が前へ進む枠は #4769**（ナウプレ enrich に `artwork_url`）
+  - ✅ **PR #4776（2026-09-28）**: `not_found` のときは +1 も保存もせず 409（`code: annict_not_found`）で断る。
+    画面は `code` を見て info の案内に切り替える。
+    Codex P2 × 3 に対処（`40b9a1d7` / `764ac823`）: ① 引いている間に別の編集が入った `not_found` では断らない（`superseded`）
+    ② api.md の置換が他の節にも当たっていた ③ 🔴 **`AnnictService#episodes` がサブタイトルの無い回を落とすので、登録済みでも
+    `not_found` に化けていた** → `episodes(untitled: true)` で回の有無を引き、サブタイトルが無ければ +1 して新しい状態 `untitled`（画面は警告）。
+    1457 tests・0 failures。
+    📌 **dev25 をこのブランチにしてある**（`764ac823`）。**目視はユーザーが後で**（admin に本物の Annict トークンが要る。
+    #4765 のダミーのトークンでは `failed` しか出せない）
+- ✅ **PR #4777（#4775・2026-09-28）**: 上流のステータスを透過するとき `Retry-After` / `X-RateLimit-*` を許可リストで中継する。
+  Controller が ClassLength を超えたので `upstream_error_code` と合わせて `UpstreamErrorMethods` へ切り出した。
+  Codex 指摘なし。✅ **dev26 で実際の 429 を起こして確認**（#4777 + #4778 を手元で合わせたブランチ・301 本目で 429）:
+  修正前は**モロヘイヤが 1 秒おきに 3 回叩き直して 2.92 秒・ヘッダなし**、修正後は**1 回で諦めて 0.63 秒・`X-RateLimit-*` が届く**。
+  結果は #4775 / PR #4777 / PR #4778 にコメント済み
+- ✅ **PR #4778（#4747・2026-09-28）**: ginseng-core v1.25.1。**dev26（rc.d）/ dev27（systemd）で 3 サービスの stop / start / restart を実走**して
+  全部 rc=0・二重起動なし・health 200。dev26 で sidekiq を `kill -9` → start も pid ファイルが入れ替わって通った。
+  ⚠ その直後 約 45 秒は health 503（`Sidekiq::ProcessSet` に旧プロセスが生存通知の期限まで残る・以前からの挙動）。
+  Codex 指摘なし。📌 **dev27 はこのブランチのまま**（マージ後に develop へ戻す）
+- ✅ **PR #4779（#4746・2026-09-28）**: ginseng-redis v2.0.8。`key?` が EXISTS になり、**`[]` を含む URL のキーで格納済みなのに false**
+  だったのが直る（手元で v2.0.6 false → v2.0.8 true を実測）＝フィードの画像メタデータのキャッシュが効いていなかった
+- ✅ **PR #4780（#4749・2026-09-28）**: ginseng-web v3.0.3。🔴 **gem が塞いだフィード画像の SSRF はモロヘイヤに届かない**
+  （`fetch_image` を上書きして `MediaMetadataStorage#push` へ委譲しており、そちらは無検証で GET していた）→
+  `push(uri, host_validator:)` を足し、フィードの enclosure からだけ `RemoteHost.unpinned_validator` を渡す。添付には掛けない。
+  dev26 で画面 3 ページが前後一致。📌 **dev26 はこのブランチ**
+- ✅ **PR #4781（#4750・2026-09-28）**: ginseng-piefed v0.1.2。⚠ **版だけでは no-op**（`Ginseng::Piefed::Service` を直に作っていた）→
+  `http_class` だけ上書きする `PiefedService`。`include Package` は gem の設定が引けなくなるのでしない。
+  ✅ **後半も同じ PR に載せた（2026-09-29・`44d37ec3`）**: 宛先を **piefed v0.2.0**（pooza/ginseng-piefed#18 の着地）へ。
+  `PiefedClippingWorker` は `clip` の戻り値 `nil` を `not public` としてログに残して終わる（再試行・Sentry なし）。
+  `raise Ginseng::ConfigError "..."` のカンマ抜けも直した。テスト `piefed_clipping_worker_result`（修正を外すと 2 件落ちる）。
+  1451 tests・0 failures。PR 本文は `Closes #4750` に変えた
+- ✅ **PR #4782（#4769・機能が前へ進む枠・2026-09-28）**: ナウプレ enrich に `artwork_url`（キーは常に返す）。
+  一辺は `itunes_image` の `pixel`（480）。Spotify は `pixel` 以上で最小の画像。
+  dev24 の実データで Apple Music 480×480・Spotify 640×640 の画像が取れることを確認。📌 **dev24 はこのブランチ**。
+  マージ後に pooza/capsicum#1133 へ知らせる。
+  ✅ **Codex P2 に対処（2026-09-29・`6ba7d3bc`）**: `width` が null の画像を 0 扱いで並べて、先頭の最大画像を取り逃していた →
+  サイズ不明は「足りる候補」から外し、足りなければ Spotify の並びの先頭を返す
+- ✅ **PR #4785（#4745・2026-09-29）**: `alert(values)` の values を Sentry の extra へ。新しい `SentryExtra` が
+  `LogScrubber` → `Logger#create_message`（syslog と同じマスク）を通す（`scrub_sentry_event` は extra を伏せないため）。
+  fail closed（`{scrub_failed: true}`）。`LockDegradationMethods#report` の payload も同じ扱い。1454 tests・0 failures
+- ✅ **PR #4786（#4731・2026-09-29）**: 手順書 4 本を `.claude/skills/`（sync / release / release-review / harness-gate）へ。
+  正本はスキル、docs の同名の節はポインタ。置き場所は repo・同期は 1 本＋同梱スクリプト（ユーザー判断）。
+  release / release-review は `disable-model-invocation`。⚠ **マージまでは docs 側の手順が正本のまま**
 - **PR #4768**（レビュー由来の残件約 30 項目・#4635 / #4697 / #4698 / #4721 / #4723 / #4724 / #4725 を閉じる）。
   5.38.0 の出荷後に develop を取り込んで ready にした（1501 tests・0 failures）
 - **#4352**（media_catalog を shallu / gomander へ横展開）は 5.38.0 から移した。⚠ リリースと束ねない。
   shallu の本番 `EXPLAIN` → flip → 24 時間観測 → gomander（日曜午前を外す）。flip の前にユーザーの確認を取る
+  - ✅ **shallu を flip した（2026-09-30 11:44 JST・ユーザー承認済み）**。EXPLAIN は `bin/diag/media_catalog_rollout.sql`
+    （現行の B 案だけ・読み取り専用・`statement_timeout` 30s）。⚠ `media_catalog_subsecond.sql` は旧クエリ入りなので本番で流さない。
+    **partial index 無しでも zugoga と同じ B 案のプラン**。page1 3,876ms（冷えた初回）→ flip 後 36ms、only_person 20→24ms、cursor 19→21ms。
+    比較は #4323 にコメント済み。📌 **24 時間観測中（〜10-01 11:45）**、日曜を過ぎたところで再確認
+  - ⚠ **shallu は `config/local.yaml`（リポジトリ内）が効いている**（`/usr/local/etc` より先に読まれる）。2 つは同一内容なので**両方を書き換えた**
+    （バックアップは各 `.bak-4352`）。rollback は両方を `false` に戻して sidekiq → puma を再起動
+  - ⚠ Claude Code の自動モードでは、本番の flag の書き換え後の再起動が「機能フラグの書き込み」として止められた。手動モードで続行した
+  - ✅ **gomander も flip した（2026-09-30 11:52 JST・shallu の観測を待たずに進めた＝ユーザー判断）**。構成は shallu と同じ（2 ファイル・`.bak-4352`）。
+    🔴 **ローカルアカウントが 384**（shallu 47 / zugoga 19）で、温まっていても page1 604ms / only_person 517ms / cursor 614ms
+    （shallu の約 20 倍・1 本約 12.5 万バッファ）。冷えた初回の page1 は 12,288ms。基準（1,000ms 未満）は満たすが余裕は小さい。
+    page 1〜3 は worker（60 分おき）のキャッシュから返るので、直に DB を引くのは 4 ページ目以降とルール付きだけ。#4323 にコメント済み。
+    📌 **24 時間観測中（〜10-01 11:53）**。⚠ **ニチアサ（10-04 日曜 08:30-09:00）を過ぎたところで必ず見直す**
 - ginseng-\* の版上げ（#4746 / #4747 / #4749 / #4750）。⚠ **2026-09-28 時点の宛先**: core **v1.25.1**（pooza/makoto2 の依頼）/
-  redis **v2.0.8** / web **v3.0.3** / piefed v0.1.2（下の 09-28 の同期記録）
+  redis **v2.0.8** / web **v3.0.3** / piefed ~~v0.1.2~~ **v0.2.0**（09-29 に差し替え）。core **v2.0.0**（破壊的変更）は **#4784 として 5.40.0 へ**（09-29 ユーザー判断: 緊急性が無いので準備したマイルストーンで。#4748 と対）
 - 📥 **#4775（pooza/makoto2 からの依頼・2026-09-28 に 5.39.0 へ）**: 上流の 429 を透過するときに
   `X-RateLimit-Reset` 等のヘッダを中継していない。**#4747（v1.25.1）と対になる**ので、429 を実際に起こして一緒に確かめる
 
@@ -555,6 +607,87 @@ Slack / LINE / メールには出なくなるが、**周期実行でメールを
 - ⚠ `Program` は singleton なので、差し替えた `logger` は `ensure` で必ず外す
 - 実測: `rake lint` 無指摘 / `rake test` **1413 tests・0 failures・0 errors**
   （develop ベースライン 1387 から **+26 ＝ 追加したぶんちょうど**）
+
+### 2026-10-01 セッション同期の記録
+
+**本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。harness upstream は `last_checked` 09-28 から 3 日なのでスキップ。
+
+- **ブランチ**: `develop` は `origin/develop` と同一・未コミット無し。**CI は直近とも `success`**
+- **Dependabot**: open アラート **0 件**
+- **open PR**: 前回の記録どおり＋ 🆕 **#4787（dependabot・icalendar 2.12.4 → 2.12.5・MERGEABLE）**
+- **Codex / 申し送り**: 前回以降のマージは **0 本**。PR #4782 の P2 は返信＋ +1 で完了。
+  🆕 **PR #4786 に Codex の P2 が 1 件、未返信**（09-29T10:59Z）: `/release` が必須の `/release-review` を呼べない
+  （`disable-model-invocation: true` なので Skill ツールから起動できず、手順が止まるかレビューを飛ばす）。
+  → **「明示的に止める」で対処（ユーザー判断・`9145f121`）**。`/release` の手順 2 で必ず止まり、ユーザーに `/release-review` を頼む。返信＋ +1 済み
+- **chubo2**: `origin/main` と差分なし。🆕 **#261（Mastodon 3 台で古いリモート投稿を削除し、ハッシュタグリレーを戻す）**。
+  モロヘイヤの実装には非関係（`tootctl` の改修は pooza/mastodon#977）
+- **ginseng-\* のピン**: 前回から**新しいタグなし**（core v2.0.0 / fediverse v3.1.4 / piefed v0.2.0 / redis v2.0.8 / web v3.0.3 /
+  youtube v3.0.2 / style v1.1.13）。各 PR・Issue の宛先は前回の判断どおり
+- **辞書台帳**（chubo2 `ee61bd7`）: **🔴 は前回と同じ 3 件**（直書き 1 / 台帳に無い 2）・**🔴 死亡 0**。
+  🟡 が広がった（gomander `precure.json` 23/144・`annict/episodes` 16/144、vulcan `annict/episodes` 14/144・`service.json` 11/144）。
+  `annict/episodes` は下の Annict 遅延と同時期
+- **#4352 の 24 時間観測は 10-01 11:45（shallu）/ 11:53（gomander）まで**。同期時点（09:11）では未了。日曜（10-04）明けに見直す予定は据え置き
+
+#### Sentry
+
+- unresolved **25 件**（前回 26）・**コメント 0 は 0 件**
+- 🔴 **`-2X` が count=126 / lastSeen 10-01T00:10:29Z**（前回 61 → +65）。**JST 10-01 06:00〜09:00 の 3 時間で 44 件**に集中。
+  zugoga / gomander / 他者（instance-20220704-2044・5.37.1）の 3 機で同時に、全件 `AnnictService#query` の ReadTimeout。
+  **他者の機体でも同時刻に増えているので Annict 側の応答遅延**と読む。判断は据え置き＝外部ノイズ。`-2Y`（count=7・他者 +2）も同じ。
+  両方にコメント済み。📌 **次の同期で密度が平常（1 日数件）へ戻ったかを見る**
+
+### 2026-09-29 セッション同期の記録
+
+**本番には触っていない**（vulcan のログを読んだだけ）。辞書台帳・harness upstream は前回（09-28）から 1 日なので回していない。
+
+- **ブランチ**: `develop` は `origin/develop` と同一・未コミット無し。**CI は直近とも `success`**
+- **Dependabot**: open アラート **0 件**
+- **open PR**: #4768 / #4774 / #4776〜#4782（前回の記録どおり）＋ 🆕 **#4783（Ruby 4.0.7 へ追従・pooza/ginseng-style#114 の配布分）**。
+  `.ruby-version` だけの変更で CI 緑。サーバー側には 4.0.7 を追加済み（pooza/chubo2#259）。デプロイ時に `bundle install` が要る
+- **Codex / 申し送り**: 前回以降のマージは **0 本**。⚠ **PR #4782 に Codex の P2 が 1 件、未対処**
+  （Spotify の画像で `width` が null のものがフォールバックで落ちる）。09-28 の記録を書いた直後に付いた
+- **chubo2**: `origin/main` と差分なし。新 Issue なし
+- **vulcan は 09-29 05:45 JST に再起動している**（`uptime` 5:09）。モロヘイヤへの影響はログ上は見ていない
+
+#### ginseng-\* の新しいタグ（2026-09-29 の同期）
+
+⚠ **判断はユーザー待ち。宛先はまだ差し替えていない:**
+
+- **core v2.0.0**（09-28 21:51Z・**破壊的変更**）: Slack / LINE がリダイレクトを追わない・`host_validator` 付きが
+  `follow_redirects: false` を尊重・`Daemon#save_config` が `tmp/cache` の symlink / 不在で `ConfigError`。
+  #4747（PR #4778）の宛先は v1.25.1 のまま
+- **piefed v0.2.0**（09-28 21:33Z）: `Service#clip` が非公開で `RequestError` を上げず `nil` を返す（pooza/ginseng-piefed#18 の着地）。
+  **PR #4781 の「後半」の前提がこれ**（`PiefedClippingWorker` は戻り値の `nil` を「弾かれた」と扱う必要がある）
+
+#### Sentry
+
+- unresolved **26 件**。**`-2X` は count=61 / lastSeen 09-29T01:00:29Z**（前回 49 → +12）。内訳は zugoga / gomander / 他者で、
+  **vulcan は 0**。判断は据え置き＝外部ノイズ
+
+#### 📣 ダイスキーの「モロヘイヤ重い」（2026-09-28 22:36 JST・misskey.delmulin.com/notes/arouuogqya）
+
+**モロヘイヤ側の処理は全部速かった。**vulcan の mulukhiya-toot-proxy.log と nginx のアクセスログで、この人の IP を追った:
+
+| 時刻（JST） | 操作 | モロヘイヤ内の所要 |
+|---|---|---|
+| 22:29:52 | `/mulukhiya/app/status/aroul0c8xl`（タグづけ画面）を開く | 約 0.03 秒 |
+| 22:30:20 / :30 / :41 | Misskey のクライアントが丸ごと読み直される（`sw.js`・同じ画像群を 3 回） | ―（モロヘイヤを通らない） |
+| 22:30:29 | `notes/delete`（元ノート）＝**削除して編集** | ―（モロヘイヤを通らない） |
+| 22:30:51 | `notes/drafts/create`（`scheduledAt` = 22:31:00・`isActuallyScheduled`） | 約 0.23 秒（Misskey 0.023 秒） |
+| 22:31:00 | リプ元 `arounzp3wq` を **Misskey のキュー（`PostScheduledNoteProcessorService`）が投稿** | ―（HTTP を経ない） |
+| 22:33:12 / 22:36:11 | 返信 2 本の `notes/create` | 約 0.27 秒ずつ |
+
+- リプ元の本文は **22:30:51 の `drafts/create` でモロヘイヤを通っている**（pre_toot はここで掛かる）。
+  22:31:00 の実投稿は Misskey 内部の予約投稿ジョブなので、**モロヘイヤのログに `notes/create` が無いのは正常**
+- 同時間帯の 1 秒超はタグ辞書・読み辞書の更新（sidekiq・10 分おき）だけで、投稿の経路ではない。puma の遅延・エラーなし
+- **体感の重さの候補**: タグづけ画面（`/mulukhiya/app/...`）は Misskey の SPA の外なので、**行って戻ると Misskey のクライアントが
+  丸ごと読み直される**（22:30 台に 3 回）。サーバー側の遅さではない
+- **Misskey 側も追ったが原因なし → 一時的なものとして打ち切り**（ユーザー判断）。misskey.log の 22:29〜22:31 に遅延・タイムアウトなし、
+  ERR は定常のもの（削除済みアクターの Delete・削除直後の `aroul0c8xl` への Announce）だけ
+- 📌 **手がかりとして残す（因果は不明）**: 22:30:52〜57 に `/proxy/preview.webp` が 4 回 403。
+  `Refusing to proxy a request from another proxy` で、**プロキシ済みのアバター URL（`/proxy/avatar.webp?url=...`）を
+  さらにプレビュー用プロキシへ渡していた**＝Misskey の仕様どおりの拒否。下書き保存の直後に出ている。
+  `files/null/` はオブジェクトストレージの既定のパスで、直接の取得は当日 13 件とも 200
 
 ### 2026-09-28 セッション同期の記録
 
