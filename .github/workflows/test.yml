@@ -18,11 +18,15 @@ jobs:
         # ⚠ これらは **harness（実サーバー）が要る**テストで、CI では走らない。
         # 実測は CI と同じ config（`controller` + ダミーの url/password）を置いて
         # `rake test` を回した値: mastodon 326 / misskey 315。
+        #
+        # 2026-09-26 (#4698): 実クラスでの catalog の配線テスト
+        # （`AttachmentTest#test_catalog_is_wired_on_the_real_class`）を足したので +1。
+        # DB が要るクラスなので CI では omission になる。実測: mastodon 327 / misskey 316。
         include:
           - controller: mastodon
-            omission_baseline: 326
+            omission_baseline: 327
           - controller: misskey
-            omission_baseline: 315
+            omission_baseline: 316
     services:
       redis:
         image: redis:7

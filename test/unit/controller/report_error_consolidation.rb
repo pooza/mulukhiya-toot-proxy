@@ -65,6 +65,35 @@ module Mulukhiya
       assert_equal(404, last_response.status)
     end
 
+    # ⚠⚠ **Ginseng 以外の例外も `report_error` を通す (#4724)。**従来は `e.log` ＋
+    # `Sentry.capture_exception` の直書きで、`Event(:alert)`（slack / line / mail）にも
+    # デッドマンにも乗っていなかった。モロヘイヤ自身のバグ（`NoMethodError` 等）は
+    # ここに落ちるので、黙らせてはいけない。
+    def test_non_ginseng_error_reaching_top_level_is_alerted
+      clear_alert_throttle(RuntimeError)
+      error = probe(RuntimeError.new('boom'))
+
+      assert_equal([:alert], error.mulukhiya_calls)
+    end
+
+    # 連続はデッドマンで抑える（#4693 と同じ扱い）。
+    def test_non_ginseng_error_reaching_top_level_is_throttled
+      clear_alert_throttle(RuntimeError)
+      probe(RuntimeError.new('boom'))
+      error = probe(RuntimeError.new('boom'))
+
+      assert_equal([:log], error.mulukhiya_calls)
+    end
+
+    # 応答は従来どおり。⚠ 例外メッセージは返さない（内部情報の露出）。
+    def test_non_ginseng_error_response_is_unchanged
+      clear_alert_throttle(RuntimeError)
+      probe(RuntimeError.new('boom'))
+
+      assert_equal(500, last_response.status)
+      assert_equal({'error' => 'Internal Server Error'}, JSON.parse(last_response.body))
+    end
+
     private
 
     def spy(error)
@@ -83,12 +112,13 @@ module Mulukhiya
   # 3 回続けて漏れた。
   class ControllerRescueConsolidationTest < TestCase
     # 現地に理由が書いてある唯一の例外 (#4603)。署名検証の失敗 (`AuthError`) を
-    # 黙らせたくないので、4xx でも alert するのが正しい。
+    # 黙らせたくないので、4xx でも alert するのが正しい。⚠ 連打はデッドマンで
+    # 抑えるので、素の `e.alert` ではなく `throttled_alert` (#4723)。
     #
     # ⚠⚠ **ファイル単位で許すと同じファイルの他ルートまで素通しになる**（Codex P2）。
     # `webhook_controller.rb` には `post '/:digest'` / `get '/:digest'` も居て、
     # そちらが `e.alert` に戻されても気づけなくなる。**ルート単位で固定する。**
-    ALLOWED = {'webhook_controller.rb' => {"post '/admin'" => 'e.alert'}}.freeze
+    ALLOWED = {'webhook_controller.rb' => {"post '/admin'" => 'throttled_alert(e)'}}.freeze
 
     DIRECT_CALL = /\A(e\.log|e\.alert|e\.status < 500 \? e\.log : e\.alert)\z/
 
