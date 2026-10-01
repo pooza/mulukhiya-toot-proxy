@@ -8,10 +8,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: b6e736db820caca781890fb134b937e7e37ca61c
-  tag: v1.23.7
+  revision: e0c739e9f4eeb195971d384bda38cbe764135d26
+  tag: v1.25.1
   specs:
-    ginseng-core (1.23.7)
+    ginseng-core (1.25.1)
       activesupport (>= 8.1.2.1)
       addressable (>= 2.9.0)
       cgi (>= 0.4.2)
@@ -49,10 +49,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-piefed.git
-  revision: ec2bf39fd0c706c33a9d159fb13fd8006b001927
-  tag: v0.1.1
+  revision: 04caa62eb12aad48f414eb53fa8691a1a52a5ae6
+  tag: v0.2.0
   specs:
-    ginseng-piefed (0.1.1)
+    ginseng-piefed (0.2.0)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -65,10 +65,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-redis.git
-  revision: 0019c73ea1eed170ef40712f788171f1edf242c9
-  tag: v2.0.6
+  revision: 3a15d90f862116ef6b5d5274bb92d8003fa7312e
+  tag: v2.0.8
   specs:
-    ginseng-redis (2.0.6)
+    ginseng-redis (2.0.8)
       redis-client
 
 GIT
@@ -236,7 +236,7 @@ GEM
       multi_xml (>= 0.5.2)
     i18n (1.15.2)
       concurrent-ruby (~> 1.0)
-    icalendar (2.12.4)
+    icalendar (2.12.5)
       base64
       ice_cube (~> 0.16)
       logger
@@ -358,6 +358,7 @@ GEM
     redis-client (0.30.1)
       connection_pool
     regexp_parser (2.12.0)
+    resolv (0.7.2)
     rest-client (2.1.0)
       http-accept (>= 1.7.0, < 2.0)
       http-cookie (>= 1.0.2, < 2.0)
@@ -506,6 +507,7 @@ DEPENDENCIES
   rack-session (>= 2.1.1)
   rack-test
   rails-erb-lint
+  resolv (~> 0.7.2)
   ricecream
   rspotify!
   rubocop-sequel

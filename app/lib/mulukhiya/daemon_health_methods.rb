@@ -13,6 +13,11 @@ module Mulukhiya
   # 「なぜ NG なのか」の説明だけ。
   module DaemonHealthMethods
     def assert_pid_alive!(pid)
+      # ⚠⚠ **0 以下は先に弾く (#4635 の 6 件目)。**壊れた pid ファイル（空・切り詰め・
+      # 非数値）は `to_i` で 0 になり、`Process.kill(0, 0)` は「自プロセスグループ全体
+      # への存在確認」として成功する＝ listener が死んでいても `/health` が OK を返し、
+      # 実況の窓で死亡を検知できない。負の pid もプロセスグループ宛てになる。
+      raise "PID '#{pid}' is invalid" unless pid.positive?
       case Process.alive_state(pid)
       when :alive
         return true

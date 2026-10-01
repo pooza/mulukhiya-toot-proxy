@@ -126,13 +126,15 @@ module Mulukhiya
     # counter を渡すとハンドラのスレッドで HTTP が集計される (#4464)。
     # nil のときは計装なし＝従来どおりの挙動。
     def run_handler(handler, payload, counter)
-      deadline = handler_deadline(handler.timeout)
+      # ⚠ ここは dispatch を呼んだスレッドで読む。ネストした dispatch なら親ハンドラの
+      # 締切が載っている（`WebhookImageHandler#run_workers` がワーカーへ渡す）。
+      deadline = nested_deadline(
+        handler_deadline(handler.timeout),
+        Thread.current[HANDLER_DEADLINE_KEY],
+      )
       thread = Thread.new do
         Thread.current[HandlerProfile::HTTP_KEY] = counter
         # ⚠ **外側の `join` より手前で切れる締切を配る (#4696)。**
-        # ⚠⚠ **ネストした dispatch には引き継がれない**（ワーカースレッドへは渡しておらず、
-        # 内側の `run_handler` も親の締切と比べない）。webhook_image → pre_upload の経路では
-        # 内側が自分の締切を配り直す＝ #4721 の 2。
         Thread.current[HANDLER_DEADLINE_KEY] = deadline
         handler.send(method, payload, params)
       end
@@ -163,6 +165,17 @@ module Mulukhiya
     def handler_deadline(timeout)
       lead = [HANDLER_DEADLINE_MARGIN, timeout / 2.0].min
       return Process.clock_gettime(Process::CLOCK_MONOTONIC) + timeout - lead
+    end
+
+    # ネストした dispatch の締切 (#4721)。
+    #
+    # ⚠⚠ **親の締切と自分の締切の近いほうを取る。**以前は内側が自分の締切を
+    # 配り直していたので、webhook_image → pre_upload の経路では内側の変換が
+    # **外側の締切より後ろ**を締切だと思い込み、外側の kill が先に来た（#4696 で
+    # 塞いだ「内側が先に切れる」が、ネストした経路でだけ開き直す）。
+    # ⚠ 自分のほうが近いなら自分に従う。親の締切で内側の上限を緩めない。
+    def nested_deadline(own, parent)
+      return [own, parent].compact.min
     end
 
     def resolve_pipeline

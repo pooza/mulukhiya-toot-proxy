@@ -242,7 +242,87 @@ module Mulukhiya
       assert_equal(['キュアスタ'], dic.keys)
     end
 
+    # ⚠ **書いた直後に Redis から読み戻さない (#4628 の 3 件目)。**読み戻しが外れると
+    # （Redis の瞬断・evict・別署名の上書き）、取得は成功したのにインメモリの辞書が
+    # 空になり、いま処理中の投稿だけ辞書タグを丸ごと失う。
+    def test_refresh_does_not_read_back_what_it_wrote
+      dic = build_dictionary([SourceDouble.build('https://example.jp/a.json', entries)])
+      dic.define_singleton_method(:load_cache) {nil}
+      dic.refresh
+
+      assert_equal(['キュアスタ'], dic.keys)
+      assert_not_nil(dic.generated_at)
+    end
+
+    # ⚠ **組み立てに失敗した辞書を世代ログで見えるようにする (#4628 の 4 件目)。**
+    # `sources` は設定の本数、`empty_sources` は試した中で空だった本数なので、
+    # `type:` の打ち間違いで `RemoteDictionary.create` が落ちた本は「健全」に見える。
+    def test_generation_log_has_attempted_sources
+      alive = SourceDouble.build('https://example.jp/a.json', entries)
+      dic = build_dictionary([alive])
+      dic.instance_variable_set(:@handler, Struct.new(:all).new([
+        {'url' => alive.uri.to_s},
+        {'url' => 'https://example.jp/b.json', 'type' => 'typo'},
+      ]))
+      logged = capture_log(dic) {dic.refresh}
+      payload = logged.find {|v| v[:message] == 'tagging dictionary refreshed'}
+
+      assert_equal(2, payload[:sources])
+      assert_equal(1, payload[:attempted_sources])
+    end
+
+    # ⚠ **last-good で埋めた回の鮮度を payload から読めるようにする (#4628 の 8 件目)。**
+    # 全ソースを埋めた回は `generated_at: Time.now` で書かれるので、キーが無いと
+    # 「いま配っている辞書のどれだけが last-good 由来か」が分からない。
+    def test_payload_has_substituted_sources
+      alive = SourceDouble.build('https://example.jp/a.json', entries('キュアスタ'))
+      flaky = SourceDouble.build('https://example.jp/b.json', entries('デルムリン'))
+      build_dictionary([alive, flaky]).refresh
+
+      assert_equal(0, load_payload[:substituted_sources])
+
+      flaky.words = {}
+      dic = build_dictionary([alive, flaky])
+      logged = capture_log(dic) {dic.refresh}
+
+      assert_equal(1, load_payload[:substituted_sources])
+      payload = logged.find {|v| v[:message] == 'tagging dictionary refreshed'}
+
+      assert_equal(['https://example.jp/b.json'], payload[:substituted_source_urls])
+    end
+
+    # ⚠ **例外で落ちた回にも世代ログを 1 行残す (#4628 の 7 件目)。**`e.alert` だけだと
+    # Sentry は鳴るが、内訳が syslog に残らず台帳の分母から落ちる（6 件目と同じ形）。
+    def test_refresh_logs_on_exception
+      dic = build_dictionary([SourceDouble.build('https://example.jp/a.json', entries)])
+      error = RuntimeError.new('boom')
+      error.define_singleton_method(:alert) {|*| nil}
+      dic.define_singleton_method(:remote_dictionaries) {raise error}
+      logged = capture_log(dic) {dic.refresh}
+      payload = logged.find {|v| v[:message] == 'tagging dictionary refresh failed'}
+
+      assert_not_nil(payload)
+      assert_equal('RuntimeError', payload[:error])
+      assert_equal(1, payload[:sources])
+    end
+
     private
+
+    def load_payload
+      return Marshal.load(redis[TaggingDictionary::REDIS_KEY]) # rubocop:disable Security/MarshalLoad
+    end
+
+    # info / error をどちらも拾う。
+    def capture_log(dic)
+      logged = []
+      double = Object.new
+      [:info, :error].each do |level|
+        double.define_singleton_method(level) {|payload| logged.push(payload)}
+      end
+      dic.define_singleton_method(:logger) {double}
+      yield
+      return logged
+    end
 
     def redis
       @redis ||= Redis.new

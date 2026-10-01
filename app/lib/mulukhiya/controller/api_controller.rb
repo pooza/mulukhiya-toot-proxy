@@ -610,8 +610,9 @@ module Mulukhiya
       return @renderer.to_s
     rescue => e
       report_error(e)
-      @renderer.status = e.status
-      @renderer.message = {error: e.message}
+      # ⚠ OAuth state の取り出し失敗（Redis の例外）は `status` を持たない (#4724)。
+      @renderer.status = e.respond_to?(:status) ? e.status : 500
+      @renderer.message = {error: public_error_message(e)}
       return @renderer.to_s
     end
 

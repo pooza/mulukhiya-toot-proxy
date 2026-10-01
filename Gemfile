@@ -3,12 +3,12 @@ ruby '>= 4.0.2', '< 5.0'
 gem 'concurrent-ruby'
 gem 'dry-validation'
 gem 'faye-websocket', github: 'pooza/faye-websocket-ruby'
-gem 'ginseng-core', github: 'pooza/ginseng-core', tag: 'v1.23.7', require: 'ginseng'
+gem 'ginseng-core', github: 'pooza/ginseng-core', tag: 'v1.25.1', require: 'ginseng'
 gem 'ginseng-fediverse', github: 'pooza/ginseng-fediverse', tag: 'v2.0.4',
   require: 'ginseng/fediverse'
-gem 'ginseng-piefed', github: 'pooza/ginseng-piefed', tag: 'v0.1.1', require: 'ginseng/piefed'
+gem 'ginseng-piefed', github: 'pooza/ginseng-piefed', tag: 'v0.2.0', require: 'ginseng/piefed'
 gem 'ginseng-postgres', github: 'pooza/ginseng-postgres', tag: 'v2.0.1'
-gem 'ginseng-redis', github: 'pooza/ginseng-redis', tag: 'v2.0.6', require: 'ginseng/redis'
+gem 'ginseng-redis', github: 'pooza/ginseng-redis', tag: 'v2.0.8', require: 'ginseng/redis'
 gem 'ginseng-web', github: 'pooza/ginseng-web', tag: 'v3.0.3', require: 'ginseng/web'
 gem 'ginseng-youtube', github: 'pooza/ginseng-youtube', tag: 'v3.0.1', require: 'ginseng/you_tube'
 gem 'icalendar'
@@ -48,6 +48,9 @@ gem 'puma', '~> 8.0'
 # `sinatra/base` 経由で入るので、`require: false` でも解決できる（実測）。
 gem 'rack', '~> 3.2.5', require: false # 2026-02 の同時アクセステスト (500 req × 2 並列・不整合 0、#4055) が通った版
 gem 'rack-session', '>= 2.1.1', require: false # ⚠ ginseng-web の床をそのまま移すだけ。事故との関係は無い
+# 🔴 CVE-2026-80212 / 80213 (#4772)。Ruby 4.0.6 同梱は 0.7.0。
+# 4.0.7 同梱と同じ 0.7.x に留める（0.8.0 は 2026-09-17 公開で未検証）
+gem 'resolv', '~> 0.7.2', require: false
 gem 'rspotify', github: 'pooza/rspotify', branch: 'master.pooza'
 gem 'ruby-progressbar'
 gem 'ruby-vips', require: 'vips'

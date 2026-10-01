@@ -125,7 +125,64 @@ module Mulukhiya
       assert_operator(deadline, :<, Time.now.to_f, '壁時計基準になっている')
     end
 
+    # 🔴 **音声変換も締切を見る (#4722)。**以前は `AudioFile#convert_type` の
+    # `exec` に timeout が無く、audio_format_convert（30 秒）の内側は #4696 と同じく
+    # 一度も発火しなかった。remux が失敗して transcode へ進む経路も含めて見る。
+    def test_audio_convert_passes_the_deadline_to_ffmpeg
+      publish(HANDLER_TIMEOUT)
+      mp3 = File.join(Environment.dir, 'public/mulukhiya/media/hugttocatch.mp3')
+      timeouts = []
+      stub_builder(:remux_audio, timeouts, status: 1) do
+        stub_builder(:transcode_audio, timeouts, status: 0) do
+          AudioFile.new(mp3).convert_type('audio/mpeg')
+        end
+      end
+
+      assert_equal(2, timeouts.size)
+      timeouts.each do |value|
+        assert_not_nil(value, 'timeout なしで ffmpeg を撃っている')
+        assert_operator(value, :<, HANDLER_TIMEOUT)
+      end
+    end
+
+    # 🔴 **ffprobe も締切を見る (#4722)。**`probe_timeout` は 30 秒固定だったので、
+    # ハンドラの timeout を 30 秒未満にすると外側が先に発火し、`{message: 'timeout'}`
+    # しか残らなかった。
+    def test_probe_timeout_respects_the_deadline
+      Thread.current[Event::HANDLER_DEADLINE_KEY] = monotonic + 5
+
+      assert_operator(@file.probe_timeout, :<=, 5)
+      assert_operator(@file.probe_timeout, :>, 0)
+    end
+
+    # ハンドラの外では従来どおり `/ffmpeg/probe/timeout` が効く。
+    def test_probe_timeout_falls_back_to_the_limit_outside_a_handler
+      Thread.current[Event::HANDLER_DEADLINE_KEY] = nil
+
+      assert_equal(probe_timeout, @file.probe_timeout)
+    end
+
     private
+
+    # FFmpegCommandBuilder の生成メソッドを差し替え、`exec` に渡った timeout を
+    # 集める。出力先には元ファイルを複製して、変換後の `new(dest)` を通す。
+    # ⚠ 必ず元へ戻すこと（残すと以後のテストが本物の ffmpeg を撃たなくなる）。
+    def stub_builder(name, timeouts, status:)
+      original = FFmpegCommandBuilder.method(name)
+      FFmpegCommandBuilder.define_singleton_method(name) do |src, dest, *_args|
+        command = Object.new
+        command.define_singleton_method(:exec) do |timeout: nil|
+          timeouts.push(timeout)
+          FileUtils.cp(src, dest)
+        end
+        command.define_singleton_method(:status) {status}
+        command
+      end
+      return yield
+    ensure
+      FFmpegCommandBuilder.singleton_class.send(:remove_method, name)
+      FFmpegCommandBuilder.define_singleton_method(name, original)
+    end
 
     def monotonic
       return Process.clock_gettime(Process::CLOCK_MONOTONIC)
