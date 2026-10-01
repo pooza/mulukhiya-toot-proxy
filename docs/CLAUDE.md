@@ -632,6 +632,15 @@ Slack / LINE / メールには出なくなるが、**周期実行でメールを
   `annict/episodes` は下の Annict 遅延と同時期
 - **#4352 の 24 時間観測は 10-01 11:45（shallu）/ 11:53（gomander）まで**。同期時点（09:11）では未了。日曜（10-04）明けに見直す予定は据え置き
 
+#### ✅ 同日中に着地: open PR 13 本をマージ（`87eaa900`）
+
+- #4768 / #4776 / #4782 / #4785 / #4783 / #4774 / #4778 / #4779 / #4781 / #4787 / #4786 / #4777 / #4780。**open PR は 0**
+- **#4777 は #4768 と衝突**（#4768 が `handle_gateway_error` を `ControllerErrorMethods` へ移していた）→ `relay_upstream_headers` の呼び出しを移動先へ、
+  `upstream_error_code` は `UpstreamErrorMethods` の 1 本に寄せた（`16f31bb6`）。**#4780 は Gemfile が衝突** → redis v2.0.8 を採り web だけ v3.0.3 で lock を作り直した（`6dca27ec`）
+- develop: `rake lint` 無指摘・`rake test` **1541 tests・0 failures・0 errors**・CI `success`
+- **ステージング 4 台を develop（`87eaa900`）へ戻した**: Ruby 4.0.7 で `bundle install` → sidekiq → puma → listener。4 台とも version 5.39.0 / health 200
+- ⚠ Issue は base が develop なので `Closes` が効かず **open のまま**。締めでモンキーテスト可否により振り分ける
+
 #### Sentry
 
 - unresolved **25 件**（前回 26）・**コメント 0 は 0 件**
