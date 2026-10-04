@@ -195,8 +195,7 @@ git diff Gemfile.lock
 - **#4793**（GAS への HEAD が 403 で落ちるたびにエラー行・1 台 1 日 144 行）— **pooza/ginseng-core#672 の着地待ち**
 - **#4789**（Mastodon の media_catalog の既定を `true` に戻す）— #4352 はニチアサ明けの見直しまで済んだ。残る前提は #4353
 - ginseng-\* のメジャー: **#4784**（core v2.0.0）/ **#4748**（fediverse v3.1.0）
-- 📌 **5.39.0 の手順 12（掃除 PR）が未了。**下の「リリース前レビュー（2026-10-04）」の「掃除 PR」の 6 件を 1 PR で落とす。
-  ⚠ **次の周回のステージング検証より前に**
+- 📌 **5.39.0 の手順 12（掃除）は PR #4795**（7 件・CI と Codex 待ち・未マージ）。⚠ **次の周回のステージング検証より前にマージする**
 
 ## リリース済み: 5.39.0（2026-10-04）
 
@@ -231,7 +230,7 @@ git diff Gemfile.lock
 - 🟡 **本リリースで直した 1 件**: 上流の 429 で解除まで 60 秒以内のとき puma スレッドを持ったまま最大 60 秒眠る
   （ginseng-core v1.25.1 から）→ `/http/retry/max_seconds: 5`（`ecf74cfa`）
 - 🟡 **Issue 1 件**: ffmpeg / ffprobe の締切が効かない → **#4794**（5.40.0）
-- 📌 **掃除 PR（手順 12・未了）**: ① 「話数 ＋」の 409 が、待っても解けない場合（特番・期またぎ・作品 ID 誤り）にも
+- 📌 **掃除 PR（手順 12）→ PR #4795**: ① 「話数 ＋」の 409 が、待っても解けない場合（特番・期またぎ・作品 ID 誤り）にも
   「時間を置いて」と案内する ② 最上位 `error do` の非 Ginseng 分岐で、ログと Sentry から path が消えた
   （`error.alert(origin: ...)` を渡す）③ `docs/api.md` の `episode/increment` に、返らなくなった `not_found` の説明が 1 文残る
   ④ `NowplayingResolver#artwork_pixel` が生の `config['/handler/...']` を読む（`ItunesImageHandler.handler_config(:pixel)` へ）
