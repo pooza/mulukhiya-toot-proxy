@@ -30,7 +30,10 @@ module Mulukhiya
     def push(uri, host_validator: nil)
       path = File.join(Environment.dir, 'tmp/media', uri.to_s.sha256)
       unless File.exist?(path)
-        RemoteHost.validate!(uri) if host_validator
+        # ⚠ **URI にしてから渡す。**`RemoteHost.validate!` は `host` を持たない値を
+        # ホスト名そのものとして扱うので、フィードから来る String の URL をそのまま渡すと
+        # URL 全体を DNS に引いて必ず拒否する（公開ホストの enclosure が全滅する）。
+        RemoteHost.validate!(Ginseng::URI.parse(uri.to_s)) if host_validator
         File.write(path, http.get(uri, {host_validator:}.compact))
       end
       values = MediaFile.new(path).file.values.merge(url: uri.to_s)
