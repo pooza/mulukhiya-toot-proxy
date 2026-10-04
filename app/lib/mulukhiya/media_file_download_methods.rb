@@ -100,7 +100,8 @@ module Mulukhiya
     # 倒す。受信後の実測が最終防衛線 (#4576 / word_suggest と同じ形)。
     # ⚠ **プリフライトにも同じ host_validator を渡す。**ここだけ無検証だと
     # GET 側のガードが見せかけの安全になる (#4523)。
-    def valid_content_length?(uri, options = {})
+    # ⚠ `options` に既定値を置かない。省略できると、検証なしの HEAD が撃てる口になる。
+    def valid_content_length?(uri, options)
       length = HTTP.new.head(uri, options).headers['content-length']
       return true if length.nil? || length.to_i <= download_max_bytes
       Logger.new.error(

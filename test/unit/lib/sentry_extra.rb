@@ -30,6 +30,17 @@ module Mulukhiya
       assert_not_match(/abcdef123456/, extra.to_s)
     end
 
+    # マスクは Hash / Array / String しか潜らない。URI オブジェクトは文字列に落としてから通す。
+    def test_masks_credential_in_uri_object
+      extra = SentryExtra.create(
+        uri: Ginseng::URI.parse('https://example.com/api?access_token=abcdef123456'),
+        nested: {uris: [Ginseng::URI.parse('https://example.com/?access_token=zyxwvu987654')]},
+      )
+
+      assert_not_match(/abcdef123456|zyxwvu987654/, extra.to_s)
+      assert_match(/example\.com/, extra.to_s)
+    end
+
     # LogScrubber の対象（本文系・OAuth コード・ボディの i）は、入れ子でも落ちる。
     def test_scrubs_body_fields
       extra = SentryExtra.create(
