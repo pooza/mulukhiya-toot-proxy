@@ -263,7 +263,7 @@ module Mulukhiya
 
     def annict_not_found_conflict
       return ConflictError.new(
-        'Annict にまだ登録されていません。時間を置いて押し直すか、編集で話数を直接書いてください。',
+        'Annict にまだ登録されていません。時間を置いて押し直すか、編集で話数・サブタイトル・Annict エピソード ID を書き換えてください。',
         code: :annict_not_found,
       )
     end
