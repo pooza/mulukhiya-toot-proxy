@@ -144,7 +144,7 @@ module Mulukhiya
     # ジャケットの一辺。`itunes_image` ハンドラ（既定で無効）の `pixel` に揃える (#4769)。
     # ⚠ ハンドラの有効・無効は見ない。添付するかどうかではなく、大きさの設定だけを借りる。
     def artwork_pixel
-      return config['/handler/itunes_image/pixel'].to_i.nonzero? || DEFAULT_ARTWORK_PIXEL
+      return ItunesImageHandler.handler_config(:pixel).to_i.nonzero? || DEFAULT_ARTWORK_PIXEL
     rescue Ginseng::ConfigError
       return DEFAULT_ARTWORK_PIXEL
     end

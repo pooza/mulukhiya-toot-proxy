@@ -46,6 +46,15 @@ module Mulukhiya
       assert_equal(403, last_response.status)
     end
 
+    # 鳴らす回にも発生源（ルート）を載せる。載せないと、最上位の受け皿に落ちた例外が
+    # どのルートのものかを syslog からも Sentry からも辿れない。
+    def test_alert_carries_origin
+      error = probe(Ginseng::AuthError.new('Invalid signature'))
+
+      assert_equal(1, error.mulukhiya_origins.size)
+      assert_match(%r{/admin}, error.mulukhiya_origins.first.to_s)
+    end
+
     # 🔴 連打は窓のあいだ log 止め。
     def test_repeated_signature_mismatch_is_throttled
       probe(Ginseng::AuthError.new('Invalid signature'))
@@ -68,7 +77,12 @@ module Mulukhiya
     def spy(error)
       calls = []
       error.define_singleton_method(:mulukhiya_calls) {calls}
-      error.define_singleton_method(:alert) {|*| calls << :alert}
+      origins = []
+      error.define_singleton_method(:mulukhiya_origins) {origins}
+      error.define_singleton_method(:alert) do |values = {}|
+        origins << values[:origin]
+        calls << :alert
+      end
       error.define_singleton_method(:log) {|*| calls << :log}
       return error
     end
