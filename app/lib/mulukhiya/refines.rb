@@ -45,7 +45,9 @@ module Mulukhiya
         # 投げると、上位の rescue がさらに alert/log を呼ぶ経路で再帰的 500 (#4317
         # の元症状) に逆戻りする。Sinatra error handler だけでなく api_controller
         # 各 rescue 経路も保護するため、ここで集約防御する。
-        Sentry.capture_exception(self) rescue nil if Sentry.initialized?
+        # ⚠ values は伏せ字を通してから extra へ載せる (#4745)。
+        extra = SentryExtra.create(values)
+        Sentry.capture_exception(self, extra:) rescue nil if Sentry.initialized?
         return Event.new(:alert).dispatch(self)
       end
 

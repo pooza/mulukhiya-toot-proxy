@@ -38,6 +38,16 @@ module Mulukhiya
       assert_nil(retry_after)
     end
 
+    # 「話数 ＋」を Annict 未登録で断った 409 (#4771)。画面は `code` で案内に切り替えるので、
+    # 本文に `code` が載ること。Annict に載る時刻は分からないので Retry-After は付けない。
+    def test_annict_not_found_has_code_without_retry_after
+      render(ProgramEditor.new.send(:annict_not_found_conflict))
+
+      assert_equal(409, @renderer.status)
+      assert_equal('annict_not_found', body[:code])
+      assert_nil(retry_after)
+    end
+
     # 理由を持たない例外の応答は従来どおり（上流透過 #4480 などと形を変えない）。
     def test_plain_error_keeps_the_legacy_shape
       render(Ginseng::NotFoundError.new('Not Found'))

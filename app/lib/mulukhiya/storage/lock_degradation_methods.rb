@@ -91,7 +91,9 @@ module Mulukhiya
     # 望ましい**のは #4573 で決めたとおり。
     def report(error, payload)
       error.log(payload)
-      Sentry.capture_exception(error, tags: sentry_tags(payload)) rescue nil if Sentry.initialized?
+      tags = sentry_tags(payload)
+      extra = SentryExtra.create(payload)
+      Sentry.capture_exception(error, tags:, extra:) rescue nil if Sentry.initialized?
     end
 
     # ⚠ Sentry では例外クラスで束ねられるので、**どの事象・どのストレージか**を

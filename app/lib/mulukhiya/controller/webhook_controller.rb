@@ -13,7 +13,12 @@ module Mulukhiya
       # ⚠ **ここは `report_error` に寄せない (#4603)。**主な失敗は署名検証
       # (`AuthError`) と設定不備 (`ServiceUnavailableError`・503) で、**署名不一致を
       # 黙らせたくない**。4xx でも alert するのが正しい。
-      e.alert
+      #
+      # ⚠ **ただし連打はデッドマンで抑える (#4723)。**素の `e.alert` だと外から
+      # 叩かれ続けたときに**不一致 1 回ごとに Sentry ＋ slack / line / mail** が飛ぶ。
+      # `report_error` の ③ と同じ `throttled_alert` で、窓のあいだ 1 回だけ鳴らす
+      # （抑えている間も syslog には残る）。
+      throttled_alert(e)
       @renderer.status = e.respond_to?(:status) ? e.status : 500
       @renderer.message = {error: e.message}
       return @renderer.to_s

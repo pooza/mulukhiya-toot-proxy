@@ -13,6 +13,18 @@ module Mulukhiya
       @attachment = item && attachment_class[item[:id]]
     end
 
+    # ⚠⚠ **実クラスでの配線 (#4698)。**`AttachmentCatalogTest` は `FakeAttachment`
+    # ダブルなので、`self.included` → `extend(ClassMethods)` の配線と、実クラス上で
+    # `catalog_cursor_key` が上書きされ `config` / `Postgres.exec` が解決することは
+    # 見ていない。#4687 と同じく「実物を通さないと分からない」型。
+    # ⚠ media の seed に依らず走らせる（`@attachment` で return しない）。
+    def test_catalog_is_wired_on_the_real_class
+      assert_respond_to(attachment_class, :catalog)
+      assert_respond_to(attachment_class, :catalog_offset)
+      assert_kind_of(Symbol, attachment_class.catalog_cursor_key)
+      assert_kind_of(Array, attachment_class.catalog(limit: 1, skip_cache: true)[:items])
+    end
+
     test 'テスト用メディアファイルの有無' do
       # 実 DB には media が存在するので非 nil を検証する。harness 等 media 未 seed の
       # 環境では構造的に green にできないため precondition 明示 omit（silent skip ではない）。

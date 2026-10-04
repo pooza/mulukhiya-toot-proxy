@@ -218,7 +218,7 @@ module Mulukhiya
     #
     # config の参照を rescue で握り潰さないこと。既定値は application.yaml が
     # 必ず持つので、引けない状態は設定の破損であり黙って無効化してはいけない
-    # (MEMORY feedback_fail-open-guard-footgun)。
+    # （fail-open の rescue がガードを黙って無効化する型を作らない）。
     def self.ruby_status(yjit_enabled)
       return 'NG' if require_yjit? && !yjit_enabled
       return 'OK'

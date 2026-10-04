@@ -5,7 +5,7 @@
 # 「upstream リリースを最後にチェックした日」を記録する。
 #
 # 用途（セッション組み込み方式。専用の cloud/cron ジョブは使わない）:
-#   - docs/CLAUDE.md の「セッション開始時の同期手順」で、last_checked から一定
+#   - .claude/skills/sync/SKILL.md（同期手順）の §8 で、last_checked から一定
 #     日数（既定: 4 日）以上経過していたら upstream 最新リリースを確認し、
 #     verified より新しい stable / RC があれば検証を促す。確認したら last_checked
 #     を当日に更新する。
@@ -13,31 +13,42 @@
 #     MASTODON_VERSION / MISSKEY_VERSION と対になる値。互換性検証を終えて
 #     harness の既定を bump したら、verified もこのファイルで同じ版に更新する。
 #
-# upstream リリースの参照先（GitHub）:
-#   - Mastodon : mastodon/mastodon      （stable は vX.Y.Z、RC は vX.Y.Z-rc.N）
-#   - Misskey  : misskey-dev/misskey    （stable は YYYY.M.P、alpha/beta は prerelease）
-#     ※ Docker Hub の misskey/misskey とは別。GitHub では misskey-dev/misskey。
-#
-# 検証フロー（新バージョン検知時）:
-#   1. cd ~/repos/chubo2/fedi-test-harness/<mastodon|misskey>
-#   2. ./scripts/update-version.sh   # upstream 最新に追従
-#   3. ./scripts/reset.sh            # 新イメージ + クリーン DB で再構築
-#   4. mulukhiya 側で account / status / controller 等の harness テストを実走
-#      (要 mulukhiya 自前 Redis localhost:6379)
-#   5. 緑なら chubo2 .env.example と本ファイルの verified を新バージョンに更新
+# 参照先と検証フローは .claude/skills/harness-gate/SKILL.md の
+# 「upstream の新しい版の検証」（#4731 で移した）。
 #
 # 運用方針の詳細は MEMORY の feedback_upstream-release-harness-verification 参照。
 
 mastodon:
-  verified: v4.7.2
-  verified_at: '2026-09-16'
+  verified: v4.7.3
+  verified_at: '2026-10-02'
 
 misskey:
-  verified: 2026.9.1
-  verified_at: '2026-09-24'
+  verified: 2026.10.0
+  verified_at: '2026-10-02'
 
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
-last_checked: '2026-09-24'
+last_checked: '2026-10-02'
+
+# 2026-10-02 チェック結果:
+#   - 🔴 **Mastodon v4.7.3（2026-10-01・stable）が出た。verified（v4.7.2）より新しいので検証対象。**
+#     Security は依存更新。アセットの再コンパイルが要る。4.6.9 / 4.5.19 / 4.4.26 と同時リリース。
+#   - 🔴 **Misskey 2026.10.0（2026-10-01・stable）が出た。verified（2026.9.1）より新しいので検証対象。**
+#     「セキュリティに関する修正」を含む。HTTP Signatures の `(request-target)` にクエリ文字列を含める修正あり。
+#   - ✅ **Mastodon は同日中に fedi-test-harness（v4.7.3・`reset.sh` でクリーン再構築）で実走し、`verified` を昇格した。**
+#     モロヘイヤ develop `6fb5092a`。**1613 tests / 3222 assertions / 0 failures / 0 errors /
+#     159 omissions（100% passed）。**失敗が無いので版間 diff は不要。
+#     `TestHarness: controller=mastodon url=http://localhost:3000` と `/api/v1/instance` の version 4.7.3 を確認。
+#     `MISSKEY_*` は 0 本（`env -i` で系を分離）。⚠ **omission 159 件は v4.7.2 と同数。**
+#     ⚠ `TestHarness: DB 接続に失敗したためスキップ: … user "u"` が 1 行出るが、**TestHarness の単体テストが
+#     わざと入れるダミー DSN（`postgres://u:p@…`・test/unit/lib/test_harness.rb）由来で無害**。
+#     chubo2 のピンは `2f6b45a`。実走後に teardown 済み。
+#   - ✅ **Misskey 2026.10.0 も同日中に実走し、`verified` を昇格した**（pooza/misskey は #457 で取り込み・マージ済み、
+#     ダイスキーへの本番デプロイは未了の時点。harness は upstream の `misskey/misskey:2026.10.0` イメージなので
+#     **fork 固有の差分は検証範囲外**）。モロヘイヤ develop `f490b091`。
+#     **1616 tests / 3213 assertions / 0 failures / 0 errors / 145 omissions（100% passed）。**omission は 2026.9.1 と同数。
+#     `TestHarness: controller=misskey url=http://localhost:3001`・`/api/meta` の version 2026.10.0・`MASTODON_*` 0 本を確認。
+#     5433 への DB 接続スキップ 1 行は上と同じダミー DSN 由来（Mastodon harness 停止中なので refused になる）。
+#     chubo2 のピンは `2bdbc8a`。実走後に teardown 済み。
 
 # 2026-09-24 チェック結果:
 #   - 🔴 **Misskey 2026.9.1（2026-09-23・stable）が出た。verified（2026.9.0）より新しいので検証対象。**

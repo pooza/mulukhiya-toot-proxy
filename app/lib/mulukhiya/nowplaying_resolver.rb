@@ -27,16 +27,41 @@ module Mulukhiya
       @prefer = prefer.to_s.strip
     end
 
+    # ジャケット画像の一辺 (px) の既定。`itunes_image` ハンドラの `pixel` が取れないとき (#4769)。
+    DEFAULT_ARTWORK_PIXEL = 480
+
     # 優先連鎖の順にプロバイダを試し、最初にヒットした
-    # {url:, provider:, normalized: {title, artist, album}} を返す。
-    # ヒットしなければ {url: nil} (404 ではなく 200 + null)。
+    # {url:, provider:, normalized: {title, artist, album}, artwork_url:} を返す。
+    # ヒットしなければ {url: nil, artwork_url: nil} (404 ではなく 200 + null)。
+    #
+    # ⚠ **`artwork_url` のキーは常に返す**（取れなければ null・#4769）。クライアントが
+    # 「キーが無い」と「画像が無い」を区別せずに済むように。画像の取得・添付・リサイズは
+    # しない（URL を返すだけ。添付は capsicum 側）。
     def resolve
-      return {url: nil} if @title.empty?
+      return {url: nil, artwork_url: nil} if @title.empty?
       provider_order.each do |provider|
         result = search(provider)
         return result if result
       end
-      return {url: nil}
+      return {url: nil, artwork_url: nil}
+    end
+
+    # Spotify のアルバム画像（大きい順に 640 / 300 / 64 など）から、`pixel` 以上で最小のものを
+    # 選ぶ。足りるものが無ければ Spotify の並びの先頭（＝最大）(#4769)。
+    # ⚠ Spotify は任意サイズを作れないので、Apple Music と同じ一辺には揃わない。
+    # ⚠ `width` が null の画像もある。0 扱いで並べ替えると先頭の最大画像を取り逃すので、
+    # サイズ不明のものは「足りる候補」から外し、フォールバックは並び順に任せる。
+    def self.spotify_artwork_url(images, pixel)
+      images = Array(images).map {|v| v.to_h.transform_keys(&:to_s)}.select {|v| v['url'].present?}
+      return nil if images.empty?
+      sufficient = images.select {|v| v['width'].to_i >= pixel}.min_by {|v| v['width'].to_i}
+      return (sufficient || images.first)['url']
+    end
+
+    # Apple Music の `artworkUrl100` のサイズ指定を差し替える（`ItunesURI#image_uri` と同じ・#4769）。
+    def self.apple_music_artwork_url(url, pixel)
+      return nil unless url.present?
+      return url.sub('100x100', "#{pixel}x#{pixel}")
     end
 
     private
@@ -67,6 +92,7 @@ module Mulukhiya
           artist: track['artistName'],
           album: track['collectionName'],
         }.compact,
+        artwork_url: self.class.apple_music_artwork_url(track['artworkUrl100'], artwork_pixel),
       }
     rescue => e
       # keyword は曲名・アーティスト等のユーザー入力なのでログに残さない (#4394)。
@@ -86,6 +112,7 @@ module Mulukhiya
           artist: track.artists.map(&:name).join(', ').presence,
           album: track.album&.name,
         }.compact,
+        artwork_url: self.class.spotify_artwork_url(track.album&.images, artwork_pixel),
       }
     rescue => e
       # keyword は曲名・アーティスト等のユーザー入力なのでログに残さない (#4394)。
@@ -112,6 +139,14 @@ module Mulukhiya
       normalized = value.to_s.downcase.tr('-', '_')
       return normalized if PROVIDERS.include?(normalized)
       return nil
+    end
+
+    # ジャケットの一辺。`itunes_image` ハンドラ（既定で無効）の `pixel` に揃える (#4769)。
+    # ⚠ ハンドラの有効・無効は見ない。添付するかどうかではなく、大きさの設定だけを借りる。
+    def artwork_pixel
+      return config['/handler/itunes_image/pixel'].to_i.nonzero? || DEFAULT_ARTWORK_PIXEL
+    rescue Ginseng::ConfigError
+      return DEFAULT_ARTWORK_PIXEL
     end
 
     def default_provider

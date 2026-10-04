@@ -146,7 +146,8 @@ module Mulukhiya
         sv_active: 1,
         sv_idle: 2,
         maxwait: 7,
-        clients_used: 13,
+        # ⚠ SHOW LISTS の 13 には観測自身の 1 本が入っている (#4695 の 5 件目)。
+        clients_used: 12,
         clients_max: 500,
         total_wait_time_us: 29_082_533,
       }, health[:pgbouncer])
@@ -170,7 +171,7 @@ module Mulukhiya
       assert_predicate(health.dig(:pgbouncer, :absent), :present?)
       assert_nil(health.dig(:pgbouncer, :cl_waiting))
       # 箱全体のクライアント数は行が無くても読める。
-      assert_equal(13, health.dig(:pgbouncer, :clients_used))
+      assert_equal(12, health.dig(:pgbouncer, :clients_used))
     end
 
     # ⚠ **2026-08-02 の gomander も 2026-08-08 の shallu も
@@ -180,8 +181,27 @@ module Mulukhiya
       admin = FakeAdmin.new(used_clients: 498, max_client_conn: 500)
       health = with_admin(admin) {Pgbouncer.health}
 
-      assert_equal(498, health.dig(:pgbouncer, :clients_used))
+      assert_equal(497, health.dig(:pgbouncer, :clients_used))
       assert_equal(500, health.dig(:pgbouncer, :clients_max))
+    end
+
+    # ⚠ **観測自身の 1 本は数えない (#4695 の 5 件目)。**`SHOW LISTS` の
+    # `used_clients` は admin コンソールへ張ったこの接続も含む。
+    def test_clients_used_excludes_the_probe_itself
+      health = with_admin(FakeAdmin.new(used_clients: 1)) {Pgbouncer.health}
+
+      assert_equal(0, health.dig(:pgbouncer, :clients_used))
+    end
+
+    # ⚠⚠ **config の破損は握らない (#4695 の 2 件目)。**`enable?` が health の rescue の
+    # 内側にあると、`Ginseng::ConfigError` が `{pgbouncer: {error: ...}}` に化けて
+    # status は OK のまま＝設定が壊れていることに誰も気付かない。
+    def test_config_error_is_not_swallowed
+      config['/postgres/pgbouncer/enable'] = nil
+
+      assert_raise(Ginseng::ConfigError) {Pgbouncer.health}
+    ensure
+      config['/postgres/pgbouncer/enable'] = 'auto'
     end
 
     # ⚠ **繋がらないこと自体が信号になりうる**（max_client_conn 枯渇なら
@@ -295,6 +315,30 @@ module Mulukhiya
     def teardown
       Singleton.__init__(Postgres)
       super
+    end
+
+    # ⚠⚠ **pgbouncer の観測も `SELECT 1` より先に取る (#4695 の 1 件目)。**
+    # `SELECT 1` は pgbouncer の待ち行列に並ぶので、後で読むと自分の前の待ちが
+    # 捌けた後の `cl_waiting` / `maxwait` になる（#4618 で `pool` について直したのと同じ形）。
+    def test_pgbouncer_is_observed_before_the_probe_query
+      order = []
+      connection = FakeConnection.new
+      connection.define_singleton_method(:fetch) do |_sql|
+        order.push(:select)
+        [{ok: 1}]
+      end
+      instance = Object.new
+      instance.define_singleton_method(:connection) {connection}
+      Postgres.instance_variable_set(:@singleton__instance__, instance)
+      stub_connect do |**_params|
+        order.push(:pgbouncer)
+        raise PG::ConnectionBad, 'refused'
+      end
+      Postgres.health
+
+      assert_equal([:pgbouncer, :select], order)
+    ensure
+      restore_connect
     end
 
     def test_status_stays_ok_when_pgbouncer_is_unreachable

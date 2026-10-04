@@ -313,6 +313,10 @@ http:
   retry:
     limit: 3
     seconds: 1
+    # 上流が 429 で示した待ち時間（Retry-After / X-RateLimit-Reset）に付き合う上限。これを超える
+    # 待ちは叩き直さずに 429 をそのまま返す。待つあいだ puma のスレッドを持ったままになるので、
+    # ginseng-core の既定（60 秒）より短く置く。
+    max_seconds: 5
   timeout:
     seconds: 30
 iceshrimp:
@@ -492,7 +496,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 5.38.1
+  version: 5.39.0
 parser:
   note:
     fields:

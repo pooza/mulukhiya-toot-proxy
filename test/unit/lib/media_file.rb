@@ -16,9 +16,25 @@ module Mulukhiya
 
     def test_create_dest_path
       files do |f|
-        basename = File.basename(MediaFile.new(f).create_dest_path(extname: '.webp'), '.webp')
+        file = MediaFile.new(f)
+        dest = file.create_dest_path(extname: '.webp')
 
-        assert_equal(64, basename.length)
+        assert_equal('.webp', File.extname(dest))
+        assert(File.basename(dest).start_with?(File.read(f).sha256))
+      end
+    end
+
+    # ⚠⚠ **同じ内容の変換で出力先が重ならないこと (#4722)。**以前は内容の sha256 から
+    # 決まる固定名で、同じ動画・画像がほぼ同時に 2 回上がる（連投・webhook の再送）と、
+    # 片方がアップロード中のファイルをもう片方の ffmpeg (`-y`) / vips が切り詰めうる。
+    # ⚠ ffmpeg は拡張子で出力形式を決めるので、拡張子は保つこと。
+    def test_create_dest_path_is_unique_per_call
+      files do |f|
+        file = MediaFile.new(f)
+        paths = Array.new(3) {file.create_dest_path(type: 'video/mp4')}
+
+        assert_equal(3, paths.uniq.size)
+        paths.each {|v| assert_equal('.mp4', File.extname(v))}
       end
     end
 

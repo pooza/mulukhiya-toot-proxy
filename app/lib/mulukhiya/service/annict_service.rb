@@ -49,7 +49,11 @@ module Mulukhiya
       return works.sort_by {|v| (v['seasonYear'].to_i * 100_000) + v['annictId']}.reverse
     end
 
-    def episodes(ids)
+    # ⚠ 既定では**サブタイトルの無い回を落とす**（エピソード一覧・タグ辞書は
+    # サブタイトルからハッシュタグを作るので、無い回は使えない）。
+    # `untitled: true` は回の有無だけを知りたい呼び出し元のため (#4771)。落とすと
+    # 「登録済みだがサブタイトルが無い」が「Annict に無い」に化ける（PR #4776 の Codex P2）。
+    def episodes(ids, untitled: false)
       entries = query(:episodes, {ids:}).dig('data', 'searchWorks', 'nodes')
       return [] unless entries.is_a?(Array) && entries.any?
       all_episodes = entries.flat_map do |work|
@@ -57,6 +61,7 @@ module Mulukhiya
       end
       work_title = entries.first['title']
       return Parallel.map(all_episodes, in_threads: Parallel.processor_count * 2) do |episode|
+        next episode if untitled && episode['title'].nil?
         enrich_episode(episode, work_title)
       end.compact
     end

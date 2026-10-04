@@ -315,7 +315,10 @@ capsicum が OS から構造化メタデータ（title / artist / album）を pu
 
 **プロバイダ優先順位（3段連鎖）**: ① 明示 `prefer` → ② `source_app_name` ヒント → ③ サーバー既定（`/nowplaying/resolve/default_provider`、**既定値 = `apple_music`**）。優先側でヒットなしなら他方へフォールバックして URL を返す。
 
-**出力**: ヒット時 `{ url, provider, normalized:{title,artist,album} }`、ヒットなしは `{ url: null }`（200）。外部 API の癖（文字化け・余分な括弧情報）の正規化はモロヘイヤ側で吸収。capsicum はレスポンスの URL を**クライアント整形のテキストに足すだけ**。読み取り専用。
+**出力**: ヒット時 `{ url, provider, normalized:{title,artist,album}, artwork_url }`、ヒットなしは `{ url: null, artwork_url: null }`（200）。
+**`artwork_url`（モロヘイヤ 5.39.0〜 / #4769・capsicum#1133）**: ジャケット画像の URL（キーは常に返す・取れなければ `null`）。一辺は `itunes_image` の `pixel`（既定 480）に揃える（Spotify は近いサイズ）。
+これで capsicum は OS ごとのネイティブ実装なしに全プラットフォームでジャケットを得られる。取得・添付は capsicum 側、リサイズはモロヘイヤの既存ハンドラに任せる。
+⚠ Mastodon は添付のある投稿にプレビューカードを出さない。外部 API の癖（文字化け・余分な括弧情報）の正規化はモロヘイヤ側で吸収。capsicum はレスポンスの URL を**クライアント整形のテキストに足すだけ**。読み取り専用。
 
 ### 既存ハンドラの扱い（確定）
 

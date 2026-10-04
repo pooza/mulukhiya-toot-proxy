@@ -52,21 +52,27 @@ module Mulukhiya
     # **自分の前の待ちが捌けた後の値**になり、有限のスパイクを丸ごと取りこぼす。
     # 「詰まりに近づいている」を見るための指標なのに、**近づいている瞬間だけ見えない**
     # という逆立ちが起きていた。
+    #
+    # ⚠⚠ **`Pgbouncer.health` も同じ理由で `SELECT 1` より先 (#4695 の 1 件目)。**
+    # 実際に枯れる資源はそちらで、`SELECT 1` は pgbouncer の待ち行列にも並ぶ。
     def self.health
       return {status: 'OK', skipped: true} unless config?
 
       snapshot = pool
+      bouncer = Pgbouncer.health
       instance.connection.fetch('SELECT 1 AS ok').first
-      return {status: 'OK'}.merge(snapshot).merge(Pgbouncer.health)
+      return {status: 'OK'}.merge(snapshot).merge(bouncer)
     rescue Sequel::PoolTimeout => e
-      # ⚠ `snapshot` は必ず Hash。`pool` は自前の rescue で `{}` を返すので raise せず、
-      # ここへ来る時点で代入は済んでいる（`|| pool` は到達しない死にコードだった）。
+      # ⚠ `snapshot` / `bouncer` は必ず Hash。どちらも観測の失敗を自前で握るので、
+      # `SELECT 1` の PoolTimeout でここへ来る時点で代入は済んでいる。
       result = {error: e.message, status: 'WARN', reason: 'pool_exhausted'}
-      return result.merge(snapshot).merge(Pgbouncer.health)
+      return result.merge(snapshot).merge(bouncer)
     rescue => e
       # ⚠ NG のときこそ pgbouncer の生死が要る。「Postgres NG だが pgbouncer は
       # 答える」と「両方死んでいる」は切り分けが真逆になる。
-      return {error: e.message, status: 'NG'}.merge(Pgbouncer.health)
+      # ⚠ `bouncer` が nil なのは `Pgbouncer.health` 自身が落ちた（config の破損）回。
+      # ここで引き直すと同じ例外で rescue の中から落ちるので、載せずに返す。
+      return {error: e.message, status: 'NG'}.merge(bouncer.to_h)
     end
 
     # 接続プールの使用状況 (#4351 Gate 2)。
