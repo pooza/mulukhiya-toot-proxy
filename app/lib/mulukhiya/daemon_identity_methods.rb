@@ -60,5 +60,32 @@ module Mulukhiya
     def identity_tag
       return Regexp.escape(File.basename(Environment.dir))
     end
+
+    private
+
+    # 🔴 **`stop` は他人のプロセスへ TERM を送らない (#4792)。**
+    #
+    # 上流の `run_stop` は pid ファイルの番号へそのままシグナルを送る（身元を見るのは
+    # `start` / `restart` / `status` の入口だけ）。⚠⚠ **同じユーザーで動く Mastodon の
+    # puma / sidekiq が番号を引いていると、モロヘイヤの停止が Mastodon を止める。**
+    # 2026-10-06 に dev26 で、`PumaDaemon.pid` へ Mastodon の puma の番号を入れて
+    # `service mulukhiya-puma restart` を呼び、実際に Mastodon の web が落ちた。
+    #
+    # ⚠ 古い pid ファイルは消して正常終了する（上流の「既に居なかった」と同じ扱い）。
+    # rc.d はこのあと pattern で取り残しを探すので、本物が別に居れば止まる。
+    def run_stop
+      reset_pid_file_error
+      found = pid
+      return super unless found && alive_state_of(found) == :dead && process_exists?(found)
+      remove_pid(found)
+      warn "PID file found, but PID #{found} is not #{app_name}."
+      @logger.warn(daemon: app_name, version: package_class.version,
+        message: 'stop', reason: 'pid file points to another process', pid_file:)
+    end
+
+    # ⚠ 「居ない」は上流の `ESRCH` の経路に任せる（メッセージを変えないため）。
+    def process_exists?(pid)
+      return Process.alive_state(pid) != :dead
+    end
   end
 end

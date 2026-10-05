@@ -111,6 +111,46 @@ module Mulukhiya
       assert_equal(:alive, Process.alive_state(pid))
     end
 
+    # 🔴 `stop` は他人のプロセスへシグナルを送らず、古い pid ファイルだけを片付ける。
+    # 2026-10-06 に dev26 で、Mastodon の puma を実際に止めてしまった形。
+    def test_stop_does_not_signal_foreign_process
+      pid = spawn_titled('puma 8.0.2 (tcp://127.0.0.1:3000) [mastodon]')
+      daemon = create_daemon(pid)
+      signals = []
+      daemon.define_singleton_method(:send_signal) {|*args| signals.push(args)}
+
+      assert_nothing_raised {silence_stderr {daemon.send(:run_stop)}}
+      assert_empty(signals)
+      assert_equal(:alive, Process.alive_state(pid))
+      assert_false(File.exist?(daemon.pid_file))
+    end
+
+    # ⚠ 自分のデーモンには従来どおり TERM を送り、pid ファイルを消す。
+    def test_stop_signals_own_process
+      pid = spawn_titled(PUMA_TITLE)
+      daemon = create_daemon(pid)
+      signals = []
+      daemon.define_singleton_method(:send_signal) {|*args| signals.push(args)}
+
+      silence_stderr {daemon.send(:run_stop)}
+
+      assert_equal([['TERM', pid]], signals)
+      assert_false(File.exist?(daemon.pid_file))
+    end
+
+    # ⚠ 身元が分からないときは上流の挙動のまま（止めにいく）。
+    def test_stop_with_identity_unavailable
+      pid = spawn_process('sleep', '30')
+      daemon = create_daemon(pid)
+      signals = []
+      daemon.define_singleton_method(:send_signal) {|*args| signals.push(args)}
+      daemon.define_singleton_method(:process_command) {|_| ''}
+
+      silence_stderr {daemon.send(:run_stop)}
+
+      assert_equal([['TERM', pid]], signals)
+    end
+
     private
 
     # ⚠ 実機の pid ファイル（`tmp/pids/PumaDaemon.pid`）を踏まないよう、名前を変えて作る。
@@ -132,7 +172,7 @@ module Mulukhiya
     def spawn_titled(title)
       pid = spawn_process(RbConfig.ruby, '-e', 'Process.setproctitle(ARGV.first); sleep 30', title)
       deadline = Time.now + WAIT_SECONDS
-      until `ps -ww -o command= -p #{pid}`.strip.end_with?(title)
+      until `ps -ww -o command= -p #{pid}`.include?(title)
         raise "proctitle not set: #{title}" if deadline < Time.now
         sleep 0.05
       end
