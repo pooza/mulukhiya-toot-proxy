@@ -186,7 +186,7 @@ git diff Gemfile.lock
 
 [マイルストーン 5.40.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/639)。
 
-- 📌 **#4792 は PR #4802 でマージ待ち（2026-10-06）**。`DaemonIdentityMethods` を 3 デーモンへ混ぜた:
+- ✅ **#4792 は PR #4802 でマージ（2026-10-06・`17a7cc22`）・クローズ。**`DaemonIdentityMethods` を 3 デーモンへ混ぜた:
   ① `alive_state_of` を上書きし、`ps` で見たコマンドが自分のものでなければ `:dead`（pid ファイルを取り直す）
   ② `run_stop` を上書きし、他人のプロセスへは TERM を送らず古い pid ファイルだけ消す。
   - **pid ファイルが残る理由が分かった**: puma / sidekiq は `start` が `exec` するので、TERM の trap が置き換わった時点で消える。
@@ -197,9 +197,11 @@ git diff Gemfile.lock
     FreeBSD の本番 3 台は Mastodon とモロヘイヤが同じユーザーなので、同じことが起きうる
   - ⚠ **検証で `dev26` の pid ファイルへ他人の番号を入れるときは、止まって困らないプロセスを選ぶ**
   - 身元が分からない（`ps` が失敗・空）ときは「生きている」扱いのまま（誤ると sidekiq が二重起動する）
-  - Codex P2 × 2 に対処: 起動スクリプトの一致を `<script> start|restart` の呼び出しに絞る／タグは前後の区切りまで見る
+  - Codex P2 × 4: 起動スクリプトの一致を `<script> start|restart` の呼び出しに絞る／タグは proctitle の決まった位置で見る／
+    `exec` 直後の姿は設定ファイルのフルパスで見る。⚠ **同じユーザーが同じホストで複数のチェックアウトを動かす構成は見分けられない**
+    （注意書きに留めた・2 件）。⚠ CI の作業ツリーは親ディレクトリも同名なので、パスにディレクトリ名を探す形はテストが落ちる
   - dev27（systemd）で修正前の再現（`active (running)` のまま `NRestarts` が増える）→ 修正後の復帰、dev26（rc.d）で同じ確認。
-    📌 **dev26 / dev27 はこのブランチ**（`fix/4792-daemon-pid-identity`・マージ後に develop へ戻す）。
+    ✅ dev26 / dev27 はマージ後に develop（`d89c8ee4`）へ戻した。
     ⚠ dev26 / dev27 は `ecf74cfa` のままだったので、切り替えに `bundle install` が要った（fediverse v2.0.5 / web v3.0.4）
   - gem 側へ報告: **pooza/ginseng-core#673**（stop が身元を見ない／既定の `alive_state_of` は生死だけ／`exec` で pid ファイルが残る）と、
     1 点目のたたき台 **pooza/ginseng-core#674**。⚠ **着地した版へ上げたら、こちらの `run_stop` の上書きは外す**
@@ -219,7 +221,7 @@ git diff Gemfile.lock
   **v4 の CI はマージコミットで success**（2026-02 以来）。⚠⚠ **v4 のワークフローにはテストのステップがもともと無い**
   （最後は `rake lint`）＝緑は依存解決・監査・lint まで。⚠ 引数なしの `bundle update` は json 3.0.2 などを掴んで
   mime-types 2.99.3 の `SyntaxError` で止まるので、CI から `rake bundle:update` を外してある
-- 📌 **PR #4803（#4801）がマージ待ち（2026-10-06）**: `AnnictEpisodeDictionary` / `AnnictDictionaryStorage`。直近の成功結果を Redis に持ち（7 日）、
+- ✅ **PR #4803（#4801）をマージ（2026-10-06・`d89c8ee4`）。⚠ #4801 は open のまま**（本番に出てから件数で確かめて閉じる）: `AnnictEpisodeDictionary` / `AnnictDictionaryStorage`。直近の成功結果を Redis に持ち（7 日）、
   10 分より新しければ Annict を引かず、失敗したらそれを 200 で返す。アラートは返している結果が 6 時間より古くなったときだけ。
   上流の失敗（`GatewayError`）以外は凌げていても鳴らす。CI 両系 SUCCESS・Codex 指摘なし（👍）。
   ⚠ **実物の Annict を通した確認はしていない**（ステージングのお知らせボットに Annict のトークンが無く 403）。
