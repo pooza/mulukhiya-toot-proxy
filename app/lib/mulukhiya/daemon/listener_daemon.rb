@@ -2,6 +2,7 @@ module Mulukhiya
   class ListenerDaemon < Ginseng::Daemon
     include Package
     include SNSMethods
+    include DaemonIdentityMethods
     extend DaemonHealthMethods
 
     def start(args = [])
@@ -13,6 +14,12 @@ module Mulukhiya
       return CommandLine.new([
         File.join(Environment.dir, 'bin/listener_worker.rb'),
       ])
+    end
+
+    # ⚠ listener は `exec` しないので、proctitle は "bin/listener_daemon.rb start" のまま
+    # （FreeBSD の `ps` では "ruby: bin/listener_daemon.rb start (ruby)"）。
+    def identity_pattern
+      return launcher_pattern('listener_daemon.rb')
     end
 
     def self.disable?
