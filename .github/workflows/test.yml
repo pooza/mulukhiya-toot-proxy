@@ -35,9 +35,10 @@ jobs:
       - name: bundle install
         run: |
           gem install bundler -v '~>2.0'
+          # ⚠ lock を尊重する（#4737）。以前は `rake bundle:update` で毎回すべての gem を
+          # 最新へ動かしていたが、4.x は Dependabot のアラート時にまとめて上げる運用で、
+          # 引数なしの bundle update は json 3.x など検証していない版を掴んで CI を壊す。
           bundle install --jobs 4 --retry 3
-          bundle exec rake bundle:update
-          git diff
           bundle exec rake bundle:check
       - name: Run lint
         run: |
