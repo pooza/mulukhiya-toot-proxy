@@ -84,11 +84,13 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: db3270ddf9322513771b2b5cfa48e90608c913a0
-  tag: v3.0.3
+  revision: 3a3bd6cbf8cef08974b65f9deb49f5f426a1cb1d
+  tag: v3.0.4
   specs:
-    ginseng-web (3.0.3)
+    ginseng-web (3.0.4)
+      addressable (>= 2.9.0)
       erb (>= 6.0.4)
+      resolv (>= 0.7.2)
       rss
       sassc
       slim
