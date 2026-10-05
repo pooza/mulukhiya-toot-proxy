@@ -704,6 +704,12 @@ harness upstream は `last_checked` 10-02 から 3 日、chubo2 の Issue 棚卸
   - 既知のまま: youtube v3.0.2 / style v1.1.13
   - ⚠ `ginseng_pin_drift.rb` は最新タグしか出さないので、**2.0.x のバックポート（v2.0.5）はスクリプトの出力からは読めない**（Issue で知った）
   - 判断はユーザーに確認する（案: core を上げずに済む fediverse v2.0.5 と web v3.0.4 を先に取り込み、残りは #4784 の後）
+  - ✅ **同日に 2 本を取り込んだ**（ユーザー承認）: **PR #4796**（fediverse v2.0.5・`db27f3a6`・#4791 をクローズ）/ **PR #4797**（web v3.0.4・`ad053703`）。
+    どちらも gem 単位で上げ、`rake lint` 無指摘・`rake test` 1548 tests / 0 failures / 0 errors。CI 両系 SUCCESS・Codex 指摘なし（👍）
+  - ⚠ **web v3.0.4 の予約レンジの修正はモロヘイヤに届かない。**`RSS20FeedRenderer#fetch_image` は gem の実装を上書きして
+    `RemoteHost.unpinned_validator` を渡す（#4749）ので、gem の `PublicHost` を通る経路が無い。**#4790 は open のまま**
+    （5.40.0・#4784 の後で扱う＝ユーザー判断）
+  - #4790 / #4791 は 5.40.0 に割り当てた
 - **pooza/ginseng-core#672**（#4793 の待ち先）: open のまま・PR なし
 - **辞書台帳**（chubo2 `08005c0`）: **🔴 は前回と同じ 3 件**（直書き 1 / 台帳に無い 2）・**🔴 死亡 0**。
   🟡 **`annict/episodes` が 3 機とも増えた**（gomander 18/144・zugoga 25/144・vulcan 30/144。前回は 0〜1/144）＝下の Sentry `-2X` と同じ事象。
