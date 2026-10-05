@@ -132,6 +132,40 @@ module Mulukhiya
       assert_nil(dictionary.error)
     end
 
+    # ⚠ 実物の Redis を通す（ダブルだけだと、保存の形と読み戻しの食い違いを見ない）。
+    def test_round_trip_through_redis
+      omit('Redis unavailable') unless Redis.health[:status] == 'OK'
+      storage = AnnictDictionaryStorage.new
+      storage.unlink(AnnictEpisodeDictionary::KEY)
+
+      assert_equal(BUILT, create(AnnictDouble.new(episodes: EPISODES), storage).fetch)
+
+      failing = AnnictDouble.new(error: Ginseng::GatewayError.new('Net::ReadTimeout'))
+      config['/service/annict/dictionary/cache/fresh'] = 0
+      dictionary = create(failing, storage)
+
+      assert_equal(BUILT, dictionary.fetch)
+      assert_equal(1, failing.calls)
+      assert_false(dictionary.alert?)
+      assert_operator(storage.ttl, :>, ALERT)
+    ensure
+      storage&.unlink(AnnictEpisodeDictionary::KEY)
+    end
+
+    def test_broken_cache_entry_is_ignored
+      omit('Redis unavailable') unless Redis.health[:status] == 'OK'
+      storage = AnnictDictionaryStorage.new
+      storage.setex(AnnictEpisodeDictionary::KEY, 60, 'not json')
+
+      assert_nil(storage.get(AnnictEpisodeDictionary::KEY))
+
+      storage.setex(AnnictEpisodeDictionary::KEY, 60, {entries: []}.to_json)
+
+      assert_nil(storage.get(AnnictEpisodeDictionary::KEY))
+    ensure
+      storage&.unlink(AnnictEpisodeDictionary::KEY)
+    end
+
     # ルートが新しいクラスを通っていること（素の呼び出しへ戻ると、凌げなくなる）。
     def test_route_uses_the_dictionary
       source = File.read(File.join(Environment.dir, 'app/lib/mulukhiya/controller/api_controller.rb'))
