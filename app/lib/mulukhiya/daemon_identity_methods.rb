@@ -58,11 +58,22 @@ module Mulukhiya
 
     # puma / sidekiq の proctitle に入るタグ（作業ディレクトリの名前）。
     #
-    # ⚠ **前後の区切りまで見る（PR #4802 の Codex P2）。**同じホストに
-    # `mulukhiya-toot-proxy-old` のような別のチェックアウトがあると、部分一致では
-    # そちらの puma / sidekiq を自分と見なす。
+    # ⚠ **タグは呼ぶ側で区切りごと囲むこと（PR #4802 の Codex P2）。**部分一致だと
+    # `mulukhiya-toot-proxy-old` のような別のチェックアウトを自分と見なす。
+    #
+    # ⚠⚠ **同じユーザーが同じホストで、同じディレクトリ名のチェックアウトを 2 つ動かす構成は
+    # 見分けられない**（proctitle にはディレクトリ名しか出ない。listener は相対パスの
+    # `bin/listener_daemon.rb start` なので、ディレクトリ名が違っても見分けられない）。
+    # その構成では、古い pid ファイルがもう一方のデーモンを指すと従来どおり「already running」に
+    # なり、`stop` はそちらへ TERM を送る。**1 ユーザー 1 チェックアウトで使うこと。**
     def identity_tag
-      return "(?<=[\\s\\[/])#{Regexp.escape(File.basename(Environment.dir))}(?=[\\s\\]/]|\\z)"
+      return Regexp.escape(File.basename(Environment.dir))
+    end
+
+    # `exec` の直後、proctitle を書き換える前の姿（"ruby .../bin/puma --config <path>"）。
+    # ⚠ 設定ファイルはフルパスで渡しているので、**チェックアウトごとに一意**。
+    def exec_pattern(*args)
+      return /#{args.map {|v| Regexp.escape(v)}.join(' ')}(?:\s|\z)/
     end
 
     # 起動スクリプトのまま居るプロセス（`exec` の前、および `exec` しない listener）の姿。

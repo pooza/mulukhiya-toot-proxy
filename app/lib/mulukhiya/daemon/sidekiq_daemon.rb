@@ -33,7 +33,11 @@ module Mulukhiya
     # 書き換える。書き換える前は "ruby .../bin/sidekiq --require <Environment.dir>/..."。
     # ⚠ 同じホストの Mastodon の sidekiq を自分と誤らないよう、タグまで含めて絞る。
     def identity_pattern
-      return Regexp.union(launcher_pattern('sidekiq_daemon.rb'), /sidekiq .*#{identity_tag}/)
+      return Regexp.union(
+        launcher_pattern('sidekiq_daemon.rb'),
+        exec_pattern('sidekiq', '--require', initializer_path),
+        /sidekiq [\d.]+ #{identity_tag} \[/,
+      )
     end
 
     def self.username
