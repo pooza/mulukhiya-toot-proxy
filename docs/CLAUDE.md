@@ -186,7 +186,26 @@ git diff Gemfile.lock
 
 [マイルストーン 5.40.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/639)。
 
-- **最初に #4792**（再起動後に puma が「already running」で上がらない）。⚠ **運用に直結する修正は優先順位を上げる。**
+- 📌 **#4792 は PR #4802 でマージ待ち（2026-10-06）**。`DaemonIdentityMethods` を 3 デーモンへ混ぜた:
+  ① `alive_state_of` を上書きし、`ps` で見たコマンドが自分のものでなければ `:dead`（pid ファイルを取り直す）
+  ② `run_stop` を上書きし、他人のプロセスへは TERM を送らず古い pid ファイルだけ消す。
+  - **pid ファイルが残る理由が分かった**: puma / sidekiq は `start` が `exec` するので、TERM の trap が置き換わった時点で消える。
+    systemd は TERM を直接送る（`ExecStop=/bin/kill -TERM $MAINPID`）ので毎回残り、rc.d は `bin/*_daemon.rb stop` を通すので消える。
+    ＝ **FreeBSD 3 台で起きなかったのは構造上の違い**（ただし kill -9・電源断では同じく残る）
+  - ⚠⚠ **① だけの段階で、dev26 の Mastodon の web を止めた**（`PumaDaemon.pid` に Mastodon の puma の番号を入れて
+    `service mulukhiya-puma restart` → 上流の `run_stop` が身元を見ずに TERM）。すぐ起動し直した。② はこれを受けて足した。
+    FreeBSD の本番 3 台は Mastodon とモロヘイヤが同じユーザーなので、同じことが起きうる
+  - ⚠ **検証で `dev26` の pid ファイルへ他人の番号を入れるときは、止まって困らないプロセスを選ぶ**
+  - 身元が分からない（`ps` が失敗・空）ときは「生きている」扱いのまま（誤ると sidekiq が二重起動する）
+  - Codex P2 × 2 に対処: 起動スクリプトの一致を `<script> start|restart` の呼び出しに絞る／タグは前後の区切りまで見る
+  - dev27（systemd）で修正前の再現（`active (running)` のまま `NRestarts` が増える）→ 修正後の復帰、dev26（rc.d）で同じ確認。
+    📌 **dev26 / dev27 はこのブランチ**（`fix/4792-daemon-pid-identity`・マージ後に develop へ戻す）。
+    ⚠ dev26 / dev27 は `ecf74cfa` のままだったので、切り替えに `bundle install` が要った（fediverse v2.0.5 / web v3.0.4）
+  - gem 側へ報告: **pooza/ginseng-core#673**（stop が身元を見ない／既定の `alive_state_of` は生死だけ／`exec` で pid ファイルが残る）と、
+    1 点目のたたき台 **pooza/ginseng-core#674**。⚠ **着地した版へ上げたら、こちらの `run_stop` の上書きは外す**
+- 🆕 **#4801**（Annict のタイムアウトで `/tagging/dic/annict/episodes` が 502・アラートが 1 日 150 件前後）— 2026-10-06 起票。
+  **#4792 の次に着手**。案: 成功した結果をキャッシュして失敗時は前回の結果を返し、アラートは「古い結果も返せなくなったとき」だけ
+- ~~最初に #4792~~（再起動後に puma が「already running」で上がらない）。⚠ **運用に直結する修正は優先順位を上げる。**
   2026-10-04 の朝、ダイスキー（vulcan）の再起動で実際に約 6 分止まった。`alive_state_of` を上書きして、
   pid ファイルの PID が自分のデーモンかを確かめる。⚠ 正常停止でも pid ファイルが残る理由は未解明（調査込み）。
   ⚠ FreeBSD 3 台は同じ朝の再起動で起きなかったが、**構造上か偶然かは切り分けていない**（対象から外す根拠にしない）
@@ -719,6 +738,8 @@ chubo2 の Issue 棚卸しは 10-02 実施なのでスキップ。
   - `-2Y` は count=27（前回 20 → +7・他者サーバー 18 / zugoga 7 / gomander 2）
   - ⚠ 退行とは見ていない（5.37.1 のままの他者サーバーでも増えている）が、**Annict 側の応答時間そのものは未計測のまま。**
     前回の「数日たっても密度が戻らなければ見直す」に近づいたので、扱いをユーザーに確認する。判断は `-2X` / `-2Y` にコメント済み
+  - ✅ **同日に #4801 として起票した（5.40.0）。**アラートは Sentry とメール / Slack / LINE を同じ 1 回で出すので、
+    ユーザーに届いている「HTTP タイムアウトのメール」は、モロヘイヤ発のものに限ればこの件
 - `-1X` は count=103 / lastSeen 10-02T05:18Z で変化なし。`-30` / `-31` も count=1 のまま
 
 ### 2026-10-05 セッション同期の記録
