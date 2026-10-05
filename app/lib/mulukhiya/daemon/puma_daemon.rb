@@ -14,7 +14,7 @@ module Mulukhiya
     # 書き換える前は "ruby .../bin/puma --config <Environment.dir>/app/initializer/puma.rb"。
     # ⚠ 同じホストの Mastodon の puma を自分と誤らないよう、タグまで含めて絞る。
     def identity_pattern
-      return /puma_daemon\.rb|puma[ :].*#{identity_tag}/
+      return Regexp.union(launcher_pattern('puma_daemon.rb'), /puma[ :].*#{identity_tag}/)
     end
 
     def self.disable?

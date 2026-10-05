@@ -16,9 +16,10 @@ module Mulukhiya
       ])
     end
 
-    # ⚠ listener は `exec` しないので、proctitle は "ruby bin/listener_daemon.rb start" のまま。
+    # ⚠ listener は `exec` しないので、proctitle は "bin/listener_daemon.rb start" のまま
+    # （FreeBSD の `ps` では "ruby: bin/listener_daemon.rb start (ruby)"）。
     def identity_pattern
-      return /listener_daemon\.rb/
+      return launcher_pattern('listener_daemon.rb')
     end
 
     def self.disable?

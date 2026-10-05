@@ -61,6 +61,18 @@ module Mulukhiya
       return Regexp.escape(File.basename(Environment.dir))
     end
 
+    # 起動スクリプトのまま居るプロセス（`exec` の前、および `exec` しない listener）の姿。
+    #
+    # ⚠⚠ **スクリプト名の部分一致にしない（PR #4802 の Codex P2）。**`vim .../puma_daemon.rb` や
+    # `bin/puma_daemon.rb stop` まで自分と見なすと、`stop` がそこへ TERM を送る。
+    # ⚠ `restart` も常駐の姿。`restart` は fork した子がそのまま `run_start` へ進むので、
+    # 管理画面や `mulukhiya-daemon.sh` から立った listener は `... restart` のまま居続ける。
+    # ⚠ rc.d の pattern（`config/sample/freebsd/`）はスクリプト名だけで見ている。あちらは
+    # 「取り残しを広く拾う」用途、こちらは「他人を自分と誤らない」用途。
+    def launcher_pattern(script)
+      return %r{(?:\A|[\s/])#{Regexp.escape(script)} (?:start|restart)(?:\s|\z)}
+    end
+
     private
 
     # 🔴 **`stop` は他人のプロセスへ TERM を送らない (#4792)。**

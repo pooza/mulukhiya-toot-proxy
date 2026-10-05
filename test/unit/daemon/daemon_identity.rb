@@ -57,6 +57,27 @@ module Mulukhiya
       assert_equal(:alive, PumaDaemon.new.alive_state_of(spawn_titled('ruby bin/puma_daemon.rb start')))
     end
 
+    # ⚠ `restart` から立った listener は "... restart" のまま居続ける。
+    def test_own_process_started_by_restart
+      pid = spawn_titled('bin/listener_daemon.rb restart')
+
+      assert_equal(:alive, ListenerDaemon.new.alive_state_of(pid))
+    end
+
+    # 🔴 スクリプト名を引数に含むだけのプロセスを自分と見なさない（PR #4802 の Codex P2）。
+    def test_process_merely_mentioning_script
+      [
+        "vim #{Environment.dir}/app/lib/mulukhiya/daemon/puma_daemon.rb",
+        'ruby bin/puma_daemon.rb stop',
+        'bin/puma_daemon.rb status',
+        'tail -f puma_daemon.rb start.log',
+      ].each do |title|
+        assert_equal(:dead, PumaDaemon.new.alive_state_of(spawn_titled(title)), title)
+      end
+      assert_equal(:dead, ListenerDaemon.new.alive_state_of(spawn_titled('less listener_daemon.rb')))
+      assert_equal(:dead, SidekiqDaemon.new.alive_state_of(spawn_titled('bin/sidekiq_daemon.rb stop')))
+    end
+
     # ⚠ 同じホストの Mastodon の puma / sidekiq を自分と誤らない。
     def test_mastodon_process
       puma = spawn_titled('puma 6.6.0 (tcp://127.0.0.1:3000) [live]')
