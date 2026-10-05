@@ -78,6 +78,17 @@ module Mulukhiya
       assert_equal(:dead, SidekiqDaemon.new.alive_state_of(spawn_titled('bin/sidekiq_daemon.rb stop')))
     end
 
+    # 🔴 名前が前方一致するだけの別のチェックアウトを自分と見なさない（PR #4802 の Codex P2）。
+    def test_other_checkout_with_similar_name
+      puma = spawn_titled("puma 8.0.2 (tcp://0.0.0.0:3009) [#{TAG}-old]")
+      sidekiq = spawn_titled("sidekiq 8.1.7 #{TAG}-old [0 of 5 busy]")
+      launcher = spawn_titled("ruby /usr/local/bin/puma --config #{Environment.dir}-old/app/initializer/puma.rb")
+
+      assert_equal(:dead, PumaDaemon.new.alive_state_of(puma))
+      assert_equal(:dead, SidekiqDaemon.new.alive_state_of(sidekiq))
+      assert_equal(:dead, PumaDaemon.new.alive_state_of(launcher))
+    end
+
     # ⚠ 同じホストの Mastodon の puma / sidekiq を自分と誤らない。
     def test_mastodon_process
       puma = spawn_titled('puma 6.6.0 (tcp://127.0.0.1:3000) [live]')

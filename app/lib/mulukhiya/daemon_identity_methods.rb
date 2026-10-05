@@ -57,8 +57,12 @@ module Mulukhiya
     end
 
     # puma / sidekiq の proctitle に入るタグ（作業ディレクトリの名前）。
+    #
+    # ⚠ **前後の区切りまで見る（PR #4802 の Codex P2）。**同じホストに
+    # `mulukhiya-toot-proxy-old` のような別のチェックアウトがあると、部分一致では
+    # そちらの puma / sidekiq を自分と見なす。
     def identity_tag
-      return Regexp.escape(File.basename(Environment.dir))
+      return "(?<=[\\s\\[/])#{Regexp.escape(File.basename(Environment.dir))}(?=[\\s\\]/]|\\z)"
     end
 
     # 起動スクリプトのまま居るプロセス（`exec` の前、および `exec` しない listener）の姿。
