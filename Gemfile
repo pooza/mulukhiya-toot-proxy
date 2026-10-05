@@ -4,7 +4,7 @@ gem 'concurrent-ruby'
 gem 'dry-validation'
 gem 'faye-websocket', github: 'pooza/faye-websocket-ruby'
 gem 'ginseng-core', github: 'pooza/ginseng-core', tag: 'v1.25.1', require: 'ginseng'
-gem 'ginseng-fediverse', github: 'pooza/ginseng-fediverse', tag: 'v2.0.4',
+gem 'ginseng-fediverse', github: 'pooza/ginseng-fediverse', tag: 'v2.0.5',
   require: 'ginseng/fediverse'
 gem 'ginseng-piefed', github: 'pooza/ginseng-piefed', tag: 'v0.2.0', require: 'ginseng/piefed'
 gem 'ginseng-postgres', github: 'pooza/ginseng-postgres', tag: 'v2.0.1'
