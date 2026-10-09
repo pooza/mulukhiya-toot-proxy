@@ -61,12 +61,29 @@ module Mulukhiya
 
     # ⚠ 2 回目も落ちたら上げる（呼び出し側の fail-open に任せる）。待たない・粘らない。
     def test_acquire_gives_up_after_second_failure
-      errors = Array.new(2) {RedisClient::CannotConnectError.new('Connection refused')}
+      errors = Array.new(2) {RedisClient::ConnectionError.new('Broken pipe')}
       client = ClientDouble.new(errors:)
       storage = storage_with(client)
 
-      assert_raise(RedisClient::CannotConnectError) {storage.acquire_token('k', 'token', 30)}
+      assert_raise(RedisClient::ConnectionError) {storage.acquire_token('k', 'token', 30)}
       assert_equal(['SET', 'SET'], client.calls)
+    end
+
+    # ⚠⚠ 接続できなかったときは撃ち直さない（PR #4807 の Codex P2）。`redis-client` は
+    # 接続時のタイムアウトも `CannotConnectError` で上げるので、撃ち直すと待ちが 2 倍になる。
+    def test_does_not_retry_when_cannot_connect
+      error = RedisClient::CannotConnectError.new('Connection timed out')
+      client = ClientDouble.new(errors: [error], store: {'k' => 'token'})
+      storage = storage_with(client)
+
+      assert_raise(RedisClient::CannotConnectError) {storage.acquire_token('k', 'token', 30)}
+      assert_equal(['SET'], client.calls)
+
+      client = ClientDouble.new(errors: [error], store: {'k' => 'token'})
+      storage = storage_with(client)
+
+      assert_raise(RedisClient::CannotConnectError) {storage.release_token('k', 'token')}
+      assert_equal(['EVAL'], client.calls)
     end
 
     # ⚠ タイムアウトは撃ち直さない（詰まっている相手に待ちを 2 倍にするだけ）。
