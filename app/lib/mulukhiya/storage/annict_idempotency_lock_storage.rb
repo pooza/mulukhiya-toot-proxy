@@ -9,17 +9,6 @@ module Mulukhiya
   class AnnictIdempotencyLockStorage < Redis
     include LockDegradationMethods
 
-    # release で誤って他人のロックを削除しないため compare-and-delete する。
-    # TTL 切れで A の自然解放後に B が同一 key で acquire したケースで、A の遅延
-    # rescue が呼ぶ release が B の新ロックを消さないようにする (#4345)。
-    RELEASE_SCRIPT = <<~LUA.freeze
-      if redis.call('GET', KEYS[1]) == ARGV[1] then
-        return redis.call('DEL', KEYS[1])
-      else
-        return 0
-      end
-    LUA
-
     # SET key value NX EX ttl で原子的にロックを獲得する。獲得できれば token を
     # 返す（nil なら他者保有または Redis 障害を伴う失敗）。capsicum 等の
     # network blip リトライによる同一 (account, target) への重複投稿を TTL 窓で
@@ -27,7 +16,7 @@ module Mulukhiya
     def acquire(account_id, target_id)
       key = create_key(lock_key(account_id, target_id))
       token = SecureRandom.uuid
-      return token if redis.call('SET', key, token, 'NX', 'EX', ttl) == 'OK'
+      return token if acquire_token(key, token, ttl)
       return nil
     rescue => e
       # ⚠ **冪等性を諦めたことを Sentry まで残す (#4762)。**`e.log` 止まりだと、
@@ -45,7 +34,7 @@ module Mulukhiya
     def release(account_id, target_id, token)
       return unless token
       key = create_key(lock_key(account_id, target_id))
-      redis.call('EVAL', RELEASE_SCRIPT, 1, key, token)
+      release_token(key, token)
     rescue => e
       note_release_failure(e, {account_id:, id_label => target_id})
     end

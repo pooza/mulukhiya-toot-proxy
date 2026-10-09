@@ -24,8 +24,9 @@ module Mulukhiya
   # （`get` / `set` は乗っている）。`redis-client` は既定で再接続しないので、
   # **Redis 再起動後に死んだ接続を掴んだ最初のコマンドは必ず例外** → fail-open。
   # 同じ瞬間 `data` と `fetcher.save` は Ginseng のリトライで成功するため、
-  # **ユーザーからは完全に正常な 200** に見える。⚠ **リトライラッパへ載せる話は
-  # 観測性ではなく耐性の変更なので #4742 へ切り出した。**
+  # **ユーザーからは完全に正常な 200** に見える。
+  # ✅ **#4742 で塞いだ**（`Redis#acquire_token` / `#release_token` が、切れた接続なら
+  # 1 回だけ撃ち直す）。Redis が本当に落ちているときは、従来どおりここへ来る。
   module LockDegradationMethods
     # 同じ事象を Sentry へ上げる間隔（秒）。
     #

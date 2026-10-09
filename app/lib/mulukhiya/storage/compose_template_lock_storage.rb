@@ -10,16 +10,6 @@ module Mulukhiya
   class ComposeTemplateLockStorage < Redis
     include LockDegradationMethods
 
-    # TTL 切れで自然解放後に別リクエストが同一 key を acquire したケースで、遅延
-    # release が他者の新ロックを消さないよう compare-and-delete する。
-    RELEASE_SCRIPT = <<~LUA.freeze
-      if redis.call('GET', KEYS[1]) == ARGV[1] then
-        return redis.call('DEL', KEYS[1])
-      else
-        return 0
-      end
-    LUA
-
     # ロック保持の TTL 秒。テンプレ CRUD 自体は一瞬で終わるが、TTL は「処理時間の
     # 見積り」ではなく「Ruby 側がストールしてもロックを失わない余裕」で決める。
     # GC・Redis の応答遅延で RMW の途中に TTL が切れると、ロック無しで書き込む
@@ -54,7 +44,7 @@ module Mulukhiya
     def acquire(account_id)
       key = create_key(lock_key(account_id))
       token = SecureRandom.uuid
-      return token if redis.call('SET', key, token, 'NX', 'EX', ttl) == 'OK'
+      return token if acquire_token(key, token, ttl)
       raise ConflictError.new(
         '別の更新が進行中です。少し待って再試行してください。',
         code: :locked,
@@ -70,7 +60,7 @@ module Mulukhiya
     end
 
     def release(account_id, token)
-      redis.call('EVAL', RELEASE_SCRIPT, 1, create_key(lock_key(account_id)), token)
+      release_token(create_key(lock_key(account_id)), token)
     rescue => e
       note_release_failure(e, account_id:)
     end
