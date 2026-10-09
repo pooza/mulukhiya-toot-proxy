@@ -122,6 +122,34 @@ module Mulukhiya
       end
     end
 
+    # 🔴 こちらで表を持っていた頃に通していたアドレス (#4790)。判定の本体を
+    # `Ginseng::PublicHost` へ寄せたので、**委譲を外して表へ戻すとここが落ちる**。
+    def test_returns_false_for_ranges_missed_by_own_table
+      {
+        '192.0.2.1' => '文書用 TEST-NET-1',
+        '198.51.100.1' => '文書用 TEST-NET-2',
+        '203.0.113.1' => '文書用 TEST-NET-3',
+        '2001:db8::1' => '文書用 (IPv6)',
+        '2002:7f00:1::1' => '6to4（127.0.0.1 を埋め込む）',
+        '2001::1' => 'Teredo',
+        'fec0::1' => 'site-local',
+        '100::1' => '2000::/3 の外',
+        '5f00::1' => '2000::/3 の外',
+      }.each do |address, label|
+        assert_false(
+          RemoteHost.public?('attacker.example', resolver: stub_resolver([address])),
+          "#{address}（#{label}）",
+        )
+      end
+    end
+
+    # ⚠ グローバルユニキャストの IPv6 は通す（塞ぎすぎていないこと）。
+    def test_returns_true_for_global_unicast_v6
+      assert_true(
+        RemoteHost.public?('example.com', resolver: stub_resolver(['2606:4700:4700::1111'])),
+      )
+    end
+
     def test_returns_false_when_resolver_returns_empty
       assert_false(RemoteHost.public?('nx.example', resolver: stub_resolver([])))
     end

@@ -1,41 +1,16 @@
-require 'resolv'
-
 module Mulukhiya
   class RemoteHost
-    IPV4_LITERAL = /\A\d{1,3}(\.\d{1,3}){3}\z/
-    IPV6_BRACKET = /\A\[.*\]\z/
     DEFAULT_DNS_TIMEOUT = 3
 
-    # DNS 解決・名前解決の失敗（環境要因）。fail-closed で false を返す。
-    # IPAddr::Error 等のロジックバグはここに含めず再 raise し Sentry へ送る。
-    RESOLUTION_ERRORS = [
-      SocketError,
-      Resolv::ResolvError,
-      Errno::ENOENT,
-      Errno::ETIMEDOUT,
-    ].freeze
-
-    # IPAddr の private? / loopback? / link_local? が拾わない予約・特殊用途レンジ (#4574)。
+    # ⚠⚠ **判定の本体は `Ginseng::PublicHost`（ginseng-core 2.1.0〜）にある (#4790)。**
+    # ここで持っていた予約レンジの表は 2 巡続けて漏れた（文書用レンジ・6to4 / Teredo・
+    # site-local・`2000::/3` の外の予約）。上流は IPv4 を IANA の Special-Purpose Address
+    # Registry に合わせ、IPv6 は「落とすレンジを並べる」のをやめて**グローバルユニキャスト
+    # （`2000::/3`）の外を丸ごと拒否**している。表をこちらへ写し直さないこと。
     #
-    # ⚠ **`0.0.0.0` は 3 述語のいずれも false を返す**のに、Linux / BSD の connect(2) は
-    # ローカルホスト宛として扱う。pinning は検証したアドレスへ接続を固定するので、
-    # ここを開けたままだと「公開ホスト名なのに localhost へ繋ぐ」経路が決定的に通る。
-    # `::`（IPv6 未指定アドレス）も同じ。
-    #
-    # ⚠ **CGNAT / NAT64 は本番 4 台では実害に届かない**が、Linode の一部リージョンや
-    # 将来の CT 群では内部へ届きうるので同じ表で塞いでおく。
-    RESERVED_RANGES = [
-      '0.0.0.0/8',          # this-network (0.0.0.0 を含む)
-      '100.64.0.0/10',      # CGNAT (RFC 6598)
-      '192.0.0.0/24',       # IETF protocol assignments
-      '198.18.0.0/15',      # benchmarking (RFC 2544)
-      '224.0.0.0/4',        # multicast
-      '240.0.0.0/4',        # reserved (255.255.255.255 を含む)
-      '::/128',             # unspecified
-      '64:ff9b::/96',       # NAT64 well-known prefix (RFC 6146)
-      '64:ff9b:1::/48',     # NAT64 local-use prefix (RFC 8215)
-      'ff00::/8',           # IPv6 multicast
-    ].map {|v| IPAddr.new(v)}.freeze
+    # こちらに残すのは、モロヘイヤの都合で決まるものだけ:
+    # 設定から読む DNS タイムアウト・拒否理由の warn ログ・`validator` の差し替え口・
+    # `unpinned_validator`・`validate!`。
 
     def self.public?(host, resolver: method(:resolve_addresses))
       return allowed_address(host, resolver:).present?
@@ -53,41 +28,25 @@ module Mulukhiya
     # allowlist の対象は管理者が設定した少数の URL なので、この不便より
     # 「検証した先に繋ぐ」ほうを採る。
     def self.allowed_address(host, resolver: method(:resolve_addresses))
-      return nil unless host.present?
-      return nil unless host.include?('.')
-      return nil if IPV4_LITERAL.match?(host)
-      return nil if IPV6_BRACKET.match?(host)
-      addrs = resolver.call(host)
-      return nil if addrs.empty?
-      # ⚠ 1 本でも内部アドレスを含むなら拒否する。「公開 IP アドレスのほうを選べばよい」
-      # ではない。混ぜて返してくるのはリバインディングそのもの。
-      return nil if addrs.any? {|ip| internal_address?(ip)}
-      return preferred_address(addrs)
-    rescue *RESOLUTION_ERRORS => e
-      # DNS 障害・タイムアウト等の環境要因は SSRF allowlist の fail-closed
-      # 方針どおり nil（= 拒否）を返す。運用ミス（未到達ホスト等）と攻撃検知の
-      # 切り分けのため warn ログを残す。IPAddr::Error 等のロジックバグは
-      # ここで握らず呼び出し元へ伝播させ Sentry で可視化する。
-      Logger.new.warn(remote_host: {host:, error: e.class.name, message: e.message})
-      return nil
+      return Ginseng::PublicHost.allowed_address(host.to_s, resolver: logging_resolver(resolver))
+    end
+
+    # 名前解決の失敗（DNS 障害・タイムアウト等の環境要因）を warn に残してから上へ渡す。
+    #
+    # ⚠ 上流は fail-closed で nil（= 拒否）を返すが、**ログは出さない。**運用ミス
+    # （未到達ホスト等）と攻撃検知を切り分けるための行なので、こちらで残す。
+    # ⚠ IPAddr::Error 等のロジックバグは上流も握らない。呼び出し元へ伝わり Sentry に出る。
+    def self.logging_resolver(resolver)
+      return lambda do |host|
+        resolver.call(host)
+      rescue *Ginseng::PublicHost::RESOLUTION_ERRORS => e
+        Logger.new.warn(remote_host: {host:, error: e.class.name, message: e.message})
+        raise
+      end
     end
 
     def self.internal_address?(ip)
-      addr = IPAddr.new(ip)
-      # ⚠ IPv4-mapped / IPv4-compatible は IPv6 として扱われるので、先に素の IPv4 へ
-      # 畳んでからレンジと突き合わせる。畳まないと ::ffff:0.0.0.0 が
-      # RESERVED_RANGES の 0.0.0.0/8 と family 違いで一致しない (#4574)。
-      addr = addr.native if addr.ipv4_mapped? || addr.ipv4_compat?
-      return true if addr.private? || addr.loopback? || addr.link_local?
-      return RESERVED_RANGES.any? {|range| range.include?(addr)}
-    end
-
-    # ⚠ IPv4 があれば IPv4 を採る。getaddresses は A と AAAA を混ぜて返すので、
-    # 素直に先頭を採ると IPv6 が来うる。モロヘイヤが動く本番 4 台は IPv4 を正と
-    # しており、IPv6 を掴むと到達しないか Happy Eyeballs のフォールバックぶんだけ
-    # 遅くなる（#4464 で踏んだ ::1 の 305ms と同じ形）。
-    def self.preferred_address(addrs)
-      return addrs.find {|ip| IPV4_LITERAL.match?(ip)} || addrs.first
+      return Ginseng::PublicHost.internal_address?(ip)
     end
 
     # Ginseng::HTTP#get の host_validator へ渡す callable (#4410)。
@@ -139,15 +98,12 @@ module Mulukhiya
 
     # Addrinfo.getaddrinfo は timeout を持てず、攻撃者が応答を引き延ばす権威
     # DNS を立てると Sinatra リクエストスレッド (Puma 5 本) を飽和させられる。
-    # Resolv::DNS#timeouts= で 1 回あたりの解決待ちを上限化する。タイムアウト
-    # 時 getaddresses は空配列を返すため、public? は addrs.empty? で
-    # fail-closed (false) に倒れる。
+    #
+    # ⚠ **締め切りは名前解決の全体に 1 本**（上流の `Timeout.timeout`・#4790）。
+    # `Resolv::DNS#timeouts=` は問い合わせ 1 回ぶんの上限でしかなく、応答しない
+    # ネームサーバーが 3 台あると「2 種別 × 3 台 × timeout」かかっていた（3 秒の設定で 18 秒）。
     def self.resolve_addresses(host)
-      resolver = Resolv::DNS.new
-      resolver.timeouts = dns_timeout
-      return resolver.getaddresses(host).map(&:to_s)
-    ensure
-      resolver&.close
+      return Ginseng::PublicHost.resolve_addresses(host, timeout: dns_timeout)
     end
 
     def self.dns_timeout
