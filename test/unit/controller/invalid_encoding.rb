@@ -61,6 +61,34 @@ module Mulukhiya
       assert_rejected('body')
     end
 
+    # ⚠ 壊れたバイトが `{` の前にあっても、JSON として送られた本文なら見る（PR #4810 の Codex P2）。
+    def test_broken_bytes_before_json_opening_is_rejected_as_bad_request
+      post_json(%(\xE3\x81{"status": "ok"}))
+
+      assert_rejected('body')
+    end
+
+    # ⚠⚠ multipart で知らない charset を名乗ると、Rack は `ASCII-8BIT` でタグ付けする。
+    # `valid_encoding?` は常に true になるので、タグを信用すると素通りする（PR #4810 の Codex P2）。
+    def test_broken_multipart_value_with_unknown_charset_is_rejected_as_bad_request
+      boundary = 'XXboundaryXX'
+      body = [
+        "--#{boundary}",
+        'Content-Disposition: form-data; name="description"',
+        'Content-Type: text/plain; charset=x-unknown',
+        '',
+        BROKEN,
+        "--#{boundary}--",
+        '',
+      ].join("\r\n")
+      post('/probe', body.b, {
+        'HTTP_HOST' => 'localhost',
+        'CONTENT_TYPE' => "multipart/form-data; boundary=#{boundary}",
+      })
+
+      assert_rejected('description')
+    end
+
     # ⚠ ログで伏せないキー（ALT など）。リクエストログの `to_json` が先に落ちると、
     # `before` の rescue がトークンを外して 401 に化ける。ログより前に落とすこと。
     def test_broken_form_value_in_unscrubbed_key_is_rejected_as_bad_request

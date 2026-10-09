@@ -177,7 +177,7 @@ module Mulukhiya
     # ⚠ クライアント起因なので Sentry・通知へは出さない（ログ 1 行だけ）。
     # ⚠ `halt` は例外ではないので、`before` の rescue には掛からない。
     def reject_invalid_encoding!
-      key = :body if json_body? && !@body.dup.force_encoding(Encoding::UTF_8).valid_encoding?
+      key = :body if json_request? && !valid_utf8?(@body)
       key ||= invalid_encoding_key(@params)
       return unless key
       logger.error(
@@ -190,19 +190,38 @@ module Mulukhiya
       halt @renderer.to_s
     end
 
+    # UTF-8 として正しいか。
+    #
+    # ⚠⚠ **付いているタグを信用しない（PR #4810 の Codex P2）。**multipart の文字列は
+    # パートが名乗った charset で、知らない charset なら `ASCII-8BIT` でタグ付けされる。
+    # `ASCII-8BIT` の `valid_encoding?` は常に true なので、そのまま見ると壊れたバイト列が
+    # 素通りし、リクエストログの `to_json` で落ちる（＝ 401 に化ける経路が残る）。
+    # 奥の処理は全部 UTF-8 を前提にしているので、UTF-8 として読めるかで見る。
+    def valid_utf8?(value)
+      return value.dup.force_encoding(Encoding::UTF_8).valid_encoding?
+    end
+
+    # 本文全体を JSON として検査する要求か。
+    #
+    # ⚠ **先頭の 1 文字だけで決めない（PR #4810 の Codex P2）。**壊れたバイトが `{` の前に
+    # あると `json_body?` が偽になり、本文が捨てられたまま奥へ進む。メディアタイプでも見る。
+    def json_request?
+      return true if json_body?
+      return request.media_type.to_s.match?(%r{\Aapplication/(.+\+)?json\z}i)
+    end
+
     # 壊れた文字列を持つ最初のキーを返す（無ければ nil）。入れ子の Hash / Array も辿る。
     #
     # ⚠ アップロードの `tempfile` など String 以外は見ない（中身はバイナリで正しい）。
-    # ⚠ `ASCII-8BIT` の文字列は `valid_encoding?` が常に true なので、ここでは落ちない。
     def invalid_encoding_key(value, key = :body)
       case value
       when String
-        return key unless value.valid_encoding?
+        return key unless valid_utf8?(value)
       when Array
         return value.filter_map {|v| invalid_encoding_key(v, key)}.first
       when Hash
         return value.filter_map do |k, v|
-          k.to_s.valid_encoding? ? invalid_encoding_key(v, k) : k
+          valid_utf8?(k.to_s) ? invalid_encoding_key(v, k) : k
         end.first
       end
       return nil
