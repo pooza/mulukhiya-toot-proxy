@@ -43,6 +43,7 @@ module Mulukhiya
         log_unparsable_body(e)
         @params = Sinatra::IndifferentHash[params]
       end
+      reject_invalid_encoding!
       logger.info(request: {
         method: request.request_method,
         # ⚠ **パスも秘匿の対象 (#4655)。**webhook の digest はそれ 1 つで
@@ -157,6 +158,54 @@ module Mulukhiya
 
     def json_body?
       return @body.to_s.lstrip.start_with?('{', '[')
+    end
+
+    # 不正な UTF-8 バイト列を含むリクエストは、入口で 400 を返して終える (#4600)。
+    #
+    # 🔴 **Rack のフォームのパースは、壊れたバイト列を弾かない。**UTF-8 のタグが付いたまま
+    # 通るので、奥の `TootParser#tags` などで `ArgumentError` になり、クライアントのバグ
+    # （切れたマルチバイト等）が 500 ＋ Sentry に化けていた。
+    # 🔴 **JSON の本文は逆に、パーサ（Yajl）が弾いて本文ごと捨てられる。**`before` の rescue が
+    # フォームの params へ倒すので、クライアントからは「投稿したのに内容が空」になる。
+    # こちらも同じ 400 で返す（実測: `lexical error: invalid bytes in UTF8 string`）。
+    # ⚠⚠ ログで伏せないキー（ALT の `description` など）に来ると、リクエストログの `to_json` が
+    # 先に落ち、`before` の rescue がトークンを外して **401（token_mismatch）に化ける。**
+    # ＝ **リクエストログより前に見ること。**
+    #
+    # ⚠ **`scrub` で直さない。**`"\xE3\x81ほげ".scrub` は `"�ほげ"` になり、化けた内容のまま
+    # 投稿される。入力が壊れていることはクライアントへ返す情報。
+    # ⚠ クライアント起因なので Sentry・通知へは出さない（ログ 1 行だけ）。
+    # ⚠ `halt` は例外ではないので、`before` の rescue には掛からない。
+    def reject_invalid_encoding!
+      key = :body if json_body? && !@body.dup.force_encoding(Encoding::UTF_8).valid_encoding?
+      key ||= invalid_encoding_key(@params)
+      return unless key
+      logger.error(
+        error: 'request contains invalid byte sequence',
+        key: key.to_s.scrub('?'),
+        path: scrub_log_path(request.path),
+      )
+      @renderer.status = 400
+      @renderer.message = {error: 'リクエストに不正な UTF-8 バイト列が含まれています。'}
+      halt @renderer.to_s
+    end
+
+    # 壊れた文字列を持つ最初のキーを返す（無ければ nil）。入れ子の Hash / Array も辿る。
+    #
+    # ⚠ アップロードの `tempfile` など String 以外は見ない（中身はバイナリで正しい）。
+    # ⚠ `ASCII-8BIT` の文字列は `valid_encoding?` が常に true なので、ここでは落ちない。
+    def invalid_encoding_key(value, key = :body)
+      case value
+      when String
+        return key unless value.valid_encoding?
+      when Array
+        return value.filter_map {|v| invalid_encoding_key(v, key)}.first
+      when Hash
+        return value.filter_map do |k, v|
+          k.to_s.valid_encoding? ? invalid_encoding_key(v, k) : k
+        end.first
+      end
+      return nil
     end
 
     def name
