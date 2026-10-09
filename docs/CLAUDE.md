@@ -186,7 +186,13 @@ git diff Gemfile.lock
 
 [マイルストーン 5.40.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/639)。
 
-- 📌 **2026-10-10 に PR を 4 本出した（マージ待ち・4 本とも CI 両系 SUCCESS）。**順番は #4804 → #4805 / #4806 → #4807（#4807 は独立）。
+- ✅ **2026-10-10 に 4 本をマージ（ユーザー承認）**: PR #4804（#4784・`793f786e`）/ #4805（#4793・`53611ac5`）/ #4806（#4748・`b2829286`）/ #4807（#4742）。
+  **#4784 / #4748 / #4742 はクローズ。⚠ #4793 は open のまま**（本番の行数を出荷後に gomander で数えて閉じる。
+  dev26 では error 行が消え、info 行と GET だけになったのを確認済み）。
+  - ⚠⚠ **積んだ PR の base を `--delete-branch` で消すと、上の PR は付け替わらずに閉じられる。**#4804 のマージで #4805 / #4806 が
+    `CLOSED` になり、`gh pr reopen` も通らなかった。**base のブランチを同じ SHA で push し直す → reopen → `gh api -X PATCH pulls/N -f base=develop` → ブランチを消す**で戻した。
+    次からは、積んだ PR の base を先に develop へ付け替えてからマージする
+  - 📌 **マージ待ち: PR #4808（#4790）/ PR #4809（piefed v0.3.0）**
   - **PR #4804（#4784）**: ginseng-core v2.2.0。`DaemonIdentityMethods` の `run_stop` の上書きを外した（上流の `stop` が身元を見る）。
     8 台とも `tmp` / `tmp/cache` は実ディレクトリ、hook は zugoga / gomander の `discordapp.com`（リダイレクトなし）。
     dev26 / dev27 で 3 サービスの restart / stop / start・`tmp/cache/*.yaml` が 0600・無関係な `sleep` の番号を書いた
@@ -200,12 +206,16 @@ git diff Gemfile.lock
     `#` 側は `曲)#precure` を区切るようになった。
     **harness（`8b2b2d92`）**: Misskey 1650 tests / 0 failures / 0 errors / 145 omissions（`controller=misskey`）、
     Mastodon 1647 tests / 0 failures / 0 errors / 159 omissions（`controller=mastodon`）。
-    📌 **dev26 / dev27 はこのブランチ**（マージ後に develop へ戻す）
+    ✅ dev26 / dev27 はマージ後に develop（`b2829286`）へ戻した
   - **PR #4807（#4742）**: `Redis#acquire_token` / `#release_token`。`ConnectionError` なら待たずに 1 回だけ撃ち直す
     （タイムアウトは撃ち直さない・撃ち直しで NX に負けたら値が自分の token かを見る）。3 つのロックの Lua も 1 か所へ。
     harness の Redis を `docker restart` して、修正前は fail-open・修正後は取得できることを確認。
-    ⚠ `reconnect_attempts: 1` は採らなかった（接続設定は gem が作り、冪等でないコマンドにも効く）
-  - 残り（未着手）: #4790 と piefed v0.3.0（どちらも #4804 の後）/ #4794 / #4789 / #4734 / #4726 / #4699 / #4612 / #4600
+    ⚠ `reconnect_attempts: 1` は採らなかった（接続設定は gem が作り、冪等でないコマンドにも効く）。
+    Codex P2 × 1 に対処: 接続できなかったとき（`CannotConnectError`・接続時のタイムアウトもこれで上がる）は撃ち直さない
+  - **PR #4808（#4790）**: `RemoteHost` の判定の本体を `Ginseng::PublicHost` へ委譲（Issue の道 1）。自前の予約レンジの表は削除。
+    残したのは DNS タイムアウトの設定・warn ログ・`validator` の差し替え口・`unpinned_validator`・`validate!`
+  - **PR #4809**: ginseng-piefed v0.3.0（PieFed 宛がリダイレクトを追わない）。⚠ 実物の PieFed への送信は未確認
+  - 残り（未着手）: #4794 / #4789 / #4734 / #4726 / #4699 / #4612 / #4600
 - ✅ **#4792 は PR #4802 でマージ（2026-10-06・`17a7cc22`）・クローズ。**`DaemonIdentityMethods` を 3 デーモンへ混ぜた:
   ① `alive_state_of` を上書きし、`ps` で見たコマンドが自分のものでなければ `:dead`（pid ファイルを取り直す）
   ② `run_stop` を上書きし、他人のプロセスへは TERM を送らず古い pid ファイルだけ消す。
