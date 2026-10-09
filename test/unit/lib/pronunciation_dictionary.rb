@@ -131,5 +131,29 @@ module Mulukhiya
       config['/word_suggest/urls'] = original_urls if defined?(original_urls)
       RemoteHost.validator = original_validator if defined?(original_validator)
     end
+
+    # GAS は HEAD に 403 を返す。黙って GET へ倒すと決めているので、上流（Ginseng::HTTP）の
+    # 「落ちた試行」の行も出さない (#4793)。gomander で 1 日 144 行出ていた。
+    # ⚠ 5xx は想定外なので行が残ること。
+    def test_head_not_supported_leaves_no_upstream_error_line
+      return if disable?
+      uri = Ginseng::URI.parse('https://dic.test/pron.json')
+      original_validator = RemoteHost.validator
+      RemoteHost.validator = ->(_host) {'93.184.216.34'}
+      logged = []
+      logger = Object.new
+      logger.define_singleton_method(:error) {|payload| logged.push(payload)}
+      logger.define_singleton_method(:method_missing) {|*_args, **_kwargs| nil}
+      @dic.instance_variable_get(:@http).instance_variable_set(:@logger, logger)
+      {403 => false, 405 => false, 500 => true}.each do |status, expected|
+        logged.clear
+        stub_request(:head, uri.to_s).to_return(status:)
+
+        assert(@dic.send(:valid_content_length?, uri), "HEAD #{status}")
+        assert_equal(expected, logged.any? {|v| v[:method] == :HEAD}, "HEAD #{status}")
+      end
+    ensure
+      RemoteHost.validator = original_validator if defined?(original_validator)
+    end
   end
 end
