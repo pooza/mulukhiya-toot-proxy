@@ -8,10 +8,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: e0c739e9f4eeb195971d384bda38cbe764135d26
-  tag: v1.25.1
+  revision: d006beebf6831542ac9851b0d3f25975139fc8db
+  tag: v2.2.0
   specs:
-    ginseng-core (1.25.1)
+    ginseng-core (2.2.0)
       activesupport (>= 8.1.2.1)
       addressable (>= 2.9.0)
       cgi (>= 0.4.2)
@@ -31,6 +31,7 @@ GIT
       nokogiri (>= 1.19.4)
       optparse
       rake (>= 12.3.3, != 13.4.0)
+      resolv (>= 0.7.2)
       sanitize (>= 6.0.2)
       securerandom
       set
@@ -42,10 +43,11 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 888a7922d0d02e11efc384adb6a1f584ed489bbc
-  tag: v2.0.5
+  revision: 27b18466b288138bb5b6f8e3631f6615c1bf7abd
+  tag: v4.0.0
   specs:
-    ginseng-fediverse (2.0.5)
+    ginseng-fediverse (4.0.0)
+      ginseng-core (>= 2.0.0)
 
 GIT
   remote: https://github.com/pooza/ginseng-piefed.git
@@ -165,7 +167,7 @@ GEM
       rexml
     crass (1.0.7)
     csv (3.3.6)
-    date (3.5.1)
+    date (3.6.0)
     domain_name (0.6.20260921)
     drb (2.2.3)
     dry-configurable (1.4.0)
@@ -207,7 +209,7 @@ GEM
     erubi (1.13.1)
     et-orbi (1.4.2)
       tzinfo
-    etc (1.4.6)
+    etc (1.5.0)
     eventmachine (1.2.7)
     facets (4.0.0)
     faraday (2.14.4)
@@ -453,7 +455,7 @@ GEM
       power_assert
     thor (1.5.0)
     tilt (2.9.0)
-    time (0.4.2)
+    time (0.5.0)
       date
     timecop (0.9.11)
     timeout (0.6.1)
@@ -462,7 +464,7 @@ GEM
     unicode-display_width (3.3.0)
       unicode-emoji (~> 4.3)
     unicode-emoji (4.3.0)
-    uri (1.1.1)
+    uri (1.1.2)
     useragent (0.16.11)
     version_gem (1.1.15)
     webmock (3.26.4)
@@ -475,7 +477,7 @@ GEM
     websocket-extensions (0.1.5)
     yajl-ruby (1.4.3)
     zeitwerk (2.8.3)
-    zlib (3.2.3)
+    zlib (3.2.4)
 
 PLATFORMS
   aarch64-linux

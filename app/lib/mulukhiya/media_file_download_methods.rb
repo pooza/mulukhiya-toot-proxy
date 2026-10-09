@@ -102,7 +102,10 @@ module Mulukhiya
     # GET 側のガードが見せかけの安全になる (#4523)。
     # ⚠ `options` に既定値を置かない。省略できると、検証なしの HEAD が撃てる口になる。
     def valid_content_length?(uri, options)
-      length = HTTP.new.head(uri, options).headers['content-length']
+      length = HTTP.new.head(
+        uri,
+        options.merge(quiet_statuses: HTTP::HEAD_UNSUPPORTED_STATUSES),
+      ).headers['content-length']
       return true if length.nil? || length.to_i <= download_max_bytes
       Logger.new.error(
         message: 'media download content-length exceeded max bytes',
@@ -129,7 +132,7 @@ module Mulukhiya
     # 残らなかった (#4635)。形は ProgramFetcher#valid_content_length? と同じ (#4397)。
     def log_preflight_failure(error, uri)
       status = error.respond_to?(:source_status) ? error.source_status : nil
-      error.log(url: uri.to_s) unless [403, 405].include?(status)
+      error.log(url: uri.to_s) unless HTTP::HEAD_UNSUPPORTED_STATUSES.include?(status)
     end
 
     def download_max_bytes

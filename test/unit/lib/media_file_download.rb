@@ -118,6 +118,20 @@ module Mulukhiya
       end
     end
 
+    # ⚠ **上流（Ginseng::HTTP）が書く「落ちた試行」の行も止める (#4793)。**呼び出し側の
+    # rescue では止められず、GAS への HEAD で 1 台 1 日 144 行出ていた。
+    # 5xx は想定外なので、上流の行も残ること。
+    def test_upstream_attempt_line_is_quiet_only_when_head_not_supported
+      allow_all
+      stub_request(:get, URL).to_return(status: 200, body: 'small')
+      {403 => false, 405 => false, 500 => true}.each do |status, expected|
+        stub_request(:head, URL).to_return(status:)
+        logged = capture_errors(upstream: true) {download(URL)}
+
+        assert_equal(expected, logged.any? {|v| v[:method] == :HEAD}, "HEAD #{status}")
+      end
+    end
+
     def test_preflight_network_error_is_logged
       allow_all
       stub_request(:head, URL).to_timeout
@@ -177,7 +191,9 @@ module Mulukhiya
 
     # Logger.new を差し替えて error の payload を集める。⚠ 必ず元へ戻すこと。
     # gem の再試行ログ (`count` 付き) はここで見たいものではないので除く。
-    def capture_errors
+    # ⚠ `count` を持つ行は上流（Ginseng::HTTP）が書く「落ちた試行」。既定では除いて、
+    # こちらが書いた行だけを返す。
+    def capture_errors(upstream: false)
       logged = []
       double = Object.new
       double.define_singleton_method(:error) {|payload| logged.push(payload)}
@@ -185,7 +201,7 @@ module Mulukhiya
       Logger.singleton_class.alias_method(:original_new_for_test, :new)
       Logger.define_singleton_method(:new) {|*_args| double}
       yield
-      return logged.reject {|v| v.key?(:count)}
+      return logged.select {|v| v.key?(:count) == upstream}
     ensure
       Logger.singleton_class.alias_method(:new, :original_new_for_test)
       Logger.singleton_class.remove_method(:original_new_for_test)

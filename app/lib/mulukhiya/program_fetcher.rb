@@ -145,6 +145,7 @@ module Mulukhiya
         uri,
         timeout: fetch_timeout,
         host_validator: RemoteHost.validator,
+        quiet_statuses: HTTP::HEAD_UNSUPPORTED_STATUSES,
       ).headers['content-length']
       return true if length.nil? || length.to_i <= fetch_max_bytes
       log_oversize(uri, length.to_i, 'program fetch content-length exceeded max bytes')
@@ -156,7 +157,7 @@ module Mulukhiya
       # ⚠ allowlist 拒否はここへ来ない (呼び出し元の RemoteHost.validate! で
       # 確定済み)。ここを通る = ホストは通ってよい、が保たれている (#4535)。
       status = e.respond_to?(:source_status) ? e.source_status : nil
-      e.log(url: uri.to_s) unless [403, 405].include?(status)
+      e.log(url: uri.to_s) unless HTTP::HEAD_UNSUPPORTED_STATUSES.include?(status)
       return true
     end
 

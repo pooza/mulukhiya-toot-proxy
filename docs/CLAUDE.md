@@ -186,6 +186,26 @@ git diff Gemfile.lock
 
 [マイルストーン 5.40.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/639)。
 
+- 📌 **2026-10-10 に PR を 4 本出した（マージ待ち・4 本とも CI 両系 SUCCESS）。**順番は #4804 → #4805 / #4806 → #4807（#4807 は独立）。
+  - **PR #4804（#4784）**: ginseng-core v2.2.0。`DaemonIdentityMethods` の `run_stop` の上書きを外した（上流の `stop` が身元を見る）。
+    8 台とも `tmp` / `tmp/cache` は実ディレクトリ、hook は zugoga / gomander の `discordapp.com`（リダイレクトなし）。
+    dev26 / dev27 で 3 サービスの restart / stop / start・`tmp/cache/*.yaml` が 0600・無関係な `sleep` の番号を書いた
+    pid ファイルへの `stop`（TERM を送らず pid ファイルだけ消す）を確認
+  - **PR #4805（#4793）**: サイズ確認の HEAD に `quiet_statuses: [403, 405]`（`HTTP::HEAD_UNSUPPORTED_STATUSES`）。
+    読み辞書・番組表・メディア取得の 3 か所。⚠ base は #4804 のブランチ。本番の行数は出荷後に gomander で数える
+  - **PR #4806（#4748）**: ginseng-fediverse v4.0.0（コード変更なし）。⚠ base は #4804 のブランチ。
+    実測: `あ#タグ` / `本文。#タグ` / `(#tag)` を抽出しなくなり、`＃全角タグ` を抽出する。
+    ⚠ **本文に既にあるタグを足し直すことは無い**（付与側の重複判定 `create_pattern` は手前の境界を見ない部分一致のまま）。
+    `escape_toot` の `@` 側は v2.0.5 と同じ（PR #4770 で保留した Codex P2 は挙動が変わらないので据え置き）、
+    `#` 側は `曲)#precure` を区切るようになった。
+    **harness（`8b2b2d92`）**: Misskey 1650 tests / 0 failures / 0 errors / 145 omissions（`controller=misskey`）、
+    Mastodon 1647 tests / 0 failures / 0 errors / 159 omissions（`controller=mastodon`）。
+    📌 **dev26 / dev27 はこのブランチ**（マージ後に develop へ戻す）
+  - **PR #4807（#4742）**: `Redis#acquire_token` / `#release_token`。`ConnectionError` なら待たずに 1 回だけ撃ち直す
+    （タイムアウトは撃ち直さない・撃ち直しで NX に負けたら値が自分の token かを見る）。3 つのロックの Lua も 1 か所へ。
+    harness の Redis を `docker restart` して、修正前は fail-open・修正後は取得できることを確認。
+    ⚠ `reconnect_attempts: 1` は採らなかった（接続設定は gem が作り、冪等でないコマンドにも効く）
+  - 残り（未着手）: #4790 と piefed v0.3.0（どちらも #4804 の後）/ #4794 / #4789 / #4734 / #4726 / #4699 / #4612 / #4600
 - ✅ **#4792 は PR #4802 でマージ（2026-10-06・`17a7cc22`）・クローズ。**`DaemonIdentityMethods` を 3 デーモンへ混ぜた:
   ① `alive_state_of` を上書きし、`ps` で見たコマンドが自分のものでなければ `:dead`（pid ファイルを取り直す）
   ② `run_stop` を上書きし、他人のプロセスへは TERM を送らず古い pid ファイルだけ消す。
