@@ -68,8 +68,9 @@ module Mulukhiya
       assert_rejected('body')
     end
 
-    # ⚠⚠ multipart で知らない charset を名乗ると、Rack は `ASCII-8BIT` でタグ付けする。
-    # `valid_encoding?` は常に true になるので、タグを信用すると素通りする（PR #4810 の Codex P2）。
+    # ⚠ multipart で知らない charset を名乗ると、Rack は `ASCII-8BIT` でタグ付けする
+    # （PR #4810 の Codex P2）。⚠ いまは Sinatra が UTF-8 へ `force_encoding` するので、
+    # **このテストは `valid_utf8?` が無くても通る。**その挙動が変わったときの見張り。
     def test_broken_multipart_value_with_unknown_charset_is_rejected_as_bad_request
       boundary = 'XXboundaryXX'
       body = [

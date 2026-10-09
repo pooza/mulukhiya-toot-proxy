@@ -192,11 +192,12 @@ module Mulukhiya
 
     # UTF-8 として正しいか。
     #
-    # ⚠⚠ **付いているタグを信用しない（PR #4810 の Codex P2）。**multipart の文字列は
-    # パートが名乗った charset で、知らない charset なら `ASCII-8BIT` でタグ付けされる。
-    # `ASCII-8BIT` の `valid_encoding?` は常に true なので、そのまま見ると壊れたバイト列が
-    # 素通りし、リクエストログの `to_json` で落ちる（＝ 401 に化ける経路が残る）。
-    # 奥の処理は全部 UTF-8 を前提にしているので、UTF-8 として読めるかで見る。
+    # ⚠ **付いているタグを信用しない（PR #4810 の Codex P2）。**Rack は multipart の文字列を
+    # パートが名乗った charset で、知らない charset なら `ASCII-8BIT`（`valid_encoding?` は
+    # 常に true）でタグ付けする。⚠ いまは Sinatra が `params` 全体を UTF-8 へ
+    # `force_encoding` してから `before` に渡すので、タグを見ても落とせている（実測）。
+    # **その挙動に頼らないための備え** — 奥の処理は全部 UTF-8 を前提にしているので、
+    # UTF-8 として読めるかで見る。
     def valid_utf8?(value)
       return value.dup.force_encoding(Encoding::UTF_8).valid_encoding?
     end
