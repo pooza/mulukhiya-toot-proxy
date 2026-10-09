@@ -192,7 +192,8 @@ git diff Gemfile.lock
   - ⚠⚠ **積んだ PR の base を `--delete-branch` で消すと、上の PR は付け替わらずに閉じられる。**#4804 のマージで #4805 / #4806 が
     `CLOSED` になり、`gh pr reopen` も通らなかった。**base のブランチを同じ SHA で push し直す → reopen → `gh api -X PATCH pulls/N -f base=develop` → ブランチを消す**で戻した。
     次からは、積んだ PR の base を先に develop へ付け替えてからマージする
-  - 📌 **マージ待ち: PR #4808（#4790）/ PR #4809（piefed v0.3.0）**
+  - ✅ **同日に PR #4808（#4790・`e396d4d6`）/ PR #4809（piefed v0.3.0・`ea3bbb77`）もマージ**。#4790 はクローズ
+  - 📌 **マージ待ち: PR #4810（#4600）/ PR #4811（#4794）**
   - **PR #4804（#4784）**: ginseng-core v2.2.0。`DaemonIdentityMethods` の `run_stop` の上書きを外した（上流の `stop` が身元を見る）。
     8 台とも `tmp` / `tmp/cache` は実ディレクトリ、hook は zugoga / gomander の `discordapp.com`（リダイレクトなし）。
     dev26 / dev27 で 3 サービスの restart / stop / start・`tmp/cache/*.yaml` が 0600・無関係な `sleep` の番号を書いた
@@ -215,7 +216,19 @@ git diff Gemfile.lock
   - **PR #4808（#4790）**: `RemoteHost` の判定の本体を `Ginseng::PublicHost` へ委譲（Issue の道 1）。自前の予約レンジの表は削除。
     残したのは DNS タイムアウトの設定・warn ログ・`validator` の差し替え口・`unpinned_validator`・`validate!`
   - **PR #4809**: ginseng-piefed v0.3.0（PieFed 宛がリダイレクトを追わない）。⚠ 実物の PieFed への送信は未確認
-  - 残り（未着手）: #4794 / #4789 / #4734 / #4726 / #4699 / #4612 / #4600
+  - **PR #4810（#4600）**: `Controller#before` の `reject_invalid_encoding!`。リクエストログの前に検査して 400。
+    ⚠ **Issue の前提と違った**: JSON のパーサ（Yajl）は不正な UTF-8 を弾く。500 にはならず、**本文が丸ごと捨てられて
+    「内容が空」の要求として奥へ進んでいた**（こちらも 400 に寄せた）。500 / 401 に化けるのはフォームの場合。
+    Codex P2 × 2: JSON はメディアタイプでも判定する／文字列はタグを信用せず UTF-8 として検査する。
+    ⚠ 後者は実測すると修正前でも落とせていた（Sinatra が `params` を UTF-8 へ `force_encoding` してから `before` に渡す）。備えとして残した
+  - **PR #4811（#4794）**: `Mulukhiya::CommandLine#exec` を上書き。締切でプロセスグループへ TERM → 2 秒 → KILL。
+    **FreeBSD（dev26）でも再現**（`sleep 5` に 1 秒の締切で 5.0 秒後）。実物の ffmpeg に 2 秒の締切: 修正前は 300 秒待っても戻らず、修正後は 2.25 秒。
+    ⚠⚠ **先頭のプロセスの終了を「止まった」と読まない**（シェル経由だと先頭はシェルで TERM で先に死に、TERM を無視する本体が残る。テストで踏んだ）。
+    Codex P1 × 2・P2 × 1: 後始末を `ensure` に（外側の `Thread#kill` でも子を残さない）／出力の読み切りまで締切に含める／`timeout: 0` は締切なしのまま。
+    上流へは **pooza/ginseng-core#684**（報告）と **pooza/ginseng-core#685**（たたき台）。⚠ **着地した版へ上げたら、こちらの上書きは外す**
+  - **#4734**: ①② は 5.37.1 で実装済みだった（`verify_upload_type!`）。件数は vulcan で 24 日 0 件・FreeBSD 3 台は直近 3 日 0 件
+    （syslog の保持が 3 日）。⚠ **HEIF の解除条件を持つ open の Issue はここだけ**（#4733 はクローズ済み）。扱いはユーザーに確認中
+  - 残り（未着手）: #4789（#4353 待ち）/ #4726 / #4699 / #4612（gem 待ち）
 - ✅ **#4792 は PR #4802 でマージ（2026-10-06・`17a7cc22`）・クローズ。**`DaemonIdentityMethods` を 3 デーモンへ混ぜた:
   ① `alive_state_of` を上書きし、`ps` で見たコマンドが自分のものでなければ `:dead`（pid ファイルを取り直す）
   ② `run_stop` を上書きし、他人のプロセスへは TERM を送らず古い pid ファイルだけ消す。
