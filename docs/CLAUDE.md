@@ -242,6 +242,11 @@ git diff Gemfile.lock
     Mastodon 1695 tests / 3452 assertions / **0 failures / 0 errors** / 159 omissions（`TestHarness: controller=mastodon url=http://localhost:3000`）、
     Misskey 1698 tests / 3505 assertions / **0 failures / 0 errors** / 145 omissions（`TestHarness: controller=misskey url=http://localhost:3001`）。
     ⚠ このあと develop にコードの変更が入ったら回し直す（docs だけのコミットは対象外）
+    → ✅ **PR #4818（レビューの指摘 1・2）を 2026-10-11 にマージ（ユーザー承認・`0a8ebb57`）し、ゲートを回し直した（06:36〜06:48 JST・`0a8ebb57`）**:
+    Mastodon 1698 tests / 3465 assertions / **0 failures / 0 errors** / 159 omissions（`TestHarness: controller=mastodon url=http://localhost:3000`）、
+    Misskey 1701 tests / 3518 assertions / **0 failures / 0 errors** / 145 omissions（`TestHarness: controller=misskey url=http://localhost:3001`）。
+    ✅ **ステージング 4 台（dev24〜27）も `0a8ebb57`**（`config: OK`・3 サービスの restart rc=0・health 200・壊れた Cookie つきの `/mulukhiya/app/token` が 200）。
+    CI はマージコミットで success。**リリース前レビューは済み＝次は `/release`**
   - **PR #4812（#4726）**: OAuth の state を発行したブラウザに縛る。`/mulukhiya/app/:page` が Cookie `mulukhiya_oauth_browser`
     （HttpOnly・SameSite=Lax・https では Secure・path `/mulukhiya`）を置き、SHA-256 を state に添えて callback で突き合わせる。
     目印の無い state は通さない。**dev26 の修正前で攻撃の形が通ることを確認**（Cookie なしの callback がトークン交換まで進む）、
