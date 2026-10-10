@@ -228,17 +228,22 @@ git diff Gemfile.lock
     上流へは **pooza/ginseng-core#684**（報告）と **pooza/ginseng-core#685**（たたき台）。⚠ **着地した版へ上げたら、こちらの上書きは外す**
   - **#4734**: ①② は 5.37.1 で実装済みだった（`verify_upload_type!`）。件数は vulcan で 24 日 0 件・FreeBSD 3 台は直近 3 日 0 件
     （syslog の保持が 3 日）。✅ **題を「HEIF の取り込みを戻す」に書き換えて on-hold にし、5.40.0 から外した**（ユーザー判断・周知はしない）
-  - 📌 **マージ待ち: PR #4812（#4726）/ PR #4814（#4699）/ PR #4815（#4612）**
+  - ✅ **同日に PR #4812（#4726・`a1985181`）/ PR #4814（#4699・`d139a3f8`）/ PR #4815（#4612・`831d863b`）もマージ**。3 件ともクローズ
+  - ✅ **5.40.0 の実装は出し切った。**open は出荷で閉じる #4801 / #4793 だけ。**#4789 は 5.41.0 へ送った**（前提の #4353 が fork への依頼で揃わない・ユーザー判断）
+  - ✅ **ステージング 4 台（dev24〜27）を develop（`831d863b`）へ揃えた**（`config: OK`・3 サービスの restart rc=0・health 200）
+  - 📌 **次回の入口: リリース手順**（`/release-review` → `/release`）。⚠ **#4812 のブラウザでのログインの目視が残っている**
+    （dev26 `https://st3.mstdn.delmulin.com/mulukhiya/app/token`）。⚠ リリースゲートの harness は `831d863b` で回し直す
+    （#4806 / #4814 で回したのは途中の HEAD）
   - **PR #4812（#4726）**: OAuth の state を発行したブラウザに縛る。`/mulukhiya/app/:page` が Cookie `mulukhiya_oauth_browser`
     （HttpOnly・SameSite=Lax・https では Secure・path `/mulukhiya`）を置き、SHA-256 を state に添えて callback で突き合わせる。
     目印の無い state は通さない。**dev26 の修正前で攻撃の形が通ることを確認**（Cookie なしの callback がトークン交換まで進む）、
     修正後は Cookie なし・別の Cookie が 403、同じ Cookie は交換へ進む。
-    ⚠ **実際のブラウザでのログインは目視していない。📌 dev26 はこのブランチ**（`6e703f96`）。
+    ⚠ **実際のブラウザでのログインは目視していない**（5.40.0 のステージング確認で行う）。
     ⚠ デプロイの瞬間にログイン画面を開いていた人は認証し直し（state の寿命 10 分）
   - **PR #4814（#4699）**: json 2.21.2 → 3.0.2。`JSON.parse` / `generate` の実体は Yajl なので、既定値の変更は経路に届かない（重複キーは後勝ちのまま）。
     **harness（`b5ebb1ee`）**: Misskey 1682 tests / 0 failures / 0 errors / 145 omissions（`controller=misskey`）、
     Mastodon 1679 tests / 0 failures / 0 errors / 159 omissions（`controller=mastodon`）。
-    📌 **dev24 / dev25 / dev27 はこのブランチ**（health 200・エラー行なし）。dev26 はリリース手順のステージングで載る
+    ステージング 4 台で health 200・エラー行なし
   - **PR #4815（#4612）**: GET に `max_bytes:` を渡して受信中に打ち切る（メディア・読み辞書・番組表）。
     ⚠⚠ **「gem 側の対応待ち」のまま載っていたが、待ち先の pooza/ginseng-core#526 は 2026-08-20 に着地済みだった**
     （[[feedback_milestone-items-may-be-already-done]] の「待ち」版。**待ち先の Issue の状態を着手前に見る**）
