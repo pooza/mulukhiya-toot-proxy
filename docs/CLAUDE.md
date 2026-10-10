@@ -228,7 +228,18 @@ git diff Gemfile.lock
     上流へは **pooza/ginseng-core#684**（報告）と **pooza/ginseng-core#685**（たたき台）。⚠ **着地した版へ上げたら、こちらの上書きは外す**
   - **#4734**: ①② は 5.37.1 で実装済みだった（`verify_upload_type!`）。件数は vulcan で 24 日 0 件・FreeBSD 3 台は直近 3 日 0 件
     （syslog の保持が 3 日）。✅ **題を「HEIF の取り込みを戻す」に書き換えて on-hold にし、5.40.0 から外した**（ユーザー判断・周知はしない）
-  - 残り（未着手）: #4789（#4353 待ち）/ #4726 / #4699 / #4612（gem 待ち）
+  - 📌 **マージ待ち: PR #4812（#4726）/ PR #4814（#4699）**
+  - **PR #4812（#4726）**: OAuth の state を発行したブラウザに縛る。`/mulukhiya/app/:page` が Cookie `mulukhiya_oauth_browser`
+    （HttpOnly・SameSite=Lax・https では Secure・path `/mulukhiya`）を置き、SHA-256 を state に添えて callback で突き合わせる。
+    目印の無い state は通さない。**dev26 の修正前で攻撃の形が通ることを確認**（Cookie なしの callback がトークン交換まで進む）、
+    修正後は Cookie なし・別の Cookie が 403、同じ Cookie は交換へ進む。
+    ⚠ **実際のブラウザでのログインは目視していない。📌 dev26 はこのブランチ**（`6e703f96`）。
+    ⚠ デプロイの瞬間にログイン画面を開いていた人は認証し直し（state の寿命 10 分）
+  - **PR #4814（#4699）**: json 2.21.2 → 3.0.2。`JSON.parse` / `generate` の実体は Yajl なので、既定値の変更は経路に届かない（重複キーは後勝ちのまま）。
+    **harness（`b5ebb1ee`）**: Misskey 1682 tests / 0 failures / 0 errors / 145 omissions（`controller=misskey`）、
+    Mastodon 1679 tests / 0 failures / 0 errors / 159 omissions（`controller=mastodon`）。
+    📌 **dev24 / dev25 / dev27 はこのブランチ**（health 200・エラー行なし）。dev26 はリリース手順のステージングで載る
+  - 残り: #4789（#4353 待ち）/ #4612（gem 待ち）。**出荷で閉じる**: #4801 / #4793
 - ✅ **#4792 は PR #4802 でマージ（2026-10-06・`17a7cc22`）・クローズ。**`DaemonIdentityMethods` を 3 デーモンへ混ぜた:
   ① `alive_state_of` を上書きし、`ps` で見たコマンドが自分のものでなければ `:dead`（pid ファイルを取り直す）
   ② `run_stop` を上書きし、他人のプロセスへは TERM を送らず古い pid ファイルだけ消す。
