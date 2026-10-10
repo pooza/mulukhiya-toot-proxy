@@ -132,6 +132,28 @@ module Mulukhiya
       RemoteHost.validator = original_validator if defined?(original_validator)
     end
 
+    # 🔴 受信中に打ち切る (#4612)。上限を超えた本文は、読み切る前に `TooLargeError` で止まる。
+    # ⚠ `max_bytes:` を渡すのをやめると、例外にならず nil（受信後の実測）で返って落ちる。
+    def test_fetch_is_cut_off_while_receiving
+      return if disable?
+      uri = Ginseng::URI.parse('https://dic.test/huge.json')
+      original_validator = RemoteHost.validator
+      original_max = config['/word_suggest/fetch/max_bytes']
+      RemoteHost.validator = ->(_host) {'93.184.216.34'}
+      config['/word_suggest/fetch/max_bytes'] = 16
+      stub_request(:head, uri.to_s).to_return(status: 200)
+      stub_request(:get, uri.to_s).to_return(
+        status: 200,
+        body: [{'word' => 'あ' * 100, 'pronunciation' => 'ア'}].to_json,
+        headers: {'Content-Type' => 'application/json'},
+      )
+
+      assert_raise(Ginseng::TooLargeError) {@dic.send(:fetch_one, uri)}
+    ensure
+      config['/word_suggest/fetch/max_bytes'] = original_max if defined?(original_max)
+      RemoteHost.validator = original_validator if defined?(original_validator)
+    end
+
     # GAS は HEAD に 403 を返す。黙って GET へ倒すと決めているので、上流（Ginseng::HTTP）の
     # 「落ちた試行」の行も出さない (#4793)。gomander で 1 日 144 行出ていた。
     # ⚠ 5xx は想定外なので行が残ること。

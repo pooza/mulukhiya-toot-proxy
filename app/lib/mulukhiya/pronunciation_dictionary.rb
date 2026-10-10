@@ -162,7 +162,14 @@ module Mulukhiya
       # 渡すと「判定不能」として GET へ倒れてしまう (#4535)。
       RemoteHost.validate!(uri)
       return nil unless valid_content_length?(uri)
-      response = @http.get(uri, timeout: fetch_timeout, host_validator: RemoteHost.validator)
+      response = @http.get(
+        uri,
+        timeout: fetch_timeout,
+        host_validator: RemoteHost.validator,
+        # ⚠ 受信中に打ち切る (#4612)。`Content-Length` を出さない・過少申告する相手に、
+        # 上限を無視して全部メモリへ読まされないように。
+        max_bytes: fetch_max_bytes,
+      )
       return nil unless valid_response_size?(response, uri)
       parsed = response.parsed_response
       return nil unless valid_schema?(parsed, uri)

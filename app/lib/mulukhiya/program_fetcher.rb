@@ -88,7 +88,7 @@ module Mulukhiya
         # 渡すと「判定不能」として GET へ倒れてしまう (#4535)。
         RemoteHost.validate!(v)
         next failed.push(v.to_s) unless valid_content_length?(v)
-        response = @http.get(v, timeout: fetch_timeout, host_validator: RemoteHost.validator)
+        response = get_limited(v)
         next failed.push(v.to_s) unless valid_response_size?(response, v)
         parsed = response.parsed_response
         next failed.push(v.to_s) unless valid_program_schema?(parsed, v)
@@ -130,6 +130,18 @@ module Mulukhiya
         attempted:,
         failed: failed.size,
         failed_urls: failed,
+      )
+    end
+
+    # ⚠ 受信中に打ち切る (#4612)。`Content-Length` を出さない・過少申告する相手に、
+    # 上限を無視して全部メモリへ読まされないように。超えたら `Ginseng::TooLargeError`
+    # （呼び出し元の URL 単位の rescue がログに残して次へ進む）。
+    def get_limited(uri)
+      return @http.get(
+        uri,
+        timeout: fetch_timeout,
+        host_validator: RemoteHost.validator,
+        max_bytes: fetch_max_bytes,
       )
     end
 

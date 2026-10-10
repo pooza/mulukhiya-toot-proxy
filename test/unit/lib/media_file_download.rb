@@ -72,6 +72,26 @@ module Mulukhiya
       assert_path_not_exist(path_for(URL))
     end
 
+    # 🔴 **受信中に打ち切る (#4612)。**上限を超えた時点で読むのをやめるので、受信後の実測
+    # （`phase: :body`）ではなく受信中（`phase: :receiving`）で落ちる。
+    # ⚠ `max_bytes:` を渡すのをやめると、ここが `:body` に戻って落ちる。
+    def test_oversize_body_is_cut_off_while_receiving
+      allow_all
+      config['/media/download/max_bytes'] = 16
+      stub_request(:head, URL).to_return(status: 200)
+      stub_request(:get, URL).to_return(status: 200, body: 'x' * 1024)
+      error = nil
+      logged = capture_errors do
+        error = assert_raise(Ginseng::GatewayError) {download(URL)}
+      end
+
+      assert_equal([:receiving], logged.filter_map {|v| v[:phase]})
+      assert_path_not_exist(path_for(URL))
+      # ⚠ 例外のメッセージに URL を入れない（#4630）。上流の TooLargeError は文中に URL を持つ。
+      assert_equal('Too large content', error.message)
+      assert_not_kind_of(Ginseng::TooLargeError, error)
+    end
+
     # ⚠⚠ **プリフライトを通したあとの GET も検証されること
     # (pooza/ginseng-core#528)。**`Ginseng::HTTP#request` は
     # `options.delete(:host_validator)` で呼び出し側の hash を壊すので、同じ hash を
