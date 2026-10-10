@@ -32,7 +32,9 @@ module Mulukhiya
       sink = @logged
       EncodingProbeController.reported = []
       EncodingProbeController.log_double = Object.new.tap do |double|
-        double.define_singleton_method(:info) {|*| nil}
+        # ⚠ **JSON 化まで通す**（PR #4818 の Codex P1）。リクエストログは `params` を丸ごと JSON にするので、
+        # 検査から外した値（アップロードのファイル名）がここで落ちないことまで見る。
+        double.define_singleton_method(:info, &:to_json)
         double.define_singleton_method(:error) {|payload| sink.push(payload)}
       end
       EncodingProbeController.class_eval do
@@ -119,6 +121,24 @@ module Mulukhiya
       assert_rejected('status')
     end
 
+    # 🔴 ファイルのパートは検査しない（5.40.0 のリリース前レビュー）。ファイル名を Shift_JIS や
+    # Latin-1 の生バイトで送るクライアントの添付を、中身が正しいのに 400 にしていた。
+    def test_upload_with_non_utf8_filename_passes
+      ['画像.png'.encode('Shift_JIS').b, "caf\xE9.png".b, '画像.png'.b].each do |filename|
+        post_upload(filename)
+
+        assert_equal(200, last_response.status, filename.inspect)
+        assert_empty(@logged)
+      end
+    end
+
+    # ⚠ 同じ要求の、ファイル以外の値は従来どおり検査する。
+    def test_broken_value_beside_upload_is_rejected_as_bad_request
+      post_upload('a.png', description: BROKEN)
+
+      assert_rejected('description')
+    end
+
     # ⚠ 正常な UTF-8 を誤検知しないこと（絵文字・結合文字・サロゲート相当の 4 バイト）。
     def test_valid_utf8_passes
       text = "プリキュア🌈 か\u3099 👨‍👩‍👧 𠮷野家"
@@ -150,6 +170,27 @@ module Mulukhiya
       assert_equal(1, rejected.length)
       assert_equal(key, rejected.first[:key])
       assert_empty(EncodingProbeController.reported, 'Sentry・通知へ出している')
+    end
+
+    def post_upload(filename, description: 'ok')
+      boundary = 'XXboundaryXX'
+      body = [
+        "--#{boundary}".b,
+        'Content-Disposition: form-data; name="description"'.b,
+        ''.b,
+        description.b,
+        "--#{boundary}".b,
+        'Content-Disposition: form-data; name="file"; filename="'.b + filename + '"'.b,
+        'Content-Type: image/png'.b,
+        ''.b,
+        "\x89PNG\r\n\x1A\n\x00\xFF".b,
+        "--#{boundary}--".b,
+        ''.b,
+      ].join("\r\n".b)
+      post('/probe', body, {
+        'HTTP_HOST' => 'localhost',
+        'CONTENT_TYPE' => "multipart/form-data; boundary=#{boundary}",
+      })
     end
   end
 end

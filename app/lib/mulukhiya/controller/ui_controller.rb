@@ -118,9 +118,13 @@ module Mulukhiya
     # ⚠ **HttpOnly・SameSite=Lax。**callback は SNS からのトップレベルの GET で戻ってくるので、
     # Lax なら届く（Strict だと届かずログインできなくなる）。
     # ⚠ 形の合わない値は捨てて作り直す（他所が置いた値をそのまま目印にしない）。
+    # 🔴 **壊れた UTF-8 も「形の合わない値」**（5.40.0 のリリース前レビュー）。Rack は Cookie の値を
+    # percent-decode するので、`%E3%81` のような値は不正なバイト列になり、正規表現に掛けると
+    # `ArgumentError` で 500 ＋アラートになる。入口の検査 (#4600) は Cookie を見ない。
     def oauth_browser_nonce
       nonce = request.cookies[OAUTH_BROWSER_COOKIE].to_s
-      nonce = SecureRandom.urlsafe_base64(32) unless nonce.match?(/\A[\w-]{32,128}\z/)
+      valid = nonce.valid_encoding? && nonce.match?(/\A[\w-]{32,128}\z/)
+      nonce = SecureRandom.urlsafe_base64(32) unless valid
       response.set_cookie(OAUTH_BROWSER_COOKIE, {
         value: nonce,
         path: '/mulukhiya',
