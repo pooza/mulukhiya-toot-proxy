@@ -89,9 +89,14 @@ module Mulukhiya
 
     # 自分で発行した state は通る（機能を殺していない）。
     def test_pkce_accepts_its_own_state
-      result = OAuthHelper.create_oauth_state(sns_type: 'mastodon')
+      # ⚠ state は発行したブラウザの目印つきで作る（目印の無い state は通らない・#4726）。
+      browser = 'browser-nonce-0000000000000000000000000'
+      result = OAuthHelper.create_oauth_state(
+        sns_type: 'mastodon',
+        browser: OAuthHelper.browser_digest(browser),
+      )
 
-      assert_equal(:exchanged, pkce_service.auth_with_pkce('code', result[:state]))
+      assert_equal(:exchanged, pkce_service.auth_with_pkce('code', result[:state], browser:))
     end
 
     private
