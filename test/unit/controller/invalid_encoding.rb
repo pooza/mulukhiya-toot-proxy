@@ -34,7 +34,7 @@ module Mulukhiya
       EncodingProbeController.log_double = Object.new.tap do |double|
         # ⚠ **JSON 化まで通す**（PR #4818 の Codex P1）。リクエストログは `params` を丸ごと JSON にするので、
         # 検査から外した値（アップロードのファイル名）がここで落ちないことまで見る。
-        double.define_singleton_method(:info) {|payload| payload.to_json}
+        double.define_singleton_method(:info, &:to_json)
         double.define_singleton_method(:error) {|payload| sink.push(payload)}
       end
       EncodingProbeController.class_eval do
