@@ -162,14 +162,7 @@ module Mulukhiya
       # 渡すと「判定不能」として GET へ倒れてしまう (#4535)。
       RemoteHost.validate!(uri)
       return nil unless valid_content_length?(uri)
-      response = @http.get(
-        uri,
-        timeout: fetch_timeout,
-        host_validator: RemoteHost.validator,
-        # ⚠ 受信中に打ち切る (#4612)。`Content-Length` を出さない・過少申告する相手に、
-        # 上限を無視して全部メモリへ読まされないように。
-        max_bytes: fetch_max_bytes,
-      )
+      return nil unless response = get_limited(uri)
       return nil unless valid_response_size?(response, uri)
       parsed = response.parsed_response
       return nil unless valid_schema?(parsed, uri)
@@ -220,6 +213,23 @@ module Mulukhiya
       status = e.respond_to?(:source_status) ? e.source_status : nil
       e.log(url: uri.to_s) unless HTTP::HEAD_UNSUPPORTED_STATUSES.include?(status)
       return true
+    end
+
+    # ⚠ 受信中に打ち切る (#4612)。`Content-Length` を出さない・過少申告する相手に、
+    # 上限を無視して全部メモリへ読まされないように。超えたら nil（その URL は失敗扱い）。
+    # ⚠⚠ **上流の `TooLargeError` をそのまま上へ渡さない（PR #4815 の Codex P1）。**あちらの
+    # メッセージは URL を文中に含むので、呼び出し元の `e.log` へ届くとマスクが効かない。
+    # URL はマスクの効くフィールドで別に残す。
+    def get_limited(uri)
+      return @http.get(
+        uri,
+        timeout: fetch_timeout,
+        host_validator: RemoteHost.validator,
+        max_bytes: fetch_max_bytes,
+      )
+    rescue Ginseng::TooLargeError
+      log_oversize(uri, nil, 'word_suggest fetch cut off while receiving')
+      return nil
     end
 
     def valid_response_size?(response, uri)

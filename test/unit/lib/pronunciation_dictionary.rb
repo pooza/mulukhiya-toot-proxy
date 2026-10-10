@@ -132,8 +132,9 @@ module Mulukhiya
       RemoteHost.validator = original_validator if defined?(original_validator)
     end
 
-    # 🔴 受信中に打ち切る (#4612)。上限を超えた本文は、読み切る前に `TooLargeError` で止まる。
-    # ⚠ `max_bytes:` を渡すのをやめると、例外にならず nil（受信後の実測）で返って落ちる。
+    # 🔴 受信中に打ち切る (#4612)。上限を超えた本文は読み切る前に止まり、その URL は失敗扱い。
+    # ⚠ `max_bytes:` を渡すのをやめると、受信後の実測（`exceeded max bytes`）に戻って落ちる。
+    # ⚠⚠ 上流の `TooLargeError` は URL を文中に持つので、上へ渡さない（PR #4815 の Codex P1）。
     def test_fetch_is_cut_off_while_receiving
       return if disable?
       uri = Ginseng::URI.parse('https://dic.test/huge.json')
@@ -148,7 +149,15 @@ module Mulukhiya
         headers: {'Content-Type' => 'application/json'},
       )
 
-      assert_raise(Ginseng::TooLargeError) {@dic.send(:fetch_one, uri)}
+      logged = []
+      logger = Object.new
+      logger.define_singleton_method(:error) {|payload| logged.push(payload)}
+      logger.define_singleton_method(:method_missing) {|*_args, **_kwargs| nil}
+      @dic.define_singleton_method(:logger) {logger}
+
+      assert_nil(@dic.send(:fetch_one, uri))
+      assert_equal(['word_suggest fetch cut off while receiving'], logged.filter_map {|v| v[:message]})
+      assert_equal(uri.to_s, logged.first[:url])
     ensure
       config['/word_suggest/fetch/max_bytes'] = original_max if defined?(original_max)
       RemoteHost.validator = original_validator if defined?(original_validator)

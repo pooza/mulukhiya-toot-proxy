@@ -88,7 +88,7 @@ module Mulukhiya
         # 渡すと「判定不能」として GET へ倒れてしまう (#4535)。
         RemoteHost.validate!(v)
         next failed.push(v.to_s) unless valid_content_length?(v)
-        response = get_limited(v)
+        next failed.push(v.to_s) unless response = get_limited(v)
         next failed.push(v.to_s) unless valid_response_size?(response, v)
         parsed = response.parsed_response
         next failed.push(v.to_s) unless valid_program_schema?(parsed, v)
@@ -134,8 +134,10 @@ module Mulukhiya
     end
 
     # ⚠ 受信中に打ち切る (#4612)。`Content-Length` を出さない・過少申告する相手に、
-    # 上限を無視して全部メモリへ読まされないように。超えたら `Ginseng::TooLargeError`
-    # （呼び出し元の URL 単位の rescue がログに残して次へ進む）。
+    # 上限を無視して全部メモリへ読まされないように。超えたら nil（その URL は失敗扱い）。
+    # ⚠⚠ **上流の `TooLargeError` をそのまま上へ渡さない（PR #4815 の Codex P1）。**あちらの
+    # メッセージは URL を文中に含むので、呼び出し元の `e.log` へ届くとマスクが効かない。
+    # URL はマスクの効くフィールドで別に残す。
     def get_limited(uri)
       return @http.get(
         uri,
@@ -143,6 +145,9 @@ module Mulukhiya
         host_validator: RemoteHost.validator,
         max_bytes: fetch_max_bytes,
       )
+    rescue Ginseng::TooLargeError
+      log_oversize(uri, nil, 'program fetch cut off while receiving')
+      return nil
     end
 
     # HTTParty がレスポンス本文を丸ごとメモリへ読み込む前に、相手が申告した
