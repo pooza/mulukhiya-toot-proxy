@@ -268,7 +268,7 @@ git diff Gemfile.lock
     - ⚠ **dev26 / dev27 は PR のブランチ（`b6ef6a5e`）のまま。**マージ後に develop へ戻す。dev24 / dev25 は `831d863b`
     - ⚠ **入れていない**: `DaemonIdentityMethods` を gem の `process_pattern` へ移す件（#4813 の 3）。`exec` の最中の一瞬に本物を他人と答える窓は自前の実装に残る
     - ⚠ リリースノートに書く: 例外の文言が `execution expired (Ns)` に変わる／締切のたびに error が 1 行出る／自サーバー以外の内部アドレス宛の投稿 URL は `Rejected host` になる
-    - 残り: pooza/ginseng-core#688 へ FreeBSD の実測を返す（未投稿）
+    - pooza/ginseng-core#688 へ FreeBSD の実測を返した（食い違いなし）
 - ✅ **#4792 は PR #4802 でマージ（2026-10-06・`17a7cc22`）・クローズ。**`DaemonIdentityMethods` を 3 デーモンへ混ぜた:
   ① `alive_state_of` を上書きし、`ps` で見たコマンドが自分のものでなければ `:dead`（pid ファイルを取り直す）
   ② `run_stop` を上書きし、他人のプロセスへは TERM を送らず古い pid ファイルだけ消す。
