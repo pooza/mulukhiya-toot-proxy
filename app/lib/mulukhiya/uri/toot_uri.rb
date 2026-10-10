@@ -2,6 +2,7 @@ module Mulukhiya
   class TootURI < Ginseng::Fediverse::TootURI
     include Package
     include SNSMethods
+    include StatusHostValidationMethods
 
     def local?
       return Ginseng::URI.parse(toot.dig('account', 'url')).host == Environment.domain_name

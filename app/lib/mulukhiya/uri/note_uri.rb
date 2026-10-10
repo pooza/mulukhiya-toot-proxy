@@ -2,6 +2,7 @@ module Mulukhiya
   class NoteURI < Ginseng::Fediverse::NoteURI
     include Package
     include SNSMethods
+    include StatusHostValidationMethods
 
     def local?
       return true if note.dig('user', 'host').empty?
