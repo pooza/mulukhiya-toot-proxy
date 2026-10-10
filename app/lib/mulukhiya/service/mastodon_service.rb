@@ -61,8 +61,8 @@ module Mulukhiya
       return JSON.parse(client)
     end
 
-    def oauth_uri
-      return oauth_uri_with_pkce
+    def oauth_uri(browser: nil)
+      return oauth_uri_with_pkce(browser:)
     end
 
     def oauth_authorize_endpoint

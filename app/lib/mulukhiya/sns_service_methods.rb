@@ -69,9 +69,10 @@ module Mulukhiya
       return create_uri('/mulukhiya/oauth/callback').to_s
     end
 
-    def oauth_uri_with_pkce
+    def oauth_uri_with_pkce(browser: nil)
       state_data = OAuthHelper.create_oauth_state(
         sns_type: controller_class.name,
+        browser: OAuthHelper.browser_digest(browser),
       )
       uri = create_uri(oauth_authorize_endpoint)
       uri.query_values = oauth_authorize_params.merge(
@@ -84,8 +85,17 @@ module Mulukhiya
       return uri
     end
 
-    def auth_with_pkce(code, state)
+    # 🔴 **state を発行したブラウザから戻ってきた要求だけを通す (#4726)。**
+    #
+    # `/mulukhiya/app/:page` は認証なしで state を発行するので、state が有効かどうかだけを
+    # 見ていると、攻撃者が**自分のアカウントで**認可した `code` と state を載せた callback の
+    # URL を被害者に踏ませられる（ログイン CSRF）。被害者の Web UI に攻撃者のトークンが入り、
+    # 以後の操作（ナウプレ・タグ付け・設定変更）が攻撃者のアカウントで行われる。
+    # ⚠ 発行時に Cookie の目印のダイジェストを state に添え、ここで突き合わせる。
+    # ⚠ **`browser` を持たない state は通さない**（目印なしで発行させれば素通り、にしない）。
+    def auth_with_pkce(code, state, browser: nil)
       state_data = OAuthHelper.consume_oauth_state(state)
+      verify_oauth_browser!(state_data, browser)
       # ⚠ **`code_verifier` を持つ state だけを通す。**同じ `OAuthStateStorage` に
       # Spotify の state（`{service:, account_id:}`・#4414）も入るので、有無だけ見ると
       # **`code_verifier` が nil のままトークン交換へ進み、PKCE の束縛が効かない**
@@ -97,6 +107,13 @@ module Mulukhiya
         code_verifier: verifier,
         redirect_uri: oauth_callback_uri,
       )
+    end
+
+    def verify_oauth_browser!(state_data, browser)
+      expected = state_data&.dig(:browser).to_s
+      actual = OAuthHelper.browser_digest(browser).to_s
+      return if expected.present? && Rack::Utils.secure_compare(expected, actual)
+      raise Ginseng::AuthError, 'Invalid OAuth state'
     end
 
     def oauth_authorize_endpoint

@@ -64,8 +64,8 @@ module Mulukhiya
       return create_uri('/mulukhiya/app/home').to_s
     end
 
-    def oauth_uri
-      return oauth_uri_with_pkce
+    def oauth_uri(browser: nil)
+      return oauth_uri_with_pkce(browser:)
     end
 
     def oauth_server_metadata
