@@ -129,6 +129,15 @@ module Mulukhiya
       assert_not_equal('short', JSON.parse(last_response.body)['nonce'])
     end
 
+    # 🔴 壊れた UTF-8 の Cookie でも 500 にしない（5.40.0 のリリース前レビュー）。
+    def test_invalid_utf8_cookie_is_replaced
+      cookie = "mulukhiya_oauth_browser=%E3%81#{'a' * 40}"
+      get('/nonce', {}, {'HTTP_HOST' => 'localhost', 'HTTP_COOKIE' => cookie})
+
+      assert_equal(200, last_response.status)
+      assert_match(/\A[\w-]{32,128}\z/, JSON.parse(last_response.body)['nonce'])
+    end
+
     private
 
     def issue(browser)

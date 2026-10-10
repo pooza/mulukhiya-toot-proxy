@@ -214,6 +214,11 @@ module Mulukhiya
     # 壊れた文字列を持つ最初のキーを返す（無ければ nil）。入れ子の Hash / Array も辿る。
     #
     # ⚠ アップロードの `tempfile` など String 以外は見ない（中身はバイナリで正しい）。
+    # 🔴 **アップロードのパートには潜らない**（5.40.0 のリリース前レビュー）。Rack はファイルのパートを
+    # `{filename:, type:, name:, tempfile:, head:}` にして渡し、`filename` と `head`（生のヘッダ）は
+    # クライアントが送ったバイト列のまま。ここを検査すると、ファイル名を Shift_JIS などで送る
+    # クライアントの添付が、中身が正しくても 400 になる。上流へ渡すのは tempfile だけで、
+    # `filename` は使っていない。
     def invalid_encoding_key(value, key = :body)
       case value
       when String
@@ -221,11 +226,16 @@ module Mulukhiya
       when Array
         return value.filter_map {|v| invalid_encoding_key(v, key)}.first
       when Hash
+        return nil if upload_part?(value)
         return value.filter_map do |k, v|
           valid_utf8?(k.to_s) ? invalid_encoding_key(v, k) : k
         end.first
       end
       return nil
+    end
+
+    def upload_part?(value)
+      return (value[:tempfile] || value['tempfile']).respond_to?(:read)
     end
 
     def name
