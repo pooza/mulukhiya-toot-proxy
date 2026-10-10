@@ -323,6 +323,54 @@ git diff Gemfile.lock
   編集時はサブタイトルと Annict エピソード ID も書き換えるよう促す。⚠ **サーバー側で古い情報を自動で消す案は採らない**
   （ユーザー「余計なことをしない今の動作がいい」）。harness とステージングは 5.40.0 の周回で見る
 
+### リリース前レビュー（5 観点）の結果（2026-10-11）
+
+対象は `v5.39.0..develop`（`23dfded2` 時点・アプリとテストで 49 ファイル）。**赤 0 / 黄 7 / 緑 8**（観点をまたぐ重複は 1 件に数えた）。
+lint 3 本は通過、ginseng-\* との interface の食い違いは無し。行き先はユーザーが一覧で決めた（「提案のとおり」）。
+
+**本リリースで直す（PR #4818）** — どちらも 5.40.0 の入口の検査が持ち込んだ退行
+
+- **1（黄・赤寄り）**: UTF-8 でないファイル名のメディアアップロードが 400（#4600 の検査が、アップロードのパートの `filename` と `head` まで見ていた）。
+  `tempfile` を持つ Hash には潜らないようにした。dev26 / dev27 で修正前 400 → 修正後は認証つきの実アップロードが 4 通りの文字コードとも 200
+- **2（黄）**: 壊れた UTF-8 の Cookie 1 本で `/mulukhiya/app/:page` が 500 ＋アラート（#4726 の `oauth_browser_nonce` が正規表現で `ArgumentError`）。
+  壊れた値は捨てて作り直す。dev26 / dev27 で修正前 500 → 修正後 200
+- ⚠ **Codex P1 × 1 は再現せず**（「検査を外してもリクエストログの JSON 化で落ちる」）。`JSON.generate` の実体は Yajl で、バイト列をそのまま通す。
+  ⚠⚠ **未認証の要求で確かめると、通っても落ちても 401 で区別が付かない**（`before` の rescue がトークンを外すため）。認証つきで通して確かめた
+
+**掃除 PR（手順 12）へ**
+
+- **3（黄）**: Annict が空の結果や「200 ＋ errors」を返すと、空の辞書が直近の良いキャッシュを上書きする（`annict_episode_dictionary.rb` の `fetch`）。
+  `works` 側は同じ応答で `NoMethodError` になり、凌げていても毎回アラート。応答の形が合わなければ `GatewayError` に寄せる。⚠ Annict がこの形を返す頻度は未確認
+- **4（黄）**: Annict が 6 時間を超えて落ちると、アラートが取得のたび（10 分おき・抑止は 300 秒）に鳴る。鳴らした印を持つ
+- **5（黄）**: 拒否されるホストの URL を PieFed へクリップすると 4 回試行・Sentry 4 件・利用者には何も返らない（`piefed_clipping_worker.rb`・`retry: 3`）。
+  ⚠ **`status_host_validation_methods.rb` のコメント「拒否の warn ログが付く」は誤り**（PR #4816）。warn が出るのは名前解決が例外で落ちたときだけ
+- **6（黄）**: 不正な UTF-8 の 400 が `docs/api.md` の「エラーレスポンス」に無い
+- **9（緑）**: OAuth の 3 種類の失敗（state の失効・Cookie の不一致・`code_verifier` 無し）が同じ文言「Invalid OAuth state」
+- **10（緑）**: `/daemon/restart/timeout/seconds` が `config/schema/base.yaml` に未宣言
+- **11（緑）**: 死んだコードと古いコメント — `RemoteHost.internal_address?`（呼び出し 0）／`NowplayingResolver#artwork_pixel` の届かない `rescue`／
+  `.github/dependabot.yml:45` と `test/unit/lib/dependabot_config.rb:5` の json「据え置き中」／`command_line_deadline.rb` の `upstream` 比較と `test_without_timeout_uses_upstream`／
+  `daemon_identity_methods.rb` 冒頭の「rc.d と同じ物差し」／`invalid_encoding.rb:6`（JSON 経路を逆に書いている）／`redis_token_lock.rb:8`／`remote_host.rb`（テスト）`:7-8`／
+  `spotify_oauth_failure.rb:55`／`media_file_download_methods.rb:26-28` と `:61`／`sns_service_methods.rb:93` の「Web UI」／
+  `annict_episode_dictionary.rb`（テスト）の `setup` が設定を戻さない／この文書の「5.32.x 以前のリリースノートは」の案内
+
+**記録のみ**
+
+- **7（緑）**: 外部の Mastodon の投稿 URL の取得がリダイレクトを追わなくなった（fediverse 3.x 以降、トークンが空でも `Authorization: Bearer ` が付き、`RedirectGuard` が追従を止める）。
+  `http://` で書かれた投稿 URL のクリップ・引用が `Bad response 301`。https の正規 URL は影響なし。本筋は gem 側。**リリースノートに注意書き**
+- **8（緑）**: 形の合う Cookie をそのまま目印に採るので、Cookie を植えられる相手（兄弟サブドメインを握る・平文 HTTP に割り込む）にはログイン CSRF が残る。
+  `__Host-` 接頭辞で塞げる。本番 4 台では現実的な経路なし
+- **12（緑）**: ログが出ない経路 3 つ（デーモンの身元が分からないとき／`never_silent?` の経路に発生源が載らない／ロックの撃ち直しが無言）
+- **13（緑）**: ハンドラの締切を 6 秒未満にすると、内側の締切の後始末（締切 ＋ 最大 3 秒）が外側の余白を超える。既定の 90 秒では起きない
+- **14（緑）**: Annict 辞書の取り直しに排他が無い。⚠ `fresh: 600` は取得の周期（10 分）と同じ値なので、Annict への要求を減らす効果は期待しない
+
+**そのほか**
+
+- ⚠ **#4722 は 3 件のうち 2 件（音声変換と ffprobe の締切・出力ファイル名の衝突）が実装済みに見える**という報告あり。未確認。着手前に実体を見る
+- wiki に書く項目（レビューが挙げた 10 個）: Annict 辞書のキャッシュ 3 キー／`/tagging/dic/annict/episodes` が障害時も 200／不正な UTF-8 は全ルートで 400／
+  ログインに Cookie `mulukhiya_oauth_browser` が必須／アップグレード手順（Ruby 版・ginseng の版）／デーモンの pid ファイルと「1 ユーザー 1 チェックアウト」／
+  クリップ・引用の URL は公開ホストだけ（自サーバーは scheme・ホスト・ポート一致で外す）／ffmpeg・再起動の締切が子を実際に止める／
+  `max_bytes` 3 つが受信中にも効く／番組表「話数 ＋」の 409 の文言
+
 ## リリース済み: 5.39.0（2026-10-04）
 
 **本番デプロイ: 4 台完了**（2026-10-04 10:07〜10:16、shallu → zugoga → gomander → vulcan の順。
