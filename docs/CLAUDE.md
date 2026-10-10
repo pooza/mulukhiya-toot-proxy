@@ -233,7 +233,8 @@ git diff Gemfile.lock
   - ✅ **ステージング 4 台（dev24〜27）を develop（`831d863b`）へ揃えた**（`config: OK`・3 サービスの restart rc=0・health 200）
   - 📌 **次回の入口: リリース手順**（`/release-review` → `/release`）。⚠ **#4812 のブラウザでのログインの目視が残っている**
     （dev26 `https://st3.mstdn.delmulin.com/mulukhiya/app/token`）。⚠ リリースゲートの harness は `831d863b` で回し直す
-    （#4806 / #4814 で回したのは途中の HEAD）
+    （#4806 / #4814 で回したのは途中の HEAD）。
+    → **2026-10-11: #4816 で develop が進んだので、ゲートの harness は `db6d3bc1` 以降で回す**（`b6ef6a5e` の実走は PR のブランチ）
   - **PR #4812（#4726）**: OAuth の state を発行したブラウザに縛る。`/mulukhiya/app/:page` が Cookie `mulukhiya_oauth_browser`
     （HttpOnly・SameSite=Lax・https では Secure・path `/mulukhiya`）を置き、SHA-256 を state に添えて callback で突き合わせる。
     目印の無い state は通さない。**dev26 の修正前で攻撃の形が通ることを確認**（Cookie なしの callback がトークン交換まで進む）、
@@ -253,7 +254,7 @@ git diff Gemfile.lock
   - ⚠⚠ **2026-10-10 10:00 JST ごろ、Codex がコードレビューの利用上限に達した。**PR #4815 の再レビュー（`d7d3d177`）は走っていない。
     上限が戻るまで `@codex review` は空振りする。**リリース前の 5 観点レビューがその代わりになる**
   - 残り: #4789（#4353 待ち）。**出荷で閉じる**: #4801 / #4793
-  - 🆕 **PR #4816（#4813・2026-10-11・未マージ）**: ginseng-core v2.4.0 / fediverse v5.0.0 / piefed v0.4.0。**#4813 は 5.40.0 に載せた**（ユーザー「3 本、更新してください」）。
+  - ✅ **PR #4816（#4813）を 2026-10-11 にマージ（ユーザー承認・`db6d3bc1`）**: ginseng-core v2.4.0 / fediverse v5.0.0 / piefed v0.4.0。**#4813 は 5.40.0 に載せた**（ユーザー「3 本、更新してください」）。
     - `Mulukhiya::CommandLine#exec` の上書き（#4811）を外した（core 2.4.0 が締切で子を止める）。テスト `command_line_deadline` は回帰として残した
     - `StatusHostValidationMethods`（`TootURI` / `NoteURI` に混ぜる）: `host_validator` は `RemoteHost.validator`。
       **自サーバーの URL だけ外す**（設定の `/<controller>/url` と scheme・ホスト・ポートの 3 つとも同じとき）。
@@ -265,7 +266,8 @@ git diff Gemfile.lock
     - **harness（`b6ef6a5e`）**: Mastodon 1695 tests / 0 failures / 0 errors / 159 omissions（`controller=mastodon`）、
       Misskey 1698 tests / 0 failures / 0 errors / 145 omissions（`controller=misskey`）。
       ⚠ Misskey の 1 回目は `DictionaryTagHandlerTest#test_handle_pre_toot` が 1 failure（実物の GAS 辞書が空・#4659 の間欠）。同じ HEAD の回し直しで 0 / 0
-    - ⚠ **dev26 / dev27 は PR のブランチ（`b6ef6a5e`）のまま。**マージ後に develop へ戻す。dev24 / dev25 は `831d863b`
+    - ✅ **ステージング 4 台（dev24〜27）を develop（`db6d3bc1`）へ揃えた**（`config: OK`・3 サービスの restart rc=0・health 200）。
+      Codex は 2 つ目のコミット（`b6ef6a5e`）まで指摘なし。⚠ **#4813 は open のまま**（`DaemonIdentityMethods` の件の扱いをユーザーに確認中）
     - ⚠ **入れていない**: `DaemonIdentityMethods` を gem の `process_pattern` へ移す件（#4813 の 3）。`exec` の最中の一瞬に本物を他人と答える窓は自前の実装に残る
     - ⚠ リリースノートに書く: 例外の文言が `execution expired (Ns)` に変わる／締切のたびに error が 1 行出る／自サーバー以外の内部アドレス宛の投稿 URL は `Rejected host` になる
     - pooza/ginseng-core#688 へ FreeBSD の実測を返した（食い違いなし）
