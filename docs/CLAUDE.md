@@ -267,7 +267,7 @@ git diff Gemfile.lock
       Misskey 1698 tests / 0 failures / 0 errors / 145 omissions（`controller=misskey`）。
       ⚠ Misskey の 1 回目は `DictionaryTagHandlerTest#test_handle_pre_toot` が 1 failure（実物の GAS 辞書が空・#4659 の間欠）。同じ HEAD の回し直しで 0 / 0
     - ✅ **ステージング 4 台（dev24〜27）を develop（`db6d3bc1`）へ揃えた**（`config: OK`・3 サービスの restart rc=0・health 200）。
-      Codex は 2 つ目のコミット（`b6ef6a5e`）まで指摘なし。⚠ **#4813 は open のまま**（`DaemonIdentityMethods` の件の扱いをユーザーに確認中）
+      Codex は 2 つ目のコミット（`b6ef6a5e`）まで指摘なし。✅ **#4813 はクローズ**。`DaemonIdentityMethods` を gem の `process_pattern` へ移す件は **#4817（5.41.0）** へ送った（ユーザー判断）
     - ⚠ **入れていない**: `DaemonIdentityMethods` を gem の `process_pattern` へ移す件（#4813 の 3）。`exec` の最中の一瞬に本物を他人と答える窓は自前の実装に残る
     - ⚠ リリースノートに書く: 例外の文言が `execution expired (Ns)` に変わる／締切のたびに error が 1 行出る／自サーバー以外の内部アドレス宛の投稿 URL は `Rejected host` になる
     - pooza/ginseng-core#688 へ FreeBSD の実測を返した（食い違いなし）
