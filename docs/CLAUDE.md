@@ -238,6 +238,10 @@ git diff Gemfile.lock
     別のブラウザへ持ち込む確認は、PR #4812 の API 直叩き（Cookie なし・別の Cookie が 403）で足りるので省いた。⚠ リリースゲートの harness は `831d863b` で回し直す
     （#4806 / #4814 で回したのは途中の HEAD）。
     → **2026-10-11: #4816 で develop が進んだので、ゲートの harness は `db6d3bc1` 以降で回す**（`b6ef6a5e` の実走は PR のブランチ）
+    → ✅ **2026-10-11 05:28〜05:41 JST にゲートの harness を `23dfded2` で実走（系ごとに別シェル）**:
+    Mastodon 1695 tests / 3452 assertions / **0 failures / 0 errors** / 159 omissions（`TestHarness: controller=mastodon url=http://localhost:3000`）、
+    Misskey 1698 tests / 3505 assertions / **0 failures / 0 errors** / 145 omissions（`TestHarness: controller=misskey url=http://localhost:3001`）。
+    ⚠ このあと develop にコードの変更が入ったら回し直す（docs だけのコミットは対象外）
   - **PR #4812（#4726）**: OAuth の state を発行したブラウザに縛る。`/mulukhiya/app/:page` が Cookie `mulukhiya_oauth_browser`
     （HttpOnly・SameSite=Lax・https では Secure・path `/mulukhiya`）を置き、SHA-256 を state に添えて callback で突き合わせる。
     目印の無い state は通さない。**dev26 の修正前で攻撃の形が通ることを確認**（Cookie なしの callback がトークン交換まで進む）、
