@@ -27,12 +27,12 @@ module Mulukhiya
     # (HEAD の Content-Length → 受信後の実測) で、HEAD 非対応の相手でも
     # 最終防衛線が残る。
     #
-    # ⚠⚠ **上限は「受信中」には効かない (#4612)。**受信後の実測に届く時点で
-    # 本文はすべてメモリに載っているので、`Content-Length` を出さない相手
-    # (chunked) や過少申告する相手には上限を無視して読まされる。⚠ **image_url は
-    # webhook から第三者が指定できる**ので、ワーカーのメモリ枯渇に繋がりうる。
-    # 受信中に打ち切るには `Ginseng::HTTP#get` 側の口が要る
-    # (pooza/ginseng-core#526)。着地したら `max_bytes:` へ載せ替えること。
+    # ⚠⚠ **上限は受信中にも効かせる (#4612)。**`max_bytes:` を渡すと、上流が上限を超えた
+    # 時点で読むのをやめて `Ginseng::TooLargeError` を上げる（pooza/ginseng-core#526）。
+    # 以前は受信後の実測だけで、`Content-Length` を出さない相手 (chunked) や過少申告する
+    # 相手には、上限を無視して全部メモリへ読まされていた。⚠ **image_url は webhook から
+    # 第三者が指定できる**ので、ワーカーのメモリ枯渇に繋がりえた。
+    # ⚠ 受信後の実測も残す（`max_bytes:` が外れても最終防衛線が残るように）。
     def download(uri, host_validator:)
       raise ArgumentError, 'host_validator is required' unless host_validator
       path = File.join(
@@ -42,10 +42,19 @@ module Mulukhiya
       )
       raise_too_large!(uri, :content_length) unless
         valid_content_length?(uri, request_options(host_validator))
-      body = HTTP.new.get(uri, request_options(host_validator)).body.to_s
+      body = fetch_body(uri, host_validator)
       raise_too_large!(uri, :body) if body.bytesize > download_max_bytes
       write_atomic(path, body)
       return new(path).file
+    end
+
+    # ⚠ **上流の `TooLargeError` はこちらの例外に替える。**あちらのメッセージは URL を
+    # 文中に含むので、そのまま上げると `raise_too_large!` が守っている約束（#4630）が破れる。
+    def fetch_body(uri, host_validator)
+      options = request_options(host_validator).merge(max_bytes: download_max_bytes)
+      return HTTP.new.get(uri, options).body.to_s
+    rescue Ginseng::TooLargeError
+      raise_too_large!(uri, :receiving)
     end
 
     # ⚠⚠ **URI を例外メッセージへ埋めない (#4630)。**`Ginseng::Logger#mask_url` は
