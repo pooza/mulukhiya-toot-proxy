@@ -253,6 +253,22 @@ git diff Gemfile.lock
   - ⚠⚠ **2026-10-10 10:00 JST ごろ、Codex がコードレビューの利用上限に達した。**PR #4815 の再レビュー（`d7d3d177`）は走っていない。
     上限が戻るまで `@codex review` は空振りする。**リリース前の 5 観点レビューがその代わりになる**
   - 残り: #4789（#4353 待ち）。**出荷で閉じる**: #4801 / #4793
+  - 🆕 **PR #4816（#4813・2026-10-11・未マージ）**: ginseng-core v2.4.0 / fediverse v5.0.0 / piefed v0.4.0。**#4813 は 5.40.0 に載せた**（ユーザー「3 本、更新してください」）。
+    - `Mulukhiya::CommandLine#exec` の上書き（#4811）を外した（core 2.4.0 が締切で子を止める）。テスト `command_line_deadline` は回帰として残した
+    - `StatusHostValidationMethods`（`TootURI` / `NoteURI` に混ぜる）: `host_validator` は `RemoteHost.validator`。
+      **自サーバーの URL だけ外す**（設定の `/<controller>/url` と scheme・ホスト・ポートの 3 つとも同じとき）。
+      ⚠⚠ **外さない形（`6bb827e8`）は harness の Misskey 系で `NoteURITest#test_to_md` が `Rejected host 'localhost'` で落ちた**
+      ＝ harness は「自サーバーが内部アドレスに解決される構成」そのもの。**取得先ホストの検証を足す変更は、開発機の緑では分からない**
+    - ⚠ ファイル名に `uri` を入れると Zeitwerk が `Uri` と読む（`status_uri_host_methods.rb` → `StatusUriHostMethods` を探して `NameError`）
+    - **dev26（FreeBSD 15.1・`/bin/sh`）で core 2.4.0 の番人が動くことを実測**（pooza/ginseng-core#688 の依頼）: `sleep 30` に 1 秒の締切で 1.0 秒・`still running` なし・残りなし。
+      TERM を無視する子は 3.0 秒、実物の ffmpeg（軽い変換）は 2 秒の締切で 2.2 秒・`received signal 15`。⚠ 重い変換（1080p・veryslow）は猶予を使い切って 4.0 秒
+    - **harness（`b6ef6a5e`）**: Mastodon 1695 tests / 0 failures / 0 errors / 159 omissions（`controller=mastodon`）、
+      Misskey 1698 tests / 0 failures / 0 errors / 145 omissions（`controller=misskey`）。
+      ⚠ Misskey の 1 回目は `DictionaryTagHandlerTest#test_handle_pre_toot` が 1 failure（実物の GAS 辞書が空・#4659 の間欠）。同じ HEAD の回し直しで 0 / 0
+    - ⚠ **dev26 / dev27 は PR のブランチ（`b6ef6a5e`）のまま。**マージ後に develop へ戻す。dev24 / dev25 は `831d863b`
+    - ⚠ **入れていない**: `DaemonIdentityMethods` を gem の `process_pattern` へ移す件（#4813 の 3）。`exec` の最中の一瞬に本物を他人と答える窓は自前の実装に残る
+    - ⚠ リリースノートに書く: 例外の文言が `execution expired (Ns)` に変わる／締切のたびに error が 1 行出る／自サーバー以外の内部アドレス宛の投稿 URL は `Rejected host` になる
+    - 残り: pooza/ginseng-core#688 へ FreeBSD の実測を返す（未投稿）
 - ✅ **#4792 は PR #4802 でマージ（2026-10-06・`17a7cc22`）・クローズ。**`DaemonIdentityMethods` を 3 デーモンへ混ぜた:
   ① `alive_state_of` を上書きし、`ps` で見たコマンドが自分のものでなければ `:dead`（pid ファイルを取り直す）
   ② `run_stop` を上書きし、他人のプロセスへは TERM を送らず古い pid ファイルだけ消す。
