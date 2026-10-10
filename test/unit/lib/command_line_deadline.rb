@@ -1,9 +1,11 @@
 module Mulukhiya
   # 締切つきの `exec` は、締切の時点で子プロセスを止める (#4794)。
   #
-  # 🔴 上流の `Timeout.timeout { Open3.capture3(...) }` は、締切が来ても子の終了を待ってから
-  # 例外を上げる。ffmpeg に渡した締切が一度も効いておらず、締切を超えた変換は孤児のまま完走し、
-  # 締切の後に間に合った変換は出力が出来ているのに失敗になっていた。
+  # ⚠ 実装は ginseng-core v2.4.0 にある（pooza/ginseng-core#684）。#4811 で持っていた上書きは外した (#4813)。
+  # ここは「この版の gem を載せたモロヘイヤで、締切が効いているか」の回帰として残す。
+  # 🔴 v2.3.0 までの上流は、締切が来ても子の終了を待ってから例外を上げていた。ffmpeg に渡した締切が
+  # 一度も効いておらず、締切を超えた変換は孤児のまま完走し、締切の後に間に合った変換は
+  # 出力が出来ているのに失敗になっていた。
   class CommandLineDeadlineTest < TestCase
     def test_raises_at_deadline_and_kills_child
       nap = unique_sleep
