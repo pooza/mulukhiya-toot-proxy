@@ -231,8 +231,11 @@ git diff Gemfile.lock
   - ✅ **同日に PR #4812（#4726・`a1985181`）/ PR #4814（#4699・`d139a3f8`）/ PR #4815（#4612・`831d863b`）もマージ**。3 件ともクローズ
   - ✅ **5.40.0 の実装は出し切った。**open は出荷で閉じる #4801 / #4793 だけ。**#4789 は 5.41.0 へ送った**（前提の #4353 が fork への依頼で揃わない・ユーザー判断）
   - ✅ **ステージング 4 台（dev24〜27）を develop（`831d863b`）へ揃えた**（`config: OK`・3 サービスの restart rc=0・health 200）
-  - 📌 **次回の入口: リリース手順**（`/release-review` → `/release`）。⚠ **#4812 のブラウザでのログインの目視が残っている**
-    （dev26 `https://st3.mstdn.delmulin.com/mulukhiya/app/token`）。⚠ リリースゲートの harness は `831d863b` で回し直す
+  - 📌 **次回の入口: リリース手順**（`/release-review` → `/release`）。✅ **#4812 のブラウザでのログインの目視は 2026-10-11 に済んだ**
+    （ユーザーが dev26 `https://st3.mstdn.delmulin.com/mulukhiya/app/token` で認証し、`token_complete` に着いた）。
+    ⚠ **Mastodon は、同じアカウントが同じアプリを承認済みだと認可画面を出さずに callback へ戻す**（`force_login=true` を付けたときだけ出す）。
+    画面が出なくても Mastodon へ行って戻る経路は同じなので、合否は `token_complete` に着くかで見る。
+    別のブラウザへ持ち込む確認は、PR #4812 の API 直叩き（Cookie なし・別の Cookie が 403）で足りるので省いた。⚠ リリースゲートの harness は `831d863b` で回し直す
     （#4806 / #4814 で回したのは途中の HEAD）。
     → **2026-10-11: #4816 で develop が進んだので、ゲートの harness は `db6d3bc1` 以降で回す**（`b6ef6a5e` の実走は PR のブランチ）
   - **PR #4812（#4726）**: OAuth の state を発行したブラウザに縛る。`/mulukhiya/app/:page` が Cookie `mulukhiya_oauth_browser`
