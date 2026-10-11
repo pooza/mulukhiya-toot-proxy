@@ -14,6 +14,14 @@ module Mulukhiya
   #
   # ⚠ **上流の失敗（`Ginseng::GatewayError`）以外は、凌げていても鳴らす。**こちらのバグを
   # キャッシュの陰に隠さないため。
+  #
+  # 以下は 5.40.0 のリリース前レビューから。
+  # ⚠⚠ **空の結果で、中身のあるキャッシュを上書きしない。**Annict は不調のとき 200 で空の検索結果や
+  # `errors` だけを返すことがあり、`AnnictService#episodes` はそれを `[]` として返す。そのまま書くと
+  # 「凌ぐための結果」が空になり、続く障害の間ずっと空の辞書を返す。
+  # ⚠ キャッシュが無い・もともと空なら、空もそのまま書く（キーワード未設定の構成では空が正しい）。
+  # ⚠⚠ **アラートは 1 回の障害につき `alert` 秒に 1 回。**辞書は 10 分おきに引かれるので、
+  # 古さだけで判定すると 6 時間を超えた障害では取得のたびに鳴る（#4801 で消したかった状態に戻る）。
   class AnnictEpisodeDictionary
     include Package
 
@@ -28,23 +36,25 @@ module Mulukhiya
 
     def fetch
       @error = nil
+      @alert = false
       @cache = @storage.get(KEY)
       return @cache['entries'] if fresh?
       entries = build
+      return keep_cache if entries.empty? && cached_entries?
       @storage.set(KEY, entries)
+      @storage.clear_alert
       return entries
     rescue => e
       raise unless @cache
       @error = e
-      e.log(stale: true, age:) unless alert?
+      @alert = alert_due?
+      e.log(stale: true, age:) unless @alert
       return @cache['entries']
     end
 
     # 握った失敗を、呼び出し側が鳴らすべきか。
     def alert?
-      return false unless @error
-      return true unless @error.is_a?(Ginseng::GatewayError)
-      return config['/service/annict/dictionary/cache/alert'] < age
+      return @alert == true
     end
 
     # 返したキャッシュの古さ（秒）。キャッシュが無ければ nil。
@@ -54,6 +64,29 @@ module Mulukhiya
     end
 
     private
+
+    # ⚠ こちらのバグ（上流の失敗以外）は毎回 true。間引きは呼び出し側の `throttled_alert` に任せる。
+    # ⚠ 上流の失敗は、古さが `alert` 秒を超えていて、かつこの障害でまだ鳴らしていないときだけ。
+    def alert_due?
+      return true unless @error.is_a?(Ginseng::GatewayError)
+      seconds = config['/service/annict/dictionary/cache/alert']
+      return false unless seconds < age
+      return @storage.first_alert?(seconds)
+    end
+
+    def cached_entries?
+      return @cache.present? && @cache['entries'].present?
+    end
+
+    def keep_cache
+      logger.warn(
+        class: self.class.to_s,
+        message: 'empty result ignored (cache kept)',
+        age:,
+        cached: @cache['entries'].size,
+      )
+      return @cache['entries']
+    end
 
     def fresh?
       return false unless @cache

@@ -4,6 +4,8 @@ module Mulukhiya
   # ⚠ **読み書きの失敗は握って nil / false を返す。**キャッシュは Annict が遅いときの
   # 保険なので、Redis の不調で本来返せる応答まで落とさない。
   class AnnictDictionaryStorage < Redis
+    ALERT_KEY = 'alerted'.freeze
+
     def get(key)
       return nil unless entry = super
       values = JSON.parse(entry)
@@ -20,6 +22,23 @@ module Mulukhiya
     rescue => e
       e.log(key:)
       return false
+    end
+
+    # この障害でまだ鳴らしていなければ true（印を `seconds` 秒置く）。
+    #
+    # ⚠ **印を置けないときは true（鳴らす側）へ倒す。**Redis の不調でアラートまで黙らせない。
+    def first_alert?(seconds)
+      return acquire(ALERT_KEY, seconds)
+    rescue => e
+      e.log(key: ALERT_KEY)
+      return true
+    end
+
+    # 取得に成功したら印を消す（次の障害でまた 1 回鳴らすため）。
+    def clear_alert
+      unlink(ALERT_KEY)
+    rescue => e
+      e.log(key: ALERT_KEY)
     end
 
     def ttl

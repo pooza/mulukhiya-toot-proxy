@@ -42,7 +42,7 @@ updates:
   ignore:
     # #4702: ginseng-* は同期手順で gem ごとに判断する（上のコメント）
     - dependency-name: 'ginseng-*'
-    # #4699: json 3.0 はリリース翌日のメジャー。harness ＋ステージングで実走してから上げる
+    # #4699: json は 5.40.0 で 3.0 へ上げた。次の major も、harness ＋ステージングで実走してから上げる
     - dependency-name: json
       update-types: ['version-update:semver-major']
     # #4663 / #4678: 2026-02 の同時アクセステストを通った版。上げる判断は実測で行う

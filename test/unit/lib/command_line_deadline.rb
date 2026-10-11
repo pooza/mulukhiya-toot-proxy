@@ -41,14 +41,13 @@ module Mulukhiya
       assert_empty(running(nap))
     end
 
-    # 締切の前に終わったものは成功し、出力・状態・pid が取れる（上流と同じ見え方）。
+    # 締切の前に終わったものは、出力・状態・pid が取れる（締切なしのときと同じ見え方）。
     def test_finishes_before_deadline
       command = CommandLine.new(['sh', '-c', 'echo out; echo err >&2; exit 3'])
+      plain = CommandLine.new(command.args)
+      plain.exec
 
-      upstream = CommandLine.new(command.args)
-      upstream.exec
-
-      assert_equal(upstream.status, command.exec(timeout: 10))
+      assert_equal(plain.status, command.exec(timeout: 10))
       assert_false(command.status.zero?)
       assert_equal("out\n", command.stdout)
       assert_equal("err\n", command.stderr)
@@ -63,8 +62,8 @@ module Mulukhiya
       assert_equal(300_000, command.stdout.bytesize)
     end
 
-    # ⚠ 締切を渡さない呼び出しは上流のまま。
-    def test_without_timeout_uses_upstream
+    # ⚠ 締切を渡さない呼び出しも従来どおり動く。
+    def test_without_timeout
       command = CommandLine.new(['echo', 'ok'])
 
       assert_equal(0, command.exec)

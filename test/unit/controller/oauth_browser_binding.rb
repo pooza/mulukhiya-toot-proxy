@@ -66,6 +66,21 @@ module Mulukhiya
       assert_nil(@service.exchanged, 'トークン交換まで進んでいる')
     end
 
+    # ⚠ 原因を文言で分ける（5.40.0 のリリース前レビュー）。403 は syslog 止めなので、同じ文言だと
+    # 「別のブラウザで戻ってきた」と「期限切れ」を見分けられない。
+    def test_rejection_messages_tell_the_cause
+      state = issue('nonce-of-the-attacker-browser-00000000000')
+      mismatch = assert_raise(Ginseng::AuthError) do
+        @service.auth_with_pkce('code', state, browser: 'nonce-of-the-victim-browser-000000000000')
+      end
+      expired = assert_raise(Ginseng::AuthError) do
+        @service.auth_with_pkce('code', 'no-such-state', browser: 'nonce-of-the-victim-browser-000000000000')
+      end
+
+      assert_match(/browser mismatch/, mismatch.message)
+      assert_match(/expired or already used/, expired.message)
+    end
+
     def test_missing_cookie_is_rejected
       state = issue('nonce-of-the-attacker-browser-00000000000')
 
