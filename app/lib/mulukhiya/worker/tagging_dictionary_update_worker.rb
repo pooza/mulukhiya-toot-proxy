@@ -12,8 +12,12 @@ module Mulukhiya
       # 外部の辞書 API を叩いてしまう (#4506)。
       return if disable?
       dictionary = TaggingDictionary.new
-      dictionary.refresh
-      log(entries: dictionary.size)
+      # ⚠ **手動の更新（管理画面・rake）は `'force' => true` を渡す (#4690)。**ソースごとの
+      # 取得間隔を無視して全部取りにいく。定時（sidekiq-scheduler）は引数なし＝間隔に従う。
+      # ⚠ Sidekiq の引数は JSON を往復するので、キーは文字列で来る。
+      force = params.is_a?(Hash) && params['force'] == true
+      dictionary.refresh(force:)
+      log(entries: dictionary.size, force:)
       return dictionary
     end
   end

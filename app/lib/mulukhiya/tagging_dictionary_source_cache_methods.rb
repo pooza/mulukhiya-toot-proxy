@@ -44,7 +44,11 @@ module Mulukhiya
     # ⚠ **使い回した回は `@empty_sources` にも `@substituted_sources` にも積まない。**
     # 上流は落ちていない。本数は `@reused_sources` で別に数える。
     # ⚠ 印はあるのに last-good が無い（消えた・壊れた）ときは nil ＝ 取りにいく。
+    # ⚠ 手動の更新（`refresh(force: true)`）は印を見ない。取れたら印は置き直される。
     def reuse_source(dic)
+      # 🔴 **手動の更新は使い回さない（PR #4828 の Codex P2）。**上流の辞書を直してから
+      # 「更新」を押した人に、最大 `interval` ぶん古い内容を返し続けることになる。
+      return nil if @force_refresh
       return nil unless source_interval(dic)
       return nil unless redis[fresh_key(dic)]
       raw = redis[source_key(dic)]

@@ -97,6 +97,27 @@ module Mulukhiya
       assert_empty(@dic.instance_variable_get(:@substituted_sources).to_a)
     end
 
+    # 🔴 **手動の更新は間隔を無視して取りにいく（PR #4828 の Codex P2）。**上流を直してから
+    # 「更新」を押した人に、古い内容を返し続けない。
+    def test_forced_refresh_bypasses_the_interval
+      @source.interval = 3600
+      fetch_source(@source)
+      reset_counters
+      updated = {'new' => {words: ['new']}}
+      @source.words = updated
+      @dic.instance_variable_set(:@force_refresh, true)
+
+      assert_equal(updated, fetch_source(@source))
+      assert_equal(2, @source.parsed)
+      assert_empty(@dic.instance_variable_get(:@reused_sources).to_a)
+
+      # ⚠ 取り直した内容が、次の定時の回で使い回される（印も last-good も置き直されている）。
+      @dic.instance_variable_set(:@force_refresh, false)
+
+      assert_equal(updated, fetch_source(@source))
+      assert_equal(2, @source.parsed)
+    end
+
     # ⚠ 既定（`interval` なし）は、これまでどおり毎回取りにいく。
     def test_source_without_interval_is_fetched_every_time
       2.times {fetch_source(@source)}

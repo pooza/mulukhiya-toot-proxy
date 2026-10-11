@@ -74,7 +74,10 @@ module Mulukhiya
       return @signature
     end
 
-    def refresh
+    # ⚠ **`force: true` は、ソースごとの取得間隔（`dics[].interval`・#4690）を無視して全部取りにいく。**
+    # 管理画面・rake からの手動更新が渡す（PR #4828 の Codex P2）。定時の更新は渡さない。
+    def refresh(force: false)
+      @force_refresh = force
       entries = merge(fetch)
       clear
       # ⚠⚠ **全滅は last-good で埋めても鳴らす (#4659 の ②)。**埋まれば
