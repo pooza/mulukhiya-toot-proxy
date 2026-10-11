@@ -14,6 +14,15 @@ module Mulukhiya
       end
     end
 
+    # 🔴 **スキーマのファイルが無いハンドラは、検査が丸ごと素通りになる（PR #4825 の Codex P2）。**
+    # `all_schema` はファイルから組むので、パイプラインに居るのにファイルが無いと
+    # `disabled: true` も型の違う `disable` も通る。`scheduled_status_save` がそうだった。
+    def test_every_handler_in_the_pipeline_has_a_schema
+      declared = Handler.all_schema[:properties].keys.to_set(&:to_s)
+
+      assert_empty(Handler.all_names.to_set - declared)
+    end
+
     def test_disable_is_declared_as_boolean
       assert_empty(validate(handler: {default_tag: {disable: true}}))
       assert_not_empty(validate(handler: {default_tag: {disable: 'true'}}))
