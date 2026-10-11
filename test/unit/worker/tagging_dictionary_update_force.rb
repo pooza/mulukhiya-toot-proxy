@@ -37,9 +37,22 @@ module Mulukhiya
       assert_true(@calls.last)
     end
 
+    # 🔴 development / test では `Worker.perform_async` がキーをシンボルにして同期で呼ぶ
+    # （PR #4828 の Codex P2）。入口から通して、`force` が届くこと。
+    def test_manual_run_forces_through_synchronous_dispatch
+      worker = @worker
+      original = TaggingDictionaryUpdateWorker.method(:new)
+      TaggingDictionaryUpdateWorker.define_singleton_method(:new) {|*| worker}
+      TaggingDictionaryUpdateWorker.perform_async('force' => true)
+
+      assert_true(@calls.last)
+    ensure
+      TaggingDictionaryUpdateWorker.define_singleton_method(:new, original)
+    end
+
     # ⚠ 真偽値の `true` だけを通す（文字列やシンボルのキーで、黙って全取得に倒さない）。
     def test_other_params_do_not_force
-      [{'force' => 'true'}, {force: true}, {'force' => 1}, nil, 'force'].each do |params|
+      [{'force' => 'true'}, {force: 'true'}, {'force' => 1}, {}, nil, 'force'].each do |params|
         @worker.perform(params)
       end
 
