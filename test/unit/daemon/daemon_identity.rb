@@ -1,14 +1,17 @@
 module Mulukhiya
   # pid ファイルが指すプロセスの身元確認 (#4792)。
   #
-  # ⚠ **実プロセスを立てて `ps` を通す。**`process_command` を差し替えると、
+  # ⚠ **実プロセスを立てて `ps` を通す。**`process_command_line` を差し替えると、
   # 「`ps` の引数が FreeBSD / Linux で通るか」「proctitle がどう見えるか」を見ないまま緑になる。
+  # ⚠ 判定は gem（`Ginseng::Daemon` の `process_pattern`）が持つ (#4817)。ここで見るのは、
+  # 3 デーモンの宣言が実物の姿に合っているか。
   class DaemonIdentityTest < TestCase
     TAG = File.basename(Environment.dir)
     PUMA_TITLE = "puma 8.0.2 (tcp://0.0.0.0:3008) [#{TAG}]".freeze
     SIDEKIQ_TITLE = "sidekiq 8.1.7 #{TAG} [0 of 5 busy]".freeze
     LISTENER_TITLE = 'bin/listener_daemon.rb start'.freeze
     WAIT_SECONDS = 5
+    GEM_OWNED = [:alive_state_of, :launcher_pattern, :exec_pattern].freeze
 
     def setup
       @pids = []
@@ -109,13 +112,39 @@ module Mulukhiya
     def test_identity_unavailable
       pid = spawn_process('sleep', '30')
       daemon = PumaDaemon.new
-      daemon.define_singleton_method(:process_command) {|_| ''}
+      daemon.define_singleton_method(:process_command_line) {|_| ''}
 
       assert_equal(:alive, daemon.alive_state_of(pid))
 
-      daemon.define_singleton_method(:process_command) {|_| raise Errno::ENOENT, 'ps'}
+      daemon.define_singleton_method(:process_command_line) {|_| raise Errno::ENOENT, 'ps'}
 
       assert_equal(:alive, daemon.alive_state_of(pid))
+    end
+
+    # 🔴 `exec` の最中は、コマンド行が一瞬 `[ruby]` のような姿になる (#4817)。
+    # 自前の実装はこれを他人と答えていた（`stop` が重なると TERM を送らずに pid ファイルだけ消す）。
+    def test_bracketed_command_line_is_unknown
+      pid = spawn_process('sleep', '30')
+
+      ['[ruby]', '[ruby] <defunct>'].each do |line|
+        daemon = PumaDaemon.new
+        daemon.define_singleton_method(:process_command_line) {|_| line}
+
+        assert_equal(:alive, daemon.alive_state_of(pid), line)
+      end
+    end
+
+    # 🔴 **宣言は `Regexp`、かつ自前の実装を戻していないこと (#4817)。**同名のメソッドを
+    # モロヘイヤ側に置くと、そちらが勝って gem の判定が使われなくなる。
+    def test_daemons_declare_pattern_and_leave_the_rest_to_the_gem
+      [PumaDaemon, SidekiqDaemon, ListenerDaemon].each do |daemon_class|
+        assert_kind_of(Regexp, daemon_class.new.process_pattern, daemon_class.to_s)
+        GEM_OWNED.each do |name|
+          owner = daemon_class.instance_method(name).owner.to_s
+
+          assert_match(/\AGinseng::/, owner, "#{daemon_class}##{name}")
+        end
+      end
     end
 
     # 受け入れ条件: 別プロセスの PID が入った pid ファイルがあっても起動を拒まない。
@@ -176,7 +205,7 @@ module Mulukhiya
       daemon = create_daemon(pid)
       signals = []
       daemon.define_singleton_method(:send_signal) {|*args| signals.push(args)}
-      daemon.define_singleton_method(:process_command) {|_| ''}
+      daemon.define_singleton_method(:process_command_line) {|_| ''}
 
       silence_stderr {daemon.send(:run_stop)}
 

@@ -32,7 +32,7 @@ module Mulukhiya
     # ⚠ sidekiq は proctitle を "sidekiq <version> <作業ディレクトリ名> [0 of 5 busy]" へ
     # 書き換える。書き換える前は "ruby .../bin/sidekiq --require <Environment.dir>/..."。
     # ⚠ 同じホストの Mastodon の sidekiq を自分と誤らないよう、タグまで含めて絞る。
-    def identity_pattern
+    def process_pattern
       return Regexp.union(
         launcher_pattern('sidekiq_daemon.rb'),
         exec_pattern('sidekiq', '--require', initializer_path),
