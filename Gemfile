@@ -65,7 +65,7 @@ group :development do
   # RuboCop 設定の正本。本体と minitest/performance/rake プラグインもこの gem が抱える。
   # ⚠⚠ タグではなく SHA で固定する（pooza/ginseng-style#75）。タグは付け替えられる。
   gem 'ginseng-style', github: 'pooza/ginseng-style',
-    ref: 'ed862dcf9550d704ee670f65a30a333a694b883a', require: false # v1.1.12
+    ref: '2818c5618476302e4a10454f1b621502a053f492', require: false # v1.1.14
   gem 'ostruct' # https://github.com/pooza/mulukhiya-toot-proxy/issues/4229
   gem 'rack-test'
   gem 'rails-erb-lint'
