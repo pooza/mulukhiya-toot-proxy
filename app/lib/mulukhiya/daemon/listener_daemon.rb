@@ -18,7 +18,7 @@ module Mulukhiya
 
     # ⚠ listener は `exec` しないので、proctitle は "bin/listener_daemon.rb start" のまま
     # （FreeBSD の `ps` では "ruby: bin/listener_daemon.rb start (ruby)"）。
-    def identity_pattern
+    def process_pattern
       return launcher_pattern('listener_daemon.rb')
     end
 
