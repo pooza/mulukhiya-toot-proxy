@@ -210,32 +210,45 @@ git diff Gemfile.lock
   - ステージング dev24 / dev26 / dev27 で health 200・エラー行 0
 - ✅ **PR #4824 — 2026-10-12（`6116104f`）・ユーザー承認**: ginseng-style v1.1.14（rubocop 1.91.0 / rubocop-minitest 0.41.0）。新しい指摘は 0 件
 
+- ✅ **PR #4825（#4700）— 2026-10-12（`34923a92`）・ユーザー承認**: 設定スキーマの穴 3 件。ハンドラのスキーマ 41 本の `disabled` を `disable` に揃え、
+  `disabled` と書いたら検査で落とす（`default.yaml`・`not: {}`）／`dics[].fields`／`program.auto_update`。#4700 はクローズ
+  - Codex P2 × 1 に対処: `scheduled_status_save` はスキーマのファイルが無く、検査が素通りだった → ファイルを足し、全ハンドラがスキーマを持つことをテストで見る
+  - 本番 4 台・ステージング 4 台の設定に `disabled:` は 0 行
+  - ⚠ **リリースノートに書く**: `disabled:` を書いていると警告が出る・`/config/validation/strict: true` なら起動が止まる
+- ✅ **PR #4827（#4817）— 2026-10-12（`847f0186`）・ユーザー承認**: デーモンの身元確認を gem の `process_pattern` へ。自前の `alive_state_of` ほかを削除
+  （`identity_tag` だけ残る）。#4817 はクローズ。dev27（systemd）・dev26（rc.d）で、pid ファイルへ無関係な `sleep` の番号を書いた状態から
+  3 デーモンとも起動し、`sleep` は生きたまま。⚠ ログが変わる: info の `pid file points to another process` → warn の `process identity mismatch`
+- ✅ **PR #4826 — 2026-10-12（`8d8e7e02`）・ユーザー承認**: `bundle update`（net-http 0.10.0 / redis-client 0.31.0 / mime-types-data / webmock 3.29.0）。
+  harness（`d6bc419e`）は両系 0 failures / 0 errors
+- ✅ **6 本をマージした後の develop（`8d8e7e02`）で harness を実走（2026-10-12 07:35〜07:50 JST・系ごとに別シェル）**:
+  Mastodon 1719 tests / 3652 assertions / **0 failures / 0 errors** / 159 omissions（`TestHarness: controller=mastodon url=http://localhost:3000`）、
+  Misskey 1722 tests / 3705 assertions / **0 failures / 0 errors** / 145 omissions（`TestHarness: controller=misskey url=http://localhost:3001`）。
+  ＝ ginseng-core 2.4.2 ＋ net-http 0.10.0 の組み合わせも通っている。⚠ このあと develop にコードが入ったら、リリースゲートは回し直す
+- ✅ **ステージング 4 台（dev24〜27）を develop（`8d8e7e02`）へ揃えた**（`config: OK`・3 サービスの restart rc=0・health 200）
+
 ### 出してある PR（マージはユーザーの承認待ち）
 
-- **PR #4825（#4700）**: 設定スキーマの穴 3 件。ハンドラのスキーマ 41 本の `disabled` を `disable` に揃え、`disabled` と書いたら検査で落とす
-  （`default.yaml`・`not: {}`）／`dics[].fields`／`program.auto_update`。CI 両系 SUCCESS。
-  Codex P2 × 1 に対処（`scheduled_status_save` はスキーマのファイルが無く、検査が素通りだった → ファイルを足し、全ハンドラがスキーマを持つことをテストで見る）。再レビューは指摘なし。
-  本番 4 台・ステージング 4 台の設定に `disabled:` は 0 行。
-  ⚠ **リリースノートに書く**: `disabled:` を書いていると警告が出る・`/config/validation/strict: true` なら起動が止まる
-- **PR #4826**: `bundle update`（net-http 0.10.0 / redis-client 0.31.0 / mime-types-data / webmock 3.29.0）。
-  **harness（`d6bc419e`）**: Mastodon 1706 tests / 0 failures / 0 errors / 159 omissions（`controller=mastodon`）、
-  Misskey 1709 tests / 0 failures / 0 errors / 145 omissions（`controller=misskey`）。
-  develop を取り込んだ `5361884b` を dev24 / dev25 / dev27 に載せて health 200・エラー行 0。
-  ⚠ core 2.4.2 ＋ net-http 0.10.0 の組み合わせでの harness はリリースゲートで回す
-- **PR #4827（#4817）**: デーモンの身元確認を gem の `process_pattern` へ。自前の `alive_state_of` ほかを削除（`identity_tag` だけ残る）。
-  dev27（systemd）・dev26（rc.d）で、pid ファイルへ無関係な `sleep` の番号を書いた状態から 3 デーモンとも起動し、`sleep` は生きたまま。CI 両系 SUCCESS
+- **PR #4828（#4690・機能が前へ進む枠）**: 辞書ソースごとの取得間隔 `dics[].interval`（秒）。間隔の内側は上流を引かず、直前の成功分（last-good）を使う。
+  既定は今までどおり毎回。印の寿命は `interval` − 600 秒（ワーカーの周期ぶん）・失敗した回は印を置かない・世代ログに `reused_sources`。
+  - **前提の実測（#4690 にコメント）**: GAS は `ETag` も `Last-Modified` も返さず `no-store` ＝ **条件付き GET は使えない**
+  - **dev25 で実物の GAS を通した**（`5d1c0b38`）: `singer.json` / `series.json` に `interval: 3600` → 2 回目の更新から `reused_sources: 2`・語数 3965 のまま。
+    ⚠ dev25 はこのブランチ・設定に `interval` を入れたまま（バックアップは `config/local.yaml.bak-4690`）
+  - 📌 **本番のどのソースにどの間隔を入れるかは未決**（設定の話・ユーザーと決める）。⚠ ニチアサの直前に直す運用があるソースには長い間隔を付けない
 
-### ステージングの現在地（2026-10-12 07:40 JST）
+### ステージングの現在地（2026-10-12 08:00 JST）
 
-dev24 / dev25 / dev27 は PR #4826 のブランチ（`5361884b`）、dev26 は PR #4827 のブランチ（`e64c1a09`）。**マージ後に 4 台を develop へ揃える。**
+dev24 / dev26 / dev27 は develop（`8d8e7e02`）、dev25 は PR #4828 のブランチ（`5d1c0b38`）。
 
 ### 残り
 
-- open（8 件）: #4817（PR #4827）/ #4700（PR #4825）/ #4789（Mastodon の media_catalog の既定を true に・#4353 待ち）/
-  #4756 / #4690 / #4678 / #4628 / #4465（L）
+- open（6 件）: #4690（PR #4828）/ #4789（Mastodon の media_catalog の既定を true に・#4353 待ち）/ #4756 / #4678 / #4628 / #4465（L）
+- **#4628 の残りは 2 件**（失効時に投稿経路で一斉取得／据え置きの回に本体 TTL を延ばさない）。「壊れたときの振る舞い」を先に決める話なので、案を出してから手を入れる
+- **#4756**（プロセス内キャッシュ・約 9 ms）は、読み手側（`TagSearchService#search` / `TaggingDictionary#concat`）の書き換えを先に直す
 - ⚠ **Issue は develop へのマージでは自動で閉じない**（`Closes` が効くのは既定ブランチ main だけ）。マージしたら手で閉じる
 - ⚠ **作業ツリーを harness が使っている間は、別の worktree で作業する**（ブランチを切り替えると実走中の HEAD が変わる）。
   worktree には `config/local.yaml` が無いので、harness を回すブランチは主ツリーに置く
+  （worktree の `rake test` は `'/crypt/password' not found` で errors 2 が出る・変更と無関係）
+- ⚠ **辞書のキャッシュを消すテストは、harness の実走中に回さない**（同じ Redis を使う）
 - ⚠ ステージングへブランチを渡すスクリプトで `$B:refs/...` と書くと、zsh が `:r` を修飾子として食う。`${B}:refs/...` と書く
 
 ## リリース済み: 5.40.0（2026-10-11）
