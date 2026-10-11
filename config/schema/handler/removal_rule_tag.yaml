@@ -1,7 +1,7 @@
 label: タグ除去ルール
 description: パターンマッチに基づいてハッシュタグを除去します
 properties:
-  disabled:
+  disable:
     type: boolean
   rules:
     items:

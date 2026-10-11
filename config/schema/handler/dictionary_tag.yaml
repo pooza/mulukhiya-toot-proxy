@@ -21,6 +21,10 @@ properties:
           required:
             - url
           type: object
+        fields:
+          items:
+            type: string
+          type: array
         name:
           type: string
         strict:
@@ -39,7 +43,7 @@ properties:
         - url
       type: object
     type: array
-  disabled:
+  disable:
     type: boolean
   retry:
     properties:

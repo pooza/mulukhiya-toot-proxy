@@ -1,7 +1,7 @@
 label: ユーザー設定コマンド
 description: コマンドでユーザー設定を更新します
 properties:
-  disabled:
+  disable:
     type: boolean
   timeout:
     minimum: 1

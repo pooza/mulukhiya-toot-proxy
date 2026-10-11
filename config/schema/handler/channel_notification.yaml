@@ -15,7 +15,7 @@ properties:
         - notify_to
       type: object
     type: array
-  disabled:
+  disable:
     type: boolean
   timeout:
     minimum: 1

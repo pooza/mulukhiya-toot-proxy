@@ -1,7 +1,7 @@
 label: PieFedクリッピング
 description: コマンドでPieFedクリッピングを作成します
 properties:
-  disabled:
+  disable:
     type: boolean
   timeout:
     minimum: 1

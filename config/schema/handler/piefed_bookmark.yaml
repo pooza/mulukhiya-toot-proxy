@@ -1,7 +1,7 @@
 label: PieFedブックマーク
 description: PieFedサーバーにブックマークを作成します
 properties:
-  disabled:
+  disable:
     type: boolean
   timeout:
     minimum: 1

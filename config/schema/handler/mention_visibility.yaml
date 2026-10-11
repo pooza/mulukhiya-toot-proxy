@@ -1,7 +1,7 @@
 label: メンション公開範囲
 description: エージェントへのメンションをダイレクトに設定します
 properties:
-  disabled:
+  disable:
     type: boolean
   timeout:
     minimum: 1

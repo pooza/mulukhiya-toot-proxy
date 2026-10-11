@@ -3,8 +3,13 @@ description: 全ハンドラーの共通既定値
 properties:
   disable:
     type: boolean
+  # ⚠⚠ **`disabled` は読まれない (#4700)。**実行時に見るのは `disable` だけなので、
+  # `disabled: true` と書いても何も起きない。以前はここと全ハンドラのスキーマが
+  # `disabled` を宣言していて、書いた設定が検査を通って黙って効かなかった。
+  # どんな値でも検査で落とす（`not: {}` は「何にも一致しない」）。
   disabled:
-    type: boolean
+    description: 読まれないキーです。disable と書いてください
+    not: {}
   timeout:
     minimum: 1
     type: integer

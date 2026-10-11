@@ -1,7 +1,7 @@
 label: 無効コマンド検出
 description: 無効または空のコマンドを検出して拒否します
 properties:
-  disabled:
+  disable:
     type: boolean
   timeout:
     minimum: 1

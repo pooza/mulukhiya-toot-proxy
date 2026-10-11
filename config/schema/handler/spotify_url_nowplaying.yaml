@@ -1,7 +1,7 @@
 label: Spotify URL NowPlaying
 description: Spotify URLをNowPlaying形式に変換します
 properties:
-  disabled:
+  disable:
     type: boolean
   timeout:
     minimum: 1
