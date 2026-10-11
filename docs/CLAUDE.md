@@ -196,6 +196,8 @@ git diff Gemfile.lock
   redis-client 0.30.1 → 0.31.0（10-05）/ mime-types-data / webmock 3.28.0。⚠ net-http と redis-client は実行時の経路なので、harness とステージングを通す。
   ⚠ redis-client は `Redis#acquire_token` の撃ち直しが例外の型（`ConnectionError` / `CannotConnectError`）に依存している
 - ginseng-style `ed862dcf` → v1.1.14（rubocop-minitest 0.41.0）も未着手。lint の指摘が増えうるので単独で
+- 🆕 **ginseng-core v2.4.0 → v2.4.2 / ginseng-fediverse v5.0.0 → v6.0.0**（2026-10-12 の同期で検出・Issue 未起票）。
+  core は署名付き URL のクエリをログでマスクする（security）。fediverse 6.0.0 の破壊的変更は、上書きしている口なので届かない。詳細は 10-12 の同期の記録
 - open（8 件）: #4817（デーモンの身元確認を gem の `process_pattern` へ）/ #4789（Mastodon の media_catalog の既定を true に・#4353 待ち）/
   #4756 / #4700 / #4690 / #4678 / #4628 / #4465（L）
 
@@ -902,6 +904,47 @@ Slack / LINE / メールには出なくなるが、**周期実行でメールを
 - ⚠ `Program` は singleton なので、差し替えた `logger` は `ensure` で必ず外す
 - 実測: `rake lint` 無指摘 / `rake test` **1413 tests・0 failures・0 errors**
   （develop ベースライン 1387 から **+26 ＝ 追加したぶんちょうど**）
+
+### 2026-10-12 セッション同期の記録
+
+**本番には触っていない**（辞書台帳の生成と Sentry `-35` / `-36` の裏取りで本番 4 台へ SSH した読み取りのみ）。月曜の 06:30 JST ごろに実施。
+chubo2 の Issue 棚卸し（10-02）と harness upstream（`last_checked` 10-10・2 日）はスキップ。
+
+- **ブランチ**: `develop` は `origin/develop` と同一・未コミット無し。CI は `0dcfd23d` で `success`
+- **Dependabot**: open アラート **0 件**
+- **open PR**: #4819（掃除 8 件）だけ。CI 両系 SUCCESS・`MERGEABLE` / `CLEAN`。**マージはユーザーの承認待ち**
+- **Codex / 申し送り**: 直近マージ 5 本（#4812 / #4814 / #4815 / #4816 / #4818）と open 1 本の行コメント・PR 本体コメントとも**未消化ゼロ**
+- **5.41.0**: open 9 件（Issue 8 ＋ PR #4819）/ closed 0 件。マイルストーンの無い open Issue は on-hold の 8 件だけ
+- **ginseng-\* のピン**: 🆕 **前回の同期のあと（10-11 05:00〜06:00 JST）にタグが 4 本切られた**。こちらの Issue は立っていない
+  - **core v2.4.0 → v2.4.2**（v2.4.1 / v2.4.2・security）: 署名付き URL のクエリ（`signature` / `sig` / `x-amz-signature` / `hm` / `jwt` など）を
+    既定でマスクする＝**いまはログに平文で残っている**。`TooLargeError` の文言から URL が外れた（こちらのたたき台 pooza/ginseng-core#686 の着地）。
+    ⚠ `guard_redirects!` を挿した HTTP は、上の名前をクエリに持つ要求の 3xx を追わなくなる（モロヘイヤの `app/` に `guard_redirects` は 0 件）
+  - **fediverse v5.0.0 → v6.0.0**（v5.0.1 / v6.0.0・破壊的）: `Service#upload_remote_resource` が取得先のホストを検証する。
+    ⚠ **モロヘイヤは `upload_remote_resource` を上書きしている**（`sns_service_methods.rb`・取得は `MediaFile.download`）ので、この変更は届かない
+    （リリースノートにも同じ記載）。gemspec の core の床は変わっていない
+  - **判断: ② 5.41.0 で取り込む**（core と fediverse を 1 本で・harness 両系とステージングを通す）。📌 **Issue の起票とマイルストーンはユーザーの判断待ち**
+  - 既知のまま: youtube v3.0.2（③ 見送り）/ style `ed862dcf` → v1.1.14（5.41.0 で単独で）
+- **chubo2**: `origin/main` と同一。`infra-note.md` の変更なし。open 24 件（前回 24・新規なし）
+- **Annict の API**: 基準（2026-10-06）と同じ。公式アカウントの最新も 10-06 のまま
+- **辞書台帳**: **🔴 は前回と同じ 3 件**（直書き 1 / 台帳に無い 2）・**🔴 死亡 0**。🟡 間欠が gomander の `precure.ml/api/dic/v1/*` 7 本に出た
+  （1〜9/141）のは、下の名前解決の失敗の時間帯のぶん。再生成を chubo2 へコミット済み（`0290d5f`）
+
+#### Sentry
+
+- unresolved **33 件**（前回 31）。**コメント 0 が 2 件**あったので、裏を取って判断を書いた（コメント 0 は 0 件に戻した）
+  - `-35`（count=3・10-11T15:04Z〜15:47Z・gomander・5.40.0・`AnnouncementWorker`）と
+    `-36`（count=2・10-11T15:18Z〜15:33Z・同・`StartupNotificationWorker`）: **自ドメイン `precure.ml` の名前解決が
+    10-11 23:57〜10-12 01:16 JST に間欠的に失敗した**（`getaddrinfo(3): Name does not resolve`・syslog に 336 行）
+  - **失敗した名前は `precure.ml` だけ**（同じ窓で宛先 895 本のうち 311 本が失敗。`api.annict.com` 654 本などは引けている）。
+    外形監視 `-1W`（Downtime detected）も 23:56 JST に出ている＝外からも引けていない。
+    同じ並びのリゾルバを使う shallu / zugoga は 0 行なので、**リゾルバ（1.1.1.1 など）全体の障害ではない**（ユーザーの問いへの答え）。
+    権威 DNS が同じ兄弟ドメインは無事なので `.ml` の TLD 側が疑わしいが、事後で未特定
+  - ⚠⚠ **副作用: monit がモロヘイヤを 4 回再起動した**（00:12 / 00:26 / 00:28 / 00:37 JST）。`/mulukhiya/api/health` が
+    `https://precure.ml/api/v1/streaming/health` を**公開名で**引くので、名前が引けないと 503 になる。**再起動しても直らない失敗で再起動が走る。**
+    `-36` はその再起動のたびに起動通知が同じ失敗で落ちたもの。📌 **手を入れるかはユーザーの判断待ち**（起票していない）
+  - 経緯は chubo2 `infra-history.md` に書いた
+  - ⚠ 2 件目のコメントを書くとき、一時ファイルの上書きが zsh の noclobber で失敗し、`-36` に `-35` の文面が入った。消して書き直した
+- `-2X` は count=581・`-2Y` は count=34 で前回から変化なし。ほかも変化なし
 
 ### 2026-10-11 セッション同期の記録
 
