@@ -57,7 +57,63 @@ module Mulukhiya
       end
     end
 
+    # ⚠⚠ **自サーバーの名前が引けないだけなら NG にしない (#4821)。**NG は health 全体を
+    # 503 にし、monit が再起動する。名前解決の失敗は再起動しても直らない。
+    # ⚠ gem は `Socket::ResolutionError` を `GatewayError` に包むので、その形で投げる。
+    def test_name_resolution_failure_is_not_ng
+      omit('ストリーミングの確認は Mastodon 系だけ') unless Environment.mastodon?
+      File.write(@pid_path, Process.pid.to_s)
+      error = wrapped(Socket::ResolutionError.new('getaddrinfo(3): Name does not resolve'))
+      stub(:check_streaming_endpoint) {raise error}
+      health = ListenerDaemon.health
+
+      assert_equal('OK', health[:status])
+      assert(health[:unresolved])
+      assert_includes(health[:error], 'Name does not resolve')
+    end
+
+    # ⚠ 外すのは名前解決だけ。繋がって 5xx・接続拒否は NG のまま（修正を広げすぎない）。
+    def test_other_streaming_failures_stay_ng
+      omit('ストリーミングの確認は Mastodon 系だけ') unless Environment.mastodon?
+      File.write(@pid_path, Process.pid.to_s)
+      [RuntimeError.new('streaming returned 502'), wrapped(Errno::ECONNREFUSED.new)].each do |error|
+        stub(:check_streaming_endpoint) {raise error}
+        health = ListenerDaemon.health
+
+        assert_equal('NG', health[:status], error.message)
+        assert_nil(health[:unresolved])
+      end
+    end
+
+    # ⚠ listener が居ないのに「名前が引けないだけ」と読まない（生死の確認が先）。
+    def test_dead_listener_is_ng_even_if_unresolvable
+      stub(:system) {|*| false}
+      error = wrapped(Socket::ResolutionError.new('getaddrinfo'))
+      stub(:check_streaming_endpoint) {raise error}
+
+      assert_equal('NG', ListenerDaemon.health[:status])
+    end
+
+    def test_name_resolution_error?
+      assert(ListenerDaemon.name_resolution_error?(wrapped(Socket::ResolutionError.new('x'))))
+      assert(ListenerDaemon.name_resolution_error?(SocketError.new('getaddrinfo: Name or service not known')))
+      assert(ListenerDaemon.name_resolution_error?(Ginseng::GatewayError.new('Failed to open TCP connection to a:443 (getaddrinfo(3): x)')))
+      assert_false(ListenerDaemon.name_resolution_error?(wrapped(Errno::ECONNREFUSED.new)))
+      assert_false(ListenerDaemon.name_resolution_error?(RuntimeError.new('streaming returned 503')))
+    end
+
     private
+
+    # gem の HTTP と同じ形（元の例外を `cause` に持つ `GatewayError`）を作る。
+    def wrapped(cause)
+      begin
+        raise cause
+      rescue
+        raise Ginseng::GatewayError, "Failed to open TCP connection (#{cause.message})"
+      end
+    rescue Ginseng::GatewayError => e
+      return e
+    end
 
     def stub(name, &)
       unless @stubs.key?(name)

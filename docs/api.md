@@ -728,6 +728,17 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 
 クライアント・監視は `postgres.pool&.waiting` の形で読み、**欠けていたら「観測できていない」として扱う**こと。
 
+**`streaming` は、自サーバーの名前が引けないだけなら `NG` にしない**（5.41.0〜、#4821）。Mastodon 系では listener の生死に加えて
+自サーバーの `/api/v1/streaming/health` を公開名で確かめるが、**名前解決の失敗は再起動しても直らない**。
+`status` を倒すと全体が 503 になり、health を再起動の引き金にしている監視（monit など）が、名前が戻るまで再起動を繰り返す。
+
+```json
+"streaming": {"status": "OK", "unresolved": true, "error": "Failed to open TCP connection to example.com:443 (getaddrinfo(3): Name does not resolve)"}
+```
+
+⚠ **`status` は `OK` のまま**なので、監視側は `unresolved` / `error` の有無を別に見ること（`pgbouncer.error` と同じ扱い）。
+⚠ 外すのは名前解決の失敗だけ。listener が居ない・接続拒否・タイムアウト・200 以外の応答は `NG`（＝全体 503）のまま。
+
 **`ruby` は構成乖離の検知用** (#4466)。YJIT は Rust の無い環境ではビルド時に黙って外れ、エラーにならないまま 24〜25% 遅いサーバーが出来上がるため、能力を可視化する。
 
 **既定では `status` が `NG` になることはない**（能力の欠落は障害ではなく、health が 503 になるとサーバーが「停止」扱いになるため）。確実に検知したいサーバーは `/runtime/require_yjit` を `true` にすると、YJIT が有効でない場合に `NG`（＝全体 503）になる。
