@@ -19,7 +19,9 @@ module Mulukhiya
   # ⚠⚠ **空の結果で、中身のあるキャッシュを上書きしない。**Annict は不調のとき 200 で空の検索結果や
   # `errors` だけを返すことがあり、`AnnictService#episodes` はそれを `[]` として返す。そのまま書くと
   # 「凌ぐための結果」が空になり、続く障害の間ずっと空の辞書を返す。
-  # ⚠ キャッシュが無い・もともと空なら、空もそのまま書く（キーワード未設定の構成では空が正しい）。
+  # ⚠ キャッシュが無い・もともと空なら、空もそのまま書く。
+  # ⚠ **見る作品が 0 件のときの空は、正しい答えとして書く**（PR #4819 の Codex P2）。キーワードを外した
+  # 設定変更が、キャッシュの寿命（7 日）まで効かなくなるため。守るのは「作品はあるのに回が空」のときだけ。
   # ⚠⚠ **アラートは 1 回の障害につき `alert` 秒に 1 回。**辞書は 10 分おきに引かれるので、
   # 古さだけで判定すると 6 時間を超えた障害では取得のたびに鳴る（#4801 で消したかった状態に戻る）。
   class AnnictEpisodeDictionary
@@ -40,7 +42,7 @@ module Mulukhiya
       @cache = @storage.get(KEY)
       return @cache['entries'] if fresh?
       entries = build
-      return keep_cache if entries.empty? && cached_entries?
+      return keep_cache if entries.empty? && @works.present? && cached_entries?
       @storage.set(KEY, entries)
       @storage.clear_alert
       return entries
@@ -94,7 +96,8 @@ module Mulukhiya
     end
 
     def build
-      episodes = @annict.episodes(@annict.works.map {|v| v['annictId'].to_i})
+      @works = @annict.works
+      episodes = @annict.episodes(@works.map {|v| v['annictId'].to_i})
       return episodes.filter_map do |e|
         title = e['title'].to_s.strip
         next if title.empty?

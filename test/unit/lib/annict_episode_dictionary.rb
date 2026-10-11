@@ -40,16 +40,17 @@ module Mulukhiya
     class AnnictDouble
       attr_reader :calls
 
-      def initialize(episodes: [], error: nil)
+      def initialize(episodes: [], error: nil, works: [{'annictId' => 1}])
         @episodes = episodes
         @error = error
+        @works = works
         @calls = 0
       end
 
       def works
         @calls += 1
         raise @error if @error
-        return [{'annictId' => 1}]
+        return @works
       end
 
       def episodes(_ids)
@@ -160,7 +161,16 @@ module Mulukhiya
       assert_not_predicate(dictionary, :alert?)
     end
 
-    # ⚠ キャッシュが無ければ、空もそのまま書く（キーワード未設定の構成では空が正しい）。
+    # ⚠ 見る作品が 0 件（キーワードを外した）なら、空が正しい答え。キャッシュを空で置き換える
+    # （PR #4819 の Codex P2）。
+    def test_empty_result_without_works_replaces_cache
+      storage = StorageDouble.new(entries: CACHED, age: FRESH + 60)
+
+      assert_empty(create(AnnictDouble.new(episodes: [], works: []), storage).fetch)
+      assert_equal([{}], storage.writes)
+    end
+
+    # ⚠ キャッシュが無ければ、空もそのまま書く。
     def test_empty_result_is_stored_without_cache
       storage = StorageDouble.new
 
