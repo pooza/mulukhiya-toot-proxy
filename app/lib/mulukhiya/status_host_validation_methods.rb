@@ -4,7 +4,9 @@ module Mulukhiya
   # 🔴 URL は利用者が書く（クリップのコマンド・引用）。検証が無いと `http://127.0.0.1:<port>/@a/1` の
   # ような URL で、ローカルのサーバーへ要求が届く（pooza/ginseng-fediverse#306）。
   # ⚠ gem の既定（`Ginseng::PublicHost.validator`）ではなく `RemoteHost.validator` を返す。
-  # 判定の本体は同じで、設定の DNS タイムアウトと、拒否の warn ログが付く（gem の既定は拒否を残さない）。
+  # 判定の本体は同じで、設定の DNS タイムアウトと、**名前解決に失敗したとき**の warn ログが付く。
+  # ⚠ IP アドレスの直書き・内部アドレスに解決される名前の拒否は、ここでも gem でもログに残らない。
+  # 痕跡は呼び出し側が残す（`PiefedClippingWorker` の `rejected host`）。
   module StatusHostValidationMethods
     # ⚠ nil を返すと検証しない。**自サーバーの URL だけ**外す。
     #

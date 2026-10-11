@@ -3,9 +3,10 @@ require 'rack/test'
 module Mulukhiya
   # 不正な UTF-8 バイト列を含むリクエストを、入口で 400 に落とす (#4600)。
   #
-  # 🔴 `JSON.parse` も Rack のフォームのパースも壊れたバイト列を弾かないので、奥の
-  # `TootParser#tags` などで `ArgumentError` になり、クライアントのバグが 500 ＋ Sentry に
-  # 化けていた。ログで伏せないキーに来ると、リクエストログが先に落ちて 401 に化ける。
+  # 🔴 Rack のフォームのパースは壊れたバイト列を弾かないので、奥の `TootParser#tags` などで
+  # `ArgumentError` になり、クライアントのバグが 500 ＋ Sentry に化けていた。ログで伏せないキーに
+  # 来ると、リクエストログが先に落ちて 401 に化ける。
+  # ⚠ JSON は逆で、パーサ（Yajl）が弾いて**本文を丸ごと捨てる**。「内容が空」の要求として奥へ進んでいた。
   class InvalidEncodingTest < TestCase
     include Rack::Test::Methods
 

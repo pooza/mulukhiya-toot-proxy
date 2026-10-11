@@ -145,8 +145,6 @@ module Mulukhiya
     # ⚠ ハンドラの有効・無効は見ない。添付するかどうかではなく、大きさの設定だけを借りる。
     def artwork_pixel
       return ItunesImageHandler.handler_config(:pixel).to_i.nonzero? || DEFAULT_ARTWORK_PIXEL
-    rescue Ginseng::ConfigError
-      return DEFAULT_ARTWORK_PIXEL
     end
 
     def default_provider

@@ -4,8 +4,8 @@ module Mulukhiya
       return ->(_host) {addresses}
     end
 
-    # 🔴 **脆弱な resolv を掴んでいないこと (#4772)。**`resolve_addresses` が
-    # `Resolv::DNS` を直に呼ぶ。Ruby 4.0.6 同梱の 0.7.0 は CVE-2026-80212（未知の
+    # 🔴 **脆弱な resolv を掴んでいないこと (#4772)。**`resolve_addresses` は
+    # `Ginseng::PublicHost` 経由で `Resolv::DNS` を呼ぶ。Ruby 4.0.6 同梱の 0.7.0 は CVE-2026-80212（未知の
     # レコード種別で解放されないクラスが増え続ける）/ 80213 を抱えている。
     # ⚠ Gemfile の宣言が外れても、同梱版が先に読まれても、ここで落ちる。
     def test_resolv_is_patched

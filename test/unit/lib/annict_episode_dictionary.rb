@@ -7,12 +7,24 @@ module Mulukhiya
 
     # Redis を使わないストレージのダブル。`updated_at` を好きな古さで置ける。
     class StorageDouble
-      attr_reader :writes
+      attr_reader :writes, :alerts, :cleared
 
       def initialize(entries: nil, age: 0, writable: true)
         @value = {'entries' => entries, 'updated_at' => Time.now.to_i - age} if entries
         @writable = writable
         @writes = []
+        @alerts = 0
+        @cleared = 0
+      end
+
+      # 1 回目だけ true（印を置けた）。
+      def first_alert?(_seconds)
+        @alerts += 1
+        return @alerts == 1
+      end
+
+      def clear_alert
+        @cleared += 1
       end
 
       def get(_key)
@@ -28,16 +40,17 @@ module Mulukhiya
     class AnnictDouble
       attr_reader :calls
 
-      def initialize(episodes: [], error: nil)
+      def initialize(episodes: [], error: nil, works: [{'annictId' => 1}])
         @episodes = episodes
         @error = error
+        @works = works
         @calls = 0
       end
 
       def works
         @calls += 1
         raise @error if @error
-        return [{'annictId' => 1}]
+        return @works
       end
 
       def episodes(_ids)
@@ -53,8 +66,13 @@ module Mulukhiya
     BUILT = {'ふたりのプリキュア' => ['23話'], '最終話' => []}.freeze
 
     def setup
+      @saved = ['fresh', 'alert'].to_h {|k| [k, config["/service/annict/dictionary/cache/#{k}"]]}
       config['/service/annict/dictionary/cache/fresh'] = FRESH
       config['/service/annict/dictionary/cache/alert'] = ALERT
+    end
+
+    def teardown
+      @saved.each {|k, v| config["/service/annict/dictionary/cache/#{k}"] = v}
     end
 
     def test_builds_and_stores_without_cache
@@ -109,6 +127,57 @@ module Mulukhiya
     end
 
     # ⚠ 返せる結果が無いときは、従来どおり上流のエラーを上げる。
+    # 🔴 6 時間を超えた障害でも、アラートは 1 回だけ（5.40.0 のリリース前レビュー）。辞書は 10 分おきに
+    # 引かれるので、古さだけで判定すると取得のたびに鳴る。
+    def test_gateway_error_alerts_once_per_outage
+      storage = StorageDouble.new(entries: CACHED, age: ALERT + 60)
+      annict = AnnictDouble.new(error: Ginseng::GatewayError.new('Net::ReadTimeout'))
+      first = create(annict, storage)
+      second = create(annict, storage)
+
+      assert_equal(CACHED, first.fetch)
+      assert_predicate(first, :alert?)
+      assert_equal(CACHED, second.fetch)
+      assert_not_predicate(second, :alert?)
+      assert_not_nil(second.error)
+    end
+
+    # ⚠ 取得に成功したら印を消す（次の障害でまた 1 回鳴らす）。
+    def test_success_clears_the_alert_mark
+      storage = StorageDouble.new(entries: CACHED, age: FRESH + 60)
+
+      assert_equal(BUILT, create(AnnictDouble.new(episodes: EPISODES), storage).fetch)
+      assert_equal(1, storage.cleared)
+    end
+
+    # 🔴 空の結果で、中身のあるキャッシュを上書きしない（5.40.0 のリリース前レビュー）。Annict は不調のとき
+    # 200 で空の検索結果を返すことがあり、そのまま書くと「凌ぐための結果」が空になる。
+    def test_empty_result_does_not_overwrite_cache
+      storage = StorageDouble.new(entries: CACHED, age: FRESH + 60)
+      dictionary = create(AnnictDouble.new(episodes: []), storage)
+
+      assert_equal(CACHED, dictionary.fetch)
+      assert_empty(storage.writes)
+      assert_not_predicate(dictionary, :alert?)
+    end
+
+    # ⚠ 見る作品が 0 件（キーワードを外した）なら、空が正しい答え。キャッシュを空で置き換える
+    # （PR #4819 の Codex P2）。
+    def test_empty_result_without_works_replaces_cache
+      storage = StorageDouble.new(entries: CACHED, age: FRESH + 60)
+
+      assert_empty(create(AnnictDouble.new(episodes: [], works: []), storage).fetch)
+      assert_equal([{}], storage.writes)
+    end
+
+    # ⚠ キャッシュが無ければ、空もそのまま書く。
+    def test_empty_result_is_stored_without_cache
+      storage = StorageDouble.new
+
+      assert_empty(create(AnnictDouble.new(episodes: []), storage).fetch)
+      assert_equal([{}], storage.writes)
+    end
+
     def test_error_is_raised_without_cache
       dictionary = create(AnnictDouble.new(error: Ginseng::GatewayError.new('Net::ReadTimeout')), StorageDouble.new)
 

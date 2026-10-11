@@ -2,8 +2,8 @@ module Mulukhiya
   # `.github/dependabot.yml` の `ignore` が `Gemfile` の上限と対になっていること (#4702)。
   #
   # ⚠⚠ **`versioning-strategy: increase-if-necessary` は、上限の外の版で manifest を動かす。**
-  # そのままでは **json 3.0 / rack 3.3 / sinatra 4.3 のような、意図して
-  # 据え置いている gem まで制約を広げる PR が出る**。`ignore` で止めている。
+  # そのままでは **rack 3.3 / sinatra 4.3 のような、意図して据え置いている gem や、
+  # 次の major を実走してから上げると決めている gem（json）まで制約を広げる PR が出る**。`ignore` で止めている。
   #
   # 🔴 **`Gemfile` に上限を足したのに `ignore` を足し忘れると、据え置きの判断が黙って
   # 崩れる。**逆に上限を外したのに `ignore` が残ると、版上げが黙って止まる。
