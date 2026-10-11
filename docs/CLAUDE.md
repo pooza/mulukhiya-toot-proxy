@@ -186,21 +186,57 @@ git diff Gemfile.lock
 
 [マイルストーン 5.41.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/641)。`config/application.yaml` は 5.41.0 へバンプ済み。
 
-- ✅ **PR #4819（5.40.0 の手順 12・掃除 8 件）は 2026-10-12 にマージ（`6010f8e6`）**: CI 両系 pass。Codex P2 × 1 に対処（`9702397c`）:
-  見る作品が 0 件（キーワードを外した）ときの空は、正しい答えとしてキャッシュを置き換える（守るのは「作品はあるのに回が空」だけ）。再レビューは指摘なし。
-  ⚠ **harness とステージングは回していない**（この周回の検証で一緒に見る）
-- **最初にやること: 5.40.0 の手順 12（掃除 PR）。**一覧は下の「リリース済み: 5.40.0」→「リリース前レビュー（5 観点）の結果」の「掃除 PR（手順 12）へ」の 8 件
-  （Annict 辞書の空上書きとアラートの鳴りすぎ／PieFed のクリップで拒否されたホストの再試行／`docs/api.md` の 400／OAuth の失敗の文言／
-  `/daemon/restart/timeout/seconds` のスキーマ／死んだコードと古いコメント）
-- **`bundle update` で動く 4 本を上げる**（5.40.0 のリリース直前に見送った・ユーザー判断）: net-http 0.9.1 → 0.10.0（2026-10-08 公開）/
-  redis-client 0.30.1 → 0.31.0（10-05）/ mime-types-data / webmock 3.28.0。⚠ net-http と redis-client は実行時の経路なので、harness とステージングを通す。
-  ⚠ redis-client は `Redis#acquire_token` の撃ち直しが例外の型（`ConnectionError` / `CannotConnectError`）に依存している
-- ginseng-style `ed862dcf` → v1.1.14（rubocop-minitest 0.41.0）も未着手。lint の指摘が増えうるので単独で
-- 🆕 **#4820: ginseng-core v2.4.0 → v2.4.2 / ginseng-fediverse v5.0.0 → v6.0.0**（2026-10-12 の同期で検出）。
-  core は署名付き URL のクエリをログでマスクする（security）。fediverse 6.0.0 の破壊的変更は、上書きしている口なので届かない。詳細は 10-12 の同期の記録
-- 🆕 **#4821**（自ドメインの名前解決が落ちると health が 503 になり、monit が再起動し続ける）— 2026-10-12 起票。⚠ 運用に直結する修正
-- open（10 件）: #4821 / #4820 / #4817（デーモンの身元確認を gem の `process_pattern` へ）/ #4789（Mastodon の media_catalog の既定を true に・#4353 待ち）/
-  #4756 / #4700 / #4690 / #4678 / #4628 / #4465（L）
+### マージ済み（develop）
+
+- ✅ **PR #4819（5.40.0 の手順 12・掃除 8 件）— 2026-10-12（`6010f8e6`）**。⚠ **この PR 単独では harness とステージングを回していない**
+  （下の #4823 / #4826 の実走が、この変更を含む HEAD を通っている）
+- ✅ **PR #4822（#4821）— 2026-10-12（`1bff88cb`）・ユーザー承認**: 自サーバーの名前が引けないだけなら、health の `streaming` を NG にしない
+  （`{status: 'OK', unresolved: true, error: ...}`）。外すのは名前解決の失敗だけ。#4821 はクローズ
+  - **きっかけ**: 2026-10-11 23:57〜10-12 01:16 JST に `.ml` の名前解決が落ち、gomander で monit がモロヘイヤを 4 回再起動した（10-12 の同期の記録）
+  - ⚠⚠ **dev25（`st2.precure.ml`）にもう 1 つの壊れ方が残っていた**: 再起動された listener が再試行 20 回（約 16 分）で終了し、
+    **以後 7 時間 503 のまま**。monit の `exec` は状態が変わったときに 1 回だけなので、503 が続く間は撃ち直さない。手で再起動して復帰
+  - 修正後は、名前が引けない間は 200 → listener が終了したら NG → monit が 1 回再起動、の周回になる（止まったまま残らない）
+  - dev25（FreeBSD）の実物の HTTP で、解決できない名前は OK（`unresolved`）・接続拒否は NG を確認。⚠ 自ドメインだけ引けない状態そのものは作っていない
+  - ⚠ **テストに `omit` を足すと、CI の omission の上限（mastodon 327 / misskey 316）を超えて落ちる。**コントローラの判定を固定して両系で実行する形にした
+- ✅ **PR #4823（#4820）— 2026-10-12（`f069b95a`）・ユーザー承認**: ginseng-core v2.4.2 / ginseng-fediverse v6.0.0。#4820 はクローズ
+  - 署名付き URL のクエリ（`signature` / `sig` / `x-amz-signature` / `hm` / `jwt` など）がログでマスクされる。
+    `/logger/mask_query_params` は gem の既定に**足す**形なので設定は変えなくてよい（`Mulukhiya::Logger` で実測）
+  - fediverse 6.0.0 の破壊的変更は届かない（`upload_remote_resource` を上書きしていて、取得は `MediaFile.download`）
+  - `TooLargeError` を受け直す 3 か所のコメントを直した（上流の文言が URL を持つのは core 2.4.0 まで）
+  - **harness（`8a721b24`）**: Mastodon 1706 tests / 0 failures / 0 errors / 159 omissions（`controller=mastodon`）、
+    Misskey 1709 tests / 0 failures / 0 errors / 145 omissions（`controller=misskey`）。
+    ⚠ **2 回目。**1 回目は Mastodon 2 failures / Misskey 1 failure（どれも実物の辞書 `mstdn.delmulin.com` → GAS を引くテスト・
+    Mastodon のログに `No route to host` 3 行）。新しい gem で同じ辞書を 6 回引いて全部 200 だったので、外部要因として同じ HEAD で回し直した
+  - ステージング dev24 / dev26 / dev27 で health 200・エラー行 0
+- ✅ **PR #4824 — 2026-10-12（`6116104f`）・ユーザー承認**: ginseng-style v1.1.14（rubocop 1.91.0 / rubocop-minitest 0.41.0）。新しい指摘は 0 件
+
+### 出してある PR（マージはユーザーの承認待ち）
+
+- **PR #4825（#4700）**: 設定スキーマの穴 3 件。ハンドラのスキーマ 41 本の `disabled` を `disable` に揃え、`disabled` と書いたら検査で落とす
+  （`default.yaml`・`not: {}`）／`dics[].fields`／`program.auto_update`。CI 両系 SUCCESS。
+  Codex P2 × 1 に対処（`scheduled_status_save` はスキーマのファイルが無く、検査が素通りだった → ファイルを足し、全ハンドラがスキーマを持つことをテストで見る）。再レビューは指摘なし。
+  本番 4 台・ステージング 4 台の設定に `disabled:` は 0 行。
+  ⚠ **リリースノートに書く**: `disabled:` を書いていると警告が出る・`/config/validation/strict: true` なら起動が止まる
+- **PR #4826**: `bundle update`（net-http 0.10.0 / redis-client 0.31.0 / mime-types-data / webmock 3.29.0）。
+  **harness（`d6bc419e`）**: Mastodon 1706 tests / 0 failures / 0 errors / 159 omissions（`controller=mastodon`）、
+  Misskey 1709 tests / 0 failures / 0 errors / 145 omissions（`controller=misskey`）。
+  develop を取り込んだ `5361884b` を dev24 / dev25 / dev27 に載せて health 200・エラー行 0。
+  ⚠ core 2.4.2 ＋ net-http 0.10.0 の組み合わせでの harness はリリースゲートで回す
+- **PR #4827（#4817）**: デーモンの身元確認を gem の `process_pattern` へ。自前の `alive_state_of` ほかを削除（`identity_tag` だけ残る）。
+  dev27（systemd）・dev26（rc.d）で、pid ファイルへ無関係な `sleep` の番号を書いた状態から 3 デーモンとも起動し、`sleep` は生きたまま。CI 両系 SUCCESS
+
+### ステージングの現在地（2026-10-12 07:40 JST）
+
+dev24 / dev25 / dev27 は PR #4826 のブランチ（`5361884b`）、dev26 は PR #4827 のブランチ（`e64c1a09`）。**マージ後に 4 台を develop へ揃える。**
+
+### 残り
+
+- open（7 件）: #4817（PR #4827）/ #4700（PR #4825）/ #4789（Mastodon の media_catalog の既定を true に・#4353 待ち）/
+  #4756 / #4690 / #4678 / #4628 / #4465（L）
+- ⚠ **Issue は develop へのマージでは自動で閉じない**（`Closes` が効くのは既定ブランチ main だけ）。マージしたら手で閉じる
+- ⚠ **作業ツリーを harness が使っている間は、別の worktree で作業する**（ブランチを切り替えると実走中の HEAD が変わる）。
+  worktree には `config/local.yaml` が無いので、harness を回すブランチは主ツリーに置く
+- ⚠ ステージングへブランチを渡すスクリプトで `$B:refs/...` と書くと、zsh が `:r` を修飾子として食う。`${B}:refs/...` と書く
 
 ## リリース済み: 5.40.0（2026-10-11）
 
