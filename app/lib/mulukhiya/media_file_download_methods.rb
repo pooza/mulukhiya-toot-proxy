@@ -48,8 +48,9 @@ module Mulukhiya
       return new(path).file
     end
 
-    # ⚠ **上流の `TooLargeError` はこちらの例外に替える。**あちらのメッセージは URL を
-    # 文中に含むので、そのまま上げると `raise_too_large!` が守っている約束（#4630）が破れる。
+    # ⚠ **上流の `TooLargeError` はこちらの例外に替える。**プリフライトで弾いたときと同じ
+    # 例外・同じログ（`phase`）に揃えるため。⚠ 上流のメッセージが URL を文中に持っていたのは
+    # ginseng-core 2.4.0 まで（2.4.1 で外れた・pooza/ginseng-core#686）。
     def fetch_body(uri, host_validator)
       options = request_options(host_validator).merge(max_bytes: download_max_bytes)
       return HTTP.new.get(uri, options).body.to_s

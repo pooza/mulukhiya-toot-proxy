@@ -8,10 +8,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 969e8c3dcd93e5dd2befede3a4c0ae42b57f6fdb
-  tag: v2.4.0
+  revision: ea106db86d2407583e65a4879b2135ed46b5116c
+  tag: v2.4.2
   specs:
-    ginseng-core (2.4.0)
+    ginseng-core (2.4.2)
       activesupport (>= 8.1.2.1)
       addressable (>= 2.9.0)
       cgi (>= 0.4.2)
@@ -43,10 +43,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 65dbed0432cdb620ca8896ca46f7a838ee888305
-  tag: v5.0.0
+  revision: d59aea22270a771e1f8775355d8d6fb7e5283d6e
+  tag: v6.0.0
   specs:
-    ginseng-fediverse (5.0.0)
+    ginseng-fediverse (6.0.0)
       ginseng-core (>= 2.1.0)
 
 GIT
@@ -76,12 +76,12 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-style.git
-  revision: ed862dcf9550d704ee670f65a30a333a694b883a
-  ref: ed862dcf9550d704ee670f65a30a333a694b883a
+  revision: 2818c5618476302e4a10454f1b621502a053f492
+  ref: 2818c5618476302e4a10454f1b621502a053f492
   specs:
-    ginseng-style (1.1.12)
-      rubocop (~> 1.90.0)
-      rubocop-minitest (~> 0.40.0)
+    ginseng-style (1.1.14)
+      rubocop (~> 1.91.0)
+      rubocop-minitest (~> 0.41.0)
       rubocop-performance (~> 1.27.0)
       rubocop-rake (~> 0.7.1)
 
@@ -374,7 +374,7 @@ GEM
     ricecream (0.2.1)
     rss (0.3.3)
       rexml
-    rubocop (1.90.0)
+    rubocop (1.91.0)
       json (>= 2.3)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.1.0)
@@ -388,9 +388,9 @@ GEM
     rubocop-ast (1.50.0)
       parser (>= 3.3.7.2)
       prism (~> 1.7)
-    rubocop-minitest (0.40.0)
+    rubocop-minitest (0.41.0)
       lint_roller (~> 1.1)
-      rubocop (>= 1.75.0, < 2.0)
+      rubocop (>= 1.89.0, < 2.0)
       rubocop-ast (>= 1.38.0, < 2.0)
     rubocop-performance (1.27.0)
       lint_roller (~> 1.1)

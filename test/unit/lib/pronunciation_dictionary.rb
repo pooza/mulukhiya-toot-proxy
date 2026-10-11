@@ -134,7 +134,7 @@ module Mulukhiya
 
     # 🔴 受信中に打ち切る (#4612)。上限を超えた本文は読み切る前に止まり、その URL は失敗扱い。
     # ⚠ `max_bytes:` を渡すのをやめると、受信後の実測（`exceeded max bytes`）に戻って落ちる。
-    # ⚠⚠ 上流の `TooLargeError` は URL を文中に持つので、上へ渡さない（PR #4815 の Codex P1）。
+    # ⚠ 上流の `TooLargeError` は上へ渡さず、その URL を失敗扱いにする（PR #4815 の Codex P1）。
     def test_fetch_is_cut_off_while_receiving
       return if disable?
       uri = Ginseng::URI.parse('https://dic.test/huge.json')
