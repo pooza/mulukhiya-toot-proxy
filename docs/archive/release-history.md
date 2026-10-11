@@ -2,6 +2,419 @@
 
 CLAUDE.md から分離した過去のリリースノート。直近リリースは [CLAUDE.md](../CLAUDE.md) を参照。
 
+## リリース済み: 5.37.1（ホットフィックス・2026-09-16・#4733）
+
+**本番デプロイ: 4 台完了**（shallu → zugoga → gomander → vulcan の順。全台 version 5.37.1 /
+health 200（全項目 OK）/ `yjit_enabled: true` / Ruby 4.0.6 据え置き）。
+`main` の `ef33eb56` / [v5.37.1](https://github.com/pooza/mulukhiya-toot-proxy/releases/tag/v5.37.1)。
+**#4733 はクローズ済み、マイルストーン 5.37.1 も閉じた。**
+
+### 本番デプロイで見たこと
+
+- 🔴 **#4728 は 5.37.1 に入っていない。**`config:lint` は zugoga（`dqdai-vjump`）と
+  gomander（`precure/petitcure`）で**依然として落ちる**。修正 PR #4729 は `develop` にしかなく、
+  ホットフィックスは `main`（5.37.0）から切ったため。⚠ **Sentry の
+  `MULUKHIYA-TOOT-PROXY-1X` は 5.38.0 まで鳴り続ける**
+- ⚠ **vulcan だけ再起動後に health 503**（`sidekiq: PID '...' was dead`）。sidekiq 本体は
+  正常稼働していたが `SidekiqDaemon.pid` が生成されておらず、health が古い PID を見ていた。
+  **sidekiq をもう一度 restart して 200 に復帰**（[[project_sidekiq-double-start-boot-race]]・
+  pooza/chubo-core#37 の起動順が未対処）。⚠ **他の 3 台では出ていない**
+- ⚠ `rake config:lint` の失敗は**パイプで握り潰されて次へ進む**。出力の最終行が
+  `config: OK` かを必ず目で見ること（5.37.0 と同じ）
+
+### 検証
+
+- **harness 実走（リリースゲート・省略不可）**: Mastodon **4.7.2** = 1454 tests / 0 failures /
+  0 errors / 159 omissions、Misskey **2026.9.0** = 1457 tests / 0 failures / 0 errors / 145 omissions
+- **ステージング 4 台（dev24-27）で end-to-end 確認**。PNG は `.webp` に変換されて 200
+  （＝モロヘイヤを通った証拠）、HEIC は **422**、アラートは **0 件**
+- ⚠ **最初の測定はモロヘイヤを迂回していた。**`X-Mulukhiya` を付けたのが誤りで、map は
+  **`default` → :3008（モロヘイヤ）/ ヘッダあり → :3000（本体直行）**（ループ防止）。
+  結果 URL が `.png` のままだったことで気づいた。**#4733 本文の「既定でモロヘイヤへ回す」が
+  実機で裏付けられた**形でもある
+- ⚠ **dev25 / dev26 は shallow clone で `origin/<branch>` を解決できない。**
+  `git fetch origin <branch>:refs/remotes/origin/<branch>` の明示 refspec が要る
+
+### 残件
+
+- **#4734**: AVIF / TIFF など今回ブロックした他の形式は 422 の対象外（実測していないので広げなかった）。
+  弾いた件数の集計もまだ無い（syslog に 1 行は残る）
+- ✅ **v4 へのバックポートも出荷済み**: [v4.42.2](https://github.com/pooza/mulukhiya-toot-proxy/releases/tag/v4.42.2)（PR #4736）。
+  ⚠ **#4737**: v4 の CI は半年ちかく `bundle install` で死んでいてテストが 1 件も走っていない
+  （`Gemfile` の `ginseng-web` が消えた `branch: 'stable'` を指している）。**マージの根拠は
+  ローカル実測**（変更前 7 failures / 138 errors → 変更後も同数＝新規の赤ゼロ）。
+  ⚠ **`bundle install` は lock の revision で通るので、ローカルで回ることを CI の根拠にしない**
+- **解除条件**: `libheif >= 1.23.4` が pkg / ports に来たら `VIPS_ALLOWED_OPERATIONS` と
+  `BLOCKED_UPLOAD_TYPES` を戻す
+
+### 開発時のメモ
+
+⚠ **5.38.0 を待たなかった理由は「上流が Security と言ったから」ではなく到達性。**
+`verify_token_integrity!` は認証ではなく自己整合性検査なので、**無効トークンでも
+`pre_upload` まで到達して libheif に届く**。2026-08-17 に同エンドポイントへ
+無効トークンでの連打があった実績もある（32,247 req / pooza/chubo2#179）。
+パッケージで塞ぐ道も無い（本番 1.22.2 / 修正は >= 1.23.4 / ports は 1.22.2_2 止まり）。
+
+⚠ **5.38.0 を待たなかった理由は「上流が Security と言ったから」ではなく到達性。**
+`verify_token_integrity!` は認証ではなく自己整合性検査なので、**無効トークンでも
+`pre_upload` まで到達して libheif に届く**。2026-08-17 に同エンドポイントへ
+無効トークンでの連打があった実績もある（32,247 req / pooza/chubo2#179）。
+パッケージで塞ぐ道も無い（本番 1.22.2 / 修正は >= 1.23.4 / ports は 1.22.2_2 止まり）。
+
+- **v4 へのバックポート**: [PR #4736](https://github.com/pooza/mulukhiya-toot-proxy/pull/4736)
+  （`dev/4.42.2` → `v4`）。4.x の受け入れ基準 4 つを満たす
+- **受け皿 #4734**: 弾いたことが利用者にも運用にも見えない（文面と件数の観測・周知の要否）
+- ⚠⚠ **受け皿 #4737: v4 の CI は `bundle install` で死んでいて、半年ちかくテストが
+  1 件も走っていない**（`Gemfile` の `ginseng-web` が消えた `branch: 'stable'` を指している）。
+  ⚠ **`bundle install` は lock の revision で通るので、ローカルで回ることを CI の根拠にしない**
+- ⚠ **デプロイ前に決めること**: この変更は**「今は無い壊れ」を作る**。いまは HEIC を上げても
+  モロヘイヤが WebP にして通していたので利用者から見れば成功していた。塞ぐと
+  **iPhone からの `.heic` 直上げが弾かれる**。⚠ 実際の HEIC トラフィック量は未計測
+- ⚠ **vulcan（ダイスキー）も同じ経路。**`pipeline.base.pre_upload` を Misskey 側も継承しており、
+  `MisskeyController` の `POST /api/v:version/media` も同じ `ImageFile` を通る。
+  vulcan の libheif 版はユーザーが確認中（2026-09-16）
+- **解除条件**: `libheif >= 1.23.4` が pkg / ports に来たら `VIPS_ALLOWED_OPERATIONS` へ戻す
+
+### #4733 HEIF の取り込み停止 — 調査の結論（2026-09-16）
+
+**Issue 本文の見立ては実装どおりだった。**入口は `pre_upload` と `pre_thumbnail` の 2 つで、
+ハンドラは `image_format_convert` と `image_resize` の**両方**（`ImageResizeHandler#convertable?` も
+`file.image?` を呼ぶ）。`MediaConvertHandler#handle_pre_upload` が `ImageFile.new(tempfile.path)` を
+作り、`convertable?` → `file.image?` → `ImageFile#type` → `Vips::Image.new_from_file` で libheif に届く。
+⚠ **`ImageFile` は `MediaFile#type`（Marcel のマジックバイト判定）を上書きしている**ので、
+素性を見ないままいきなり vips に渡る。`Vips.block` はリポジトリに 1 行も無い。
+
+調査で出た、実装するときに踏む穴:
+
+- 🔴 **`Vips.block('VipsForeignLoadHeif', true)` だけでは塞がらない**（ローカル libvips 8.16.1 /
+  ruby-vips 2.3.0 で実測）。libvips は heif ローダを止めると **magickload にフォールバック**し、
+  ImageMagick の HEIC デリゲート＝**同じ libheif** に渡る
+  （`magickload: Magick: … @ error/heic.c/ReadHEICImage/661`）。
+  **許可リスト方式（`Vips.block('VipsForeign', true)` → 必要なものだけ `false`）でないと意味が無い**
+- ⚠ **Mastodon 4.7.2 の `config/initializers/vips.rb` をそのまま写すと GIF が壊れる。**
+  向こうの許可リストは saver に **cgif を入れていない**（`Nsgif` は loader のみ）。一方
+  モロヘイヤの `ImageResizeHandler#convertable?` は `animated?` を除外しないので、
+  **アニメ GIF をリサイズして `.gif` に書き戻す**。実測で `VipsForeignSave: … is not a known file format`
+  になった。**要るのは Mastodon の 8 本 ＋ `VipsForeignSaveCgif`**
+- 🔴 **`verify_token_integrity!` は認証ではない。**`Controller#token` は**リクエスト自身の
+  `Authorization` ヘッダ**を読み、それを `sns.token` と突き合わせるだけの**自己整合性検査**
+  （2025-10 のトークン汚染事故の再発検知）で、上流にトークンの有効性を問い合わせない。
+  ⚠⚠ **つまり無効トークン・トークン無しでも `Event.new(:pre_upload).dispatch` まで到達し、
+  libheif に届く。**実績もある — 2026-08-17 の Tencent ボット網が
+  `POST /api/v1/media` へ**無効トークンでアップロードを連打**した（32,247 req・chubo2 #179）
+- ⚠ **止めた後は「無音の素通し」になる。**`ImageFile#type` は `rescue return MIMEType::DEFAULT`
+  なので、ブロック後は例外が握り潰されて `application/octet-stream` → `image?` が false →
+  **ハンドラが黙って素通し**する。`errors.push` も `e.alert` も通らないので、ログにも Sentry にも
+  1 行も出ない（#4549 と同型）。HEIC は変換されずそのまま上流へ行き、**Mastodon 4.7.2 が弾く**＝
+  **利用者が見るエラー文面は Mastodon のもの**になる。モロヘイヤ側で文面を出すなら案 2 が要る
+- 案 2 のマジックバイト判定は**自前で書かなくてよい**。Marcel 2.1.0 は
+  `ftypheic` だけで `image/heic` を返す（実測）＝ `MediaFile#type` がすでにそれ
+- **置き場所は `app/lib/mulukhiya.rb` 末尾の `Bundler.require` 後のブロック**
+  （`setup_sidekiq` などが並ぶところ）。⚠ **ここは全エントリポイントとテストが通る**ので、
+  #4687 の「起動時だけ走る initializer は CI 緑を根拠にできない」を回避できる。
+  `app/initializer/*.rb`（config.ru / puma.rb / sidekiq.rb）に置くと踏む
+- **未確認**: 本番の `local.yaml` で `image_format_convert` / `image_resize` が無効化されていないか（SSH が要る）
+
+### ginseng-\* のピン判断（2026-09-16 の同期）
+
+- **`ginseng-fediverse` v1.8.31 → v2.0.0 は ② 次のマイルストーンで取り込む（保留）。**
+  中身は `escape_sigils` が `IDOLM@STER` → `IDOLM@ STER` のように**リンク化しない `@` / `#` まで
+  壊していた**のを直したもので、モロヘイヤは `NowplayingHandler` で曲名・アルバム名・
+  アーティスト名に `escape_toot` を通しているため**ナウプレの出力が直接良くなる**。
+  ⚠ **保留の理由は pooza/ginseng-fediverse#276（`escape_sigils` が BINARY 文字列で落ちる・
+  2.0.0 リリース前レビューの黄）が open のまま**だから。v2.0.1 を待つ。
+  ⚠ 取り込むときは `test/unit/lib/string.rb` の `assert_equal('IDOLM@ STER', ...)` が
+  **壊れた側を期待値に固定している**ので、必ず一緒に直す（上げるだけだと赤になる）
+- **`ginseng-web` v2.0.0 → v3.0.0 は取り込める。**Dependabot PR #4732 が open で CI は両系 SUCCESS、
+  移管された 5 本（`puma` / `rack` / `rack-session` / `sinatra` / `tilt`）は #4679 で
+  `Gemfile` に宣言済み。⚠ 2026-09-10 時点の「意図して保留」はもう成り立たない
+
+## リリース済み: 5.37.0（2026-09-10）
+
+**本番デプロイ: 4 台完了**（2026-09-10 23:41〜、shallu → zugoga → gomander → vulcan の順。
+全台 version 5.37.0 / health 200（全項目 OK）/ `yjit_enabled: true` / Ruby 4.0.6 据え置き / monit OK）。
+`main` の `770e9853` / [v5.37.0](https://github.com/pooza/mulukhiya-toot-proxy/releases/tag/v5.37.0)。
+
+### 本番デプロイで見たこと
+
+- **rc.d（#4478）を FreeBSD 3 台へ配布**。現行の 9 本は 5.36.0 の配布物と同一だったので上書き。
+  **3 サービスの再起動を 1 本の SSH で流して 43〜64 秒で戻った**（従来は fd を切らないと戻らなかった）。
+  `service mulukhiya-* status` が動き、**puma の起動出力が `/var/log/mulukhiya-toot-proxy.log` に届く**ようになった
+- 🔴 **zugoga / gomander で `rake config:lint` が失敗** → #4728（上の 5.38.0 参照）。⚠ デプロイ手順の
+  `rake config:lint | tail -1` は**失敗しても次へ進む**ので、出力の最終行が `config: OK` かを目で見ること
+- ⚠ **再起動の直後はカスタムフィードが 0 件で返る**。描画キャッシュが無く、sidekiq の初回更新
+  （5 分周期）を待つ必要がある。**再起動直後の 0 件を退行と読まない**（今回それで一度疑った）
+- ⚠ **zugoga の `dqdai-vjump` は 0 件が正常**（スクレイパー自体が `[]` を返す＝上流側。リリースと無関係）
+
+### 開発時のメモ
+
+**2026-09-08 に 5.36.0 を出荷した直後の状態。**
+[マイルストーン 5.37.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/635) 作成済み・**14 件 / 重み 25**（⚠ 2026-09-10 に #4699 を外して **13 件 / 重み 24**）。
+`config/application.yaml` は 5.37.0 へバンプ済み。
+
+⚠ **消化を目的にした回**（2026-09-08 のユーザーとの整理）。テーマで選ばず、**年齢と重みで選んだ**。
+「リリース運用 → リリース前レビュー → 消化を目的にしたマイルストーン」を参照。
+
+⚠⚠ **ただし「消化だけの回」にはしない**（2026-09-09 のユーザー指示）。
+**「不具合修正だけだとモチベーションを持てないので、何かしらは含めてほしい」。**
+消化が目的の回でも、**機能が前へ進む Issue を最低 1 件は入れる。**
+この回は **#4639（メディアカタログの点灯）** がそれにあたる。
+
+**棚の実測（2026-09-08・サイズを全件へ付与した後）**: `on-hold` 8 件を除いて
+**`size:S` 12 / `size:M` 23 / `size:L` 5 ＝ 重み 121 ＝ 約 5.4 マイルストーン分**。
+
+| 日数 | Issue | 重み | 主眼 |
+| ---: | --- | ---: | --- |
+| 83 | #4414 | 3 | Spotify OAuth に `state`(CSRF) を追加 |
+| 77 | #4428 | 3 | harness で webhook 投稿経路をインプロセス検証 |
+| 48 | #4478 | 1 | rc スクリプトが SSH 越しの restart で戻ってこない |
+| 35 | #4520 | 1 | 404 が `not_found` に body を差し替えられる |
+| 25 | #4586 | 1 | Listener の `root_cert_file` が `SSL_CERT_FILE` にフォールバック |
+| 24 | #4593 | 1 | HTTP タイムアウト。⚠ **下記のとおり実質着地済みの可能性** |
+| 22 | #4597 | 3 | schema の `format` が 1 つも検証していない |
+| 22 | #4596 | 1 | config 検証の `strict` が構造的に発火しない |
+| 1 | #4699 | 1 | json 3.0 の移行（`~> 2.21` の上限を外す） |
+| 1 | #4696 | 1 | ffmpeg の内側 Timeout が構造的に発火しない |
+| 1 | #4694 | 3 | webhook 応答の穴 4 件 |
+| 1 | #4693 | 3 | `report_error` の alert 過不足 3 系統 |
+| 1 | #4689 | 1 | 辞書ソースの間欠 404 を再送する |
+| 18 | **#4639** | 3 | 🎯 **メディアカタログ Gate 2 の overlay flip を zugoga で実施**（2026-09-09 追加） |
+
+#### 進捗（2026-09-10 時点）
+
+⚠⚠ **実装はすべて着地した（PR #4703〜#4717・open PR 0 本）。**残るのは
+**#4639 の手順 4・5（zugoga の flip と 24 時間観測）だけで、これは 5.37.0 の本番
+デプロイ後に回す**（下の「#4639 の手順 3」参照）。#4699 は調査と前提の観測性までで、
+版上げ本体は harness ＋ステージング実走待ち（Issue は open）。
+
+| Issue | PR | 状態 |
+| --- | --- | --- |
+| 手順 12 の掃除 | #4703 | ✅ マージ |
+| #4596 config の strict | #4704 | ✅ マージ・⚠ **ステージング再起動での確認待ち** |
+| #4586 `root_cert_file` | #4705 | ✅ マージ・⚠ **根は pooza/ginseng-core#512** |
+| #4696 ffmpeg の締切 | #4706 | ✅ マージ |
+| #4520 404 のボディ | #4707 | ✅ マージ |
+| #4699 の前提（body 解釈失敗の観測性） | #4708 | ✅ マージ・⚠ **版上げは 5.37.0 から外した**（下の「json 3.0 は生成側でも」） |
+| #4478 rc.d の restart | #4709 | ✅ マージ・⚠ **実機への配布待ち** |
+| #4689 辞書の 404 再送 | #4710 | ✅ マージ |
+| #4597 schema の format | #4711 | ✅ マージ |
+| #4693 `report_error` の過不足 | #4712 | ✅ マージ |
+| #4694 webhook 応答の穴 | #4713 | ✅ マージ |
+| #4414 Spotify の state | #4714 | ✅ マージ・⚠ **capsicum#737 へ申し送り済み**（`oauth_uri` に Bearer が要るようになった） |
+| #4428 harness で webhook 検証 | #4715 | ✅ マージ・harness 側は pooza/chubo2#232 |
+| #4639 手順 3 で見つけた `/feed/media` の不具合 | #4717 | ✅ マージ |
+| #4702 dependabot の受け皿（マイルストーン外） | #4716 | ✅ マージ・⚠ **効くのは `main` に入ってから** |
+| リリース前レビューの赤（alert のデッドマン） | #4719 | ✅ マージ（下の「リリース前レビュー」参照） |
+| リリース前レビューの docs の齟齬 | #4720 | ✅ マージ |
+
+##### 🔴 #4639 の手順 3（dev26 で flip）で眠っていた不具合が出た
+
+flip すると `/feed/media` の全 item から **`<pubDate>` が消えていた**。`feed_entry` が
+`created_at:` を返し、ginseng-web の RSS 生成は**キーをすべて item のセッターとして送る**ので、
+`created_at=` で例外になって後ろの `date` が捨てられる。⚠ **レスポンスは 200 のまま**
+（item 単位で rescue される）。media_catalog は 5.23.0 から既定で無効だったので本番で誰も
+踏まなかった。⚠⚠ **このまま zugoga で flip していたら、リクエストごと × item ごとに syslog が
+1 行ずつ増えた**（#4549 の「日 2 万行」と同型）。→ PR #4717。
+
+⚠ **手順 4（zugoga の flip）は #4717 が本番に入るまで進めない。**dev26 は flip したまま
+（`config/local.yaml.bak-4639` にバックアップ）。
+
+##### ⚠ `.github/dependabot.yml` は `main` のものが読まれる
+
+`target-branch: develop` は「PR をどこへ出すか」で、**設定の読み先ではない**。#4716 の
+PR 本文で逆のことを書いてしまい、#4702 で訂正した。**リリースまで version update は出ない。**
+
+⚠ **`Closes #NNNN` は効かない。**PR の宛先が `develop` で、**GitHub が自動クローズするのは
+既定ブランチ（`main`）へマージされたときだけ**。マイルストーンの Issue はリリースまで open
+のまま残るのが正常で、追いかけ直さないこと。
+
+##### 🔴 この回で Codex が出した P1 / P2 は 7 件とも実質的だった
+
+⚠ **とくに 3 件は、こちらのテストが false negative だった**ものを突いている:
+
+1. **PR #4708 P1** — 例外メッセージが本文を反響しうる。⚠ こちらのテストは `,,` を
+   使っていたので**反響部分が記号だけになり素通り**していた
+2. **PR #4713 P1** — `drain` を `ensure` へ移しただけでは、**取り出し済みで処理中の
+   添付が拾えない**（`Thread#kill` は `rescue => e` を通さない）。⚠⚠ **添付 1 枚 ＝
+   ワーカー 1 本という最も普通の形で、修正が何も残さない**状態だった
+3. **PR #4711 P1** — 検証を `Mulukhiya.validate_config` にだけ足すと、
+   🔴 **`rake config:lint` が「起動前チェック」として設定されているのに
+   `config: OK` を返して exit 0** する
+
+⚠ ただし **PR #4710 の P1 は半分だけ正しかった**（pinning のすり抜けは実在したが、
+「無限に再送しうる」は `repeat` の `cnt < retry_limit` があるので成り立たない）。
+**指摘も実機・実装で裏を取る。**
+
+##### ⚠⚠ `JSON.parse` は json gem のものではない（2026-09-09 判明）
+
+```
+JSON.parse    → yajl-ruby-1.4.3/lib/yajl/json_gem/parsing.rb
+JSON.generate → yajl-ruby-1.4.3/lib/yajl/json_gem/encoding.rb
+```
+
+**`ginseng-core` が引く yajl-ruby の `yajl/json_gem` が差し替えている。**
+⚠ `Gemfile` にも `Gemfile.lock` の直接依存にも `yajl-ruby` は現れない。
+**json 3.0 の既定変更（重複キーの拒否など）は `JSON.parse` に届かない**ので、
+#4699 の見立てはこれを前提に描き直した。⚠ `obj.to_json` は json gem のまま。
+
+⚠ **アプリの runtime で測ること。**`bundle exec ruby -rjson -e ...`（アプリを
+読み込まない素の環境）で測って一度誤った。
+
+##### 🔴 訂正（2026-09-10・リリース前レビューで発覚）: Yajl も入力を反響する
+
+PR #4708 / #4699 / コード内コメントで「**アプリ内の Yajl は `lexical error: invalid char in
+json text.` としか言わない（入力を反響しない）**」と書いたが、**誤り。**Yajl のメッセージは
+**3 行**で、**2 行目に入力がそのまま入る**:
+
+```
+0: "lexical error: invalid char in json text.\n"
+1: "   {\"status\": \xE7\xA7\x98\xE5\xAF\x86\xE3\x81\xAE\xE6\x9C\xAC\xE6\x96\x87}\n"   ← 本文
+2: "   (right here) ------^\n"
+```
+
+⚠⚠ **誤った原因は 2 つ重なっていた。**
+1. プローブの出力を `grep` で 1 行目だけに絞っていた
+2. メッセージが **ASCII-8BIT** なので、`inspect` すると日本語が `\xE7\xA7\x98…` に
+   エスケープされ、**日本語の正規表現に一致しない**。`test_log_does_not_carry_the_body` は
+   これで**本文が漏れていても素通りする** false negative になっている（掃除 PR で直す）
+
+⚠ **実害は無い。**#4708 は Codex の P1 を受けて**ログに `message` をそもそも載せない**形に
+してあるので、Yajl が反響しても外へは出ない。**むしろ #4708 の判断が必要だった裏付け**。
+⚠ **エンコーディングが BINARY の文字列を、UTF-8 の正規表現で「含まない」と判定しないこと。**
+
+##### 🔴 json 3.0 は生成側でも重複キーを拒否する — #4699 を 5.37.0 から外した（2026-09-10）
+
+```
+# json 3.0.2
+{a: 1, "a" => 2}.to_json   #=> JSON::GeneratorError: detected duplicate key "a"
+# json 2.21.2（現行）: {"a":1,"a":2}。警告は -W:deprecated のときだけ
+```
+
+⚠⚠ **`JSON.parse` 系は Yajl なので届かないが、`to_json` は json gem のまま**なので、シンボルと
+文字列で同名のキーが混ざったハッシュを出した瞬間に例外になる。**現行 2.21 は deprecation 警告が
+既定で無効なので、本番で起きているかのデータが無い。**上流も 3 日で 3 回リリース（3.0.1 は削除した
+API を戻した）。→ **ステージングで `RUBYOPT=-W:deprecated` を回して `detected duplicate key` を
+数えてから上げる**（手順は #4699 のコメント）。⚠ **急がないという意味で外したのではない。**
+
+#### リリース前レビュー（5 観点）の結果（2026-09-10）
+
+| 観点 | 赤 | 黄 | 緑 |
+| --- | ---: | ---: | ---: |
+| セキュリティ | 0 | 0 | 3（＋差分外の参考 3） |
+| API 契約 | 0 | 2 | 3 |
+| 並行性・ライフサイクル | 0 | 4 | 2（＋差分外の参考 3） |
+| エラー処理・観測性 | 0 | 2 | 5 |
+| スタイル・規約 | 0 | 1 | 13 |
+
+⚠⚠ **各観点は赤 0 だったが、合わせると赤が 1 件あった。**`throttled_alert`（#4693 / PR #4712）が
+「KEYS を撃つ」（並行性・観測性・API 契約の 3 観点が別々に指摘）と「書けない Redis では
+再送の sleep ＋全ルートの alert が黙る（`/health` は OK のまま）」（観測性が実測）を
+**同時に持っていた**。→ **PR #4719 でマージ済み**（`SET NX EX` 1 発・失敗時はプロセス内の
+抑止へ倒す）。⚠ **観点ごとの深刻度をそのまま並べず、同じ場所への指摘は束ねて読み直す。**
+
+**中以上は Issue にした**（マイルストーン外・引き金つき）:
+
+| Issue | 中身 |
+| --- | --- |
+| #4721 | webhook のタイムアウト経路の残り（手を付けていない添付を「上限超過」と誤報告 / 動画変換の締切がネストで引き継がれない）。⚠ `event.rb` の「何段ネストしても一意」は誤り |
+| #4722 | メディア変換の残り（ffmpeg の内側 Timeout で alert が動画ごと / 音声変換・ffprobe が締切を見ない / 出力先の同名競合） |
+| #4723 | webhook `/admin` の alert 洪水 / `client_message` を許可リストに |
+| #4724 | OAuth state の取り出し失敗が 403 に化けて無音 / error ブロックの非 Ginseng 分岐 |
+| #4725 | 404 で Content-Type と本文が食い違う（既存） |
+| #4726 | `/oauth/callback` のログイン CSRF（**要確認**・security） |
+| #4727 | 管理画面から再起動した puma の stderr が `/dev/null` |
+
+⚠ **yajl-ruby の件（`JSON.parse` の差し替え・入力の反響）はユーザーが起票する**（2026-09-10 明示）。
+こちらから起票しない。
+
+**極小は手順 12 の掃除 PR へ**（リリース後。⚠ 先送りではなく、ここが受け皿）→ **PR #4730 で全件**:
+
+- `/ffmpeg/timeout` を schema に宣言し、0 以下を弾く（0 で `Timeout.timeout(0)`＝無制限になる）。コメントの「ハンドラの外だけ」も直す
+- webhook `/:digest` の rescue が `{error: e.message}` を返す（DB 障害中は `PG::ConnectionBad` の接続先が認証なしで返る）
+- `media_convert_handler.rb` の `errors.push` を `e.alert` の前へ（#4722 の一部）
+- PKCE の callback で `code_verifier` を必須にする（#4726 の一部）
+- json 3.0 のコメント（`controller.rb` / `unparsable_body.rb`）を Yajl の実態へ。`test_duplicate_key_body_reaches_the_same_path` の `<= 1` は 0 件でも通る
+- `test_log_does_not_carry_the_body` の false negative（BINARY エンコーディング）を ASCII 部分で判定する形へ
+- NeverSilent の配線そのものを通すテスト（`verify_token_integrity!` / `encrypt_token!`）
+- `AuthError` を 401 と書いているコメント 2 か所（実際は 403）
+- コメントとメソッドの割り込み（`test_case.rb` の `invalidate_shared_caches`、`spotify_user_service` テストの `account_double`）
+- `SpotifyUserService#initialize` のコメント（`oauth_uri` はアカウント必須になった）、`create_state` / `account_id` / `verify_state!` を private へ
+- `spotify_auth_contract.rb` の `pooza/capsicum#570` → `#737`
+- 弱いアサーション: `webhook_inprocess` の 404 は `error` キーまで、`listener_root_cert` の blank は error ログが出ないことまで見る
+- schema の `pattern` の `^` / `$` → `\A` / `\z`（4 か所）
+- `test.yml` の「実インスタンス」→「実サーバー」
+- rc.d の status コメント「`start` 自身が fork する」（fork するのは `restart` だけ）
+- `.bundler-audit.yml` の Sinatra ReDoS 除外（前提の 4.1.1 固定はもう無い）
+- `oauth_state_storage.rb` の「本番 3 台」→ 4 台（vulcan も Redis 8.0.5 で GETDEL が通る）
+- `event.rb` の「何段ネストしても一意」を #4721 への参照に置き換える
+- 抑止した log 行に `origin` を足す → ⚠ **PR #4719 で入れた**（ここでは不要）
+
+#### 🎯 #4639 — この回の「機能が前へ進む」枠（2026-09-09 追加）
+
+⚠ **年齢・重みでは選ばれない枠。**上記のとおりユーザーの明示指示で入れている。
+
+**#4393 の LATERAL merge が着地済み（26,415ms → 56.7ms）**なので、残るのは
+**overlay を立てて実際に点けること**だけ。rollback の信号も **#4618 の `/health` 拡張が
+5.36.0 で本番に乗った**ところで揃っている（`postgres.pool.waiting` / pgbouncer ブロック）。
+`total_wait_time_us` の起点は「本番 4 台へのデプロイ（2026-09-08・5.36.0）」の節にある。
+
+- ⚠ **手順 3（dev26）は性能検証ではない。**壊れていないことだけを見る
+- ⚠ **`/health` は Puma 1 プロセスの Sequel プールしか見ていない。**2026-05-19 に枯れたのは
+  **pgbouncer**（[[project_incident-2026-05-19-feed-media-pool]]）。判定は pgbouncer 側の
+  `cl_waiting` を主に取る
+- ⚠ **後続は #4352（shallu / gomander への横展開）だが、24 時間観測が前提**なので
+  同じマイルストーンには入れない（2026-09-09 の判断）
+
+#### ⚠ #4593 は実質着地している（2026-09-08 の棚卸しで実測）
+
+起票時の主張は「**`/http/timeout/seconds` が config に無く、`Ginseng::HTTP` も `get`/`post` に
+`timeout:` を渡していない。両側とも未設定で実効は Net::ReadTimeout 既定の 60 秒**」だったが、
+**どちらも解消している。**
+
+- `config/application.yaml` に `/http/timeout/seconds: 30` が入っている
+- **pooza/ginseng-core#514 は closed** で、`request` / `request_with_body` が
+  `options[:timeout] ||= timeout` を渡すようになっている
+- **実測**: `Mulukhiya::HTTP.new.timeout == 30`、かつ HTTParty へ**実際に `timeout=30` が渡る**
+  （`HTTParty.get` を差し替えて観測）
+- 切れたときの振る舞いも「黙って死ぬ」形ではない。`Net::ReadTimeout` は `repeat` が
+  `log_retry_error` を出してから `GatewayError` に包んで投げる
+
+⚠ **残っているのは「30 という値を投稿経路の実測から決めたか」だけ。**既定の 60 秒より短いので
+改善ではあるが、測って決めた記録は無い。⚠⚠ **クローズしてよいかはユーザーに確認する**
+（[[feedback_defer-requires-followup-issue]]「元要件を先送りする時は受け皿を起票するまでクローズ不可・クローズ前に確認」）。
+
+#### 小粒の掃除（手順 12）— ✅ 着地（2026-09-09）
+
+**#4698 から外した 5 件**を 1 PR で落とした。⚠ **動作を変えない・既存テストで担保される・lint 緑**のものだけ。
+
+| | 対象 | 結果 |
+| --- | --- | --- |
+| 1 | `model/attachment_methods.rb` — `"\#{self}.catalog_cursor_key"` の補間がエスケープされ literal で出る | ✅ 修正（**1 文字**） |
+| 2 | `dbms/postgres.rb` — `return` に多行チェイン ＋ 到達しない `\|\| pool` | ✅ 修正（一時変数に割って 1 行 return・`\|\| pool` を削除） |
+| 3 | `test/unit/dbms/pgbouncer.rb` — 見栄えのための桁揃え 4 行 | ⚠ **既に無かった**（`459cfa75` で解消済み）。着手前に実測すること |
+| 4 | `webhook.rb` — `extend LogScrubber` が死にコード | 🔴 **誤り。取り下げた**（下記） |
+| 5 | `test/unit/daemon/sidekiq_daemon.rb` — クラス名 `SudekiqDaemonTest` の綴り | ✅ 修正 |
+
+あわせて ① として「起票しない」と決めていた `TaggingDictionary.invalidate_cache` の `KEYS` は、
+**該当箇所へコメント**を残して終わりにした。⚠ 起票時の「呼び出し元はテストと **rake**」は不正確で、
+**実際の呼び出し元はテストだけ**（`TestCase.invalidate_shared_caches` と辞書キャッシュのテスト 3 本）。
+`app/task/mulukhiya/tagging.rb` が叩いているのは `TaggingDictionaryUpdateWorker` で、これとは別物。
+
+##### 🔴 4 は死にコードではなかった — テストが根拠付きで依存していた
+
+`Webhook` の `extend LogScrubber` は、導入時の呼び出し元（`self.create`）こそ #4657 で消えているが、
+**`test/unit/controller/log_scrub_path.rb` の `test_webhook_class_scrubs_digest` が
+`Webhook.scrub_log_digest` を直接叩いている。**しかもそのテストには
+
+> ⚠ **クラスメソッドからも引ける**ことを押さえる。digest をログへ出す経路がクラス側に生えたときに、素の値が漏れないため。
+
+という**意図の明記**がある。⚠⚠ **「呼び出し元が消えた」だけで死にコードと判定してはいけない。**
+`extend` / `include` は**能力を生やす**ので、消費者はクラス本体の外（テスト・将来の経路）にいる。
+今回は `grep -rn "Webhook\.scrub"` を repo 全体へ打って初めて見つかった。
+
+取り下げの代わりに、**stale だったコメントのほうを直した**（`self.create` を根拠として挙げていたので、
+読んだ人が同じ誤判定を繰り返す形になっていた）。
+
 ## リリース済み: 5.36.0（2026-09-08）
 
 **スコープ確定（2026-08-27）。**[マイルストーン 5.36.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/634)
