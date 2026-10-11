@@ -233,11 +233,16 @@ git diff Gemfile.lock
   - **前提の実測（#4690 にコメント）**: GAS は `ETag` も `Last-Modified` も返さず `no-store` ＝ **条件付き GET は使えない**
   - **dev25 で実物の GAS を通した**（`5d1c0b38`）: `singer.json` / `series.json` に `interval: 3600` → 2 回目の更新から `reused_sources: 2`・語数 3965 のまま。
     ⚠ dev25 はこのブランチ・設定に `interval` を入れたまま（バックアップは `config/local.yaml.bak-4690`）
+  - **Codex P2 × 3 に対処**（再レビューは指摘なし・CI 両系 SUCCESS・HEAD は `965569ac`）: ① 手動の更新（`POST /tagging/dic/update`・rake）は
+    `force` を渡して間隔を無視する ② 実際に取りにいって失敗した回は「新しい」印を消す（残すと定時の更新が取り直さない）
+    ③ `force` は文字列・シンボルどちらのキーでも受ける（development / test は `Worker.perform_async` がシンボルにして同期で呼ぶ）。
+    dev25 で、定時と同じ呼び方は `reused_sources: 2`・`rake mulukhiya:tagging:dic:update` は `reused_sources: 0` を確認
+  - ⚠ **手動更新が間隔を無視するので、ニチアサの直前に辞書を直したら「更新」を押せば届く**
   - 📌 **本番のどのソースにどの間隔を入れるかは未決**（設定の話・ユーザーと決める）。⚠ ニチアサの直前に直す運用があるソースには長い間隔を付けない
 
 ### ステージングの現在地（2026-10-12 08:00 JST）
 
-dev24 / dev26 / dev27 は develop（`8d8e7e02`）、dev25 は PR #4828 のブランチ（`5d1c0b38`）。
+dev24 / dev26 / dev27 は develop（`8d8e7e02`）、dev25 は PR #4828 のブランチ（`965569ac`）。
 
 ### 残り
 
