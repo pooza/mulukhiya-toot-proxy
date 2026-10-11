@@ -2037,7 +2037,12 @@ Issue #4233 の APIController 段階的リファクタは「1〜2 マイルス�
 - **足りないのは DB 直読み層だけ。**v5-plan は Akkoma を「Mastodon 系（`MastodonController` 担当）」に分類しており API はほぼ互換。一方 DB は `users` / `objects` / `activities` / `oauth_tokens` で Mastodon の `accounts` / `statuses` とは別物
 - 抽象化の縫い目は生きている（`controller_name.camelize` → constantize、`sns_type` 分岐は app 全体で 20 箇所）。除去コミット #4031 / #4033 / #4034 から `git show 46c4f4e2^:<path>` で復元できる
 - ⚠ **`Ginseng::Fediverse::PleromaService` は gem 側に残っているが最終更新 2024-09-16。**この 2 年ぶんの `MastodonService` の変化に追随できているかは未検証
-- **CT が先。**検証環境（pooza/chubo2#164、pve の LXC）が無いまま足すと、3 系統目が「走っていないのに緑」になり #4503 で潰した状態が復活する
+- ✅ **検証環境は 2026-10-10 に建った＝着手のブロッカーは解消**（2026-10-11 ユーザー確認）。dev29 `https://st.akkoma.b-shock.org`
+  （Akkoma 3.20.1・OTP リリース・Ubuntu 26.04 の LXC・2 vCPU / 2GB・新規登録は閉じてある・管理者 `pooza`）。構成と踏んだ点は chubo2
+  `docs/infra-servers.md`「dev29（Akkoma ステージング）」、経緯は `docs/infra-history.md` の 2026-10-10 の節。
+  ⚠ **マイルストーンは 5.43.0 のまま動かさない**（ユーザー「変えなくていい」）。作業を始められる状態になった、というだけで、急ぐ理由は増えていない。
+  **最初の一歩は dev29 へのモロヘイヤの設置**（pooza/chubo2#164 の残り）
+- ~~**CT が先。**~~ 検証環境が無いまま足すと、3 系統目が「走っていないのに緑」になり #4503 で潰した状態が復活する（→ 上のとおり解消）
 
 ここに無い版（5.37.x 以前）のリリースノートは [release-history.md](archive/release-history.md) を参照。
 
