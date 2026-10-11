@@ -31,6 +31,7 @@ module Mulukhiya
       logger.send(words.empty? ? :error : :info, dic: dic.to_h.merge(words: words.count))
       return save_source(dic, words) if words.present?
       @empty_sources.push(dic.uri.to_s)
+      clear_fresh(dic)
       return restore_source(dic)
     end
 
@@ -106,6 +107,17 @@ module Mulukhiya
       return unless interval = source_interval(dic)
       ttl = interval - TaggingDictionary::FRESH_MARGIN
       redis.setex(fresh_key(dic), ttl, Time.now.to_i.to_s) if ttl.positive?
+    end
+
+    # 🔴 **実際に取りにいって失敗した回は、印を消す（PR #4828 の Codex P2）。**印が生きている間の
+    # 失敗は手動の更新（`force`）でしか起きないが、消さないと、定時の更新が残りの間隔ぶん
+    # 「使い回し」で済ませて取り直さない＝一度の失敗が、上流を見にいかない時間を作る。
+    # ⚠ last-good は消さない（埋めるのに使う）。
+    def clear_fresh(dic)
+      return unless source_interval(dic)
+      redis.unlink(fresh_key(dic))
+    rescue => e
+      e.log(dic: dic.to_h)
     end
 
     # ⚠ ダブルやサブクラスが `interval` を持たないときは「毎回」。

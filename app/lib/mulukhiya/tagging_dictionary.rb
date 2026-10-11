@@ -271,6 +271,7 @@ module Mulukhiya
         result.push(fetch_source(dic))
       rescue => e
         @empty_sources.push(dic.uri.to_s)
+        clear_fresh(dic)
         result.push(restore_source(dic))
         e.log(dic: dic.to_h)
       end

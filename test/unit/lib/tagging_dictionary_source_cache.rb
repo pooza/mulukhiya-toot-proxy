@@ -118,6 +118,43 @@ module Mulukhiya
       assert_equal(2, @source.parsed)
     end
 
+    # 🔴 **手動の更新が失敗したら、印を消す（PR #4828 の Codex P2）。**残すと、定時の更新が
+    # 残りの間隔ぶん使い回して、上流を取り直さない。
+    def test_failed_forced_refresh_clears_the_fresh_mark
+      @source.interval = 3600
+      fetch_source(@source)
+      reset_counters
+      @source.words = {}
+      @dic.instance_variable_set(:@force_refresh, true)
+
+      # 失敗した回は last-good で埋める（辞書は痩せない）。
+      assert_equal(entries, fetch_source(@source))
+      assert_equal([URL], @dic.instance_variable_get(:@empty_sources).to_a)
+      assert_nil(redis[@dic.send(:fresh_key, @source)])
+
+      # ⚠ 次の定時の回は、使い回さずに取りにいく。
+      @dic.instance_variable_set(:@force_refresh, false)
+      @source.words = entries
+      reset_counters
+      fetch_source(@source)
+
+      assert_equal(3, @source.parsed)
+      assert_empty(@dic.instance_variable_get(:@reused_sources).to_a)
+    end
+
+    # ⚠ 例外で落ちた回も同じ（`fetch` の rescue を通る）。
+    def test_raising_forced_refresh_clears_the_fresh_mark
+      @source.interval = 3600
+      fetch_source(@source)
+      @source.define_singleton_method(:parse) {raise Ginseng::GatewayError, 'Bad response 404'}
+      @dic.instance_variable_set(:@force_refresh, true)
+      source = @source
+      @dic.define_singleton_method(:remote_dictionaries) {[source]}
+
+      assert_equal([entries], @dic.send(:fetch).to_a)
+      assert_nil(redis[@dic.send(:fresh_key, @source)])
+    end
+
     # ⚠ 既定（`interval` なし）は、これまでどおり毎回取りにいく。
     def test_source_without_interval_is_fetched_every_time
       2.times {fetch_source(@source)}
