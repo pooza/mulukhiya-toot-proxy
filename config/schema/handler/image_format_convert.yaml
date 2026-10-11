@@ -1,7 +1,7 @@
 label: 画像フォーマット変換
 description: アップロードされた画像を既定のフォーマットに変換します
 properties:
-  disabled:
+  disable:
     type: boolean
   timeout:
     minimum: 1

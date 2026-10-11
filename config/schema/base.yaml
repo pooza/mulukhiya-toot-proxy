@@ -377,6 +377,8 @@ properties:
     type: object
   program:
     properties:
+      auto_update:
+        type: boolean
       urls:
         items:
           format: uri

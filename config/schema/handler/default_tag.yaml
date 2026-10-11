@@ -1,7 +1,7 @@
 label: デフォルトタグ
 description: 投稿にデフォルトのハッシュタグを付与します
 properties:
-  disabled:
+  disable:
     type: boolean
   tags:
     items:

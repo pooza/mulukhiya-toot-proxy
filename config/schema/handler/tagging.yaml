@@ -1,7 +1,7 @@
 label: タグ処理
 description: 投稿末尾のハッシュタグを正規化・整理します
 properties:
-  disabled:
+  disable:
     type: boolean
   normalize:
     properties:

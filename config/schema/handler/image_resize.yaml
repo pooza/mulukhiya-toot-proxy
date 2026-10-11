@@ -1,7 +1,7 @@
 label: 画像リサイズ
 description: 大きな画像を既定の最大ピクセル数にリサイズします
 properties:
-  disabled:
+  disable:
     type: boolean
   pixel:
     minimum: 200

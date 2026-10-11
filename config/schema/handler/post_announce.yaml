@@ -1,7 +1,7 @@
 label: アナウンス投稿
 description: アナウンスを未収載ステータスとして投稿します
 properties:
-  disabled:
+  disable:
     type: boolean
   timeout:
     minimum: 1

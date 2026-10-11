@@ -1,7 +1,7 @@
 label: メディアタグ
 description: 添付メディアの種類に応じたハッシュタグを付与します
 properties:
-  disabled:
+  disable:
     type: boolean
   tags:
     properties:
