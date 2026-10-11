@@ -14,6 +14,7 @@ module Mulukhiya
     end
 
     def teardown
+      Environment.define_singleton_method(:mastodon?, @mastodon) if @mastodon
       @stubs.each do |name, original|
         if original
           ListenerDaemon.define_singleton_method(name, original)
@@ -61,7 +62,7 @@ module Mulukhiya
     # 503 にし、monit が再起動する。名前解決の失敗は再起動しても直らない。
     # ⚠ gem は `Socket::ResolutionError` を `GatewayError` に包むので、その形で投げる。
     def test_name_resolution_failure_is_not_ng
-      omit('ストリーミングの確認は Mastodon 系だけ') unless Environment.mastodon?
+      as_mastodon
       File.write(@pid_path, Process.pid.to_s)
       error = wrapped(Socket::ResolutionError.new('getaddrinfo(3): Name does not resolve'))
       stub(:check_streaming_endpoint) {raise error}
@@ -74,7 +75,7 @@ module Mulukhiya
 
     # ⚠ 外すのは名前解決だけ。繋がって 5xx・接続拒否は NG のまま（修正を広げすぎない）。
     def test_other_streaming_failures_stay_ng
-      omit('ストリーミングの確認は Mastodon 系だけ') unless Environment.mastodon?
+      as_mastodon
       File.write(@pid_path, Process.pid.to_s)
       [RuntimeError.new('streaming returned 502'), wrapped(Errno::ECONNREFUSED.new)].each do |error|
         stub(:check_streaming_endpoint) {raise error}
@@ -103,6 +104,13 @@ module Mulukhiya
     end
 
     private
+
+    # ⚠ ストリーミングの確認は Mastodon 系だけが通る。**omit にしない** — Misskey 系の CI で
+    # 実行されないテストが増える（omission の上限・#4503）。判定だけ Mastodon に固定する。
+    def as_mastodon
+      @mastodon ||= Environment.method(:mastodon?)
+      Environment.define_singleton_method(:mastodon?) {true}
+    end
 
     # gem の HTTP と同じ形（元の例外を `cause` に持つ `GatewayError`）を作る。
     def wrapped(cause)
