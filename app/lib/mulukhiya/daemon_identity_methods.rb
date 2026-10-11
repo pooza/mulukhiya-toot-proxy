@@ -26,8 +26,8 @@ module Mulukhiya
   # （当時は `run_stop` をここで上書きして塞いだ。v2.2.0 で上流へ移ったので外した・#4784）。
   # rc.d はこのあと pattern で取り残しを探すので、本物が別に居れば止まる。
   #
-  # ⚠ 混ぜる側は `identity_pattern` を持つこと。**rc.d の `mulukhiya_*_pattern` と
-  # 同じ物差し**にしてある（`config/sample/freebsd/`）。
+  # ⚠ 混ぜる側は `identity_pattern` を持つこと。**rc.d の `mulukhiya_*_pattern`（`config/sample/freebsd/`）
+  # より狭い。**あちらは取り残しを広く拾う用途、こちらは他人を自分と誤らない用途（→ `launcher_pattern`）。
   module DaemonIdentityMethods
     def alive_state_of(found)
       state = super

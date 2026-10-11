@@ -1,5 +1,7 @@
 module Mulukhiya
   module SNSServiceMethods
+    EXPIRED_OAUTH_STATE = 'Invalid OAuth state (expired or already used)'.freeze
+
     include SNSMethods
 
     def upload(path, params = {})
@@ -89,7 +91,7 @@ module Mulukhiya
     #
     # `/mulukhiya/app/:page` は認証なしで state を発行するので、state が有効かどうかだけを
     # 見ていると、攻撃者が**自分のアカウントで**認可した `code` と state を載せた callback の
-    # URL を被害者に踏ませられる（ログイン CSRF）。被害者の Web UI に攻撃者のトークンが入り、
+    # URL を被害者に踏ませられる（ログイン CSRF）。被害者の WebUI に攻撃者のトークンが入り、
     # 以後の操作（ナウプレ・タグ付け・設定変更）が攻撃者のアカウントで行われる。
     # ⚠ 発行時に Cookie の目印のダイジェストを state に添え、ここで突き合わせる。
     # ⚠ **`browser` を持たない state は通さない**（目印なしで発行させれば素通り、にしない）。
@@ -101,7 +103,7 @@ module Mulukhiya
       # **`code_verifier` が nil のままトークン交換へ進み、PKCE の束縛が効かない**
       # （5.37.0 リリース前レビュー・#4726 の関連）。
       verifier = state_data&.dig(:code_verifier)
-      raise Ginseng::AuthError, 'Invalid OAuth state' unless verifier.present?
+      raise Ginseng::AuthError, EXPIRED_OAUTH_STATE unless verifier.present?
       return oauth_token_request(
         code,
         code_verifier: verifier,
@@ -113,7 +115,10 @@ module Mulukhiya
       expected = state_data&.dig(:browser).to_s
       actual = OAuthHelper.browser_digest(browser).to_s
       return if expected.present? && Rack::Utils.secure_compare(expected, actual)
-      raise Ginseng::AuthError, 'Invalid OAuth state'
+      # ⚠ **文言で原因を分ける**（5.40.0 のリリース前レビュー）。403 は syslog 止めなので、同じ文言だと
+      # 「Cookie を落とすブラウザ・別のブラウザで戻ってきた」と「期限切れ」を行番号でしか見分けられない。
+      raise Ginseng::AuthError, EXPIRED_OAUTH_STATE unless state_data
+      raise Ginseng::AuthError, 'Invalid OAuth state (browser mismatch: retry in the same browser)'
     end
 
     def oauth_authorize_endpoint

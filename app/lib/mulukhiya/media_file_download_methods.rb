@@ -23,8 +23,8 @@ module Mulukhiya
     #
     # ⚠ **サイズ上限を持つ。**以前は Content-Length も本文長も見ずに
     # `File.write(path, get(uri).body)` していたので、巨大な応答をそのまま
-    # メモリとディスクへ通していた。判定は word_suggest / program と同じ二段
-    # (HEAD の Content-Length → 受信後の実測) で、HEAD 非対応の相手でも
+    # メモリとディスクへ通していた。判定は word_suggest / program と同じ三段
+    # (HEAD の Content-Length → 受信中の打ち切り → 受信後の実測) で、HEAD 非対応の相手でも
     # 最終防衛線が残る。
     #
     # ⚠⚠ **上限は受信中にも効かせる (#4612)。**`max_bytes:` を渡すと、上流が上限を超えた

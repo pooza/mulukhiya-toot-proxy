@@ -45,10 +45,6 @@ module Mulukhiya
       end
     end
 
-    def self.internal_address?(ip)
-      return Ginseng::PublicHost.internal_address?(ip)
-    end
-
     # Ginseng::HTTP#get の host_validator へ渡す callable (#4410)。
     # リダイレクトの各ホップがこれを通る。
     #

@@ -5,7 +5,7 @@ module Mulukhiya
   # なる。ロックはそこで fail-open し、同じ要求の読み書きは ginseng-redis の再送で通るので、
   # 利用者には正常な 200 のままロックだけが外れていた。
   class RedisTokenLockTest < TestCase
-    # `redis.call` の差し替え。`failures` の数だけ先頭の呼び出しを落とす。
+    # `redis.call` の差し替え。`errors` に渡した数だけ先頭の呼び出しを落とす。
     class ClientDouble
       attr_reader :calls
 
