@@ -496,7 +496,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 5.39.0
+  version: 5.40.0
 parser:
   note:
     fields:
@@ -626,6 +626,16 @@ service:
       suffixes:
         bad: （評価:良くない）
         spoiler: （ネタバレ）
+    # エピソード辞書（`GET /tagging/dic/annict/episodes`）の直近の成功結果 (#4801)。
+    dictionary:
+      cache:
+        # この秒数より新しければ Annict を引かずに返す。
+        fresh: 600
+        # Annict の失敗が続き、返している結果がこの秒数より古くなったらアラートを出す。
+        # それまでの失敗は syslog 止め。
+        alert: 21600
+        # 結果を持っておく秒数。過ぎると、Annict の失敗がそのまま 502 になる。
+        ttl: 604800
     timeout: 5
     urls:
       api:

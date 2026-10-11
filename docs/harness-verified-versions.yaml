@@ -27,8 +27,16 @@ misskey:
   verified_at: '2026-10-02'
 
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
-last_checked: '2026-10-02'
+last_checked: '2026-10-10'
 
+# 2026-10-10 チェック結果:
+#   - **新しいものは無い。実走・bump とも不要。**`last_checked` の更新のみ。
+#   - Mastodon: 最新 stable は **v4.7.3（2026-10-01）＝ verified と同じ**。v4.7.3 より新しい RC は無い。
+#   - Misskey: 最新 stable は **2026.10.0（2026-10-01）＝ verified と同じ**。それより新しい prerelease も無い。
+# 2026-10-06 チェック結果:
+#   - **新しいものは無い。実走・bump とも不要。**`last_checked` の更新のみ。
+#   - Mastodon: 最新 stable は **v4.7.3（2026-10-01）＝ verified と同じ**。v4.7.3 より新しい RC は無い。
+#   - Misskey: 最新 stable は **2026.10.0（2026-10-01）＝ verified と同じ**。それより新しい prerelease も無い。
 # 2026-10-02 チェック結果:
 #   - 🔴 **Mastodon v4.7.3（2026-10-01・stable）が出た。verified（v4.7.2）より新しいので検証対象。**
 #     Security は依存更新。アセットの再コンパイルが要る。4.6.9 / 4.5.19 / 4.4.26 と同時リリース。

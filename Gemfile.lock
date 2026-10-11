@@ -8,10 +8,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: e0c739e9f4eeb195971d384bda38cbe764135d26
-  tag: v1.25.1
+  revision: 969e8c3dcd93e5dd2befede3a4c0ae42b57f6fdb
+  tag: v2.4.0
   specs:
-    ginseng-core (1.25.1)
+    ginseng-core (2.4.0)
       activesupport (>= 8.1.2.1)
       addressable (>= 2.9.0)
       cgi (>= 0.4.2)
@@ -31,6 +31,7 @@ GIT
       nokogiri (>= 1.19.4)
       optparse
       rake (>= 12.3.3, != 13.4.0)
+      resolv (>= 0.7.2)
       sanitize (>= 6.0.2)
       securerandom
       set
@@ -42,17 +43,19 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 6c9b246fbc954bdf613c7afd3395dd1cb9409c3a
-  tag: v2.0.4
+  revision: 65dbed0432cdb620ca8896ca46f7a838ee888305
+  tag: v5.0.0
   specs:
-    ginseng-fediverse (2.0.4)
+    ginseng-fediverse (5.0.0)
+      ginseng-core (>= 2.1.0)
 
 GIT
   remote: https://github.com/pooza/ginseng-piefed.git
-  revision: 04caa62eb12aad48f414eb53fa8691a1a52a5ae6
-  tag: v0.2.0
+  revision: 2f216baf34d06132fe4ebcff5f64903b503ebab8
+  tag: v0.4.0
   specs:
-    ginseng-piefed (0.2.0)
+    ginseng-piefed (0.4.0)
+      ginseng-core (>= 2.0.0)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -84,11 +87,13 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: db3270ddf9322513771b2b5cfa48e90608c913a0
-  tag: v3.0.3
+  revision: 3a3bd6cbf8cef08974b65f9deb49f5f426a1cb1d
+  tag: v3.0.4
   specs:
-    ginseng-web (3.0.3)
+    ginseng-web (3.0.4)
+      addressable (>= 2.9.0)
       erb (>= 6.0.4)
+      resolv (>= 0.7.2)
       rss
       sassc
       slim
@@ -163,7 +168,7 @@ GEM
       rexml
     crass (1.0.7)
     csv (3.3.6)
-    date (3.5.1)
+    date (3.6.0)
     domain_name (0.6.20260921)
     drb (2.2.3)
     dry-configurable (1.4.0)
@@ -205,7 +210,7 @@ GEM
     erubi (1.13.1)
     et-orbi (1.4.2)
       tzinfo
-    etc (1.4.6)
+    etc (1.5.0)
     eventmachine (1.2.7)
     facets (4.0.0)
     faraday (2.14.4)
@@ -242,7 +247,7 @@ GEM
       logger
       ostruct
     ice_cube (0.17.0)
-    json (2.21.2)
+    json (3.0.2)
     json-schema (6.2.1)
       addressable (~> 2.8)
       bigdecimal (>= 3.1, < 5)
@@ -451,7 +456,7 @@ GEM
       power_assert
     thor (1.5.0)
     tilt (2.9.0)
-    time (0.4.2)
+    time (0.5.0)
       date
     timecop (0.9.11)
     timeout (0.6.1)
@@ -460,7 +465,7 @@ GEM
     unicode-display_width (3.3.0)
       unicode-emoji (~> 4.3)
     unicode-emoji (4.3.0)
-    uri (1.1.1)
+    uri (1.1.2)
     useragent (0.16.11)
     version_gem (1.1.15)
     webmock (3.26.4)
@@ -473,7 +478,7 @@ GEM
     websocket-extensions (0.1.5)
     yajl-ruby (1.4.3)
     zeitwerk (2.8.3)
-    zlib (3.2.3)
+    zlib (3.2.4)
 
 PLATFORMS
   aarch64-linux
@@ -496,7 +501,7 @@ DEPENDENCIES
   ginseng-web!
   ginseng-youtube!
   icalendar
-  json (~> 2.21)
+  json (~> 3.0)
   json-schema
   marcel
   optparse

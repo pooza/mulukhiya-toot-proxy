@@ -131,5 +131,60 @@ module Mulukhiya
       config['/word_suggest/urls'] = original_urls if defined?(original_urls)
       RemoteHost.validator = original_validator if defined?(original_validator)
     end
+
+    # 🔴 受信中に打ち切る (#4612)。上限を超えた本文は読み切る前に止まり、その URL は失敗扱い。
+    # ⚠ `max_bytes:` を渡すのをやめると、受信後の実測（`exceeded max bytes`）に戻って落ちる。
+    # ⚠⚠ 上流の `TooLargeError` は URL を文中に持つので、上へ渡さない（PR #4815 の Codex P1）。
+    def test_fetch_is_cut_off_while_receiving
+      return if disable?
+      uri = Ginseng::URI.parse('https://dic.test/huge.json')
+      original_validator = RemoteHost.validator
+      original_max = config['/word_suggest/fetch/max_bytes']
+      RemoteHost.validator = ->(_host) {'93.184.216.34'}
+      config['/word_suggest/fetch/max_bytes'] = 16
+      stub_request(:head, uri.to_s).to_return(status: 200)
+      stub_request(:get, uri.to_s).to_return(
+        status: 200,
+        body: [{'word' => 'あ' * 100, 'pronunciation' => 'ア'}].to_json,
+        headers: {'Content-Type' => 'application/json'},
+      )
+
+      logged = []
+      logger = Object.new
+      logger.define_singleton_method(:error) {|payload| logged.push(payload)}
+      logger.define_singleton_method(:method_missing) {|*_args, **_kwargs| nil}
+      @dic.define_singleton_method(:logger) {logger}
+
+      assert_nil(@dic.send(:fetch_one, uri))
+      assert_equal(['word_suggest fetch cut off while receiving'], logged.filter_map {|v| v[:message]})
+      assert_equal(uri.to_s, logged.first[:url])
+    ensure
+      config['/word_suggest/fetch/max_bytes'] = original_max if defined?(original_max)
+      RemoteHost.validator = original_validator if defined?(original_validator)
+    end
+
+    # GAS は HEAD に 403 を返す。黙って GET へ倒すと決めているので、上流（Ginseng::HTTP）の
+    # 「落ちた試行」の行も出さない (#4793)。gomander で 1 日 144 行出ていた。
+    # ⚠ 5xx は想定外なので行が残ること。
+    def test_head_not_supported_leaves_no_upstream_error_line
+      return if disable?
+      uri = Ginseng::URI.parse('https://dic.test/pron.json')
+      original_validator = RemoteHost.validator
+      RemoteHost.validator = ->(_host) {'93.184.216.34'}
+      logged = []
+      logger = Object.new
+      logger.define_singleton_method(:error) {|payload| logged.push(payload)}
+      logger.define_singleton_method(:method_missing) {|*_args, **_kwargs| nil}
+      @dic.instance_variable_get(:@http).instance_variable_set(:@logger, logger)
+      {403 => false, 405 => false, 500 => true}.each do |status, expected|
+        logged.clear
+        stub_request(:head, uri.to_s).to_return(status:)
+
+        assert(@dic.send(:valid_content_length?, uri), "HEAD #{status}")
+        assert_equal(expected, logged.any? {|v| v[:method] == :HEAD}, "HEAD #{status}")
+      end
+    ensure
+      RemoteHost.validator = original_validator if defined?(original_validator)
+    end
   end
 end

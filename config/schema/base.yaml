@@ -58,6 +58,21 @@ properties:
     type: object
   annict:
     properties:
+      dictionary:
+        properties:
+          cache:
+            properties:
+              alert:
+                minimum: 0
+                type: integer
+              fresh:
+                minimum: 0
+                type: integer
+              ttl:
+                minimum: 1
+                type: integer
+            type: object
+        type: object
       episodes:
         properties:
           ruby:

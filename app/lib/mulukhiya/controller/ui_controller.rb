@@ -1,5 +1,9 @@
 module Mulukhiya
   class UIController < Controller
+    # OAuth の state を、発行したブラウザに縛るための目印を置く Cookie (#4726)。
+    OAUTH_BROWSER_COOKIE = 'mulukhiya_oauth_browser'.freeze
+    OAUTH_BROWSER_COOKIE_MAX_AGE = 30 * 24 * 60 * 60
+
     get '/' do
       @renderer = SlimRenderer.new
       @renderer.template = 'home'
@@ -12,7 +16,7 @@ module Mulukhiya
       end
       @renderer = SlimRenderer.new
       @renderer.template = params[:page]
-      @renderer[:oauth_url] = sns.oauth_uri
+      @renderer[:oauth_url] = sns.oauth_uri(browser: oauth_browser_nonce)
       return @renderer.to_s
     rescue Ginseng::RenderError, Ginseng::NotFoundError
       @renderer.status = 404
@@ -26,7 +30,11 @@ module Mulukhiya
         @renderer.status = 400
         return @renderer.to_s
       end
-      result = sns.auth_with_pkce(params[:code], params[:state])
+      result = sns.auth_with_pkce(
+        params[:code],
+        params[:state],
+        browser: request.cookies[OAUTH_BROWSER_COOKIE],
+      )
       raise Ginseng::AuthError, 'Token exchange failed' unless result
       parsed = result.parsed_response
       access_token = parsed['access_token'] || parsed['accessToken']
@@ -103,6 +111,29 @@ module Mulukhiya
       return @renderer.to_s
     rescue Ginseng::RenderError, Ginseng::NotFoundError
       @renderer.status = 404
+    end
+
+    # state を発行したブラウザの目印。無ければ作って Cookie に置く (#4726)。
+    #
+    # ⚠ **HttpOnly・SameSite=Lax。**callback は SNS からのトップレベルの GET で戻ってくるので、
+    # Lax なら届く（Strict だと届かずログインできなくなる）。
+    # ⚠ 形の合わない値は捨てて作り直す（他所が置いた値をそのまま目印にしない）。
+    # 🔴 **壊れた UTF-8 も「形の合わない値」**（5.40.0 のリリース前レビュー）。Rack は Cookie の値を
+    # percent-decode するので、`%E3%81` のような値は不正なバイト列になり、正規表現に掛けると
+    # `ArgumentError` で 500 ＋アラートになる。入口の検査 (#4600) は Cookie を見ない。
+    def oauth_browser_nonce
+      nonce = request.cookies[OAUTH_BROWSER_COOKIE].to_s
+      valid = nonce.valid_encoding? && nonce.match?(/\A[\w-]{32,128}\z/)
+      nonce = SecureRandom.urlsafe_base64(32) unless valid
+      response.set_cookie(OAUTH_BROWSER_COOKIE, {
+        value: nonce,
+        path: '/mulukhiya',
+        httponly: true,
+        same_site: :lax,
+        secure: request.ssl?,
+        max_age: OAUTH_BROWSER_COOKIE_MAX_AGE,
+      })
+      return nonce
     end
 
     def token

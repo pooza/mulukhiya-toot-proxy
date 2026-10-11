@@ -795,16 +795,11 @@ module Mulukhiya
     get '/tagging/dic/annict/episodes' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.annict?
       raise Ginseng::AuthError, 'Unauthorized' unless annict = account_class.info_account.annict
-      episodes = annict.episodes(annict.works.map {|v| v['annictId'].to_i})
-      @renderer.message = episodes.filter_map do |e|
-        title = e['title'].to_s.strip
-        next if title.empty?
-        if (m = e['numberText'].to_s[/\d+/])
-          [title, ["#{m}話"]]
-        else
-          [title, []]
-        end
-      end.to_h
+      # ⚠ Annict が落ちていても、直近の成功結果があればそれを 200 で返す (#4801)。
+      # 鳴らすのは「古い結果で凌げなくなってきた」ときだけ（`AnnictEpisodeDictionary#alert?`）。
+      dictionary = AnnictEpisodeDictionary.new(annict)
+      @renderer.message = dictionary.fetch
+      report_error(dictionary.error) if dictionary.alert?
       return @renderer.to_s
     rescue => e
       report_error(e)

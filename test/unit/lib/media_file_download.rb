@@ -72,6 +72,26 @@ module Mulukhiya
       assert_path_not_exist(path_for(URL))
     end
 
+    # 🔴 **受信中に打ち切る (#4612)。**上限を超えた時点で読むのをやめるので、受信後の実測
+    # （`phase: :body`）ではなく受信中（`phase: :receiving`）で落ちる。
+    # ⚠ `max_bytes:` を渡すのをやめると、ここが `:body` に戻って落ちる。
+    def test_oversize_body_is_cut_off_while_receiving
+      allow_all
+      config['/media/download/max_bytes'] = 16
+      stub_request(:head, URL).to_return(status: 200)
+      stub_request(:get, URL).to_return(status: 200, body: 'x' * 1024)
+      error = nil
+      logged = capture_errors do
+        error = assert_raise(Ginseng::GatewayError) {download(URL)}
+      end
+
+      assert_equal([:receiving], logged.filter_map {|v| v[:phase]})
+      assert_path_not_exist(path_for(URL))
+      # ⚠ 例外のメッセージに URL を入れない（#4630）。上流の TooLargeError は文中に URL を持つ。
+      assert_equal('Too large content', error.message)
+      assert_not_kind_of(Ginseng::TooLargeError, error)
+    end
+
     # ⚠⚠ **プリフライトを通したあとの GET も検証されること
     # (pooza/ginseng-core#528)。**`Ginseng::HTTP#request` は
     # `options.delete(:host_validator)` で呼び出し側の hash を壊すので、同じ hash を
@@ -115,6 +135,20 @@ module Mulukhiya
         logged = capture_errors {download(URL)}
 
         assert_equal(count, logged.size, "HEAD #{status}")
+      end
+    end
+
+    # ⚠ **上流（Ginseng::HTTP）が書く「落ちた試行」の行も止める (#4793)。**呼び出し側の
+    # rescue では止められず、GAS への HEAD で 1 台 1 日 144 行出ていた。
+    # 5xx は想定外なので、上流の行も残ること。
+    def test_upstream_attempt_line_is_quiet_only_when_head_not_supported
+      allow_all
+      stub_request(:get, URL).to_return(status: 200, body: 'small')
+      {403 => false, 405 => false, 500 => true}.each do |status, expected|
+        stub_request(:head, URL).to_return(status:)
+        logged = capture_errors(upstream: true) {download(URL)}
+
+        assert_equal(expected, logged.any? {|v| v[:method] == :HEAD}, "HEAD #{status}")
       end
     end
 
@@ -177,7 +211,9 @@ module Mulukhiya
 
     # Logger.new を差し替えて error の payload を集める。⚠ 必ず元へ戻すこと。
     # gem の再試行ログ (`count` 付き) はここで見たいものではないので除く。
-    def capture_errors
+    # ⚠ `count` を持つ行は上流（Ginseng::HTTP）が書く「落ちた試行」。既定では除いて、
+    # こちらが書いた行だけを返す。
+    def capture_errors(upstream: false)
       logged = []
       double = Object.new
       double.define_singleton_method(:error) {|payload| logged.push(payload)}
@@ -185,7 +221,7 @@ module Mulukhiya
       Logger.singleton_class.alias_method(:original_new_for_test, :new)
       Logger.define_singleton_method(:new) {|*_args| double}
       yield
-      return logged.reject {|v| v.key?(:count)}
+      return logged.select {|v| v.key?(:count) == upstream}
     ensure
       Logger.singleton_class.alias_method(:new, :original_new_for_test)
       Logger.singleton_class.remove_method(:original_new_for_test)

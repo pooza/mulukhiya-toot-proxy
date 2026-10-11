@@ -64,9 +64,13 @@ module Mulukhiya
     #
     # ⚠ **抑止中の log には発生源を載せる。**抑止しているあいだは syslog が唯一の
     # 記録なので、どのルートで何件落ちたかを数えられないと意味が無い。
+    #
+    # ⚠ **鳴らす回にも発生源を載せる。**最上位の `error do` に落ちた例外は、ここで載せないと
+    # syslog にも Sentry の extra にもルートが残らない（5.39.0 のリリース前レビュー）。
     def throttled_alert(error)
-      return error.alert if acquire_alert_slot(alert_throttle_key(error))
-      return error.log(throttled: true, origin: alert_throttle_origin)
+      origin = alert_throttle_origin
+      return error.alert(origin:) if acquire_alert_slot(alert_throttle_key(error))
+      return error.log(throttled: true, origin:)
     end
 
     # 鳴らす権利を獲得できたか。
@@ -120,6 +124,8 @@ module Mulukhiya
     # そのまま画面や本文へ出すと内部の構成が漏れる（#4724 の 1 で OAuth state の
     # 取り出し失敗を上げるようにしたら、`/oauth/callback` がこれを出しうるようになった）。
     # ⚠ 4xx は利用者が直せる理由なので従来どおり返す。
+    # ⚠ **全ルートの規則ではない。**当てているのは OAuth の 2 経路（`/oauth/callback` と
+    # token_error 画面）だけで、ほかのルートの `rescue` は `e.message` をそのまま返している。
     def public_error_message(error)
       return error.message if error.respond_to?(:status) && error.status < 500
       return 'Internal Server Error'

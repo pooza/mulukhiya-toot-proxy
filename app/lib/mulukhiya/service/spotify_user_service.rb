@@ -42,8 +42,15 @@ module Mulukhiya
     # ⚠ **それでも倒す先は運用側不備のまま据え置く。**`error_description` の
     # 文面は Spotify の契約ではないので、文字列一致で振り分けると
     # **#4537 で塞いだ側の誤誘導**（何度再連携しても直らない）が戻る。
-    # 代わりに **判定不能であることと `error_description` を残し**、
-    # 実データが貯まってから倒す先を決める。受け皿は #4743。
+    # 代わりに **判定不能であることと `error_description` を残す**
+    # （`log_undecidable_oauth_error`）。
+    #
+    # ⚠ **#4743 は「踏んでいない」としてクローズした（2026-10-05）。**本番 4 台の
+    # ログ（保持 10 日ぶん）にこの行は 0 件、Sentry にも Spotify の token endpoint
+    # 由来のイベントは無かった。観測点は残してあるので、
+    # `spotify token refresh: undecidable oauth error` が出たら #4743 を開き直して
+    # `oauth_error_description` を読む。トークン破損が混ざるなら、文面で分けずに
+    # **送る前に `refresh_token` の健全性を見る**（復号できたか・空でないか）。
     UNDECIDABLE_OAUTH_ERRORS = ['invalid_request'].freeze
 
     # token endpoint が返す OAuth 2.0 の error のうち、**こちら側の設定ミス**を

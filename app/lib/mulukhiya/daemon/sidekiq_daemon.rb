@@ -7,6 +7,7 @@ require 'syslog/logger'
 module Mulukhiya
   class SidekiqDaemon < Ginseng::Daemon
     include Package
+    include DaemonIdentityMethods
     extend DaemonHealthMethods
 
     # 停止要求から hard shutdown（積み残しをキューへ戻す経路）までの締切 (秒)。
@@ -26,6 +27,17 @@ module Mulukhiya
         'sidekiq',
         '--require', initializer_path
       ])
+    end
+
+    # ⚠ sidekiq は proctitle を "sidekiq <version> <作業ディレクトリ名> [0 of 5 busy]" へ
+    # 書き換える。書き換える前は "ruby .../bin/sidekiq --require <Environment.dir>/..."。
+    # ⚠ 同じホストの Mastodon の sidekiq を自分と誤らないよう、タグまで含めて絞る。
+    def identity_pattern
+      return Regexp.union(
+        launcher_pattern('sidekiq_daemon.rb'),
+        exec_pattern('sidekiq', '--require', initializer_path),
+        /sidekiq [\d.]+ #{identity_tag} \[/,
+      )
     end
 
     def self.username
