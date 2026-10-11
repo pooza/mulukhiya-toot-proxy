@@ -217,9 +217,9 @@ module Mulukhiya
 
     # ⚠ 受信中に打ち切る (#4612)。`Content-Length` を出さない・過少申告する相手に、
     # 上限を無視して全部メモリへ読まされないように。超えたら nil（その URL は失敗扱い）。
-    # ⚠⚠ **上流の `TooLargeError` をそのまま上へ渡さない（PR #4815 の Codex P1）。**あちらの
-    # メッセージは URL を文中に含むので、呼び出し元の `e.log` へ届くとマスクが効かない。
-    # URL はマスクの効くフィールドで別に残す。
+    # ⚠ **上流の `TooLargeError` は上へ渡さず、ここで失敗扱いにする（PR #4815 の Codex P1）。**
+    # URL はマスクの効くフィールドで残す。⚠ 上流のメッセージが URL を文中に持っていたのは
+    # ginseng-core 2.4.0 まで（2.4.1 で外れた・pooza/ginseng-core#686）。
     def get_limited(uri)
       return @http.get(
         uri,
