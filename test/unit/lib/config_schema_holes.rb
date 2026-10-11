@@ -60,6 +60,16 @@ module Mulukhiya
       assert_not_empty(validate(handler: {dictionary_tag: {dics: [dic.merge(fields: [1])]}}))
     end
 
+    # ソースごとの取得間隔 (#4690)。秒の正の整数。
+    def test_dictionary_interval_must_be_a_positive_integer
+      dic = {url: 'https://example.com/dic.json'}
+
+      assert_empty(validate(handler: {dictionary_tag: {dics: [dic.merge(interval: 3600)]}}))
+      ['3600', 0, 1.5].each do |value|
+        assert_not_empty(validate(handler: {dictionary_tag: {dics: [dic.merge(interval: value)]}}), value.inspect)
+      end
+    end
+
     # 🔴 `Program#auto_update?` は `!= false` で読む。クォートした "false" や 0 は真に倒れて、
     # 番組表エディタの書き込みが全部 409 になる。型の間違いを検査で落とす。
     def test_program_auto_update_must_be_boolean

@@ -25,6 +25,9 @@ properties:
           items:
             type: string
           type: array
+        interval:
+          minimum: 1
+          type: integer
         name:
           type: string
         strict:

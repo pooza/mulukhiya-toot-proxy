@@ -25,6 +25,9 @@ module Mulukhiya
     # gomander で 1 日 38% の回に出る。本体と同じ 1 時間だと、続けて外した
     # ソースの last-good が先に消えて意味を成さない。
     DEFAULT_SOURCE_CACHE_TTL = 86_400
+    # 「新しい」印の寿命から引く秒数 (#4690)。更新ワーカーの周期（10 分）ぶん。
+    # ⚠ これ以下の `interval` は印が置かれず、毎回取りにいく。
+    FRESH_MARGIN = 600
 
     def initialize
       super
@@ -258,6 +261,7 @@ module Mulukhiya
       result = Concurrent::Array.new
       @empty_sources = Concurrent::Array.new
       @substituted_sources = Concurrent::Array.new
+      @reused_sources = Concurrent::Array.new
       dics = remote_dictionaries
       @attempted_sources = dics.size
       Parallel.each(dics, in_threads: Parallel.processor_count * 2) do |dic|

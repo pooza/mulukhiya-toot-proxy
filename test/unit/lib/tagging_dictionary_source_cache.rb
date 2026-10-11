@@ -20,9 +20,16 @@ module Mulukhiya
         return double
       end
 
-      def parse = @words
+      # ⚠ 上流を引いた回数を数える (#4690)。「引かずに済ませた」ことを見るため。
+      def parse
+        @parsed = @parsed.to_i + 1
+        return @words
+      end
+
+      def parsed = @parsed.to_i
 
       attr_writer :words, :strict
+      attr_accessor :interval
 
       def to_h = {uri: uri.to_s}
 
@@ -74,6 +81,94 @@ module Mulukhiya
       assert_empty(fetch_source(@source))
       assert_equal([URL], @dic.instance_variable_get(:@empty_sources).to_a)
       assert_empty(@dic.instance_variable_get(:@substituted_sources).to_a)
+    end
+
+    # 🔴 **本命 (#4690)。**間隔の内側では上流を引かず、直前の成功分を返す。
+    def test_source_within_interval_is_reused
+      @source.interval = 3600
+      fetch_source(@source)
+      reset_counters
+
+      assert_equal(entries, fetch_source(@source))
+      assert_equal(1, @source.parsed)
+      assert_equal([URL], @dic.instance_variable_get(:@reused_sources).to_a)
+      # ⚠ 上流は落ちていない。失敗にも「埋めた」にも数えない。
+      assert_empty(@dic.instance_variable_get(:@empty_sources).to_a)
+      assert_empty(@dic.instance_variable_get(:@substituted_sources).to_a)
+    end
+
+    # ⚠ 既定（`interval` なし）は、これまでどおり毎回取りにいく。
+    def test_source_without_interval_is_fetched_every_time
+      2.times {fetch_source(@source)}
+
+      assert_equal(2, @source.parsed)
+      assert_nil(redis[@dic.send(:fresh_key, @source)])
+    end
+
+    # ⚠ 印の寿命は周期ぶん短い（`interval: 3600` が実質 70 分にならない）。
+    def test_fresh_mark_expires_before_the_interval
+      @source.interval = 3600
+      fetch_source(@source)
+      ttl = redis.redis.call('TTL', @dic.send(:fresh_key, @source))
+
+      assert_predicate(ttl, :positive?)
+      assert_operator(ttl, :<=, 3600 - TaggingDictionary::FRESH_MARGIN)
+    end
+
+    # ⚠ 周期以下の間隔は印を置かない＝毎回取りにいく（取りにいかなくなる側へ倒さない）。
+    def test_interval_shorter_than_the_cycle_is_ignored
+      @source.interval = TaggingDictionary::FRESH_MARGIN
+      2.times {fetch_source(@source)}
+
+      assert_equal(2, @source.parsed)
+    end
+
+    # 🔴 **失敗した回は印を置かない。**last-good で埋めた回のあとも、次の回は取りにいく。
+    def test_failed_fetch_is_not_marked_fresh
+      @source.interval = 3600
+      fetch_source(@source)
+      redis.unlink(@dic.send(:fresh_key, @source))
+      @source.words = {}
+      fetch_source(@source)
+
+      assert_nil(redis[@dic.send(:fresh_key, @source)])
+
+      @source.words = entries
+      fetch_source(@source)
+
+      assert_equal(3, @source.parsed)
+    end
+
+    # ⚠ 印はあるのに last-good が無い・壊れているなら、取りにいく。
+    def test_fresh_mark_without_last_good_falls_back_to_fetch
+      @source.interval = 3600
+      fetch_source(@source)
+      redis.unlink(@dic.send(:source_key, @source))
+
+      assert_equal(entries, fetch_source(@source))
+      assert_equal(2, @source.parsed)
+
+      redis[@dic.send(:source_key, @source)] = 'not a marshal dump'
+
+      assert_equal(entries, fetch_source(@source))
+      assert_equal(3, @source.parsed)
+    end
+
+    # ⚠ `invalidate_cache` は印も消す（「既知の状態から始める」）。
+    def test_invalidate_cache_drops_fresh_marks
+      @source.interval = 3600
+      fetch_source(@source)
+      TaggingDictionary.invalidate_cache
+
+      assert_nil(redis[@dic.send(:fresh_key, @source)])
+    end
+
+    # ⚠ 設定の型が違うときは「毎回」に倒す。
+    def test_remote_dictionary_interval
+      build = ->(value) {RemoteDictionary.allocate.tap {|d| d.instance_variable_set(:@params, {'/interval' => value})}}
+
+      assert_equal(3600, build.call(3600).interval)
+      [nil, 0, -1, '3600', 1.5].each {|value| assert_nil(build.call(value).interval, value.inspect)}
     end
 
     def test_source_cache_has_ttl
@@ -345,6 +440,7 @@ module Mulukhiya
     def reset_counters
       @dic.instance_variable_set(:@empty_sources, Concurrent::Array.new)
       @dic.instance_variable_set(:@substituted_sources, Concurrent::Array.new)
+      @dic.instance_variable_set(:@reused_sources, Concurrent::Array.new)
     end
 
     def build_dictionary(dics = [])

@@ -60,6 +60,16 @@ module Mulukhiya
       return false
     end
 
+    # このソースを取り直す間隔（秒）。nil なら毎回取り直す (#4690)。
+    #
+    # ⚠ **数値以外・0 以下は「毎回」に倒す。**間隔を読み違えて取りに行かなくなる側へは倒さない
+    # （型の間違いは `rake config:lint` が拾う）。
+    def interval
+      value = @params['/interval']
+      return nil unless value.is_a?(Integer) && value.positive?
+      return value
+    end
+
     def to_h
       return {uri: uri.to_s}
     end
