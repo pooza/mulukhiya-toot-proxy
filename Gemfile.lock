@@ -100,10 +100,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-youtube.git
-  revision: 74b9f344df15ab8a2f6f09808781f97e6ad872a5
-  tag: v3.0.1
+  revision: ad7af8c8296b6918b9f1604be5855c24fb6a81aa
+  tag: v3.0.2
   specs:
-    ginseng-youtube (3.0.1)
+    ginseng-youtube (3.0.2)
 
 GIT
   remote: https://github.com/pooza/rspotify.git
@@ -241,11 +241,10 @@ GEM
       multi_xml (>= 0.5.2)
     i18n (1.15.2)
       concurrent-ruby (~> 1.0)
-    icalendar (2.12.5)
+    icalendar (2.13.0)
       base64
       ice_cube (~> 0.16)
       logger
-      ostruct
     ice_cube (0.17.0)
     json (3.0.2)
     json-schema (6.2.1)

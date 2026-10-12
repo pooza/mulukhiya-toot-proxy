@@ -10,7 +10,7 @@ gem 'ginseng-piefed', github: 'pooza/ginseng-piefed', tag: 'v0.4.0', require: 'g
 gem 'ginseng-postgres', github: 'pooza/ginseng-postgres', tag: 'v2.0.1'
 gem 'ginseng-redis', github: 'pooza/ginseng-redis', tag: 'v2.0.8', require: 'ginseng/redis'
 gem 'ginseng-web', github: 'pooza/ginseng-web', tag: 'v3.0.4', require: 'ginseng/web'
-gem 'ginseng-youtube', github: 'pooza/ginseng-youtube', tag: 'v3.0.1', require: 'ginseng/you_tube'
+gem 'ginseng-youtube', github: 'pooza/ginseng-youtube', tag: 'v3.0.2', require: 'ginseng/you_tube'
 gem 'icalendar'
 # ⚠⚠ **推移依存だが上限をこちらで持つ (#4699)。**`json` を要求している gem は
 # どれも `json (>= 2.3)` のように**下限しか書いていない**ので、`bundle update` の
