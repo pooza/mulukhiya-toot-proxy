@@ -53,7 +53,7 @@ module Mulukhiya
     # ⚠ **従来はこの回が syslog に 1 行も残らなかった。**`refresh` が
     # `log_generation` の手前で return するので、「1 本欠けただけ」に見えて
     # **全滅したことが分からない**状態だった（#4628 の 6 件目）。
-    def log_retention
+    def log_retention(ttl_extended: false)
       logger.error(
         message: 'tagging dictionary retained',
         redis_key: TaggingDictionary::REDIS_KEY,
@@ -65,6 +65,8 @@ module Mulukhiya
         substituted_sources: @substituted_sources.to_a.size,
         empty_source_urls: @empty_sources.to_a,
         entries: size,
+        # 本体キャッシュの寿命を延ばせたか (#4628 の 9 件目)。false が続けば失効が近い。
+        ttl_extended:,
       )
     end
 

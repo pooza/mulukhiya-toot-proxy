@@ -72,6 +72,12 @@ module Mulukhiya
       return redis.call('SET', create_key(key), '1', 'NX', 'EX', ttl.to_i) == 'OK'
     end
 
+    # 既にある鍵の寿命を置き直す（`EXPIRE`）。鍵があって置けたとき true (#4628)。
+    # ⚠ 1 コマンド・再送なし。例外は呼び出し側へ上げる。
+    def expire(key, ttl) # rubocop:disable Naming/PredicateMethod
+      return redis.call('EXPIRE', create_key(key), ttl.to_i).to_i == 1
+    end
+
     # トークン付きのロックを取る（`SET key token NX EX ttl`）。取れたとき true (#4742)。
     #
     # 🔴 **切れた接続を掴んでいたら、1 回だけ撃ち直す。**`redis-client` は既定で再接続しないので、
