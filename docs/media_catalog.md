@@ -2,16 +2,30 @@
 
 モロヘイヤが提供する **メディアカタログ** （`/mulukhiya/api/media`、`/mulukhiya/feed/media`、`MediaCatalogUpdateWorker`）は、当該サーバーのローカル投稿に添付されたメディア（画像・動画・音声）をページング可能なカタログとして配信する機能。capsicum などのクライアントがメディア一覧画面を提供するために利用する。
 
-**5.23.0 (#4343) から デフォルト無効** に変更された。実験的機能として扱い、性能影響を理解したサーバー管理者だけが明示的にオプトインする運用に切り替えている。
+**既定値は Mastodon が有効（5.41.0・#4789）、Misskey が無効（#4375 まで）。**
 
-## 5.23.0 でのデフォルト変更の経緯
+| 版 | Mastodon | Misskey |
+| --- | --- | --- |
+| 〜5.22.x | 有効 | 有効 |
+| 5.23.0〜5.40.x | 無効（実験的扱い・#4343） | 無効 |
+| 5.41.0〜 | **有効** | 無効 |
+
+Mastodon の既定を戻したのは、クエリの書き直し（#4393 の B 案）で **追加の index なしに** 1 秒未満になり、本番 3 台で実績ができたため。
+
+- 重さは **ローカルアカウント数にほぼ比例**する（温まった状態の 1 クエリで、47 アカウントが数十 ms、384 アカウントが 0.5〜0.6 秒）。⚠ **384 を超える規模は未検証**。キャッシュが空の初回は 384 アカウントで 12 秒かかったことがある
+- 有効になると、`MediaCatalogUpdateWorker` が定期的に動き、WebUI にメディアフィードが出る
+- 重いと感じたら、overlay（`local.yaml`）に `/mastodon/data/media_catalog: false` を書けば、5.23.0〜5.40.x と同じ状態（503 を返す）に戻る。データは失われない
+- アップグレード直後は `/mulukhiya/api/health` の `postgres.pool.waiting` が 0 のままかを見る
+- ⚠ **index の作成は要らない。**pooza の zugoga にだけ partial index（`idx_mlkhy_statuses_local_catalog`）が残っているが、無い台でも成立している（2026-10-12 に本番 3 台で確認・#4353）
+
+## 5.23.0 でいったん無効にした経緯
 
 本機能の SQL クエリ（`app/query/{mastodon,misskey}/media_catalog.sql.erb`）は、ローカル投稿が連合受信に対して少数派になる本番規模で、PostgreSQL のプランナが `media_attachments` PK の id 降順 backward scan + フィルタアウトを選び、LIMIT を満たす local 行が見つかるまで非 local 行を大量に舐める病理を起こす。
 
 - **本番ベースライン（zugoga、2026-05-23 計測）**: 単一クエリで実行時間 **175,248 ms（約 2 分 55 秒）**。対象テーブル `media_attachments` 1,872,570 行、`statuses` 約 1,500 万行、local 比率 0.27%。
 - **2026-05-19 障害**: 全サーバー（zugoga / shallu / lbock）で投稿不可。重 SQL が DB 接続プール（pgbouncer）を専有し、Mastodon Web の `POST /inbox` 等が連鎖タイムアウト。
 - **最適化（2026-08 に決着）**: ⚠⚠ **candidate A（partial index）では届かなかった**（170s → 約 10s 止まり）。**決着は #4393 の B 案（LATERAL merge・PR #4613）**で、`/feed/media` page1 が **26,415ms → 56.7ms**、`only_person` が **25,998ms → 6.5ms**。🔴 **追加 index は不要**（Mastodon 本体の `index_media_attachments_on_account_id_and_status_id` で成立）。⚠ 下記「性能トラックの記録」の DDL は**採用されなかった候補**なので、そのまま適用しないこと。
-- **判断**: 機能自体が pooza の毎晩ルーチン（Annict + 番組表）と独立しており、最適化を急ぐより停止する選択を取った。partial index と機能再開はセットで判断する。
+- **当時の判断**: 機能自体が pooza の毎晩ルーチン（Annict + 番組表）と独立しており、最適化を急ぐより停止する選択を取った。⚠ その後 B 案で決着したので、**機能再開に partial index は要らない**。
 
 詳細な経緯（試して効かなかったものを含む）は下記「性能トラックの記録」、検証スクリプトは [`bin/diag/media_catalog_index.sql`](../bin/diag/media_catalog_index.sql) を参照。
 

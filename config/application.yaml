@@ -374,7 +374,11 @@ mastodon:
     account_timeline: true
     favorite_tags: true
     futured_tag: true
-    media_catalog: false
+    # ⚠ Mastodon は 5.41.0 で既定を true に戻した (#4789)。重さはローカルアカウント数に
+    # ほぼ比例する（47 で数十 ms、384 で 0.5〜0.6 秒／温まった状態の 1 クエリ）。
+    # 重ければ overlay で false にすれば、5.23.0〜5.40.x と同じ「503 を返す」状態に戻る。
+    # ⚠ Misskey は false のまま（#4375）。
+    media_catalog: true
   dbms: postgres
   display_name: Mastodon
   features:

@@ -82,28 +82,26 @@ cure-api 独立化（#4144）でカスタム API（`/api/custom`）は完全削�
 
 cure-api 側を触るときに「カスタムフィードも一緒に整理」と思い込まないこと。両者は名前が似ているが完全に別系統。
 
-## media_catalog の実験的扱い（5.23.0〜）
+## media_catalog の既定値（Mastodon は有効・Misskey は無効）
 
-`media_catalog` 機能（`/mulukhiya/api/media`、`/feed/media`、`MediaCatalogUpdateWorker`、Mastodon WebUI のメディアフィード）は 5.23.0 (#4343) で **デフォルト無効化・実験的機能扱い** に変更された。
+`media_catalog` 機能（`/mulukhiya/api/media`、`/feed/media`、`MediaCatalogUpdateWorker`、Mastodon WebUI のメディアフィード）の既定値は、
+**Mastodon が `true`（5.41.0・#4789）、Misskey が `false`（#4375 まで）**。5.23.0〜5.40.x は両方 `false`（実験的扱い・#4343）だった。
 
-**経緯**: 本番 Mastodon (zugoga / shallu / lbock) で底値レイテンシ 175 秒級の重 SQL（`media_attachments_pkey` backward scan + 85 万行フィルタアウト）が観測され、2026-05-19 には DB プール枯渇による全サーバー投稿不可障害も発生。本来の最適化（#4323、partial index `idx_mlkhy_statuses_local_catalog` 追加）は本番複数台への段階的展開で 1〜2 週間スケールであり、機能自体が pooza の毎晩ルーチン（Annict + 番組表）と無関係なため、最適化を急ぐより停止する判断に切り替えた。
+**経緯**: 2026-05-19 に、底値 175 秒級の重い SQL が DB の接続プールを専有して全サーバーが投稿不可になり、5.23.0 で既定を無効にした。
+決着は #4393 の **B 案（ローカルアカウント駆動の LATERAL merge・PR #4613）**で、🔴 **追加の index は要らない**。
+⚠ **partial index（候補 A・`idx_mlkhy_statuses_local_catalog`）は不採用**（170 秒 → 約 10 秒止まり）。zugoga にだけ残っているが、
+無い shallu / gomander でも 1 秒未満で成立している（2026-10-12 に本番 3 台で確認）。揃えるかは pooza のインフラだけの話で、受け皿は pooza/chubo2#272。
 
 **現在の状態**:
 
-- `config/application.yaml` の `/mastodon/data/media_catalog` / `/misskey/data/media_catalog` のデフォルトは `false`
 - `/features` API で `media_catalog: bool` を露出（capsicum / モロヘイヤ WebUI の事前判定用）
-- 有効化したいサーバーは overlay yaml で個別に `true` を設定する（opt-in）
-- disabled 時の API は 503 + `{ "available": false, "items": [] }`（404 と区別し「機能未提供」ではなく「現在 OFF」を伝える）
-- WebUI / capsicum (pooza/capsicum#606) は features を見て placeholder を出す
+- 無効のときの API は 503 + `{ "available": false, "items": [] }`（404 と区別し「機能未提供」ではなく「現在 OFF」を伝える）
+- 重さは**ローカルアカウント数にほぼ比例**（温まった 1 クエリで 47 アカウントが数十 ms、384 が 0.5〜0.6 秒）。⚠ 384 超は未検証・冷えた初回は 384 で 12 秒
+- 戻し方は overlay に `/mastodon/data/media_catalog: false`。見るものは `/mulukhiya/api/health` の `postgres.pool.waiting`
+- ⚠ **他の運用者への責任は注意書きまで**（2026-10-01 の合意）。アカウント数を見て警告する等の自動の安全策は入れない。index の作成も案内しない
+- ⚠ Misskey 側（`/misskey/data/media_catalog`）は #4375 が済むまで `false` のまま。きゅあすきー等の他者運用がある
 
-**機能再開を判断する場合の手順**:
-
-1. #4323 を on-hold から外す
-2. [media_catalog.md](media_catalog.md)「性能トラックの記録」に従い zugoga / shallu / gomander の本番 DB に candidate A の partial index を `CONCURRENTLY` 適用
-3. 効果計測（同じ EXPLAIN 比較）後、対象サーバーの overlay yaml で `/mastodon/data/media_catalog: true` を設定
-4. `pooza/mastodon` migration PR で index を恒久化（[chubo2 docs/infra-note.md](https://github.com/pooza/chubo2) の daisskey drive_file 先行事例と同パターン）
-
-新規 mulukhiya インストールは無効が既定。本機能を前提に新規実装を入れないこと（再開判断とセットで設計する）。
+詳細は [media_catalog.md](media_catalog.md)。
 
 ## tomato-shrieker との連携
 
