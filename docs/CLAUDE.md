@@ -226,6 +226,20 @@ git diff Gemfile.lock
   ＝ ginseng-core 2.4.2 ＋ net-http 0.10.0 の組み合わせも通っている。⚠ このあと develop にコードが入ったら、リリースゲートは回し直す
 - ✅ **ステージング 4 台（dev24〜27）を develop（`8d8e7e02`）へ揃えた**（`config: OK`・3 サービスの restart rc=0・health 200）
 
+### 出してある PR（マージはユーザーの承認待ち）
+
+- **PR #4831（#4789）**: Mastodon の `media_catalog` の既定を `true` に戻す（Misskey は `false` のまま）。変更は既定値 1 行＋文書＋既定値のテスト。
+  CI 両系 SUCCESS・Codex は P2 を 1 件（文書に partial index の適用手順が残っていた）直して指摘なし（HEAD `be65376c`）。
+  harness（`1d8fec04`）両系 0 failures / 0 errors（Mastodon 1763 tests・omission 159 → 158 / Misskey 1762 tests）
+  - **#4353 は 2026-10-12 にクローズ**（ユーザー判断）。本番 3 台を読み取りだけで確認: index があるのは zugoga だけ（`idx_scan` 累計 1541 万回＝使われている）、
+    無い shallu（48 アカウント）/ gomander（384）も `/feed/media` は 1 秒未満。**「あれば役に立つ・なくても成立する・作成の案内は不要」**。
+    揃えるかは pooza のインフラだけの話で、**決定は先送り＝受け皿は pooza/chubo2#272**
+  - **dev25 で確認**: 明示の `media_catalog: false` があると 503 のまま（＝戻し方が効く）→ 行を外すと `features.media_catalog: true`・`/feed/media` 200（0.05〜0.9 秒）・`pool.waiting` 0。
+    ⚠ dev25 は明示の行を外したまま（既定で慣らす。バックアップは `config/local.yaml.bak-4789`）・ブランチは PR #4831 のもの
+  - ⚠ dev24 も `config/local.yaml` に明示の `false` がある（＝ 5.41.0 でも無効のまま）。dev26 は明示の `true`
+  - 入れなかったもの: 深いページの上限（Issue の「できれば」）・Wiki（リリース時）
+  - ⚠ shallu の `/feed/media` は 1 回だけ 6.4 秒だった（続く 3 回は 0.25〜0.31 秒）。原因は未特定＝キャッシュが空のときの型と同じ見え方
+
 ### 2026-10-12 にマージしたもの（3 回目）
 
 - **PR #4830（#4628 の残り 2 件・振る舞いは 2026-10-12 にユーザーと決めた・`55fe80b5`）**: 本体キャッシュが無いとき、**投稿の経路（`TaggingDictionary.new`）は上流へ取りにいかない**。
@@ -265,7 +279,7 @@ dev24 / dev25 / dev26 / dev27 とも develop（`55fe80b5`）・health 200。dev2
 
 ### 残り
 
-- open（1 件）: #4789（Mastodon の media_catalog の既定を true に・#4353 待ち）。**それ以外は消化済み**＝リリース前レビュー（5 観点）へ進める状態
+- open（1 件）: #4789（PR #4831・マージ待ち）。**それ以外は消化済み**＝マージ後はリリース前レビュー（5 観点）へ進める状態
 - **2026-10-12 にクローズ（ユーザー判断・not planned）**: #4465（照合の索引化・削れるのは 1 ms 前後で、実測が前提を否定）/ #4756（辞書のプロセス内キャッシュ・約 9 ms に対して、共有した辞書が壊れるとタグ付けが黙って狂う）。
   ⚠ どちらも「辞書の語数が桁で増えたら起こし直す」。**次の大玉として選択肢に出さない**
 - ⚠ **Issue は develop へのマージでは自動で閉じない**（`Closes` が効くのは既定ブランチ main だけ）。マージしたら手で閉じる
