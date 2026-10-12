@@ -228,11 +228,22 @@ git diff Gemfile.lock
 
 ### 出してある PR（マージはユーザーの承認待ち）
 
-- **PR #4828（#4690・機能が前へ進む枠）**: 辞書ソースごとの取得間隔 `dics[].interval`（秒）。間隔の内側は上流を引かず、直前の成功分（last-good）を使う。
+- **PR #4830（#4628 の残り 2 件・振る舞いは 2026-10-12 にユーザーと決めた）**: 本体キャッシュが無いとき、**投稿の経路（`TaggingDictionary.new`）は上流へ取りにいかない**。
+  更新ワーカーへ依頼を 10 分に 1 回だけ出し（印 `tagging_dictionary/refresh_request`・`'cold' => true`）、ソースごとの last-good からメモリの中で組み立てる。
+  last-good も無ければ空の辞書で投稿を通す。依頼は、走る時点で本体が埋まっていれば何もしない（Sidekiq 復帰時にまとめて上流を叩かない）。
+  据え置いた回は本体の寿命を延ばす（作ってから `source_ttl`＝24 時間まで・延ばす先も残り時間で切る＝ Codex P2）。更新ワーカーは `new(lazy: true)`（二重取得をやめた）。
+  - harness（`388ffa64`）両系 0 failures / 0 errors（Mastodon 1756 / Misskey 1759 tests）・CI 両系 SUCCESS・Codex は P2 を 1 件直して指摘なし（HEAD `a478d21d`）
+  - **dev25 で実測**: Sidekiq を止めて本体キャッシュを消す → `new` は 3965 語（温かいときと同数）を約 90 ms で返し（温かいとき約 50 ms）、ジョブは 1 本だけ積まれた。
+    Sidekiq を戻すと 20 秒ほどで本体が埋まった。syslog に `tagging dictionary cold` が 1 行（`restored_sources: 10`）
+  - ⚠ development / test は `Worker.perform_async` が同期なので、依頼を出したその場で本体が埋まる（テストの見え方は以前と同じ）
+
+### 2026-10-12 にマージしたもの（2 回目）
+
+- **PR #4828（#4690・機能が前へ進む枠・`dec45a09`）**: 辞書ソースごとの取得間隔 `dics[].interval`（秒）。間隔の内側は上流を引かず、直前の成功分（last-good）を使う。
   既定は今までどおり毎回。印の寿命は `interval` − 600 秒（ワーカーの周期ぶん）・失敗した回は印を置かない・世代ログに `reused_sources`。
   - **前提の実測（#4690 にコメント）**: GAS は `ETag` も `Last-Modified` も返さず `no-store` ＝ **条件付き GET は使えない**
   - **dev25 で実物の GAS を通した**（`5d1c0b38`）: `singer.json` / `series.json` に `interval: 3600` → 2 回目の更新から `reused_sources: 2`・語数 3965 のまま。
-    ⚠ dev25 はこのブランチ・設定に `interval` を入れたまま（バックアップは `config/local.yaml.bak-4690`）
+    ⚠ dev25 は設定に `interval: 3600` を 2 か所入れたまま（機能は develop に入ったので、そのまま慣らす。バックアップは `config/local.yaml.bak-4690`）
   - **Codex P2 × 3 に対処**（再レビューは指摘なし・CI 両系 SUCCESS・HEAD は `965569ac`）: ① 手動の更新（`POST /tagging/dic/update`・rake）は
     `force` を渡して間隔を無視する ② 実際に取りにいって失敗した回は「新しい」印を消す（残すと定時の更新が取り直さない）
     ③ `force` は文字列・シンボルどちらのキーでも受ける（development / test は `Worker.perform_async` がシンボルにして同期で呼ぶ）。
@@ -240,19 +251,19 @@ git diff Gemfile.lock
   - ⚠ **手動更新が間隔を無視するので、ニチアサの直前に辞書を直したら「更新」を押せば届く**
   - 📌 **本番のどのソースにどの間隔を入れるかは未決**（設定の話・ユーザーと決める）。⚠ ニチアサの直前に直す運用があるソースには長い間隔を付けない
 
-- **PR #4829（#4678）**: 同時アクセス下でトークンが取り違えられないことの回帰テスト（`test/unit/controller/concurrent_token_isolation.rb`・4 本）。実コントローラを継いだプローブを、Rack 直呼びと**テスト内の Puma**（keep-alive 8 本・500 リクエスト）で叩き、上流（WebMock）へ出たトークンを応答ごとに突き合わせる。防御策（`verify_token_integrity!`）の発火が 0 回だったことも別に見る。わざと状態を共有させたプローブで「防御策が発火する」「防御策を外すと突き合わせが検出する」も確かめる。CI 両系 SUCCESS・Codex は P2 を 1 件（`/puma/threads` が 1 だと壊したプローブが直列になる）直して指摘なし。
+- **PR #4829（#4678・`4b6d1031`）**: 同時アクセス下でトークンが取り違えられないことの回帰テスト（`test/unit/controller/concurrent_token_isolation.rb`・4 本）。実コントローラを継いだプローブを、Rack 直呼びと**テスト内の Puma**（keep-alive 8 本・500 リクエスト）で叩き、上流（WebMock）へ出たトークンを応答ごとに突き合わせる。防御策（`verify_token_integrity!`）の発火が 0 回だったことも別に見る。わざと状態を共有させたプローブで「防御策が発火する」「防御策を外すと突き合わせが検出する」も確かめる。CI 両系 SUCCESS・Codex は P2 を 1 件（`/puma/threads` が 1 だと壊したプローブが直列になる）直して指摘なし。
   - 🔴 **事故の版（rack 3.2.3 + sinatra 4.2.0）へ下げても緑だった**（puma 8.0.2 / Ruby 4.0.7・3 回）。＝このテストは事故を再現しない。`Gemfile` の注記を「上げた版でこのテストを回す・緑は安全の証明ではない・ステージングの通し確認は省かない」に改めた。
   - ⚠ 罠: 本物のサービスは `default_token` を DB から引くので、DB の無い環境では `before` が黙って落ちて `sns` が nil になる（500 の本文は `Internal Server Error` だけ）。プローブは `default_token` だけ外した子を `sns_class` で返す。
 
-### ステージングの現在地（2026-10-12 08:00 JST）
+### ステージングの現在地（2026-10-12 12:50 JST）
 
-dev24 / dev26 / dev27 は develop（`8d8e7e02`）、dev25 は PR #4828 のブランチ（`965569ac`）。
+dev24 / dev26 / dev27 は develop（`8d8e7e02`・#4828 / #4829 より前）、dev25 は PR #4830 のブランチ（`a478d21d`）。
 
 ### 残り
 
-- open（6 件）: #4690（PR #4828）/ #4789（Mastodon の media_catalog の既定を true に・#4353 待ち）/ #4756 / #4678 / #4628 / #4465（L）
-- **#4628 の残りは 2 件**（失効時に投稿経路で一斉取得／据え置きの回に本体 TTL を延ばさない）。「壊れたときの振る舞い」を先に決める話なので、案を出してから手を入れる
-- **#4756**（プロセス内キャッシュ・約 9 ms）は、読み手側（`TagSearchService#search` / `TaggingDictionary#concat`）の書き換えを先に直す
+- open（2 件）: #4628（PR #4830）/ #4789（Mastodon の media_catalog の既定を true に・#4353 待ち）
+- **2026-10-12 にクローズ（ユーザー判断・not planned）**: #4465（照合の索引化・削れるのは 1 ms 前後で、実測が前提を否定）/ #4756（辞書のプロセス内キャッシュ・約 9 ms に対して、共有した辞書が壊れるとタグ付けが黙って狂う）。
+  ⚠ どちらも「辞書の語数が桁で増えたら起こし直す」。**次の大玉として選択肢に出さない**
 - ⚠ **Issue は develop へのマージでは自動で閉じない**（`Closes` が効くのは既定ブランチ main だけ）。マージしたら手で閉じる
 - ⚠ **作業ツリーを harness が使っている間は、別の worktree で作業する**（ブランチを切り替えると実走中の HEAD が変わる）。
   worktree には `config/local.yaml` が無いので、harness を回すブランチは主ツリーに置く
