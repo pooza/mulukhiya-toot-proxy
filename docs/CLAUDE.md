@@ -226,9 +226,9 @@ git diff Gemfile.lock
   ＝ ginseng-core 2.4.2 ＋ net-http 0.10.0 の組み合わせも通っている。⚠ このあと develop にコードが入ったら、リリースゲートは回し直す
 - ✅ **ステージング 4 台（dev24〜27）を develop（`8d8e7e02`）へ揃えた**（`config: OK`・3 サービスの restart rc=0・health 200）
 
-### 出してある PR（マージはユーザーの承認待ち）
+### 2026-10-12 にマージしたもの（3 回目）
 
-- **PR #4830（#4628 の残り 2 件・振る舞いは 2026-10-12 にユーザーと決めた）**: 本体キャッシュが無いとき、**投稿の経路（`TaggingDictionary.new`）は上流へ取りにいかない**。
+- **PR #4830（#4628 の残り 2 件・振る舞いは 2026-10-12 にユーザーと決めた・`55fe80b5`）**: 本体キャッシュが無いとき、**投稿の経路（`TaggingDictionary.new`）は上流へ取りにいかない**。
   更新ワーカーへ依頼を 10 分に 1 回だけ出し（印 `tagging_dictionary/refresh_request`・`'cold' => true`）、ソースごとの last-good からメモリの中で組み立てる。
   last-good も無ければ空の辞書で投稿を通す。依頼は、走る時点で本体が埋まっていれば何もしない（Sidekiq 復帰時にまとめて上流を叩かない）。
   据え置いた回は本体の寿命を延ばす（作ってから `source_ttl`＝24 時間まで・延ばす先も残り時間で切る＝ Codex P2）。更新ワーカーは `new(lazy: true)`（二重取得をやめた）。
@@ -255,13 +255,17 @@ git diff Gemfile.lock
   - 🔴 **事故の版（rack 3.2.3 + sinatra 4.2.0）へ下げても緑だった**（puma 8.0.2 / Ruby 4.0.7・3 回）。＝このテストは事故を再現しない。`Gemfile` の注記を「上げた版でこのテストを回す・緑は安全の証明ではない・ステージングの通し確認は省かない」に改めた。
   - ⚠ 罠: 本物のサービスは `default_token` を DB から引くので、DB の無い環境では `before` が黙って落ちて `sns` が nil になる（500 の本文は `Internal Server Error` だけ）。プローブは `default_token` だけ外した子を `sns_class` で返す。
 
-### ステージングの現在地（2026-10-12 12:50 JST）
+### ステージングの現在地（2026-10-12 13:20 JST）
 
-dev24 / dev26 / dev27 は develop（`8d8e7e02`・#4828 / #4829 より前）、dev25 は PR #4830 のブランチ（`a478d21d`）。
+dev24 / dev25 / dev26 / dev27 とも develop（`55fe80b5`）・health 200。dev25 は設定に `interval: 3600` を 2 か所入れたまま。
+⚠ dev27 は `misskey@dev27.b-shock.local`（Linux・systemd）。`mastodon@dev27` では入れない。
+
+**develop（`55fe80b5`）で harness 両系 0 failures / 0 errors**（Mastodon 1757 tests / 159 omissions、Misskey 1760 tests / 145 omissions）。
+⚠ リリースゲートとして読むなら、この後に develop へコードが入っていないこと。
 
 ### 残り
 
-- open（2 件）: #4628（PR #4830）/ #4789（Mastodon の media_catalog の既定を true に・#4353 待ち）
+- open（1 件）: #4789（Mastodon の media_catalog の既定を true に・#4353 待ち）。**それ以外は消化済み**＝リリース前レビュー（5 観点）へ進める状態
 - **2026-10-12 にクローズ（ユーザー判断・not planned）**: #4465（照合の索引化・削れるのは 1 ms 前後で、実測が前提を否定）/ #4756（辞書のプロセス内キャッシュ・約 9 ms に対して、共有した辞書が壊れるとタグ付けが黙って狂う）。
   ⚠ どちらも「辞書の語数が桁で増えたら起こし直す」。**次の大玉として選択肢に出さない**
 - ⚠ **Issue は develop へのマージでは自動で閉じない**（`Closes` が効くのは既定ブランチ main だけ）。マージしたら手で閉じる
