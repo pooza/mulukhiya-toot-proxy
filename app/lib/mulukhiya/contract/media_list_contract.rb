@@ -8,6 +8,7 @@ module Mulukhiya
     end
 
     DEFAULT_MAX_PAGE = 50
+    MAX_BIGINT = (2**63) - 1
 
     # ⚠⚠ **ページに上限を置く（5.41.0 のリリース前レビュー）。**未認証で届き、深いページほど
     # 重い（OFFSET ぶんまで各ローカルアカウントから引く）。上限が無いと `?page=1000000` で
@@ -26,8 +27,14 @@ module Mulukhiya
     # （5.41.0 のリリース前レビュー）。
     rule(:cursor) do
       next unless key?
-      pattern = Environment.mastodon_type? ? /\A\d+\z/ : /\A[0-9A-Za-z]+\z/
-      key.failure('形式が正しくありません。') unless value.match?(pattern)
+      # ⚠ Mastodon の ID は bigint。桁が多すぎる数字も変換に失敗して 500 になるので、
+      # 範囲まで見る（PR #4833 の Codex P2）。Misskey は長さだけ切る。
+      valid = if Environment.mastodon_type?
+        value.match?(/\A\d{1,19}\z/) && value.to_i <= MAX_BIGINT
+      else
+        value.match?(/\A[0-9A-Za-z]{1,64}\z/)
+      end
+      key.failure('形式が正しくありません。') unless valid
     end
   end
 end
