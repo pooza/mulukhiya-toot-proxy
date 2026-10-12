@@ -3,8 +3,8 @@ module Mulukhiya
   #
   # ⚠ TaggingDictionaryUpdateWorderTest と分けてあるのは、あちらが実物の辞書を引くから。
   # ここで見るのは「`force` が `refresh` まで届くか」だけで、環境に依らない。
-  # ⚠ 本体キャッシュが空だと `TaggingDictionary.new` の中でも `refresh`（force なし）が 1 回走るので、
-  # 回数ではなく「最後の呼び出し」と「true が混ざっていないか」で見る。
+  # ⚠ 更新ワーカーは `TaggingDictionary.new(lazy: true)` で作るので、`new` の中では `refresh` は
+  # 走らない（#4628）。判定は「最後の呼び出し」と「true が混ざっていないか」で見る。
   class TaggingDictionaryUpdateForceTest < TestCase
     def setup
       @calls = calls = []

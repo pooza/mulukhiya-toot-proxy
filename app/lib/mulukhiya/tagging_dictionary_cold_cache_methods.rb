@@ -22,11 +22,20 @@ module Mulukhiya
     # その場で本体キャッシュが埋まる。埋まっていればそれを使う。
     # ⚠ ここで落ちても投稿は通す。
     def fill_cold_cache
-      return if sources.none?
-      requested = request_refresh
-      @cache = nil
-      return if cache.is_a?(Hash)
-      restore_from_sources(log: requested)
+      # 🔴 **ソースが 0 本でも `cache` は Hash にする（5.41.0 のリリース前レビュー）。**
+      # ソースが無いと更新ワーカーは動かない（`disable?`）ので、本体キャッシュを書く者が
+      # いない。nil のままだと `TagSearchService#search` の `cache.each` が落ちて、
+      # 辞書を設定していないサーバーのタグ検索が 500 になる。
+      return @cache = {} if sources.none?
+      # ⚠ **読み直すのは依頼を出せた回だけ。**その場で埋まりうるのは、依頼が同期で走った
+      # とき（development / test）だけ。毎回読み直すと、署名の合わない本体が残っている間、
+      # `cache discarded` のログが投稿のたびに 2 行ずつ出る。
+      if request_refresh
+        @cache = nil
+        return if cache.is_a?(Hash)
+        return restore_from_sources(log: true)
+      end
+      restore_from_sources(log: false)
     rescue => e
       e.log
       @cache ||= {}

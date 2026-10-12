@@ -14,11 +14,16 @@ module Mulukhiya
       dictionary = TaggingDictionary.new(lazy: true)
       # ⚠ **投稿の経路からの依頼（`'cold' => true`・#4628）は、もう埋まっていれば何もしない。**
       # Sidekiq が止まっていた間に溜まった依頼が、復帰した瞬間にまとめて上流を叩かないため。
-      return dictionary if flag?(params, :cold) && dictionary.cache.is_a?(Hash)
+      # ⚠ 何もしなかった回も 1 行残す。残さないと、溜まった依頼が「start → done だけ」で
+      # 並び、更新ワーカーが空振りしているように見える（5.41.0 のリリース前レビュー）。
+      if flag?(params, :cold) && dictionary.cache.is_a?(Hash)
+        log(entries: dictionary.size, cold: true, skipped: true)
+        return dictionary
+      end
       # ⚠ **手動の更新（管理画面・rake）は `'force' => true` を渡す (#4690)。**ソースごとの
       # 取得間隔を無視して全部取りにいく。定時（sidekiq-scheduler）は引数なし＝間隔に従う。
       dictionary.refresh(force: flag?(params, :force))
-      log(entries: dictionary.size, force: flag?(params, :force))
+      log(entries: dictionary.size, force: flag?(params, :force), cold: flag?(params, :cold))
       return dictionary
     end
 

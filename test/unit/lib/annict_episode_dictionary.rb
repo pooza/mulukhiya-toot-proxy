@@ -126,7 +126,6 @@ module Mulukhiya
       assert_predicate(dictionary, :alert?)
     end
 
-    # ⚠ 返せる結果が無いときは、従来どおり上流のエラーを上げる。
     # 🔴 6 時間を超えた障害でも、アラートは 1 回だけ（5.40.0 のリリース前レビュー）。辞書は 10 分おきに
     # 引かれるので、古さだけで判定すると取得のたびに鳴る。
     def test_gateway_error_alerts_once_per_outage
@@ -178,6 +177,7 @@ module Mulukhiya
       assert_equal([{}], storage.writes)
     end
 
+    # ⚠ 返せる結果が無いときは、従来どおり上流のエラーを上げる。
     def test_error_is_raised_without_cache
       dictionary = create(AnnictDouble.new(error: Ginseng::GatewayError.new('Net::ReadTimeout')), StorageDouble.new)
 

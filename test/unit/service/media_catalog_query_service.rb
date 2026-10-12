@@ -18,6 +18,14 @@ module Mulukhiya
       @service = MediaCatalogQueryService.new(attachment_class: @attachment_class)
     end
 
+    # ⚠⚠ 知らないパラメータは `catalog` へ渡さない（5.41.0 のリリース前レビュー）。未認証の
+    # `?skip_cache=1` でキャッシュを飛ばせ、`?limit=5` / `?rule=x` は型が合わず 500 になっていた。
+    def test_unknown_params_are_dropped
+      @service.call({'page' => '2', 'skip_cache' => '1', 'limit' => '5', 'rule' => 'x', 'offset' => '9'})
+
+      assert_equal({page: 2, only_person: 0}, @attachment_class.received_params)
+    end
+
     def test_default_page_is_set_when_cursor_absent
       @service.call({})
 

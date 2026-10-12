@@ -56,6 +56,10 @@ module Mulukhiya
       return nil unless raw
       words = Marshal.load(raw) # rubocop:disable Security/MarshalLoad
       return nil unless words.is_a?(Hash) && words.present?
+      # ⚠ **使い回した回も last-good の寿命を置き直す（5.41.0 のリリース前レビュー）。**
+      # 置き直さないと、長い `interval`（例: 86400）では、印が切れて取りにいく頃に
+      # last-good の残りが 10 分ほどしか無く、続けて外すと埋め戻せない。
+      redis.expire(source_key(dic), source_cache_ttl)
       @reused_sources&.push(dic.uri.to_s)
       logger.info(dic: dic.to_h.merge(words: words.count, reused: true))
       return words

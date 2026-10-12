@@ -9,7 +9,7 @@ module Mulukhiya
     # （`2000::/3`）の外を丸ごと拒否**している。表をこちらへ写し直さないこと。
     #
     # こちらに残すのは、モロヘイヤの都合で決まるものだけ:
-    # 設定から読む DNS タイムアウト・拒否理由の warn ログ・`validator` の差し替え口・
+    # 設定から読む DNS タイムアウト・名前解決に失敗したときの warn ログ・`validator` の差し替え口・
     # `unpinned_validator`・`validate!`。
 
     def self.public?(host, resolver: method(:resolve_addresses))

@@ -2,6 +2,14 @@ module Mulukhiya
   class MediaCatalogQueryService
     include Package
 
+    # クエリへ渡してよいパラメータ。
+    #
+    # ⚠⚠ **ここで絞る（5.41.0 のリリース前レビュー）。**`Contract#exec` はエラーを返すだけで
+    # 絞らないので、以前は要求のパラメータがそのまま `catalog` へ届いていた。未認証の
+    # `?skip_cache=1` でキャッシュを飛ばせ、`?limit=5` / `?rule=x` は型が合わず 500 になる
+    # （`limit` / `rule` / `skip_cache` は内部の呼び出しだけが使う）。
+    ALLOWED_PARAMS = [:page, :cursor, :q, :only_person].freeze
+
     def initialize(attachment_class: Environment.attachment_class)
       @attachment_class = attachment_class
     end
@@ -13,7 +21,7 @@ module Mulukhiya
     private
 
     def normalize(params)
-      params = params.dup
+      params = ALLOWED_PARAMS.to_h {|key| [key, params[key] || params[key.to_s]]}.compact
       params[:page] = (params[:page] || 1).to_i unless params[:cursor]
       params[:only_person] = (params[:only_person] || 0).to_i.zero? ? 0 : 1
       if params[:q].to_s.empty?

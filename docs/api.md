@@ -458,7 +458,7 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
       "announcement_push": false,
       "compose_templates": true,
       "feed": true,
-      "media_catalog": false,
+      "media_catalog": true,
       "media_update": true,
       "nowplaying_resolver": true,
       "nowplaying_url_resolver": true,
