@@ -12,6 +12,7 @@ module Mulukhiya
     include SNSMethods
     include TaggingDictionaryLogMethods
     include TaggingDictionarySourceCacheMethods
+    include TaggingDictionaryColdCacheMethods
     include TaggingDictionaryMatchMethods
 
     REDIS_KEY = 'tagging_dictionary'.freeze
@@ -28,12 +29,21 @@ module Mulukhiya
     # 「新しい」印の寿命から引く秒数 (#4690)。更新ワーカーの周期（10 分）ぶん。
     # ⚠ これ以下の `interval` は印が置かれず、毎回取りにいく。
     FRESH_MARGIN = 600
+    # 本体キャッシュが無いときに出す「更新の依頼」の印 (#4628 の 2 件目)。
+    # ⚠ **`SOURCE_REDIS_KEY_PREFIX` の外に置く**ので、`invalidate_cache` が名指しで消す。
+    REFRESH_REQUEST_KEY = "#{REDIS_KEY}/refresh_request".freeze
+    # 依頼を出す間隔の下限。更新ワーカーの周期（10 分）に揃える。
+    REFRESH_REQUEST_TTL = 600
 
-    def initialize
-      super
+    # 🔴 **ここでは上流（GAS）へ取りにいかない (#4628 の 2 件目)。**`new` は投稿の経路
+    # （`Handler#dictionary` ほか）から呼ばれる。本体キャッシュが無いときは
+    # `fill_cold_cache` が、更新の依頼を 1 回だけ出して、ソースごとの last-good で組み立てる。
+    # ⚠ `lazy: true` は更新ワーカー用。直後に自分で `refresh` するので、依頼も組み立ても要らない。
+    def initialize(lazy: false)
+      super()
       @handler = Handler.create(:dictionary_tag)
       @http = HTTP.new
-      refresh unless cache.is_a?(Hash)
+      fill_cold_cache unless lazy || cache.is_a?(Hash)
       update(cache.to_h)
     end
 
@@ -90,7 +100,7 @@ module Mulukhiya
         # ⚠ fail-open 自体は残す (GAS の一過性障害で辞書が消し飛ぶのを防ぐ意図は
         # 正しい)。TTL があるので古い内容が無期限に居座ることはない (#4583)。
         update(cache.to_h)
-        log_retention
+        log_retention(ttl_extended: extend_cache_ttl)
         return self
       end
       payload = build_payload(entries)
@@ -135,6 +145,8 @@ module Mulukhiya
       # （`TestCase.invalidate_shared_caches` と辞書キャッシュのテスト 3 本）で、
       # 本番の要求経路には乗らない。SCAN へ置き換える価値が無いので意図して残す。
       redis.keys("#{SOURCE_REDIS_KEY_PREFIX}/*").each {|key| redis.unlink(key)}
+      # ⚠ 更新の依頼の印も捨てる (#4628)。残すと、次の `new` が依頼を出さない。
+      redis.unlink(REFRESH_REQUEST_KEY)
       return redis.unlink(REDIS_KEY)
     end
 
@@ -223,8 +235,9 @@ module Mulukhiya
     # ⚠ **生きたキャッシュがあるときだけ。**初回起動で本体キャッシュも無ければ、
     # 痩せていても公開するほうがまし（何も引けないより良い）。
     #
-    # ⚠ **据え置きは無期限にならない。**本体キャッシュの TTL は 1 時間なので、
-    # ソースが恒久的に死んだ場合は 1 時間で失効し、痩せた辞書が公開される。
+    # ⚠ **据え置きは無期限にならない。**据え置いた回は本体キャッシュの寿命を延ばすが
+    # （`extend_cache_ttl`・#4628 の 9 件目）、延ばすのは作ってから `source_ttl`（24 時間）
+    # まで。ソースが恒久的に死んだ場合は、そこで失効して痩せた辞書が公開される。
     def keep_last_known_good?(entries)
       return false if cache.blank?
       return true if discardable?(entries)
