@@ -37,6 +37,34 @@ module Mulukhiya
       Postgres.singleton_class.remove_method(:__orig_exec)
     end
 
+    # 閲覧注意・CW の印 (5.41.0 のリリース前レビュー)。未認証で届く一覧なので、ぼかす材料を渡す。
+    def test_plain_row_has_no_flags
+      flags = FakeAttachment.catalog_flags(sensitive: false, spoiler_text: '', status_text: '本文')
+
+      assert_equal({sensitive: false, spoiler_text: nil, body: '本文'}, flags)
+    end
+
+    def test_sensitive_row_keeps_the_body
+      flags = FakeAttachment.catalog_flags(sensitive: true, spoiler_text: nil, status_text: '本文')
+
+      assert_equal({sensitive: true, spoiler_text: nil, body: '本文'}, flags)
+    end
+
+    # ⚠⚠ CW つきは、閲覧注意の印が無くても sensitive に倒し、CW の内側の本文を出さない。
+    def test_spoiler_row_hides_the_body
+      flags = FakeAttachment.catalog_flags(sensitive: false, spoiler_text: 'ネタバレ', status_text: '本文')
+
+      assert_equal({sensitive: true, spoiler_text: 'ネタバレ', body: nil}, flags)
+    end
+
+    # ⚠ 上限のページでは「続きあり」と言わない（次を引くと 422 になる）。
+    def test_has_next_is_false_at_the_max_page
+      config['/webui/media/catalog/max_page'] = 2
+
+      assert_true(catalog(page: 1, limit: 3)[:has_next])
+      assert_false(catalog(page: 2, limit: 3)[:has_next])
+    end
+
     # ⚠⚠ **#4632 の回帰。**`has_next` を見るために取得件数へ +1 しているので、
     # その `limit` を OFFSET の基準にも使うと**ページごとに 1 件抜ける**。
     def test_offset_is_computed_from_the_page_width

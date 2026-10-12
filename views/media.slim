@@ -22,7 +22,12 @@ html lang='ja' data-theme='light'
           button.small @click='searchMedias' 検索
       ul.medias
         li.media v-for='media in medias'
-          .media-container
+          / 閲覧注意・CW つきは、押すまで中身を出さない (5.41.0)。
+          .media-container.sensitive v-if='media.sensitive && !media.revealed'
+            button.small @click='media.revealed = true'
+              i class='fas fa-eye-slash'
+              |  {{media.status.spoiler_text || '閲覧注意'}}
+          .media-container v-else=''
             a :href='media.url' target='_blank' rel='noreferrer' v-if='media.thumbnail_url && media.mediatype=="image"'
               img :src='media.thumbnail_url'
             video :src='media.url' controls='' v-else-if='media.mediatype=="video"'
@@ -47,7 +52,8 @@ html lang='ja' data-theme='light'
           ul.params
             li.param
               i class='fas fa-comment'
-              a :href='media.status.public_url' target='_blank' rel='noreferrer' v-if='media.status.body' {{media.status.body}}
+              a :href='media.status.public_url' target='_blank' rel='noreferrer' v-if='media.status.spoiler_text' {{media.status.spoiler_text}}
+              a :href='media.status.public_url' target='_blank' rel='noreferrer' v-else-if='media.status.body' {{media.status.body}}
               a :href='media.status.public_url' target='_blank' rel='noreferrer' v-else='' = controller.status_label
           ul.params v-if='account.username==media.account.username && media.status.webui_url'
             li.param

@@ -23,13 +23,42 @@ module Mulukhiya
           limit: params[:limit] + 1,
           offset: catalog_offset(params),
         ))
-        has_next = rows.size > params[:limit]
+        return catalog_result(rows, params)
+      end
+
+      def catalog_result(rows, params)
+        has_next = rows.size > params[:limit] && !catalog_last_page?(params)
         page_rows = rows.first(params[:limit])
-        items = build_catalog_items(page_rows)
-        result = {items:, has_next:}
+        result = {items: build_catalog_items(page_rows), has_next:}
         result[:next_cursor] = page_rows.last[catalog_cursor_key].to_s if has_next && page_rows.last
         result[:page] = params[:page] if params[:page]
         return result
+      end
+
+      # ⚠ 上限のページでは「続きあり」と言わない（次を引くと 422 になる）。
+      # ⚠ cursor で送るとき（Mastodon）はページの上限に掛からない。
+      def catalog_last_page?(params)
+        return false if params[:cursor] || params[:page].nil?
+        max = config['/webui/media/catalog/max_page'] rescue nil
+        return params[:page] >= (max || MediaListContract::DEFAULT_MAX_PAGE)
+      end
+
+      # 閲覧注意・CW の印 (5.41.0 のリリース前レビュー)。
+      #
+      # ⚠⚠ **未認証で届く一覧なので、ぼかす材料をクライアントへ渡す。**以前は印が無く、
+      # CW の内側の本文とサムネイルがそのまま出ていた。
+      # - `sensitive`: 閲覧注意。⚠ **CW つきも true に倒す**（CW の付いた投稿のメディアを
+      #   印なしで並べない）
+      # - `status.spoiler_text`: CW の文言
+      # - `status.body`: ⚠ **CW つきは nil**（CW の内側を一覧に出さない）
+      def catalog_flags(row)
+        spoiler = row[:spoiler_text].to_s.strip
+        spoiler = nil if spoiler.empty?
+        return {
+          sensitive: row[:sensitive] == true || !spoiler.nil?,
+          spoiler_text: spoiler,
+          body: spoiler ? nil : row[:status_text],
+        }
       end
 
       # ⚠ **OFFSET は「ページ幅」で計算する (#4632)。**`has_next` を見るために

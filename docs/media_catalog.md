@@ -16,6 +16,8 @@ Mastodon の既定を戻したのは、クエリの書き直し（#4393 の B �
 - 有効になると、`MediaCatalogUpdateWorker` が定期的に動き、WebUI にメディアフィードが出る
 - 重いと感じたら、overlay（`local.yaml`）に `/mastodon/data/media_catalog: false` を書けば、5.23.0〜5.40.x と同じ状態（503 を返す）に戻る。データは失われない
 - アップグレード直後は `/mulukhiya/api/health` の `postgres.pool.waiting` が 0 のままかを見る
+- **載るのは公開の投稿だけ**（5.41.0）。未収載（Misskey ではホーム公開）は載せない。閲覧注意・CW つきは `sensitive` / `status.spoiler_text` の印を付けて返し、CW つきは本文を返さない。WebUI は押すまで表示しない。RSS（`/feed/media`）には閲覧注意・CW つきを載せない
+- 未認証で引けるページには上限がある（`/webui/media/catalog/max_page`・既定 50）
 - ⚠ **index の作成は要らない。**pooza の zugoga にだけ partial index（`idx_mlkhy_statuses_local_catalog`）が残っているが、無い台でも成立している（2026-10-12 に本番 3 台で確認・#4353）
 
 ## 5.23.0 でいったん無効にした経緯

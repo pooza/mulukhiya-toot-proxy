@@ -7,6 +7,17 @@ module Mulukhiya
       optional(:only_person).value(:integer)
     end
 
+    DEFAULT_MAX_PAGE = 50
+
+    # ⚠⚠ **ページに上限を置く（5.41.0 のリリース前レビュー）。**未認証で届き、深いページほど
+    # 重い（OFFSET ぶんまで各ローカルアカウントから引く）。上限が無いと `?page=1000000` で
+    # 全件を引いて並べさせられる（2026-05-19 の接続プール枯渇と同じ経路）。
+    rule(:page) do
+      next unless key?
+      max = (Config.instance['/webui/media/catalog/max_page'] rescue nil) || DEFAULT_MAX_PAGE
+      key.failure("#{max} ページまでです。") if value > max
+    end
+
     # ⚠ cursor は ID（Mastodon は数字・Misskey は英数字）。それ以外はクエリへ渡さない。
     # Mastodon では bigint への変換に失敗して 500 になり、未認証の要求で alert が鳴る
     # （5.41.0 のリリース前レビュー）。

@@ -23,6 +23,15 @@ module Mulukhiya
       assert_equal(Environment.mastodon_type?, result.present?)
     end
 
+    # ⚠⚠ ページの上限（未認証で深いページを引かせない）。
+    def test_page_is_capped
+      config['/webui/media/catalog/max_page'] = 5
+
+      assert_empty(errors(page: 5))
+      assert_not_empty(errors(page: 6))
+      assert_not_empty(errors(page: 1_000_000))
+    end
+
     private
 
     def errors(params)
