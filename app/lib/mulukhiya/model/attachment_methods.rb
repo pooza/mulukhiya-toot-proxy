@@ -80,7 +80,12 @@ module Mulukhiya
         return nil if params[:cursor]
         page = params[:page] || 1
         only_person = params[:only_person] || 0
-        return MediaCatalogStorage.new.get("page:#{page}:person:#{only_person}")
+        cached = MediaCatalogStorage.new.get("page:#{page}:person:#{only_person}")
+        # ⚠ **キャッシュの `has_next` は、いまの上限で見直す（PR #4833 の Codex P2）。**2 ページ目
+        # 以降は 24 時間残るので、`max_page` を下げた後も古い `has_next: true` が返り、
+        # 次を引いた利用者が 422 になる。
+        cached[:has_next] = false if cached && catalog_last_page?(page:)
+        return cached
       rescue => e
         e.log
         return nil

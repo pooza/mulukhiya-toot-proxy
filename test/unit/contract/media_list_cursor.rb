@@ -19,7 +19,8 @@ module Mulukhiya
 
     # ⚠ Mastodon の ID は bigint。範囲の外の数字は変換に失敗する（PR #4833 の Codex P2）。
     def test_out_of_range_cursor_is_rejected
-      assert_not_empty(errors(cursor: '9' * 27))
+      # ⚠ Misskey の ID は英数字なので、長い数字も 64 文字までは形として通る。
+      assert_equal(Environment.mastodon_type?, errors(cursor: '9' * 27).present?)
       assert_equal(Environment.mastodon_type?, errors(cursor: (2**63).to_s).present?)
       assert_empty(errors(cursor: ((2**63) - 1).to_s))
       assert_not_empty(errors(cursor: 'a' * 65))

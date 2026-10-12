@@ -74,6 +74,21 @@ module Mulukhiya
       assert_true(catalog(cursor: '999', limit: 3)[:has_next])
     end
 
+    # ⚠ キャッシュ済みのページも、いまの上限で `has_next` を見直す（PR #4833 の Codex P2）。
+    def test_cached_page_is_clamped_to_the_current_max_page
+      storage = MediaCatalogStorage.new
+      storage.set('page:2:person:0', {items: [], has_next: true, page: 2})
+      config['/webui/media/catalog/max_page'] = 3
+
+      assert_true(FakeAttachment.catalog(page: 2)[:has_next])
+
+      config['/webui/media/catalog/max_page'] = 2
+
+      assert_false(FakeAttachment.catalog(page: 2)[:has_next])
+    ensure
+      storage&.unlink('page:2:person:0')
+    end
+
     # ⚠⚠ **#4632 の回帰。**`has_next` を見るために取得件数へ +1 しているので、
     # その `limit` を OFFSET の基準にも使うと**ページごとに 1 件抜ける**。
     def test_offset_is_computed_from_the_page_width
