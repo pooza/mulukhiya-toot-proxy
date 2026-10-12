@@ -459,12 +459,23 @@ module Mulukhiya
       assert_equal(1, payload[:sources])
     end
 
+    # ⚠ 間隔を変えたら、古い間隔の印は効かない（PR #4833 の Codex P2）。last-good は引き継ぐ。
+    def test_changing_interval_ignores_the_old_fresh_mark
+      @source.interval = 86_400
+      fetch_source(@source)
+      @source.interval = 3600
+      fetch_source(@source)
+
+      assert_equal(2, @source.parsed)
+      assert_equal(entries, restore_source(@source))
+    end
+
     # ⚠ 使い回した回も last-good の寿命を置き直す（5.41.0 のリリース前レビュー）。長い `interval` だと、
     # 印が切れて取りにいく頃に last-good の残りがほとんど無く、続けて外すと埋め戻せない。
     def test_reuse_extends_last_good_ttl
       @source.interval = 3600
       fetch_source(@source)
-      key = redis.keys("#{TaggingDictionary::SOURCE_REDIS_KEY_PREFIX}/*").find {|v| !v.end_with?('/fresh')}
+      key = redis.keys("#{TaggingDictionary::SOURCE_REDIS_KEY_PREFIX}/*").find {|v| !v.include?('/fresh')}
       redis.expire(key, 100)
       fetch_source(@source)
 

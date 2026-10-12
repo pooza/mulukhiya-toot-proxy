@@ -132,8 +132,12 @@ module Mulukhiya
 
     # ⚠ **last-good と同じ接頭辞の下に置く。**`invalidate_cache` が一緒に消すので、
     # 「既知の状態から始める」が保たれる。
+    #
+    # ⚠ **印の鍵には `interval` を入れる（PR #4833 の Codex P2）。**last-good の鍵
+    # （`cache_signature`）は `interval` に依らないので、印まで同じ鍵にすると、間隔を
+    # 短くしても古い印（長い寿命）が残り、新しい間隔が効かない。
     def fresh_key(dic)
-      return "#{source_key(dic)}/fresh"
+      return "#{source_key(dic)}/fresh/#{source_interval(dic)}"
     end
 
     def source_cache_ttl
