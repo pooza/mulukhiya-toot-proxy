@@ -224,6 +224,48 @@ git diff Gemfile.lock
   ＝ ginseng-core 2.4.2 ＋ net-http 0.10.0 の組み合わせも通っている。⚠ このあと develop にコードが入ったら、リリースゲートは回し直す
 - ✅ **ステージング 4 台（dev24〜27）を develop（`8d8e7e02`）へ揃えた**（`config: OK`・3 サービスの restart rc=0・health 200）
 
+### リリース前レビュー（5 観点）の結果（2026-10-12）
+
+対象は `v5.40.0..develop`（`ca56bd56` 時点）。**赤 1 / 黄 10 / 緑 7**（観点をまたぐ重複は 1 件に数えた）。行き先はユーザーが指摘ごとに決めた。
+
+**本リリースで直した（PR #4833・`a6c540a1`）**
+
+- 🔴 **赤 1: 辞書ソースが 0 本のサーバーで、タグ検索 API が 500**（#4628 の回帰）。本体キャッシュが無いと `TaggingDictionary#cache` が nil になり、
+  `TagSearchService#search` の `cache.each` が落ちる。ソースが無いと更新ワーカーも動かない（`disable?`）ので、本体を書く者がいない
+  ＝**デプロイから最大 1 時間後（5.40.0 が書いた空の payload の TTL 切れ）に出始める**。`fill_cold_cache` が空の Hash を置く。
+  ⚠ **「呼び出し元が何も書かなくなる」変更は、書き手が居ない設定（ソース 0 本）を必ず見る**
+- **media_catalog の見直し（既定が有効になる #4789 に伴う・Mastodon / Misskey とも）** — 行き先はユーザー判断:
+  - **未収載（Misskey はホーム公開）を載せない**（公開だけ）。本番 3 台の直近 1 年では一覧の 2〜5%
+  - **閲覧注意・CW は印を付けて載せる**: `items[].sensitive`（CW つきも true）/ `status.spoiler_text` / CW つきは `status.body: null`。
+    RSS（`/feed/media`）はぼかせないので載せない（`safe: true`）。WebUI は押すまで表示しない。**capsicum への依頼は pooza/capsicum#1284**
+  - **ページの上限** `/webui/media/catalog/max_page`（既定 50・超えると 422・上限のページは `has_next: false`・cursor で辿る限り掛からない）
+  - 知らないパラメータを `catalog` へ渡さない（未認証の `skip_cache` / `limit` / `rule`）・`cursor` の形と範囲を検証
+  - キャッシュの鍵を `media_catalog_v2` に（古い形の応答が最大 24 時間返るのを避ける）・鍵に `max_page` を含める
+- その場で直した黄・緑: `'cold'` のジョブの空振りにログ 1 行／依頼を出せなかった回は本体を読み直さない（`cache discarded` が 2 行ずつ出る）／
+  last-good の鍵から `interval` を外し、印の鍵にだけ入れる／使い回した回も last-good の寿命を置き直す／コメントと実装の食い違い 3 件／`docs/api.md` の例
+
+**記録のみ（ユーザー判断・Issue にしない）** — どれも障害時だけの話
+
+- `/feed/media` はキャッシュを通らず、要求ごとに SQL が走る（大きいサーバーで同時要求が重なったときだけ）。リリースノートの注意書きに含める
+- 名前解決の失敗（`unresolved`）はどの通知にも乗らない。`StartupNotificationWorker#extract_status` は `:status` しか見ない
+- 名前解決の障害が長引くと、約 16〜20 分周期の再起動ループが残る（listener の再接続が `/websocket/retry/max_count: 20` で `exit 1` → health NG → monit）
+- 辞書が cold のまま続いても Sentry に出ない（`tagging dictionary cold` は `logger.error` だけ。Sidekiq が生きたまま詰まったとき）
+- Annict が「200 で空」を返し続けても、古さのアラート（6 時間）が鳴らない（`keep_cache` は warn だけ）
+
+**リリース時にやること（レビュー由来）**
+
+- リリースノート: 設定の `disabled:` はエラー文に直し方が出ない（`matched the disallowed schema`）ので、「`disable` に書き直す・strict なら起動しない」を明記。Wiki の `EmojiSpacingHandler.md` の「共通の `disabled`」も直す
+- リリースノート: メディアカタログは公開だけ・印が付く・ページの上限・未収載は載らなくなる
+- Wiki「メディアカタログ」は旧既定（5.23.0 から無効）のまま
+
+**Codex（PR #4833）**: P2 を 6 件。⚠⚠ **`@codex review` を 6 回投げた＝回しすぎ。**ginseng-style の codex-review スキルでは **P2 は直して返信するだけ・再レビューは P1 だけ**。
+直すたびに新しいコードへ P2 が 1 件ずつ付き、後ろへ行くほど条件が狭くなった（4・5 回目は「`max_page` を変えた直後の 24 時間」）。
+⚠ 途中で CI を 1 回落とした（cursor のテストが Mastodon 前提・Misskey の ID は英数字）。**テストを足したら CI 相当の設定で両系を回してから push する**
+
+**ステージングでの確認**: dev25 / dev27 に info アカウントから検証用の投稿を 4 件ずつ（公開・未収載・閲覧注意・CW）。未収載は載らず、印が付き、CW の本文は返らず、
+RSS から外れる。WebUI のぼかしは `https://st2.precure.ml/mulukhiya/app/media` をブラウザで押して確認。
+⚠ dev25 の WebUI はサムネイルが 5 件とも表示されなかった（今回の変更の前からかは未確認）
+
 ### 2026-10-12 にマージしたもの（4 回目）
 
 - **PR #4831（#4789・`ca56bd56`）**: Mastodon の `media_catalog` の既定を `true` に戻す（Misskey は `false` のまま）。変更は既定値 1 行＋文書＋既定値のテスト。
@@ -267,18 +309,18 @@ git diff Gemfile.lock
   - 🔴 **事故の版（rack 3.2.3 + sinatra 4.2.0）へ下げても緑だった**（puma 8.0.2 / Ruby 4.0.7・3 回）。＝このテストは事故を再現しない。`Gemfile` の注記を「上げた版でこのテストを回す・緑は安全の証明ではない・ステージングの通し確認は省かない」に改めた。
   - ⚠ 罠: 本物のサービスは `default_token` を DB から引くので、DB の無い環境では `before` が黙って落ちて `sns` が nil になる（500 の本文は `Internal Server Error` だけ）。プローブは `default_token` だけ外した子を `sns_class` で返す。
 
-### ステージングの現在地（2026-10-12 15:10 JST）
+### ステージングの現在地（2026-10-12 17:30 JST）
 
-dev24 / dev25 / dev26 / dev27 とも develop（`ca56bd56`）・health 200。`media_catalog` は dev25（既定）・dev26（明示の `true`）が有効、
+dev24 / dev25 / dev26 / dev27 とも develop（`a6c540a1`）・health 200。`media_catalog` は dev25（既定）・dev26（明示の `true`）が有効、
 dev24（明示の `false`）・dev27（Misskey）が無効。dev25 は設定に `interval: 3600` を 2 か所入れたまま。
 ⚠ dev27 は `misskey@dev27.b-shock.local`（Linux・systemd）。`mastodon@dev27` では入れない。
 
-**develop（`ca56bd56`）で harness 両系 0 failures / 0 errors**（Mastodon 1763 tests / 158 omissions、Misskey 1762 tests / 145 omissions）。
+**develop（`a6c540a1`）で harness 両系 0 failures / 0 errors**（Mastodon 1788 tests / 158 omissions、Misskey 1787 tests / 145 omissions）。
 ⚠ リリースゲートとして読むなら、この後に develop へコードが入っていないこと。
 
 ### 残り
 
-- **open は 0 件**（2026-10-12）。次はリリース前レビュー（5 観点）→ リリース。⚠ リリース時にやること: Wiki（メディアカタログ・`interval` の運用注意）、リリースノート冒頭の注意点（#4789 の 5 項目）、本番のどのソースに `interval` を入れるかの決定
+- **open は 0 件**（2026-10-12）。**リリース前レビュー（5 観点）も済み**（上の節）＝次は `/release`。⚠ リリース時にやること: Wiki（メディアカタログ・`interval` の運用注意・`EmojiSpacingHandler.md` の `disabled`）、リリースノート冒頭の注意点（#4789 の 5 項目＋メディアカタログの範囲と印＋`disabled:`）、本番のどのソースに `interval` を入れるかの決定
 - **2026-10-12 にクローズ（ユーザー判断・not planned）**: #4465（照合の索引化・削れるのは 1 ms 前後で、実測が前提を否定）/ #4756（辞書のプロセス内キャッシュ・約 9 ms に対して、共有した辞書が壊れるとタグ付けが黙って狂う）。
   ⚠ どちらも「辞書の語数が桁で増えたら起こし直す」。**次の大玉として選択肢に出さない**
 - ⚠ **Issue は develop へのマージでは自動で閉じない**（`Closes` が効くのは既定ブランチ main だけ）。マージしたら手で閉じる
