@@ -7,6 +7,8 @@ SELECT
   note_file.note_id AS status_id,
   note_file.text AS status_text,
   note_file.visibility,
+  drive_file."isSensitive" AS sensitive,
+  note_file.cw AS spoiler_text,
   note_file.username,
   note_file.display_name
 FROM
@@ -25,7 +27,8 @@ FROM
       INNER JOIN "user" ON note."userId" = "user".id
     WHERE (0 < array_length(note."fileIds", 1))
       AND (note."userHost" IS null)
-      AND (note."visibility" IN ('<%= controller_class.visibility_name(:public) %>', '<%= controller_class.visibility_name(:unlisted) %>'))
+      <%# 🔴 **公開だけ（5.41.0 のリリース前レビュー）。**以前はホーム公開（unlisted）も含めていた。 -%>
+      AND (note."visibility" = '<%= controller_class.visibility_name(:public) %>')
       <% unless params[:only_person].to_i.zero? %>
         AND ("user"."isBot" = false)
       <% end %>
@@ -36,6 +39,11 @@ FROM
       note.id DESC
   ) AS note_file ON drive_file.id = note_file.file_id
 WHERE (drive_file."userHost" IS null)
+  <%# RSS はぼかせないので、閲覧注意・CW つきを外す（`safe` は feed だけが渡す）。 -%>
+  <% if params[:safe] %>
+    AND (drive_file."isSensitive" = false)
+    AND (coalesce(note_file.cw, '') = '')
+  <% end %>
   <% if params[:rule] %>
     <% params[:rule].keywords.each do |keyword| %>
       AND (concat_ws(E'\t', note_file.text, note_file.cw, drive_file.name) LIKE '%<%= escape(keyword) %>%')

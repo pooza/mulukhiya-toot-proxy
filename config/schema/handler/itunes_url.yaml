@@ -1,7 +1,7 @@
 label: iTunes URL短縮
 description: iTunes URLを短縮形に変換します
 properties:
-  disabled:
+  disable:
     type: boolean
   timeout:
     minimum: 1

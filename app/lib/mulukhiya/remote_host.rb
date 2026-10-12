@@ -9,7 +9,7 @@ module Mulukhiya
     # （`2000::/3`）の外を丸ごと拒否**している。表をこちらへ写し直さないこと。
     #
     # こちらに残すのは、モロヘイヤの都合で決まるものだけ:
-    # 設定から読む DNS タイムアウト・拒否理由の warn ログ・`validator` の差し替え口・
+    # 設定から読む DNS タイムアウト・名前解決に失敗したときの warn ログ・`validator` の差し替え口・
     # `unpinned_validator`・`validate!`。
 
     def self.public?(host, resolver: method(:resolve_addresses))
@@ -43,10 +43,6 @@ module Mulukhiya
         Logger.new.warn(remote_host: {host:, error: e.class.name, message: e.message})
         raise
       end
-    end
-
-    def self.internal_address?(ip)
-      return Ginseng::PublicHost.internal_address?(ip)
     end
 
     # Ginseng::HTTP#get の host_validator へ渡す callable (#4410)。

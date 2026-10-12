@@ -2,16 +2,32 @@
 
 モロヘイヤが提供する **メディアカタログ** （`/mulukhiya/api/media`、`/mulukhiya/feed/media`、`MediaCatalogUpdateWorker`）は、当該サーバーのローカル投稿に添付されたメディア（画像・動画・音声）をページング可能なカタログとして配信する機能。capsicum などのクライアントがメディア一覧画面を提供するために利用する。
 
-**5.23.0 (#4343) から デフォルト無効** に変更された。実験的機能として扱い、性能影響を理解したサーバー管理者だけが明示的にオプトインする運用に切り替えている。
+**既定値は Mastodon が有効（5.41.0・#4789）、Misskey が無効（#4375 まで）。**
 
-## 5.23.0 でのデフォルト変更の経緯
+| 版 | Mastodon | Misskey |
+| --- | --- | --- |
+| 〜5.22.x | 有効 | 有効 |
+| 5.23.0〜5.40.x | 無効（実験的扱い・#4343） | 無効 |
+| 5.41.0〜 | **有効** | 無効 |
+
+Mastodon の既定を戻したのは、クエリの書き直し（#4393 の B 案）で **追加の index なしに** 1 秒未満になり、本番 3 台で実績ができたため。
+
+- 重さは **ローカルアカウント数にほぼ比例**する（温まった状態の 1 クエリで、47 アカウントが数十 ms、384 アカウントが 0.5〜0.6 秒）。⚠ **384 を超える規模は未検証**。キャッシュが空の初回は 384 アカウントで 12 秒かかったことがある
+- 有効になると、`MediaCatalogUpdateWorker` が定期的に動き、WebUI にメディアフィードが出る
+- 重いと感じたら、overlay（`local.yaml`）に `/mastodon/data/media_catalog: false` を書けば、5.23.0〜5.40.x と同じ状態（503 を返す）に戻る。データは失われない
+- アップグレード直後は `/mulukhiya/api/health` の `postgres.pool.waiting` が 0 のままかを見る
+- **載るのは公開の投稿だけ**（5.41.0）。未収載（Misskey ではホーム公開）は載せない。閲覧注意・CW つきは `sensitive` / `status.spoiler_text` の印を付けて返し、CW つきは本文を返さない。WebUI は押すまで表示しない。RSS（`/feed/media`）には閲覧注意・CW つきを載せない
+- 未認証で引けるページには上限がある（`/webui/media/catalog/max_page`・既定 50）
+- ⚠ **index の作成は要らない。**pooza の zugoga にだけ partial index（`idx_mlkhy_statuses_local_catalog`）が残っているが、無い台でも成立している（2026-10-12 に本番 3 台で確認・#4353）
+
+## 5.23.0 でいったん無効にした経緯
 
 本機能の SQL クエリ（`app/query/{mastodon,misskey}/media_catalog.sql.erb`）は、ローカル投稿が連合受信に対して少数派になる本番規模で、PostgreSQL のプランナが `media_attachments` PK の id 降順 backward scan + フィルタアウトを選び、LIMIT を満たす local 行が見つかるまで非 local 行を大量に舐める病理を起こす。
 
 - **本番ベースライン（zugoga、2026-05-23 計測）**: 単一クエリで実行時間 **175,248 ms（約 2 分 55 秒）**。対象テーブル `media_attachments` 1,872,570 行、`statuses` 約 1,500 万行、local 比率 0.27%。
 - **2026-05-19 障害**: 全サーバー（zugoga / shallu / lbock）で投稿不可。重 SQL が DB 接続プール（pgbouncer）を専有し、Mastodon Web の `POST /inbox` 等が連鎖タイムアウト。
 - **最適化（2026-08 に決着）**: ⚠⚠ **candidate A（partial index）では届かなかった**（170s → 約 10s 止まり）。**決着は #4393 の B 案（LATERAL merge・PR #4613）**で、`/feed/media` page1 が **26,415ms → 56.7ms**、`only_person` が **25,998ms → 6.5ms**。🔴 **追加 index は不要**（Mastodon 本体の `index_media_attachments_on_account_id_and_status_id` で成立）。⚠ 下記「性能トラックの記録」の DDL は**採用されなかった候補**なので、そのまま適用しないこと。
-- **判断**: 機能自体が pooza の毎晩ルーチン（Annict + 番組表）と独立しており、最適化を急ぐより停止する選択を取った。partial index と機能再開はセットで判断する。
+- **当時の判断**: 機能自体が pooza の毎晩ルーチン（Annict + 番組表）と独立しており、最適化を急ぐより停止する選択を取った。⚠ その後 B 案で決着したので、**機能再開に partial index は要らない**。
 
 詳細な経緯（試して効かなかったものを含む）は下記「性能トラックの記録」、検証スクリプトは [`bin/diag/media_catalog_index.sql`](../bin/diag/media_catalog_index.sql) を参照。
 
@@ -28,23 +44,23 @@
 
 capsicum 側のクライアント対応は [`pooza/capsicum#606`](https://github.com/pooza/capsicum/issues/606) で進行。
 
-## 機能を有効化する手順（オプトイン）
+## 有効・無効を切り替える手順
 
-「本番規模のローカル投稿数 × 連合経由メディア数」が大きいサーバーでは、有効化前に partial index 適用を推奨する（後述）。
+⚠ **index の作成は要らない。**かつてここで勧めていた partial index（候補 A）は不採用になった（170 秒 → 約 10 秒止まり）。適用しないこと。
 
 ### 設定
 
 サーバーの `config/local.yaml`（または `/usr/local/etc/mulukhiya-toot-proxy/local.yaml`）に追記:
 
-**Mastodon サーバー**:
+**Mastodon サーバー**（既定は有効。重いときに無効へ戻す）:
 
 ```yaml
 mastodon:
   data:
-    media_catalog: true
+    media_catalog: false
 ```
 
-**Misskey サーバー**:
+**Misskey サーバー**（既定は無効。有効にする）:
 
 ```yaml
 misskey:
@@ -56,8 +72,8 @@ misskey:
 
 設定変更後、以下を再起動する:
 
-- `sidekiq` プロセス（`MediaCatalogUpdateWorker` の有効化を読み直すため）
-- `puma` プロセス（API・Feed の 503 → 200 切替を読み直すため）
+- `sidekiq` プロセス（`MediaCatalogUpdateWorker` の有効・無効を読み直すため）
+- `puma` プロセス（API・Feed の 503 / 200 の切替を読み直すため）
 
 サービス名は環境依存。例:
 
@@ -71,12 +87,12 @@ curl -s https://your.instance/mulukhiya/api/about | jq '.config.features.media_c
 # => true なら有効
 ```
 
-## 再開判断のチェックリスト
+## 有効にして動かすときのチェックリスト
 
-性能影響を踏まえ、本番規模のサーバーで有効化する場合は以下を段階的に確認することを推奨する:
+Mastodon は既定で有効になる。ローカルアカウントが多いサーバー（目安として 384 を超える規模は未検証）と、Misskey で有効にする場合は、以下を確認することを推奨する:
 
 1. **本番データ規模の把握** — `statuses` 行数、`media_attachments` 行数、local 比率（`SELECT count(*) FILTER (WHERE local) * 1.0 / count(*) FROM statuses`）。
-2. **ベースライン EXPLAIN 取得** — [`bin/diag/media_catalog_index.sql`](../bin/diag/media_catalog_index.sql) §1–§2 を本番 DB で実行。底値が数百 ms 級なら有効化リスクは低い。10 秒級以上なら index 適用を先行。
+2. **ベースライン EXPLAIN 取得** — [`bin/diag/media_catalog_index.sql`](../bin/diag/media_catalog_index.sql) §1–§2 を本番 DB で実行。底値が数百 ms 級ならリスクは低い。⚠ **秒単位で遅くても index は足さない**（効かないことが分かっている）。その場合は無効に戻し、ローカルアカウント数と実行計画を添えて報告する。
 3. ⚠ **partial index の追加は不要**（#4393 の B 案で決着済み）。`bin/diag/media_catalog_index.sql` §4 で再計測して裏を取る。
 4. **sidekiq 余力の確認** — `MediaCatalogUpdateWorker` は専用キュー（`media_catalog`、concurrency 1、`config/application.yaml` の `sidekiq.capsule.media_catalog`）で隔離されているが、worker 起動中は当該クエリが DB に居座る。pgbouncer の `pool_mode = transaction` 等で他の接続を圧迫しない構成になっているか確認。
 5. **段階適用** — 開発・ステージング → 本番の順で `local.yaml` 切替・再起動・観測（pgbouncer の `SHOW POOLS`、sidekiq dashboard、Sentry レイテンシ）。
@@ -86,6 +102,9 @@ curl -s https://your.instance/mulukhiya/api/about | jq '.config.features.media_c
 ## 性能トラックの記録（旧 `media-catalog-index-plan.md`・2026-09-08 統合）
 
 > ## ⚠⚠ 先に現在地
+>
+> **2026-10-12 追記: Gate 2 も済んだ。**zugoga（#4639）・shallu / gomander（#4352）とも有効にして実績ができ、
+> 5.41.0 で Mastodon の既定を有効に戻した（#4789）。以下は当時の記録で、**手順としては使わない**。
 >
 > **設計は決着済み。残るのは Gate 2 だけ。**#4351（Gate 0/1）は 2026-08-22、
 > #4393（sub-second 化）は 2026-08-27 に**どちらもクローズ済み**で、

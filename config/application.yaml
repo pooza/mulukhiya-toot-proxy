@@ -374,7 +374,11 @@ mastodon:
     account_timeline: true
     favorite_tags: true
     futured_tag: true
-    media_catalog: false
+    # ⚠ Mastodon は 5.41.0 で既定を true に戻した (#4789)。重さはローカルアカウント数に
+    # ほぼ比例する（47 で数十 ms、384 で 0.5〜0.6 秒／温まった状態の 1 クエリ）。
+    # 重ければ overlay で false にすれば、5.23.0〜5.40.x と同じ「503 を返す」状態に戻る。
+    # ⚠ Misskey は false のまま（#4375）。
+    media_catalog: true
   dbms: postgres
   display_name: Mastodon
   features:
@@ -496,7 +500,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 5.40.0
+  version: 5.41.0
 parser:
   note:
     fields:
@@ -835,6 +839,9 @@ webui:
       ttl: 8640000
     catalog:
       limit: 100
+      # 未認証で引けるページの上限 (5.41.0)。これより深いページは 422。
+      # ⚠ 深いページほど重い（各ローカルアカウントから limit × page 件ずつ引く）。
+      max_page: 50
     copyright:
       message: null
       url: null

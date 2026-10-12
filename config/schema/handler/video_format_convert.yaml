@@ -1,7 +1,7 @@
 label: 動画フォーマット変換
 description: アップロードされた動画を既定のフォーマットに変換・トランスコードします
 properties:
-  disabled:
+  disable:
     type: boolean
   timeout:
     minimum: 1

@@ -41,9 +41,11 @@ module Mulukhiya
       titles = keyword.split(/\s+/) if keyword.present?
       titles = self.class.keywords unless titles.present?
       return [] unless titles.present?
-      works = query(:works, {titles:}).dig('data', 'searchWorks', 'edges').map do |work|
-        self.class.create_work_info(work['node'])
-      end
+      # ⚠ Annict は不調のとき 200 で `{"errors": [...], "data": null}` を返すことがある。`nil.map` の
+      # `NoMethodError` にすると、上流の不調が「こちらのバグ」として扱われる（5.40.0 のリリース前レビュー）。
+      edges = query(:works, {titles:}).dig('data', 'searchWorks', 'edges')
+      raise Ginseng::GatewayError, 'Annict returned no works' unless edges.is_a?(Array)
+      works = edges.map {|work| self.class.create_work_info(work['node'])}
       works.concat(account[:works]) if viewers_works?
       works.uniq! {|v| v['annictId']}
       return works.sort_by {|v| (v['seasonYear'].to_i * 100_000) + v['annictId']}.reverse

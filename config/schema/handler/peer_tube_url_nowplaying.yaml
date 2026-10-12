@@ -1,7 +1,7 @@
 label: PeerTube NowPlaying
 description: PeerTube URLをNowPlaying形式に変換します
 properties:
-  disabled:
+  disable:
     type: boolean
   timeout:
     minimum: 1

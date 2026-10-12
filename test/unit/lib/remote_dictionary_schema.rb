@@ -99,5 +99,18 @@ module Mulukhiya
     def dictionary(type)
       return RemoteDictionary.create('url' => URL, 'type' => type, 'fields' => ['word'])
     end
+
+    public
+
+    # ⚠ `interval` は last-good の鍵に含めない（5.41.0 のリリース前レビュー）。足した・変えただけで
+    # 鍵が変わると、直後の失敗を埋め戻せない。解釈に効く設定（`strict`）は含めたまま。
+    def test_cache_signature_ignores_interval
+      plain = RemoteDictionary.create('url' => URL, 'type' => 'related')
+      timed = RemoteDictionary.create('url' => URL, 'type' => 'related', 'interval' => 3600)
+      strict = RemoteDictionary.create('url' => URL, 'type' => 'related', 'strict' => true)
+
+      assert_equal(plain.cache_signature, timed.cache_signature)
+      assert_not_equal(plain.cache_signature, strict.cache_signature)
+    end
   end
 end

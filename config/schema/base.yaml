@@ -151,6 +151,20 @@ properties:
       - mastodon
       - misskey
     type: string
+  daemon:
+    # ⚠ 宣言が無いと、local.yaml に書いた正当な `/daemon/*` が `Config#audit` の unknown_keys に出る。
+    properties:
+      restart:
+        properties:
+          timeout:
+            properties:
+              seconds:
+                # ⚠ 0 は「締切なし」（`CommandLine#exec(timeout: 0)`）。負の数は通さない。
+                minimum: 0
+                type: number
+            type: object
+        type: object
+    type: object
   diag:
     properties:
       enable:
@@ -363,6 +377,8 @@ properties:
     type: object
   program:
     properties:
+      auto_update:
+        type: boolean
       urls:
         items:
           format: uri
@@ -539,6 +555,9 @@ properties:
             properties:
               limit:
                 minimum: 10
+                type: integer
+              max_page:
+                minimum: 1
                 type: integer
             required:
               - limit

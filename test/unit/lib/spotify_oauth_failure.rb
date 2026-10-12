@@ -52,7 +52,7 @@ module Mulukhiya
     end
 
     # ⚠⚠ **ただし「判定できなかった」ことは必ず残す。**これが倒す先を決める
-    # ための唯一の実データになる（受け皿は #4743）。
+    # ための唯一の実データになる（#4743 はクローズ済み。出たら開き直す）。
     def test_only_invalid_request_is_undecidable
       assert(undecidable?('error' => 'invalid_request'))
       assert_false(undecidable?('error' => 'invalid_client'))

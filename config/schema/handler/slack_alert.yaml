@@ -1,7 +1,7 @@
 label: Slackアラート
 description: エラー発生時にSlack Webhookへアラートを送信します
 properties:
-  disabled:
+  disable:
     type: boolean
   hooks:
     items:

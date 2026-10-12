@@ -146,7 +146,7 @@ module Mulukhiya
     def editable_schema
       return {} if EXCLUDED_EDITABLE_HANDLERS.include?(underscore)
       props = schema['properties'] || {}
-      return props.except('disabled', 'timeout', 'toggleable', 'experimental')
+      return props.except('disable', 'disabled', 'timeout', 'toggleable', 'experimental')
     end
 
     def editable_params

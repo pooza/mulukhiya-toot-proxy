@@ -23,13 +23,59 @@ module Mulukhiya
           limit: params[:limit] + 1,
           offset: catalog_offset(params),
         ))
-        has_next = rows.size > params[:limit]
+        return catalog_result(rows, params)
+      end
+
+      def catalog_result(rows, params)
+        has_next = rows.size > params[:limit] && !catalog_last_page?(params)
         page_rows = rows.first(params[:limit])
-        items = build_catalog_items(page_rows)
-        result = {items:, has_next:}
+        result = {items: build_catalog_items(page_rows), has_next:}
         result[:next_cursor] = page_rows.last[catalog_cursor_key].to_s if has_next && page_rows.last
         result[:page] = params[:page] if params[:page]
         return result
+      end
+
+      # ページ単位のキャッシュの鍵。巡回ワーカーと読み手で同じものを使う。
+      #
+      # ⚠ **上限（`max_page`）を鍵に入れる（PR #4833 の Codex P2）。**`has_next` / `next_cursor` は
+      # 上限で決まり、2 ページ目以降は 24 時間残る。入れないと、上限を変えた後も古い境界の
+      # 応答が返る（下げれば 422 へ誘導し、上げれば新しく許したページへ進めない）。
+      def catalog_cache_key(page, only_person)
+        return "page:#{page}:person:#{only_person}:max:#{catalog_max_page}"
+      end
+
+      def catalog_max_page
+        max = config['/webui/media/catalog/max_page'] rescue nil
+        return max || MediaListContract::DEFAULT_MAX_PAGE
+      end
+
+      # ⚠ 上限のページでは「続きあり」と言わない（次を引くと 422 になる）。
+      # ⚠ **`page` があれば cursor つきでも見る（PR #4833 の Codex P2）。**巡回ワーカーは
+      # `page:` と `cursor:` を両方渡してページ単位のキャッシュを作るので、cursor で外すと、
+      # 上限のページが `has_next: true` でキャッシュされ、次を引いた利用者が 422 になる。
+      # ⚠ API からの cursor つきの要求は `page` を持たない（`MediaCatalogQueryService` が落とす）
+      # ので、cursor で送る限り上限には掛からない。
+      def catalog_last_page?(params)
+        return false if params[:page].nil?
+        return params[:page] >= catalog_max_page
+      end
+
+      # 閲覧注意・CW の印 (5.41.0 のリリース前レビュー)。
+      #
+      # ⚠⚠ **未認証で届く一覧なので、ぼかす材料をクライアントへ渡す。**以前は印が無く、
+      # CW の内側の本文とサムネイルがそのまま出ていた。
+      # - `sensitive`: 閲覧注意。⚠ **CW つきも true に倒す**（CW の付いた投稿のメディアを
+      #   印なしで並べない）
+      # - `status.spoiler_text`: CW の文言
+      # - `status.body`: ⚠ **CW つきは nil**（CW の内側を一覧に出さない）
+      def catalog_flags(row)
+        spoiler = row[:spoiler_text].to_s.strip
+        spoiler = nil if spoiler.empty?
+        return {
+          sensitive: row[:sensitive] == true || !spoiler.nil?,
+          spoiler_text: spoiler,
+          body: spoiler ? nil : row[:status_text],
+        }
       end
 
       # ⚠ **OFFSET は「ページ幅」で計算する (#4632)。**`has_next` を見るために
@@ -47,7 +93,7 @@ module Mulukhiya
         return nil if params[:cursor]
         page = params[:page] || 1
         only_person = params[:only_person] || 0
-        return MediaCatalogStorage.new.get("page:#{page}:person:#{only_person}")
+        return MediaCatalogStorage.new.get(catalog_cache_key(page, only_person))
       rescue => e
         e.log
         return nil

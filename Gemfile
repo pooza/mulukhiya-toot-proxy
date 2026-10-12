@@ -3,14 +3,14 @@ ruby '>= 4.0.2', '< 5.0'
 gem 'concurrent-ruby'
 gem 'dry-validation'
 gem 'faye-websocket', github: 'pooza/faye-websocket-ruby'
-gem 'ginseng-core', github: 'pooza/ginseng-core', tag: 'v2.4.0', require: 'ginseng'
-gem 'ginseng-fediverse', github: 'pooza/ginseng-fediverse', tag: 'v5.0.0',
+gem 'ginseng-core', github: 'pooza/ginseng-core', tag: 'v2.4.2', require: 'ginseng'
+gem 'ginseng-fediverse', github: 'pooza/ginseng-fediverse', tag: 'v6.0.0',
   require: 'ginseng/fediverse'
 gem 'ginseng-piefed', github: 'pooza/ginseng-piefed', tag: 'v0.4.0', require: 'ginseng/piefed'
 gem 'ginseng-postgres', github: 'pooza/ginseng-postgres', tag: 'v2.0.1'
 gem 'ginseng-redis', github: 'pooza/ginseng-redis', tag: 'v2.0.8', require: 'ginseng/redis'
 gem 'ginseng-web', github: 'pooza/ginseng-web', tag: 'v3.0.4', require: 'ginseng/web'
-gem 'ginseng-youtube', github: 'pooza/ginseng-youtube', tag: 'v3.0.1', require: 'ginseng/you_tube'
+gem 'ginseng-youtube', github: 'pooza/ginseng-youtube', tag: 'v3.0.2', require: 'ginseng/you_tube'
 gem 'icalendar'
 # ⚠⚠ **推移依存だが上限をこちらで持つ (#4699)。**`json` を要求している gem は
 # どれも `json (>= 2.3)` のように**下限しか書いていない**ので、`bundle update` の
@@ -37,8 +37,10 @@ gem 'puma', '~> 8.0'
 # 🔴 上限まで書くのは 2025-10 のトークン汚染事故のため
 # (docs/archive/postmortem-2025-10-rack32.md)。異なるアカウントの投稿として送信される
 # 事故で、⚠ CVE になっておらず原因も未特定なので advisory では判定できない。
-# ⚠⚠ 上限を外してよい条件は #4678（同時アクセスの回帰テスト）が緑になること。
-# それまで sinatra 4.3 系 / rack 3.3 系へは動かさない。
+# ⚠⚠ 上限を上げるときは、**上げた版で** `ruby bin/test.rb concurrent_token_isolation`
+# （同時アクセスの回帰テスト・#4678）を両系で回す。⚠ 緑は「いまの実装で取り違えが
+# 起きない」ことの回帰までで、安全の証明ではない（原因が未特定のため）。
+# ステージングでの通し確認は省かない。
 #
 # ⚠⚠ **4 つとも `require: false` (#4680)。**宣言の目的は**版の制約だけ**で、ロードの
 # 指示ではない。🔴 付けないと `Bundler.require` がトップレベルの sinatra
@@ -65,7 +67,7 @@ group :development do
   # RuboCop 設定の正本。本体と minitest/performance/rake プラグインもこの gem が抱える。
   # ⚠⚠ タグではなく SHA で固定する（pooza/ginseng-style#75）。タグは付け替えられる。
   gem 'ginseng-style', github: 'pooza/ginseng-style',
-    ref: 'ed862dcf9550d704ee670f65a30a333a694b883a', require: false # v1.1.12
+    ref: '2818c5618476302e4a10454f1b621502a053f492', require: false # v1.1.14
   gem 'ostruct' # https://github.com/pooza/mulukhiya-toot-proxy/issues/4229
   gem 'rack-test'
   gem 'rails-erb-lint'

@@ -1,7 +1,7 @@
 label: メールアラート
 description: エラー発生時にメールでアラートを送信します
 properties:
-  disabled:
+  disable:
     type: boolean
   sendmail_bin:
     type: string

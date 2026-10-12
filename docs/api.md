@@ -50,6 +50,19 @@ capsicum 等のクライアントアプリが、モロヘイヤ固有の機能�
 
 ### エラーレスポンス
 
+#### 不正な UTF-8 (400)
+
+リクエストに UTF-8 として読めないバイト列が含まれていると、**どのルートでも** 400 を返す（5.40.0〜・#4600）。
+`/mulukhiya/api/*` だけでなく、モロヘイヤが中継している Mastodon / Misskey の API パスと webhook も対象。
+
+```json
+{"error": "リクエストに不正な UTF-8 バイト列が含まれています。"}
+```
+
+- JSON の本文は全体を、フォーム・multipart は値とキーを検査する。**アップロードするファイルの中身とファイル名は検査しない**
+- **再送しても直らない。**クライアント側で文字列の切り方（マルチバイト文字の途中で切っていないか）を直すこと
+- 5.39.x までは 500 になるか、JSON の本文が丸ごと捨てられて「内容が空の投稿」として扱われていた
+
 #### 認証エラー (403)
 
 ```json
@@ -445,7 +458,7 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
       "announcement_push": false,
       "compose_templates": true,
       "feed": true,
-      "media_catalog": false,
+      "media_catalog": true,
       "media_update": true,
       "nowplaying_resolver": true,
       "nowplaying_url_resolver": true,
@@ -482,7 +495,7 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
 
 **`features.annict` / `features.annict_linked`**: `features.annict` は **サーバーレベル**の設定（当該モロヘイヤサーバーで Annict の client_id/secret が設定済みか）。`features.annict_linked` は **ユーザーレベル**の状態で、リクエストの Bearer トークンに紐付く SNS アカウントに Annict access_token が保管済みなら `true`（未連携・トークン無しは `false`、無認証リクエストでも `false`）。token 存在のみで判定し liveness/refresh の確認は行わない。capsicum は両者を組み合わせ、「サーバーは Annict 対応かつ当該ユーザーが連携済み」のときのみ感想投稿ボタンを表示する（`pooza/capsicum#298`）。
 
-**`features.media_catalog`**: メディアカタログ機能の現在のオン/オフ状態。実体は `/{controller}/data/media_catalog` を `/about` で features 側に合流させたもの（discovery を features 一本に集約するため、`annict_linked` と同じ動的合流パターン、#4343）。5.23.0 から デフォルト `false`（実験的扱い）。`false` のとき `/media`・`/feed/media` はいずれも **404 ではなく 503** を返す。`/media`（JSON）は body に `{"available": false, "items": [], "has_next": false}` を含める。`/feed/media`（RSS 2.0）は body 形式維持のため空 channel のみを返し（JSON フィールドは付かない）、HTTP ステータスのみで状態を示す。capsicum 等のクライアントは本フラグを参照して「メンテナンス中」表示に切り替える（`pooza/capsicum#606`）。`Retry-After` ヘッダは付与しない（再開タイミングが運用判断ベースで見積もり不能なため、クライアントは `/about` を polling して features を見る）。「機能未提供」(404) と「現在 OFF」(503) の区別が目的。
+**`features.media_catalog`**: メディアカタログ機能の現在のオン/オフ状態。実体は `/{controller}/data/media_catalog` を `/about` で features 側に合流させたもの（discovery を features 一本に集約するため、`annict_linked` と同じ動的合流パターン、#4343）。既定値は Mastodon が `true`（5.41.0 で戻した・#4789）、Misskey が `false`。5.23.0〜5.40.x は両方 `false`（実験的扱い）だった。`false` のとき `/media`・`/feed/media` はいずれも **404 ではなく 503** を返す。`/media`（JSON）は body に `{"available": false, "items": [], "has_next": false}` を含める。`/feed/media`（RSS 2.0）は body 形式維持のため空 channel のみを返し（JSON フィールドは付かない）、HTTP ステータスのみで状態を示す。capsicum 等のクライアントは本フラグを参照して「メンテナンス中」表示に切り替える（`pooza/capsicum#606`）。`Retry-After` ヘッダは付与しない（再開タイミングが運用判断ベースで見積もり不能なため、クライアントは `/about` を polling して features を見る）。「機能未提供」(404) と「現在 OFF」(503) の区別が目的。
 
 **`features.program_editable`**: 番組表エディタ（`/admin/program/entry/*` 5 ルート）の書き込み API が現在利用可能か。`livecure?` が `true`（番組表機能対応 controller）かつ `/program/auto_update` が `false`（自動更新無効）のときのみ `true`（#4272）。`true` でも管理者権限が必要なのは従来通り。`false` のとき書き込み 5 ルートは 409 Conflict（メッセージ「自動更新が有効のため、編集できません。」）を返す。WebUI 側は本フラグを見て編集ボタン類を非表示・案内表示に切り替える。`livecure?` 自体が `false` のサーバーでは番組表機能が無いので常に `false`。⚠ **`true` でも 409 は起こりうる**（5.33.0〜 / #4534 の書き込みロック競合）。**本フラグと 409 を「編集不可」として同一視しないこと**——ロック競合の 409 は一過性で、再試行すれば通る。5.38.0〜 は 409 の `code` で区別できる（`auto_update` / `locked`、#4579）。
 
@@ -714,6 +727,17 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 前提を置かないこと。**
 
 クライアント・監視は `postgres.pool&.waiting` の形で読み、**欠けていたら「観測できていない」として扱う**こと。
+
+**`streaming` は、自サーバーの名前が引けないだけなら `NG` にしない**（5.41.0〜、#4821）。Mastodon 系では listener の生死に加えて
+自サーバーの `/api/v1/streaming/health` を公開名で確かめるが、**名前解決の失敗は再起動しても直らない**。
+`status` を倒すと全体が 503 になり、health を再起動の引き金にしている監視（monit など）が、名前が戻るまで再起動を繰り返す。
+
+```json
+"streaming": {"status": "OK", "unresolved": true, "error": "Failed to open TCP connection to example.com:443 (getaddrinfo(3): Name does not resolve)"}
+```
+
+⚠ **`status` は `OK` のまま**なので、監視側は `unresolved` / `error` の有無を別に見ること（`pgbouncer.error` と同じ扱い）。
+⚠ 外すのは名前解決の失敗だけ。listener が居ない・接続拒否・タイムアウト・200 以外の応答は `NG`（＝全体 503）のまま。
 
 **`ruby` は構成乖離の検知用** (#4466)。YJIT は Rust の無い環境ではビルド時に黙って外れ、エラーにならないまま 24〜25% 遅いサーバーが出来上がるため、能力を可視化する。
 
@@ -1185,13 +1209,13 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 メディアカタログを取得する。
 
 - **認証**: オプショナル（認証時は検索クエリ `q` が使用可能）
-- **前提条件**: `/{controller}/data/media_catalog` が `true`（5.23.0 から デフォルト `false`）。無効時は **503** + body `{"available": false, "items": [], "has_next": false}` を返す。クライアントは `/about` の `features.media_catalog` で事前に有効/無効を判定可能（#4343）
+- **前提条件**: `/{controller}/data/media_catalog` が `true`（既定値は Mastodon が `true`・Misskey が `false`。5.23.0〜5.40.x は両方 `false`）。無効時は **503** + body `{"available": false, "items": [], "has_next": false}` を返す。クライアントは `/about` の `features.media_catalog` で事前に有効/無効を判定可能（#4343）
 - **パラメータ**:
 
 | 名前 | 型 | 必須 | 説明 |
 |------|-----|------|------|
-| `page` | integer | 任意 | ページ番号（デフォルト: 1、1以上。`cursor` 指定時は無視される） |
-| `cursor` | string | 任意 | カーソル（前回レスポンスの `next_cursor` を指定） |
+| `page` | integer | 任意 | ページ番号（デフォルト: 1、1以上。`cursor` 指定時は無視される）。上限は `/webui/media/catalog/max_page`（既定 50）で、超えると 422（5.41.0） |
+| `cursor` | string | 任意 | カーソル（前回レスポンスの `next_cursor` を指定）。ID の形（Mastodon は数字・Misskey は英数字）でなければ 422（5.41.0） |
 | `q` | string | 任意 | 検索クエリ（認証時のみ有効） |
 | `only_person` | integer | 任意 | 人物のみ（0: 全て / 1: 人物のみ、デフォルト: 0） |
 
@@ -1203,6 +1227,18 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 | `page` | integer | 現在のページ番号 |
 | `has_next` | boolean | 次のページが存在するか |
 | `next_cursor` | string | 次ページのカーソル（`has_next` が `true` の場合のみ） |
+
+- **載る範囲（5.41.0 で変更）**: ローカルの**公開**投稿に付いたメディアだけ。未収載（Misskey ではホーム公開）は載らない（5.40.x までは載っていた）。サイレンス・凍結アカウント、ブースト、削除済みは従来どおり載らない
+- **閲覧注意・CW の印（5.41.0 で追加）**: 未認証で届く一覧なので、**ぼかすのはクライアントの責任**
+
+| `items[]` のフィールド | 型 | 説明 |
+|-----------|-----|------|
+| `sensitive` | boolean | 閲覧注意。⚠ **CW つきの投稿のメディアも `true`**。`true` のものは、利用者が操作するまでサムネイル・本体を表示しないこと |
+| `status.spoiler_text` | string \| null | CW の文言。無ければ `null` |
+| `status.body` | string \| null | 投稿の本文。⚠ **CW つきは `null`**（CW の内側は一覧に出さない） |
+
+- 上限のページ（`max_page`）では `has_next` は `false` になる
+- 知らないパラメータは無視される（5.40.x までは内部用の `skip_cache` / `limit` / `rule` が素通しだった）
 
 ### P4: NowPlaying・Webhook・番組情報
 

@@ -87,7 +87,7 @@ module Mulukhiya
 
       assert_equal([:receiving], logged.filter_map {|v| v[:phase]})
       assert_path_not_exist(path_for(URL))
-      # ⚠ 例外のメッセージに URL を入れない（#4630）。上流の TooLargeError は文中に URL を持つ。
+      # ⚠ 例外のメッセージに URL を入れない（#4630）。プリフライトで弾いたときと同じ例外に揃える。
       assert_equal('Too large content', error.message)
       assert_not_kind_of(Ginseng::TooLargeError, error)
     end

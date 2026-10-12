@@ -1,7 +1,7 @@
 label: Amazon URL短縮
 description: Amazon商品URLを短縮形に変換します
 properties:
-  disabled:
+  disable:
     type: boolean
   timeout:
     minimum: 1

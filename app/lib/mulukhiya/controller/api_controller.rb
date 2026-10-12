@@ -783,7 +783,7 @@ module Mulukhiya
 
     post '/tagging/dic/update' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
-      TaggingDictionaryUpdateWorker.perform_async
+      TaggingDictionaryUpdateWorker.perform_async('force' => true)
       return @renderer.to_s
     rescue => e
       report_error(e)

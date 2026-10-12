@@ -8,10 +8,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 969e8c3dcd93e5dd2befede3a4c0ae42b57f6fdb
-  tag: v2.4.0
+  revision: ea106db86d2407583e65a4879b2135ed46b5116c
+  tag: v2.4.2
   specs:
-    ginseng-core (2.4.0)
+    ginseng-core (2.4.2)
       activesupport (>= 8.1.2.1)
       addressable (>= 2.9.0)
       cgi (>= 0.4.2)
@@ -43,10 +43,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 65dbed0432cdb620ca8896ca46f7a838ee888305
-  tag: v5.0.0
+  revision: d59aea22270a771e1f8775355d8d6fb7e5283d6e
+  tag: v6.0.0
   specs:
-    ginseng-fediverse (5.0.0)
+    ginseng-fediverse (6.0.0)
       ginseng-core (>= 2.1.0)
 
 GIT
@@ -76,12 +76,12 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-style.git
-  revision: ed862dcf9550d704ee670f65a30a333a694b883a
-  ref: ed862dcf9550d704ee670f65a30a333a694b883a
+  revision: 2818c5618476302e4a10454f1b621502a053f492
+  ref: 2818c5618476302e4a10454f1b621502a053f492
   specs:
-    ginseng-style (1.1.12)
-      rubocop (~> 1.90.0)
-      rubocop-minitest (~> 0.40.0)
+    ginseng-style (1.1.14)
+      rubocop (~> 1.91.0)
+      rubocop-minitest (~> 0.41.0)
       rubocop-performance (~> 1.27.0)
       rubocop-rake (~> 0.7.1)
 
@@ -100,10 +100,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-youtube.git
-  revision: 74b9f344df15ab8a2f6f09808781f97e6ad872a5
-  tag: v3.0.1
+  revision: ad7af8c8296b6918b9f1604be5855c24fb6a81aa
+  tag: v3.0.2
   specs:
-    ginseng-youtube (3.0.1)
+    ginseng-youtube (3.0.2)
 
 GIT
   remote: https://github.com/pooza/rspotify.git
@@ -241,11 +241,10 @@ GEM
       multi_xml (>= 0.5.2)
     i18n (1.15.2)
       concurrent-ruby (~> 1.0)
-    icalendar (2.12.5)
+    icalendar (2.13.0)
       base64
       ice_cube (~> 0.16)
       logger
-      ostruct
     ice_cube (0.17.0)
     json (3.0.2)
     json-schema (6.2.1)
@@ -269,7 +268,7 @@ GEM
     mime-types (3.7.0)
       logger
       mime-types-data (~> 3.2025, >= 3.2025.0507)
-    mime-types-data (3.2026.0929)
+    mime-types-data (3.2026.1006)
     mini_mime (1.1.5)
     mini_portile2 (2.8.9)
     minitest (6.0.6)
@@ -279,7 +278,8 @@ GEM
     multi_xml (0.9.1)
       bigdecimal (>= 3.1, < 5)
     mustermann (3.1.1)
-    net-http (0.9.1)
+    net-http (0.10.0)
+      net-protocol (>= 0.3.0)
       uri (>= 0.11.1)
     net-imap (0.6.7)
       date
@@ -360,7 +360,7 @@ GEM
       nokogiri (>= 1.15.7, != 1.16.7, != 1.16.6, != 1.16.5, != 1.16.4, != 1.16.3, != 1.16.2, != 1.16.1, != 1.16.0.rc1, != 1.16.0)
     rainbow (3.1.1)
     rake (13.4.2)
-    redis-client (0.30.1)
+    redis-client (0.31.0)
       connection_pool
     regexp_parser (2.13.1)
     resolv (0.7.2)
@@ -373,7 +373,7 @@ GEM
     ricecream (0.2.1)
     rss (0.3.3)
       rexml
-    rubocop (1.90.0)
+    rubocop (1.91.0)
       json (>= 2.3)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.1.0)
@@ -387,9 +387,9 @@ GEM
     rubocop-ast (1.50.0)
       parser (>= 3.3.7.2)
       prism (~> 1.7)
-    rubocop-minitest (0.40.0)
+    rubocop-minitest (0.41.0)
       lint_roller (~> 1.1)
-      rubocop (>= 1.75.0, < 2.0)
+      rubocop (>= 1.89.0, < 2.0)
       rubocop-ast (>= 1.38.0, < 2.0)
     rubocop-performance (1.27.0)
       lint_roller (~> 1.1)
@@ -468,7 +468,7 @@ GEM
     uri (1.1.2)
     useragent (0.16.11)
     version_gem (1.1.15)
-    webmock (3.26.4)
+    webmock (3.29.0)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)

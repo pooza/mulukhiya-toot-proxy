@@ -1,5 +1,8 @@
 module Mulukhiya
   class PiefedClippingWorker < ClippingWorker
+    # ⚠ ginseng-core の `HostValidationMethods#validate_host!` の文言。専用の例外クラスは無い。
+    REJECTED_HOST_MESSAGE = 'Rejected host'.freeze
+
     def disable?
       return true unless controller_class.piefed?
       return super
@@ -19,6 +22,11 @@ module Mulukhiya
         return log(account_id: params[:account_id], message: 'not public', uri: params[:uri].to_s)
       end
       log(account_id: params[:account_id], message: 'clipped')
+    rescue Ginseng::GatewayError => e
+      # 取得先ホストの検証で拒否された URL（ginseng-fediverse 5.0.0・#4813）は、何度試しても通らない。
+      # 利用者が書いた URL の結果なので、再試行も Sentry もさせず、ログだけ残す（5.40.0 のリリース前レビュー）。
+      raise unless e.message.start_with?(REJECTED_HOST_MESSAGE)
+      log(account_id: params[:account_id], message: 'rejected host', uri: params[:uri].to_s)
     end
   end
 end

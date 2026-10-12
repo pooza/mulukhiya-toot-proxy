@@ -1,0 +1,9 @@
+label: 予約投稿の保存
+description: 予約投稿の内容を保存し、編集画面で元の内容を復元できるようにします
+properties:
+  disable:
+    type: boolean
+  timeout:
+    minimum: 1
+    type: integer
+type: object
