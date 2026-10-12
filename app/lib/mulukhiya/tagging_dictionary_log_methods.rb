@@ -32,6 +32,8 @@ module Mulukhiya
         attempted_sources: @attempted_sources.to_i,
         empty_sources: empty.size,
         substituted_sources: substituted.size,
+        # 間隔の内側で、上流を引かずに済ませた本数 (#4690)。
+        reused_sources: @reused_sources.to_a.size,
         entries: size,
         ttl: cache_ttl,
       }
