@@ -83,8 +83,13 @@ module Mulukhiya
     #
     # ⚠ **ハッシュにしてから使うこと。**`@params` には `?access_token=` 付きの URL が
     # 入る (#4511)。Redis のキー一覧は運用の手元にも syslog にも出る。
+    #
+    # ⚠ **`interval` は含めない（5.41.0 のリリース前レビュー）。**取得結果の解釈に効かない
+    # 設定なので、含めると `interval` を足した・変えただけで last-good が別の鍵になり、
+    # 直後の 1 回が上流の失敗に当たると埋め戻せない。
     def cache_signature
-      return Digest::SHA256.hexdigest([self.class.name, @params.sort].to_json)
+      params = @params.reject {|key, _| key.to_s == '/interval'}
+      return Digest::SHA256.hexdigest([self.class.name, params.sort].to_json)
     end
 
     def self.all(&block)

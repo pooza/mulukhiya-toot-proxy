@@ -556,6 +556,9 @@ properties:
               limit:
                 minimum: 10
                 type: integer
+              max_page:
+                minimum: 1
+                type: integer
             required:
               - limit
             type: object

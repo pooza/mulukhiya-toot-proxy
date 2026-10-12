@@ -54,9 +54,12 @@ module Mulukhiya
         attachments = where(id: rows.map {|r| r[:id]}).to_h {|a| [a.id, a]}
         return rows.filter_map do |row|
           next unless attachment = attachments[row[:id]]
+          flags = catalog_flags(row)
           attachment.to_h.merge(
+            sensitive: flags[:sensitive],
             status: {
-              body: row[:status_text],
+              body: flags[:body],
+              spoiler_text: flags[:spoiler_text],
               public_url: Status.create_uri(:public, row.except(:id)).to_s,
               webui_url: Status.create_uri(:webui, row.except(:id)).to_s,
             },
@@ -67,7 +70,8 @@ module Mulukhiya
 
       def self.feed(&block)
         return enum_for(__method__) unless block
-        rows = Postgres.exec(:media_catalog, {page: 1, limit: MediaFeedRenderer.limit})
+        # ⚠ RSS はぼかせないので、閲覧注意・CW つきは載せない（`safe`）。
+        rows = Postgres.exec(:media_catalog, {page: 1, limit: MediaFeedRenderer.limit, safe: true})
         ids = rows.map {|row| row[:id]}
         attachments = where(id: ids).to_h {|a| [a.id, a]}
         ids.filter_map {|id| attachments[id]&.feed_entry}.each(&block)

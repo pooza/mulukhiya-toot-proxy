@@ -14,7 +14,8 @@ module Mulukhiya
       end
       @worker = TaggingDictionaryUpdateWorker.allocate
       @worker.define_singleton_method(:disable?) {false}
-      @worker.define_singleton_method(:log) {|*| nil}
+      @logged = logged = []
+      @worker.define_singleton_method(:log) {|payload| logged.push(payload)}
     end
 
     def teardown
@@ -28,6 +29,8 @@ module Mulukhiya
       @worker.perform(cold: true)
 
       assert_empty(@calls)
+      # ⚠ 何もしなかった回も 1 行残す（溜まった依頼が空振りに見えないように）。
+      assert_equal([true, true], @logged.map {|v| v[:skipped]})
     end
 
     def test_cold_request_refreshes_when_cache_is_missing

@@ -458,7 +458,7 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
       "announcement_push": false,
       "compose_templates": true,
       "feed": true,
-      "media_catalog": false,
+      "media_catalog": true,
       "media_update": true,
       "nowplaying_resolver": true,
       "nowplaying_url_resolver": true,
@@ -1214,8 +1214,8 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 
 | 名前 | 型 | 必須 | 説明 |
 |------|-----|------|------|
-| `page` | integer | 任意 | ページ番号（デフォルト: 1、1以上。`cursor` 指定時は無視される） |
-| `cursor` | string | 任意 | カーソル（前回レスポンスの `next_cursor` を指定） |
+| `page` | integer | 任意 | ページ番号（デフォルト: 1、1以上。`cursor` 指定時は無視される）。上限は `/webui/media/catalog/max_page`（既定 50）で、超えると 422（5.41.0） |
+| `cursor` | string | 任意 | カーソル（前回レスポンスの `next_cursor` を指定）。ID の形（Mastodon は数字・Misskey は英数字）でなければ 422（5.41.0） |
 | `q` | string | 任意 | 検索クエリ（認証時のみ有効） |
 | `only_person` | integer | 任意 | 人物のみ（0: 全て / 1: 人物のみ、デフォルト: 0） |
 
@@ -1227,6 +1227,18 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 | `page` | integer | 現在のページ番号 |
 | `has_next` | boolean | 次のページが存在するか |
 | `next_cursor` | string | 次ページのカーソル（`has_next` が `true` の場合のみ） |
+
+- **載る範囲（5.41.0 で変更）**: ローカルの**公開**投稿に付いたメディアだけ。未収載（Misskey ではホーム公開）は載らない（5.40.x までは載っていた）。サイレンス・凍結アカウント、ブースト、削除済みは従来どおり載らない
+- **閲覧注意・CW の印（5.41.0 で追加）**: 未認証で届く一覧なので、**ぼかすのはクライアントの責任**
+
+| `items[]` のフィールド | 型 | 説明 |
+|-----------|-----|------|
+| `sensitive` | boolean | 閲覧注意。⚠ **CW つきの投稿のメディアも `true`**。`true` のものは、利用者が操作するまでサムネイル・本体を表示しないこと |
+| `status.spoiler_text` | string \| null | CW の文言。無ければ `null` |
+| `status.body` | string \| null | 投稿の本文。⚠ **CW つきは `null`**（CW の内側は一覧に出さない） |
+
+- 上限のページ（`max_page`）では `has_next` は `false` になる
+- 知らないパラメータは無視される（5.40.x までは内部用の `skip_cache` / `limit` / `rule` が素通しだった）
 
 ### P4: NowPlaying・Webhook・番組情報
 

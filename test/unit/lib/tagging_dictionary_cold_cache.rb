@@ -126,6 +126,34 @@ module Mulukhiya
       assert_empty(@requests)
     end
 
+    # 🔴 **ソースが 0 本でも `cache` は Hash（5.41.0 のリリース前レビュー）。**nil のままだと
+    # タグ検索（`TagSearchService#search` の `cache.each`）が落ちて 500 になる。ソースが無いと
+    # 更新ワーカーも動かないので、本体キャッシュを書く者がいない。
+    def test_no_sources_cache_is_an_empty_hash
+      dic = build_dictionary([])
+      dic.send(:fill_cold_cache)
+
+      assert_equal({}, dic.cache)
+      assert_equal({}, TagSearchService.new(dic).search('キュア'))
+    end
+
+    # ⚠ 依頼を出せなかった回は、本体キャッシュを読み直さない（署名の合わない本体が残っている間、
+    # 読むたびに `cache discarded` が出るため）。
+    def test_cache_is_reread_only_when_requested
+      warm_last_good
+      build_dictionary([@source]).send(:fill_cold_cache)
+      dic = build_dictionary([@source])
+      loads = 0
+      dic.define_singleton_method(:load_cache) do
+        loads += 1
+        nil
+      end
+      dic.send(:fill_cold_cache)
+
+      assert_equal(0, loads)
+      assert_equal(entries, dic.cache)
+    end
+
     # 🔴 入口（`new`）から通して、上流を引かないこと。
     def test_new_does_not_fetch
       warm_last_good

@@ -41,6 +41,8 @@ SELECT
   picked.status_id,
   picked.status_text,
   picked.visibility,
+  picked.sensitive,
+  picked.spoiler_text,
   accounts.username,
   accounts.display_name
 FROM (
@@ -68,13 +70,22 @@ CROSS JOIN LATERAL (
     statuses.id AS status_id,
     statuses.text AS status_text,
     statuses.visibility,
+    statuses.sensitive,
+    statuses.spoiler_text,
     statuses.account_id AS status_account_id
   FROM media_attachments AS attachments
     INNER JOIN statuses ON attachments.status_id = statuses.id
   WHERE (attachments.account_id = local_accounts.account_id)
     AND (statuses.local = true)
     AND (statuses.reblog_of_id IS null)
-    AND (statuses.visibility < 2)
+    <%# 🔴 **公開だけ（5.41.0 のリリース前レビュー）。**未収載は公開タイムラインに出ない投稿なので、
+        未認証のサーバー横断の一覧にも載せない。以前は `< 2`（未収載を含む）だった。 -%>
+    AND (statuses.visibility = 0)
+    <%# RSS はぼかせないので、閲覧注意・CW つきを外す（`safe` は feed だけが渡す）。 -%>
+    <% if params[:safe] %>
+      AND (statuses.sensitive = false)
+      AND (coalesce(statuses.spoiler_text, '') = '')
+    <% end %>
     AND (statuses.deleted_at IS null)
     <% if params[:rule] %>
       <% params[:rule].keywords.each do |keyword| %>

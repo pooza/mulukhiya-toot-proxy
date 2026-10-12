@@ -56,6 +56,10 @@ module Mulukhiya
       return nil unless raw
       words = Marshal.load(raw) # rubocop:disable Security/MarshalLoad
       return nil unless words.is_a?(Hash) && words.present?
+      # ⚠ **使い回した回も last-good の寿命を置き直す（5.41.0 のリリース前レビュー）。**
+      # 置き直さないと、長い `interval`（例: 86400）では、印が切れて取りにいく頃に
+      # last-good の残りが 10 分ほどしか無く、続けて外すと埋め戻せない。
+      redis.expire(source_key(dic), source_cache_ttl)
       @reused_sources&.push(dic.uri.to_s)
       logger.info(dic: dic.to_h.merge(words: words.count, reused: true))
       return words
@@ -128,8 +132,12 @@ module Mulukhiya
 
     # ⚠ **last-good と同じ接頭辞の下に置く。**`invalidate_cache` が一緒に消すので、
     # 「既知の状態から始める」が保たれる。
+    #
+    # ⚠ **印の鍵には `interval` を入れる（PR #4833 の Codex P2）。**last-good の鍵
+    # （`cache_signature`）は `interval` に依らないので、印まで同じ鍵にすると、間隔を
+    # 短くしても古い印（長い寿命）が残り、新しい間隔が効かない。
     def fresh_key(dic)
-      return "#{source_key(dic)}/fresh"
+      return "#{source_key(dic)}/fresh/#{source_interval(dic)}"
     end
 
     def source_cache_ttl

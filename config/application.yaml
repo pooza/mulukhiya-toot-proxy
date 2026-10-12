@@ -839,6 +839,9 @@ webui:
       ttl: 8640000
     catalog:
       limit: 100
+      # 未認証で引けるページの上限 (5.41.0)。これより深いページは 422。
+      # ⚠ 深いページほど重い（各ローカルアカウントから limit × page 件ずつ引く）。
+      max_page: 50
     copyright:
       message: null
       url: null
