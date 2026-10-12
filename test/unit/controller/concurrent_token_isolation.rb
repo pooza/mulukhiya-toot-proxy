@@ -22,6 +22,10 @@ module Mulukhiya
   class ConcurrentTokenIsolationTest < TestCase
     REQUESTS = 500
     CLIENTS = 8
+    # ⚠ わざと壊したプローブは**設定に依らず**複数スレッドで受ける。`/puma/threads` が 1 の
+    # 環境だと直列になって混線が起きず、「仕掛けが効くことの確認」が必ず落ちる
+    # （PR #4829 の Codex P2）。
+    NEGATIVE_CONTROL_THREADS = 5
 
     # 実コントローラ（Mastodon / Misskey）を継いだプローブ。**`token` の取り出しと
     # `before` は本物**で、足すのはイベントを挟まない投稿ルートだけ（ハンドラは DB や
@@ -160,7 +164,7 @@ module Mulukhiya
     # 🔴 **仕掛けが効くことの確認（その 1）: 防御策が受け止める。**
     def test_shared_state_is_caught_by_defence
       probe = create_probe(SharedStateBug)
-      results = with_puma(probe) do |port|
+      results = with_puma(probe, threads: NEGATIVE_CONTROL_THREADS) do |port|
         run_concurrently(requests: 100) do |serial, token, client|
           http = client[:http] ||= Net::HTTP.start('127.0.0.1', port)
           response = http.request(create_request(serial, token))
@@ -176,7 +180,7 @@ module Mulukhiya
     # ⚠ Misskey は `params[:i]` がそのまま上流へ行くので、ヘッダーで送った分だけが混ざる。
     def test_shared_state_is_detected_without_defence
       probe = create_probe(SharedStateBug, NoDefence)
-      results = with_puma(probe) do |port|
+      results = with_puma(probe, threads: NEGATIVE_CONTROL_THREADS) do |port|
         run_concurrently(requests: 100) do |serial, token, client|
           http = client[:http] ||= Net::HTTP.start('127.0.0.1', port)
           response = http.request(create_request(serial, token))
@@ -196,10 +200,10 @@ module Mulukhiya
       return probe
     end
 
-    def with_puma(probe)
+    def with_puma(probe, threads: config['/puma/threads'])
       server = Puma::Server.new(Rack::URLMap.new('/' => probe), nil, {
-        min_threads: config['/puma/threads'],
-        max_threads: config['/puma/threads'],
+        min_threads: threads,
+        max_threads: threads,
         log_writer: Puma::LogWriter.null,
       })
       port = server.add_tcp_listener('127.0.0.1', 0).addr[1]
