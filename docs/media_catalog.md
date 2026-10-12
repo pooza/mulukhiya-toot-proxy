@@ -42,23 +42,23 @@ Mastodon の既定を戻したのは、クエリの書き直し（#4393 の B �
 
 capsicum 側のクライアント対応は [`pooza/capsicum#606`](https://github.com/pooza/capsicum/issues/606) で進行。
 
-## 機能を有効化する手順（オプトイン）
+## 有効・無効を切り替える手順
 
-「本番規模のローカル投稿数 × 連合経由メディア数」が大きいサーバーでは、有効化前に partial index 適用を推奨する（後述）。
+⚠ **index の作成は要らない。**かつてここで勧めていた partial index（候補 A）は不採用になった（170 秒 → 約 10 秒止まり）。適用しないこと。
 
 ### 設定
 
 サーバーの `config/local.yaml`（または `/usr/local/etc/mulukhiya-toot-proxy/local.yaml`）に追記:
 
-**Mastodon サーバー**:
+**Mastodon サーバー**（既定は有効。重いときに無効へ戻す）:
 
 ```yaml
 mastodon:
   data:
-    media_catalog: true
+    media_catalog: false
 ```
 
-**Misskey サーバー**:
+**Misskey サーバー**（既定は無効。有効にする）:
 
 ```yaml
 misskey:
@@ -70,8 +70,8 @@ misskey:
 
 設定変更後、以下を再起動する:
 
-- `sidekiq` プロセス（`MediaCatalogUpdateWorker` の有効化を読み直すため）
-- `puma` プロセス（API・Feed の 503 → 200 切替を読み直すため）
+- `sidekiq` プロセス（`MediaCatalogUpdateWorker` の有効・無効を読み直すため）
+- `puma` プロセス（API・Feed の 503 / 200 の切替を読み直すため）
 
 サービス名は環境依存。例:
 
@@ -85,12 +85,12 @@ curl -s https://your.instance/mulukhiya/api/about | jq '.config.features.media_c
 # => true なら有効
 ```
 
-## 再開判断のチェックリスト
+## 有効にして動かすときのチェックリスト
 
-性能影響を踏まえ、本番規模のサーバーで有効化する場合は以下を段階的に確認することを推奨する:
+Mastodon は既定で有効になる。ローカルアカウントが多いサーバー（目安として 384 を超える規模は未検証）と、Misskey で有効にする場合は、以下を確認することを推奨する:
 
 1. **本番データ規模の把握** — `statuses` 行数、`media_attachments` 行数、local 比率（`SELECT count(*) FILTER (WHERE local) * 1.0 / count(*) FROM statuses`）。
-2. **ベースライン EXPLAIN 取得** — [`bin/diag/media_catalog_index.sql`](../bin/diag/media_catalog_index.sql) §1–§2 を本番 DB で実行。底値が数百 ms 級なら有効化リスクは低い。10 秒級以上なら index 適用を先行。
+2. **ベースライン EXPLAIN 取得** — [`bin/diag/media_catalog_index.sql`](../bin/diag/media_catalog_index.sql) §1–§2 を本番 DB で実行。底値が数百 ms 級ならリスクは低い。⚠ **秒単位で遅くても index は足さない**（効かないことが分かっている）。その場合は無効に戻し、ローカルアカウント数と実行計画を添えて報告する。
 3. ⚠ **partial index の追加は不要**（#4393 の B 案で決着済み）。`bin/diag/media_catalog_index.sql` §4 で再計測して裏を取る。
 4. **sidekiq 余力の確認** — `MediaCatalogUpdateWorker` は専用キュー（`media_catalog`、concurrency 1、`config/application.yaml` の `sidekiq.capsule.media_catalog`）で隔離されているが、worker 起動中は当該クエリが DB に居座る。pgbouncer の `pool_mode = transaction` 等で他の接続を圧迫しない構成になっているか確認。
 5. **段階適用** — 開発・ステージング → 本番の順で `local.yaml` 切替・再起動・観測（pgbouncer の `SHOW POOLS`、sidekiq dashboard、Sentry レイテンシ）。
@@ -100,6 +100,9 @@ curl -s https://your.instance/mulukhiya/api/about | jq '.config.features.media_c
 ## 性能トラックの記録（旧 `media-catalog-index-plan.md`・2026-09-08 統合）
 
 > ## ⚠⚠ 先に現在地
+>
+> **2026-10-12 追記: Gate 2 も済んだ。**zugoga（#4639）・shallu / gomander（#4352）とも有効にして実績ができ、
+> 5.41.0 で Mastodon の既定を有効に戻した（#4789）。以下は当時の記録で、**手順としては使わない**。
 >
 > **設計は決着済み。残るのは Gate 2 だけ。**#4351（Gate 0/1）は 2026-08-22、
 > #4393（sub-second 化）は 2026-08-27 に**どちらもクローズ済み**で、
