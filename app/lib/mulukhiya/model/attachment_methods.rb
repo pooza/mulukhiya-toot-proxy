@@ -36,9 +36,13 @@ module Mulukhiya
       end
 
       # ⚠ 上限のページでは「続きあり」と言わない（次を引くと 422 になる）。
-      # ⚠ cursor で送るとき（Mastodon）はページの上限に掛からない。
+      # ⚠ **`page` があれば cursor つきでも見る（PR #4833 の Codex P2）。**巡回ワーカーは
+      # `page:` と `cursor:` を両方渡してページ単位のキャッシュを作るので、cursor で外すと、
+      # 上限のページが `has_next: true` でキャッシュされ、次を引いた利用者が 422 になる。
+      # ⚠ API からの cursor つきの要求は `page` を持たない（`MediaCatalogQueryService` が落とす）
+      # ので、cursor で送る限り上限には掛からない。
       def catalog_last_page?(params)
-        return false if params[:cursor] || params[:page].nil?
+        return false if params[:page].nil?
         max = config['/webui/media/catalog/max_page'] rescue nil
         return params[:page] >= (max || MediaListContract::DEFAULT_MAX_PAGE)
       end

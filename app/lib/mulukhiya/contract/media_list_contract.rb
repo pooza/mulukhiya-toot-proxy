@@ -12,8 +12,11 @@ module Mulukhiya
     # ⚠⚠ **ページに上限を置く（5.41.0 のリリース前レビュー）。**未認証で届き、深いページほど
     # 重い（OFFSET ぶんまで各ローカルアカウントから引く）。上限が無いと `?page=1000000` で
     # 全件を引いて並べさせられる（2026-05-19 の接続プール枯渇と同じ経路）。
+    # ⚠ cursor つきの要求では `page` は無視されるので、上限も見ない（PR #4833 の Codex P2）。
+    # ページ番号を数え続けながら `next_cursor` を辿るクライアントを 422 にしない。
     rule(:page) do
       next unless key?
+      next if values[:cursor]
       max = (Config.instance['/webui/media/catalog/max_page'] rescue nil) || DEFAULT_MAX_PAGE
       key.failure("#{max} ページまでです。") if value > max
     end

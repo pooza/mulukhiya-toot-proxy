@@ -26,6 +26,13 @@ module Mulukhiya
       assert_equal({page: 2, only_person: 0}, @attachment_class.received_params)
     end
 
+    # ⚠ cursor があるときは `page` を捨てる（PR #4833 の Codex P2）。
+    def test_page_is_dropped_when_cursor_present
+      @service.call({'page' => '51', 'cursor' => '123'})
+
+      assert_equal({cursor: '123', only_person: 0}, @attachment_class.received_params)
+    end
+
     def test_default_page_is_set_when_cursor_absent
       @service.call({})
 

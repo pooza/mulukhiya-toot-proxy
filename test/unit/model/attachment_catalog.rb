@@ -65,6 +65,15 @@ module Mulukhiya
       assert_false(catalog(page: 2, limit: 3)[:has_next])
     end
 
+    # ⚠ 巡回ワーカーは `page:` と `cursor:` を両方渡す。cursor つきでも上限のページは
+    # `has_next: false` でキャッシュされること（PR #4833 の Codex P2）。
+    def test_has_next_is_false_at_the_max_page_with_a_cursor
+      config['/webui/media/catalog/max_page'] = 2
+
+      assert_false(catalog(page: 2, cursor: '999', limit: 3)[:has_next])
+      assert_true(catalog(cursor: '999', limit: 3)[:has_next])
+    end
+
     # ⚠⚠ **#4632 の回帰。**`has_next` を見るために取得件数へ +1 しているので、
     # その `limit` を OFFSET の基準にも使うと**ページごとに 1 件抜ける**。
     def test_offset_is_computed_from_the_page_width

@@ -32,6 +32,14 @@ module Mulukhiya
       assert_not_empty(errors(page: 1_000_000))
     end
 
+    # ⚠ cursor つきの要求では `page` は無視される＝上限にも掛からない（PR #4833 の Codex P2）。
+    def test_page_cap_is_ignored_with_a_cursor
+      config['/webui/media/catalog/max_page'] = 5
+      cursor = Environment.mastodon_type? ? '115000000000000000' : 'a1b2c3'
+
+      assert_empty(errors(page: 51, cursor:))
+    end
+
     private
 
     def errors(params)

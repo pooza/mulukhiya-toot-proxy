@@ -22,7 +22,13 @@ module Mulukhiya
 
     def normalize(params)
       params = ALLOWED_PARAMS.to_h {|key| [key, params[key] || params[key.to_s]]}.compact
-      params[:page] = (params[:page] || 1).to_i unless params[:cursor]
+      # ⚠ cursor があるときは `page` を捨てる（文書どおり無視する）。残すと文字列のまま
+      # `catalog` へ届き、ページの上限の判定に掛かる（PR #4833 の Codex P2）。
+      if params[:cursor]
+        params.delete(:page)
+      else
+        params[:page] = (params[:page] || 1).to_i
+      end
       params[:only_person] = (params[:only_person] || 0).to_i.zero? ? 0 : 1
       if params[:q].to_s.empty?
         params.delete(:q)
