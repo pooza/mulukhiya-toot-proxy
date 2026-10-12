@@ -74,8 +74,11 @@ module Mulukhiya
     # ⚠ **無期限には延ばさない。**作ってから `source_ttl`（last-good と同じ 24 時間）まで。
     def extend_cache_ttl
       return false unless generated_at
-      return false if (Time.now - generated_at) >= source_cache_ttl
-      return redis.expire(TaggingDictionary::REDIS_KEY, cache_ttl)
+      # ⚠ **延ばす先も上限で切る（PR #4830 の Codex P2）。**上限の直前の回が `cache_ttl` を
+      # 丸ごと置くと、23 時間 50 分めの据え置きで 24 時間 50 分まで生き延びる。
+      remaining = (source_cache_ttl - (Time.now - generated_at)).floor
+      return false unless remaining.positive?
+      return redis.expire(TaggingDictionary::REDIS_KEY, [cache_ttl, remaining].min)
     rescue => e
       e.log
       return false

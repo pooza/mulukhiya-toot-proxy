@@ -170,6 +170,18 @@ module Mulukhiya
       assert_operator(ttl, :<=, 100)
     end
 
+    # ⚠ 延ばす先も上限で切る（PR #4830 の Codex P2）。上限まで残り 30 秒なら 30 秒まで。
+    def test_retention_extension_is_capped_at_the_horizon
+      @dic.refresh
+      age_payload(TaggingDictionary::DEFAULT_SOURCE_CACHE_TTL - 30)
+      break_source
+      logged = capture_log(@dic) {@dic.refresh}
+      retained = logged.find {|v| v[:message] == 'tagging dictionary retained'}
+
+      assert_true(retained[:ttl_extended])
+      assert_operator(ttl, :<=, 30)
+    end
+
     private
 
     # 上流が空を返し、last-good も無い（＝埋められない失敗）状態にする。
