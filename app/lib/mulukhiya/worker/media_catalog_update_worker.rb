@@ -20,8 +20,7 @@ module Mulukhiya
         pages.times do |i|
           page = i + 1
           result = attachment_class.catalog(page:, only_person:, cursor:, skip_cache: true)
-          key = "page:#{page}:person:#{only_person}"
-          storage.set(key, result)
+          storage.set(attachment_class.catalog_cache_key(page, only_person), result)
           log(page:, only_person:, items: result[:items].size)
           break unless result[:has_next]
           cursor = result[:next_cursor] if cursor_pagination

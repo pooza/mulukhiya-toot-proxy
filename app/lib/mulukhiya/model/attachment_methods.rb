@@ -35,6 +35,20 @@ module Mulukhiya
         return result
       end
 
+      # ページ単位のキャッシュの鍵。巡回ワーカーと読み手で同じものを使う。
+      #
+      # ⚠ **上限（`max_page`）を鍵に入れる（PR #4833 の Codex P2）。**`has_next` / `next_cursor` は
+      # 上限で決まり、2 ページ目以降は 24 時間残る。入れないと、上限を変えた後も古い境界の
+      # 応答が返る（下げれば 422 へ誘導し、上げれば新しく許したページへ進めない）。
+      def catalog_cache_key(page, only_person)
+        return "page:#{page}:person:#{only_person}:max:#{catalog_max_page}"
+      end
+
+      def catalog_max_page
+        max = config['/webui/media/catalog/max_page'] rescue nil
+        return max || MediaListContract::DEFAULT_MAX_PAGE
+      end
+
       # ⚠ 上限のページでは「続きあり」と言わない（次を引くと 422 になる）。
       # ⚠ **`page` があれば cursor つきでも見る（PR #4833 の Codex P2）。**巡回ワーカーは
       # `page:` と `cursor:` を両方渡してページ単位のキャッシュを作るので、cursor で外すと、
@@ -43,8 +57,7 @@ module Mulukhiya
       # ので、cursor で送る限り上限には掛からない。
       def catalog_last_page?(params)
         return false if params[:page].nil?
-        max = config['/webui/media/catalog/max_page'] rescue nil
-        return params[:page] >= (max || MediaListContract::DEFAULT_MAX_PAGE)
+        return params[:page] >= catalog_max_page
       end
 
       # 閲覧注意・CW の印 (5.41.0 のリリース前レビュー)。
@@ -80,12 +93,7 @@ module Mulukhiya
         return nil if params[:cursor]
         page = params[:page] || 1
         only_person = params[:only_person] || 0
-        cached = MediaCatalogStorage.new.get("page:#{page}:person:#{only_person}")
-        # ⚠ **キャッシュの `has_next` は、いまの上限で見直す（PR #4833 の Codex P2）。**2 ページ目
-        # 以降は 24 時間残るので、`max_page` を下げた後も古い `has_next: true` が返り、
-        # 次を引いた利用者が 422 になる。
-        cached[:has_next] = false if cached && catalog_last_page?(page:)
-        return cached
+        return MediaCatalogStorage.new.get(catalog_cache_key(page, only_person))
       rescue => e
         e.log
         return nil
