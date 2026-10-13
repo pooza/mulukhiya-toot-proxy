@@ -185,7 +185,14 @@ git diff Gemfile.lock
 [マイルストーン 5.42.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/642)。`config/application.yaml` は 5.42.0 へバンプ済み。
 
 - スコープは未確定（open 3 件: 下の「5.41.0 のリリース時点の申し送り」と `gh issue list --milestone 5.42.0` を見る）
-- 📌 **2026-10-14 に PR を 3 本出した（CI 両系 SUCCESS・Codex の P2 は対処済み・マージはユーザーの承認待ち）**:
+- ✅ **2026-10-14 に PR を 3 本マージした（ユーザー承認・CI 両系 SUCCESS・Codex の P2 は対処済み）**: #4835（`52a4e4fd`）/ #4836（`ebc31225`）/ #4837（`d5a07b24`）。**#4695 はクローズ**
+  - **ステージング 4 台（dev24〜27）を develop（`d5a07b24`）へ揃えた**（`config: OK`・3 サービスの restart rc=0・health 200）
+  - **develop（`d5a07b24`）で harness を実走（系ごとに別シェル）**:
+    Mastodon 1798 tests / 3829 assertions / **0 failures / 0 errors** / 158 omissions（`TestHarness: controller=mastodon url=http://localhost:3000`）、
+    Misskey 1797 tests / 3877 assertions / **0 failures / 0 errors** / 145 omissions（`TestHarness: controller=misskey url=http://localhost:3001`）。
+    ⚠ リリースゲートとして読むなら、この後に develop へコードが入っていないこと
+  - 📌 **次に決めること（ユーザー「2・3 はそのあとに」）**: ダイスキー（vulcan）でメディアカタログを有効にするか／Misskey の既定値を `true` に戻すか
+- 3 本の中身:
   - **PR #4835**: Annict のエピソード辞書は、キーワード（`/service/annict/works`）を入れ替えた後の空でキャッシュを置き換える（PR #4834 にマージ後に届いた Codex P2）。
     ⚠ 見分けるのは設定のキーワードで、Annict が返した作品の ID ではない（不調のときは作品の検索も欠ける）
   - **PR #4836（#4695 の残り 1 件）**: pgbouncer の `clients_used / clients_max` が `/postgres/pgbouncer/warn/clients_ratio`（既定 0.8）以上で
