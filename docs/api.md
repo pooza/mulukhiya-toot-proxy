@@ -704,13 +704,19 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 
 ⚠⚠ **pgbouncer の観測の失敗は `status` を動かさない。**pgbouncer の停止と `max_client_conn` 枯渇は
 接続失敗からは区別できず、`status` を倒すと再起動のたびに health が揺れて信号として使えなくなる。
-**`pgbouncer.error` があっても `status` は `OK` のまま**なので、監視側はエラーの有無を別に見ること。
-
-**クライアント数が上限に近づくと `WARN` になる**（5.42.0〜、#4695）。`clients_used / clients_max` が
-`/postgres/pgbouncer/warn/clients_ratio`（既定 0.8）以上のとき、`postgres` が `WARN`（`reason: pgbouncer_clients_high`）になる。
-HTTP ステータスは 200 のまま。管理者への「ヘルスステータス変更」の通知は、`WARN` になったときと戻ったときに飛ぶ。
-⚠ **見えるのは「近づいている」間だけ。**上限に達した後は観測自身が繋がらず、上の `pgbouncer.error`（`status` は `OK`）になる。
+**`pgbouncer.error` があっても `status` は `OK` のまま**なので、監視側はエラーの有無を別に見ること
+（上限に達して断られたときだけは `WARN`。下記）。
 ⚠ ただし `/postgres/pgbouncer/enable` が引けない（設定の破損）場合は握らず、`postgres` が `NG` になる（5.39.0〜、#4695）。
+
+**クライアント数が上限に近づくと `WARN` になる**（5.42.0〜、#4695）。HTTP ステータスは 200 のまま。
+管理者への「ヘルスステータス変更」の通知は、`WARN` になったときと戻ったときに飛ぶ（通知には `reason` が添えられる）。
+⚠ 割合の境目で揺れている間は、5 分ごとに通知が届く。
+
+| `reason` | 状況 |
+|------|------|
+| `pgbouncer_clients_high` | `clients_used / clients_max` が `/postgres/pgbouncer/warn/clients_ratio`（既定 0.8）以上 |
+| `pgbouncer_clients_exhausted` | 上限に達していて、観測自身が `no more connections allowed` で断られた（`pgbouncer.error` に文言が入る） |
+| `pgbouncer_warn_config` | `/postgres/pgbouncer/warn/clients_ratio` が数値として引けない（設定の誤り）。⚠ `NG` にはしない |
 
 ⚠ **観測点は `SELECT 1` の手前**（5.39.0〜、#4695）。`SELECT 1` 自身が待ち行列に並ぶので、後で読むと
 自分の前の待ちが捌けた後の値になる。`pool` も同じ理由で手前へ移してあり、⚠ **コールドプールでは
@@ -724,7 +730,7 @@ HTTP ステータスは 200 のまま。管理者への「ヘルスステータ�
 | DB 未設定（`/postgres/dsn` なし） | `OK`（`skipped: true`） | ⚠ **無い** |
 | 接続不能 | `NG` | ⚠ **無い** |
 | プール枯渇（`Sequel::PoolTimeout`） | `WARN`（`reason: pool_exhausted`） | 通常はあるが ⚠ **観測に失敗すれば無い** |
-| pgbouncer のクライアント数が上限に近い | `WARN`（`reason: pgbouncer_clients_high`） | ある |
+| pgbouncer のクライアント数が上限に近い・達した | `WARN`（`reason: pgbouncer_clients_high` ほか） | 通常はあるが ⚠ **観測に失敗すれば無い** |
 | **観測だけ失敗**（`SELECT 1` は通る） | 🔴 **`OK`** | ⚠ **無い** |
 | `num_waiting` を持たないプール実装 | `OK` | `pool` はあるが ⚠ **`waiting` だけ無い**（`.compact` で落ちる） |
 

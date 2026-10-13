@@ -86,7 +86,8 @@ module Mulukhiya
     end
 
     def keywords
-      return AnnictService.keywords.map(&:to_s).sort
+      # ⚠ 設定が配列でなく 1 語で書かれていても落とさない（5.42.0 のリリース前レビュー）。
+      return Array(AnnictService.keywords).map(&:to_s).sort
     end
 
     # ⚠ キーワードを持たない古い形のキャッシュ（5.41.0 まで）は、同じものとして扱う（守る側へ倒す）。

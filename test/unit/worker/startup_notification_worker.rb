@@ -96,6 +96,17 @@ module Mulukhiya
       assert_match(/ステータス: 正常/, message)
     end
 
+    # ⚠ WARN には理由を添える（5.42.0 のリリース前レビュー）。OK・NG には付けない。
+    def test_create_change_message_carries_the_warn_reason
+      new_reported = {redis: 'OK', postgres: 'WARN'}
+      reported = {redis: 'OK', postgres: 'OK'}
+      health = {redis: {status: 'OK', reason: 'x'}, postgres: {status: 'WARN', reason: 'pgbouncer_clients_high'}, status: 200}
+      message = @worker.send(:create_change_message, new_reported, reported, health)
+
+      assert_match(/postgres: OK → WARN \(pgbouncer_clients_high\)/, message)
+      assert_match(/^redis: OK$/, message)
+    end
+
     def test_extract_status
       health = {
         redis: {status: 'OK'},
