@@ -22,6 +22,11 @@ module Mulukhiya
   # ⚠ キャッシュが無い・もともと空なら、空もそのまま書く。
   # ⚠ **見る作品が 0 件のときの空は、正しい答えとして書く**（PR #4819 の Codex P2）。キーワードを外した
   # 設定変更が、キャッシュの寿命（7 日）まで効かなくなるため。守るのは「作品はあるのに回が空」のときだけ。
+  # ⚠ **キーワード（`/service/annict/works`）を入れ替えた後の空も、正しい答えとして書く**（PR #4834 の Codex P2）。
+  # 新しい作品に題のついた回がまだ無いと、前の作品の回が寿命まで残るため。キャッシュにキーワードを添えて見分ける。
+  # ⚠ 見分けるのは設定のキーワードで、Annict が返した作品の ID ではない。不調のときは作品の検索も欠けるので、
+  # ID で比べると「凌ぐための結果」を障害の最中に捨てる。アカウントの視聴中の作品（`viewers_works?`）の
+  # 入れ替わりは見分けない。
   # ⚠⚠ **アラートは 1 回の障害につき `alert` 秒に 1 回。**辞書は 10 分おきに引かれるので、
   # 古さだけで判定すると 6 時間を超えた障害では取得のたびに鳴る（#4801 で消したかった状態に戻る）。
   class AnnictEpisodeDictionary
@@ -42,8 +47,8 @@ module Mulukhiya
       @cache = @storage.get(KEY)
       return @cache['entries'] if fresh?
       entries = build
-      return keep_cache if entries.empty? && @works.present? && cached_entries?
-      @storage.set(KEY, entries)
+      return keep_cache if entries.empty? && @works.present? && cached_entries? && same_keywords?
+      @storage.set(KEY, entries, keywords:)
       @storage.clear_alert
       return entries
     rescue => e
@@ -78,6 +83,16 @@ module Mulukhiya
 
     def cached_entries?
       return @cache.present? && @cache['entries'].present?
+    end
+
+    def keywords
+      return AnnictService.keywords.map(&:to_s).sort
+    end
+
+    # ⚠ キーワードを持たない古い形のキャッシュ（5.41.0 まで）は、同じものとして扱う（守る側へ倒す）。
+    def same_keywords?
+      return true unless @cache['keywords'].is_a?(Array)
+      return @cache['keywords'] == keywords
     end
 
     def keep_cache

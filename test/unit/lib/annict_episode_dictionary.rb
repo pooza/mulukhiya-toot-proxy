@@ -7,10 +7,10 @@ module Mulukhiya
 
     # Redis を使わないストレージのダブル。`updated_at` を好きな古さで置ける。
     class StorageDouble
-      attr_reader :writes, :alerts, :cleared
+      attr_reader :writes, :alerts, :cleared, :keywords
 
-      def initialize(entries: nil, age: 0, writable: true)
-        @value = {'entries' => entries, 'updated_at' => Time.now.to_i - age} if entries
+      def initialize(entries: nil, age: 0, writable: true, keywords: nil)
+        @value = {'entries' => entries, 'keywords' => keywords, 'updated_at' => Time.now.to_i - age} if entries
         @writable = writable
         @writes = []
         @alerts = 0
@@ -31,8 +31,9 @@ module Mulukhiya
         return @value
       end
 
-      def set(_key, entries)
+      def set(_key, entries, keywords: nil)
         @writes.push(entries)
+        @keywords = keywords
         return @writable
       end
     end
@@ -67,12 +68,15 @@ module Mulukhiya
 
     def setup
       @saved = ['fresh', 'alert'].to_h {|k| [k, config["/service/annict/dictionary/cache/#{k}"]]}
+      @keywords = AnnictService.keywords
+      config['/service/annict/works'] = ['いまの作品']
       config['/service/annict/dictionary/cache/fresh'] = FRESH
       config['/service/annict/dictionary/cache/alert'] = ALERT
     end
 
     def teardown
       @saved.each {|k, v| config["/service/annict/dictionary/cache/#{k}"] = v}
+      config['/service/annict/works'] = @keywords
     end
 
     def test_builds_and_stores_without_cache
@@ -160,6 +164,24 @@ module Mulukhiya
       assert_not_predicate(dictionary, :alert?)
     end
 
+    # ⚠ キーワードを入れ替えた後の空は、正しい答え。新しい作品に題のついた回がまだ無いとき、
+    # 前の作品の回を残さない（PR #4834 の Codex P2）。
+    def test_empty_result_after_keyword_change_replaces_cache
+      storage = StorageDouble.new(entries: CACHED, age: FRESH + 60, keywords: ['前の作品'])
+
+      assert_empty(create(AnnictDouble.new(episodes: []), storage).fetch)
+      assert_equal([{}], storage.writes)
+      assert_equal(['いまの作品'], storage.keywords)
+    end
+
+    # 🔴 キーワードが同じなら、空で上書きしない（不調のときの空と見分けがつかない）。
+    def test_empty_result_with_same_keywords_keeps_cache
+      storage = StorageDouble.new(entries: CACHED, age: FRESH + 60, keywords: ['いまの作品'])
+
+      assert_equal(CACHED, create(AnnictDouble.new(episodes: []), storage).fetch)
+      assert_empty(storage.writes)
+    end
+
     # ⚠ 見る作品が 0 件（キーワードを外した）なら、空が正しい答え。キャッシュを空で置き換える
     # （PR #4819 の Codex P2）。
     def test_empty_result_without_works_replaces_cache
@@ -208,6 +230,7 @@ module Mulukhiya
       storage.unlink(AnnictEpisodeDictionary::KEY)
 
       assert_equal(BUILT, create(AnnictDouble.new(episodes: EPISODES), storage).fetch)
+      assert_equal(['いまの作品'], storage.get(AnnictEpisodeDictionary::KEY)['keywords'])
 
       failing = AnnictDouble.new(error: Ginseng::GatewayError.new('Net::ReadTimeout'))
       config['/service/annict/dictionary/cache/fresh'] = 0
