@@ -126,6 +126,15 @@ module Mulukhiya
       assert_equal('1003', catalog(page: 1, limit: 3)[:next_cursor])
     end
 
+    # ⚠ 行が 1 列で一意に並ばない SNS（Misskey）は、`catalog_cursor` を上書きして 2 つ組にする (#4375)。
+    def test_next_cursor_can_be_composed_by_the_subclass
+      FakeAttachment.define_singleton_method(:catalog_cursor) {|row| "#{row[:status_id]}.#{row[:id]}"}
+
+      assert_equal('1003.3', catalog(page: 1, limit: 3)[:next_cursor])
+    ensure
+      FakeAttachment.singleton_class.send(:remove_method, :catalog_cursor)
+    end
+
     # 最終ページでは `has_next` が false になり `next_cursor` を付けない。
     def test_last_page_has_no_cursor
       result = catalog(page: 4, limit: 3)

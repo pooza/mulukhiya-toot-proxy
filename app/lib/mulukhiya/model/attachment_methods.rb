@@ -30,7 +30,7 @@ module Mulukhiya
         has_next = rows.size > params[:limit] && !catalog_last_page?(params)
         page_rows = rows.first(params[:limit])
         result = {items: build_catalog_items(page_rows), has_next:}
-        result[:next_cursor] = page_rows.last[catalog_cursor_key].to_s if has_next && page_rows.last
+        result[:next_cursor] = catalog_cursor(page_rows.last) if has_next && page_rows.last
         result[:page] = params[:page] if params[:page]
         return result
       end
@@ -106,6 +106,12 @@ module Mulukhiya
       # 2 ファイルを分けていた唯一の差分。**
       def catalog_cursor_key
         raise NotImplementedError, "#{self}.catalog_cursor_key"
+      end
+
+      # 行から `next_cursor` を作る。⚠ 行が `catalog_cursor_key` だけで一意に並ばない SNS
+      # （Misskey）は、ここを上書きして 2 つ組にする (#4375)。
+      def catalog_cursor(row)
+        return row[catalog_cursor_key].to_s
       end
     end
 

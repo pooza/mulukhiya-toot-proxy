@@ -1,3 +1,11 @@
+<%#
+  ⚠⚠ **1 つのノートに添付が複数あると、`note_id` だけでは行が一意に並ばない (#4325 / #4375)。**
+  以前は `note_id < cursor` で次のページを取っていたので、ページの境目に当たったノートの
+  残りの添付がどのページにも出なかった。`fileIds` の中の位置（`file_order`）を添えて
+  `(note_id DESC, file_order ASC)` で並べ、cursor も `<note_id>.<file_order>` の 2 つ組にする。
+  ⚠ 位置の無い cursor（5.41.0 までの形）は「そのノートは出し切った」と読む（従来どおり）。
+-%>
+<% cursor_note, cursor_order = params[:cursor].to_s.split('.', 2) if params[:cursor] %>
 SELECT
   drive_file.id,
   drive_file.name,
@@ -5,6 +13,7 @@ SELECT
   drive_file.size AS file_size,
   drive_file.properties AS meta,
   note_file.note_id AS status_id,
+  note_file.file_order,
   note_file.text AS status_text,
   note_file.visibility,
   drive_file."isSensitive" AS sensitive,
@@ -16,7 +25,8 @@ FROM
   INNER JOIN (
     SELECT
       note.id as note_id,
-      unnest(note."fileIds") as file_id,
+      file.file_id,
+      file.file_order,
       note.visibility,
       note.text,
       note.cw,
@@ -25,6 +35,7 @@ FROM
     FROM
       note
       INNER JOIN "user" ON note."userId" = "user".id
+      CROSS JOIN LATERAL unnest(note."fileIds") WITH ORDINALITY AS file(file_id, file_order)
     WHERE (0 < array_length(note."fileIds", 1))
       AND (note."userHost" IS null)
       <%# 🔴 **公開だけ（5.41.0 のリリース前レビュー）。**以前はホーム公開（unlisted）も含めていた。 -%>
@@ -35,8 +46,9 @@ FROM
       <% if test_account %>
         AND ("user".id <> '<%= test_account.id %>')
       <% end %>
-    ORDER BY
-      note.id DESC
+      <% if cursor_note %>
+        AND (note.id <= '<%= escape(cursor_note) %>')
+      <% end %>
   ) AS note_file ON drive_file.id = note_file.file_id
 WHERE (drive_file."userHost" IS null)
   <%# RSS はぼかせないので、閲覧注意・CW つきを外す（`safe` は feed だけが渡す）。 -%>
@@ -54,11 +66,14 @@ WHERE (drive_file."userHost" IS null)
       AND (coalesce(drive_file.name, '') NOT LIKE '%<%= escape(keyword) %>%')
     <% end %>
   <% end %>
-  <% if params[:cursor] %>
-    AND (note_file.note_id < '<%= params[:cursor] %>')
+  <% if cursor_note && cursor_order %>
+    AND NOT (note_file.note_id = '<%= escape(cursor_note) %>' AND note_file.file_order <= <%= cursor_order.to_i %>)
+  <% elsif cursor_note %>
+    AND (note_file.note_id < '<%= escape(cursor_note) %>')
   <% end %>
 ORDER BY
-  note_file.note_id DESC
+  note_file.note_id DESC,
+  note_file.file_order ASC
 LIMIT <%= params[:limit] %>
 <% unless params[:cursor] %>
   <%# ページ幅は呼び出し側が計算して渡す。has_next 用の +1 を混ぜない (#4632) -%>
