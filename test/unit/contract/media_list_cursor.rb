@@ -26,6 +26,16 @@ module Mulukhiya
       assert_not_empty(errors(cursor: 'a' * 65))
     end
 
+    # ⚠ Misskey の cursor は `<note_id>.<fileIds の中の位置>` の 2 つ組 (#4375)。
+    def test_composite_cursor_depends_on_the_server_type
+      assert_equal(Environment.mastodon_type?, errors(cursor: 'a1b2c3.2').present?)
+      assert_not_empty(errors(cursor: 'a1b2c3.'))
+      assert_not_empty(errors(cursor: 'a1b2c3.x'))
+      assert_not_empty(errors(cursor: 'a1b2c3.1.2'))
+      assert_not_empty(errors(cursor: 'a1b2c3.1234'))
+      assert_not_empty(errors(cursor: '.1'))
+    end
+
     def test_alphabetic_cursor_depends_on_the_server_type
       result = errors(cursor: 'a1b2c3')
 

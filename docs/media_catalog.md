@@ -414,6 +414,11 @@ daisskey 先行事例に準拠しつつ、**EXPLAIN ベースライン・候補�
   #4353（C: pooza/mastodon migration 恒久化）/ **#4375（D: Misskey track
   — `drive_file` index + 複合キー cursor 化で `Misskey::Attachment.cursor_pagination?`
   を true 反転）**。
+  - ✅ **cursor 化は 5.42.0 で済み**: cursor は `<note_id>.<fileIds の中の位置>` の 2 つ組。位置は `generate_subscripts` で取り、
+    実行計画は従来の形（ローカルのノート数に比例）のまま。
+  - **ダイスキー（vulcan）の実測（2026-10-14・読み取りのみ・追加の index なし）**: 1 ページ目 69 ms / OFFSET 2500 で 153 ms / cursor つき 86 ms。
+    `note` 約 33 万行・ローカルの公開で添付つきのノート 1,366（うち添付が複数 588）。**ダイスキーでは index は要らない。**
+    ⚠ ローカルのノートが桁で多いサーバーは未検証。
 - 先行事例: chubo2 `docs/infra-note.md`「daisskey drive_file partial index
   追加 (2026-05-01)」、`pooza/misskey` PR #418（Misskey 側が partial index 手法の
   先行実証。本 Mastodon 計画はこれを `statuses` スキーマへ移植したもの）

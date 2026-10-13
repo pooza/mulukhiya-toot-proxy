@@ -23,6 +23,7 @@ module Mulukhiya
     end
 
     # ⚠ cursor は ID（Mastodon は数字・Misskey は英数字）。それ以外はクエリへ渡さない。
+    # ⚠ Misskey は `<note_id>.<fileIds の中の位置>` の 2 つ組 (#4375)。位置の無い形（5.41.0 まで）も受ける。
     # Mastodon では bigint への変換に失敗して 500 になり、未認証の要求で alert が鳴る
     # （5.41.0 のリリース前レビュー）。
     rule(:cursor) do
@@ -32,7 +33,7 @@ module Mulukhiya
       valid = if Environment.mastodon_type?
         value.match?(/\A\d{1,19}\z/) && value.to_i <= MAX_BIGINT
       else
-        value.match?(/\A[0-9A-Za-z]{1,64}\z/)
+        value.match?(/\A[0-9A-Za-z]{1,64}(?:\.\d{1,3})?\z/)
       end
       key.failure('形式が正しくありません。') unless valid
     end

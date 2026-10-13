@@ -23,11 +23,8 @@ module Mulukhiya
       # クラスロード時に Sequel::Error になる。AttachmentTest と同じ DB
       # 構成ガードで保護する。
       return unless Environment.dbms_class&.config?
-      if Environment.misskey_type?
-        assert_false(@worker.attachment_class.cursor_pagination?)
-      else
-        assert_true(@worker.attachment_class.cursor_pagination?)
-      end
+      # ⚠ Misskey も cursor で送る (#4375)。
+      assert_true(@worker.attachment_class.cursor_pagination?)
     end
   end
 end

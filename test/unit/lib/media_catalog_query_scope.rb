@@ -35,6 +35,18 @@ module Mulukhiya
       assert_include(source(:misskey), '(drive_file."isSensitive" = false)')
     end
 
+    # 🔴 Misskey は 1 つのノートに添付が複数ある。`note_id` だけで並べて切ると、ページの境目に
+    # 当たったノートの残りの添付がどのページにも出ない (#4325 / #4375)。
+    def test_misskey_orders_and_cuts_by_note_and_file_order
+      sql = source(:misskey)
+
+      assert_include(sql, 'generate_subscripts(note."fileIds", 1) as file_order')
+      assert_match(/ORDER BY\s+note_file\.note_id DESC,\s+note_file\.file_order ASC/, sql)
+      assert_include(sql, 'note_file.file_order <= <%= cursor_order.to_i %>')
+      # ⚠ cursor は検証済みでも素で埋めない。
+      assert_not_include(sql, "'<%= params[:cursor] %>'")
+    end
+
     def test_feed_asks_for_the_safe_set
       [:mastodon, :misskey].each do |type|
         model = File.read(File.join(Environment.dir, "app/lib/mulukhiya/model/#{type}/attachment.rb"))
