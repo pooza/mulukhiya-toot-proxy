@@ -40,7 +40,7 @@ module Mulukhiya
     def test_misskey_orders_and_cuts_by_note_and_file_order
       sql = source(:misskey)
 
-      assert_include(sql, 'WITH ORDINALITY AS file(file_id, file_order)')
+      assert_include(sql, 'generate_subscripts(note."fileIds", 1) as file_order')
       assert_match(/ORDER BY\s+note_file\.note_id DESC,\s+note_file\.file_order ASC/, sql)
       assert_include(sql, 'note_file.file_order <= <%= cursor_order.to_i %>')
       # ⚠ cursor は検証済みでも素で埋めない。
