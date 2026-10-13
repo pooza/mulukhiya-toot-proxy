@@ -61,7 +61,8 @@ module Mulukhiya
       snapshot = pool
       bouncer = Pgbouncer.health
       instance.connection.fetch('SELECT 1 AS ok').first
-      return {status: 'OK'}.merge(snapshot).merge(bouncer)
+      # ⚠ pgbouncer のクライアント数が上限に近いときだけ WARN に倒す (#4695)。NG・pool_exhausted は下の rescue。
+      return {status: 'OK'}.merge(snapshot).merge(bouncer).merge(Pgbouncer.warning(bouncer))
     rescue Sequel::PoolTimeout => e
       # ⚠ `snapshot` / `bouncer` は必ず Hash。どちらも観測の失敗を自前で握るので、
       # `SELECT 1` の PoolTimeout でここへ来る時点で代入は済んでいる。
