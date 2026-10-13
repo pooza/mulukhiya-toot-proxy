@@ -191,7 +191,9 @@ git diff Gemfile.lock
     Mastodon 1798 tests / 3829 assertions / **0 failures / 0 errors** / 158 omissions（`TestHarness: controller=mastodon url=http://localhost:3000`）、
     Misskey 1797 tests / 3877 assertions / **0 failures / 0 errors** / 145 omissions（`TestHarness: controller=misskey url=http://localhost:3001`）。
     ⚠ リリースゲートとして読むなら、この後に develop へコードが入っていないこと
-  - 📌 **次に決めること（ユーザー「2・3 はそのあとに」）**: ダイスキー（vulcan）でメディアカタログを有効にするか／Misskey の既定値を `true` に戻すか
+  - 📌 **Misskey のメディアカタログの段取り（2026-10-14 ユーザー判断）**: 5.42.0 を出荷 → **ダイスキー（vulcan）で有効にする**（#4375）→ 観測 →
+    Misskey の既定値を `true` に戻す（**#4838・5.43.0**）。既定値は一旦据え置き。
+    ⚠ vulcan の flip は 5.42.0 の出荷後（5.41.0 のままだと、cursor で辿ったときに添付が抜ける）
 - 3 本の中身:
   - **PR #4835**: Annict のエピソード辞書は、キーワード（`/service/annict/works`）を入れ替えた後の空でキャッシュを置き換える（PR #4834 にマージ後に届いた Codex P2）。
     ⚠ 見分けるのは設定のキーワードで、Annict が返した作品の ID ではない（不調のときは作品の検索も欠ける）
