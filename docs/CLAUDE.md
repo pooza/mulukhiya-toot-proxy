@@ -194,6 +194,27 @@ git diff Gemfile.lock
   - 📌 **Misskey のメディアカタログの段取り（2026-10-14 ユーザー判断）**: 5.42.0 を出荷 → **ダイスキー（vulcan）で有効にする**（#4375）→ 観測 →
     Misskey の既定値を `true` に戻す（**#4838・5.43.0**）。既定値は一旦据え置き。
     ⚠ vulcan の flip は 5.42.0 の出荷後（5.41.0 のままだと、cursor で辿ったときに添付が抜ける）
+- ✅ **リリース前レビュー（5 観点・`v5.41.0..develop`・2026-10-14）: 赤 0 / 黄 6 / 緑 9**（重複は 1 件に数えた）。行き先はユーザーが決めた
+  - **本リリースで直した（PR #4839・`b6b1003b`・Codex は指摘なし）**:
+    割合の設定が壊れていても health を NG にしない（`pgbouncer_warn_config`。NG だと monit が再起動し続ける）／
+    上限に達した後も WARN のまま（`pgbouncer_clients_exhausted`。観測が `no more connections allowed` で断られると OK に戻り、いちばん悪い瞬間に「WARN → OK」が飛ぶ形だった）／
+    Annict のキーワードが 1 語でも落とさない／通知の WARN に理由を添える／Misskey の `catalog_cursor` の整理／コメント・`docs/api.md`・スキーマの並び
+  - **記録のみ（ユーザー判断・Issue にしない）**:
+    - WARN の判定が境目で揺れると、通知が 5 分ごとに届く。本番 3 台の平常は 500 のうち 10〜16（10-14 の公開 health）＝揺れるのは詰まりかけている間だけ
+    - キーワードの変更と Annict の不調が重なると、凌ぐ用のキャッシュが空になる（変えた直後だけ）
+    - `cursor_pagination?` が両系 `true` になり、分岐の意味が無い（Akkoma で 3 系目が要るかもしれないので残した）
+    - 設定名 `warn/clients_ratio` は既存の `threshold` 系と不揃い（意味は通るのでそのまま）
+  - **デプロイ手順に織り込む**: キャッシュの鍵が `media_catalog_v3` に変わるので、再起動の直後に `rake mulukhiya:media_catalog:update` を打つ
+    （打たないと、最初の巡回まで最長 30 分、2・3 ページ目の要求ごとに SQL が走る）
+- ✅ **リリースゲート（`b6b1003b`・2026-10-14・系ごとに別シェル）**:
+  Mastodon 1802 tests / 3840 assertions / **0 failures / 0 errors** / 158 omissions（`TestHarness: controller=mastodon url=http://localhost:3000`）、
+  Misskey 1801 tests / 3888 assertions / **0 failures / 0 errors** / 145 omissions（`TestHarness: controller=misskey url=http://localhost:3001`）。
+  ステージング 4 台も `b6b1003b`（`config: OK`・3 サービスの restart rc=0・health 200・`/api/about` は 5.42.0・`/app/media` 200）。
+  ⚠ この後に develop へコードが入ったら回し直す
+  - **dev27 でメディアカタログを有効にした（ダイスキーの flip のリハーサル）**: `config/local.yaml` に `misskey.data.media_catalog: true`（バックアップは `config/local.yaml.bak-4375`）。
+    再起動 → `rake mulukhiya:media_catalog:update` → `media_catalog_v3:page:1:*` が 2 本。`/api/media` 200（13 件）・`?cursor=asas0399u2.1` は同じノートの 2 枚目から・
+    位置の無い cursor は次のノートから・不正な形 4 種は 422・`/feed/media` 200。**dev27 は有効のまま慣らす**
+  - **リリース前の `bundle update` は入れていない**: Dependabot 0 件・bundler-audit 指摘なし。動くのは json 3.1.0 / net-imap / rubocop など（セキュリティ上の理由が無いので次の周回で）
 - 3 本の中身:
   - **PR #4835**: Annict のエピソード辞書は、キーワード（`/service/annict/works`）を入れ替えた後の空でキャッシュを置き換える（PR #4834 にマージ後に届いた Codex P2）。
     ⚠ 見分けるのは設定のキーワードで、Annict が返した作品の ID ではない（不調のときは作品の検索も欠ける）
