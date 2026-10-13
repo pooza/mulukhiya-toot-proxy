@@ -16,8 +16,9 @@ module Mulukhiya
       return nil
     end
 
-    def set(key, entries)
-      setex(key, ttl, {entries:, updated_at: Time.now.to_i}.to_json)
+    # `keywords` は、この結果を作ったときの設定のキーワード（`AnnictEpisodeDictionary#same_keywords?`）。
+    def set(key, entries, keywords: nil)
+      setex(key, ttl, {entries:, keywords:, updated_at: Time.now.to_i}.to_json)
       return true
     rescue => e
       e.log(key:)
