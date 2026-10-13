@@ -185,6 +185,18 @@ git diff Gemfile.lock
 [マイルストーン 5.42.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/642)。`config/application.yaml` は 5.42.0 へバンプ済み。
 
 - スコープは未確定（open 3 件: 下の「5.41.0 のリリース時点の申し送り」と `gh issue list --milestone 5.42.0` を見る）
+- 📌 **2026-10-14 に PR を 3 本出した（CI 両系 SUCCESS・Codex の P2 は対処済み・マージはユーザーの承認待ち）**:
+  - **PR #4835**: Annict のエピソード辞書は、キーワード（`/service/annict/works`）を入れ替えた後の空でキャッシュを置き換える（PR #4834 にマージ後に届いた Codex P2）。
+    ⚠ 見分けるのは設定のキーワードで、Annict が返した作品の ID ではない（不調のときは作品の検索も欠ける）
+  - **PR #4836（#4695 の残り 1 件）**: pgbouncer の `clients_used / clients_max` が `/postgres/pgbouncer/warn/clients_ratio`（既定 0.8）以上で
+    `postgres` を `WARN`（`reason: pgbouncer_clients_high`）。HTTP は 200 のまま・管理者へ「ヘルスステータス変更」が飛ぶ。
+    ⚠ **ステージング 4 台は pgbouncer を挟んでいない**ので実物では未確認（出荷後に本番 3 台の health で見る）
+  - **PR #4837（#4375 の手順 3）**: Misskey の cursor を `<note_id>.<fileIds の中の位置>` の 2 つ組に。`cursor_pagination?` は両系 `true`。キャッシュの鍵は `media_catalog_v3`。
+    dev27 で添付 3 枚のノート 2 本を作って全 13 行と突き合わせた（修正前は cursor で 9〜11 行）。
+    ⚠ **位置は `generate_subscripts` で取る**（`LATERAL unnest ... WITH ORDINALITY` は副問い合わせが平坦化され、note の主キーを逆順に舐める計画に変わる。
+    vulcan で OFFSET 2500 が 583 ms・note 33 万行のうち 31 万行を捨てた）
+  - **#4375 の残りは判断だけ**: ダイスキー（vulcan）は追加の index なしで 1 ページ目 69 ms / OFFSET 2500 で 153 ms（#4375 にコメント）。
+    有効にするか（本番の設定変更）・Misskey の既定値を戻すかはユーザーが決める。#4323（メタ）は #4375 が閉じれば閉じられる
 - ⚠ **本番のどの辞書ソースに `interval`（5.41.0・#4690）を入れるかは未決**（ユーザー「後で決める」・2026-10-12）。こちらから急かさない
 - capsicum のメディアカタログのぼかしは pooza/capsicum#1284（依頼済み）
 - zugoga にだけある index を揃えるかは pooza/chubo2#272（先送り・pooza のインフラだけの話）
