@@ -27,8 +27,13 @@ misskey:
   verified_at: '2026-10-02'
 
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
-last_checked: '2026-10-10'
+last_checked: '2026-10-14'
 
+# 2026-10-14 チェック結果:
+#   - **新しいものは無い。実走・bump とも不要。**`last_checked` の更新のみ。
+#   - Mastodon: 最新 stable は **v4.7.3（2026-10-01）＝ verified と同じ**。v4.7.3 より新しい RC は無い。
+#   - Misskey: 最新 stable は **2026.10.0（2026-10-01）＝ verified と同じ**。
+#     2026.10.1-alpha.0（2026-10-13）が出ているが alpha なので対象外。stable が出たら回す。
 # 2026-10-10 チェック結果:
 #   - **新しいものは無い。実走・bump とも不要。**`last_checked` の更新のみ。
 #   - Mastodon: 最新 stable は **v4.7.3（2026-10-01）＝ verified と同じ**。v4.7.3 より新しい RC は無い。
