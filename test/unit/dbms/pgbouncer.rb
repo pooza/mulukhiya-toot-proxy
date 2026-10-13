@@ -379,6 +379,19 @@ module Mulukhiya
       assert_equal('WARN', with_admin(admin) {Postgres.health}[:status])
     end
 
+    # ⚠ 割合の 0 以下は検査で落とす（PR #4836 の Codex P2）。0 だと観測のたびに WARN になる。
+    # スキーマは draft-04 なので、下限は `minimum` と真偽値の `exclusiveMinimum` の組で書く。
+    def test_schema_rejects_a_non_positive_ratio
+      schema = config.schema.dig('properties', 'postgres', 'properties', 'pgbouncer', 'properties', 'warn')
+
+      assert_empty(JSON::Validator.fully_validate(schema, {'clients_ratio' => 0.8}))
+      assert_empty(JSON::Validator.fully_validate(schema, {'clients_ratio' => 1}))
+      assert_not_empty(JSON::Validator.fully_validate(schema, {'clients_ratio' => 0}))
+      assert_not_empty(JSON::Validator.fully_validate(schema, {'clients_ratio' => -0.5}))
+      assert_not_empty(JSON::Validator.fully_validate(schema, {'clients_ratio' => 1.1}))
+      assert_not_empty(JSON::Validator.fully_validate(schema, {}))
+    end
+
     # ⚠ 数が読めない（観測の失敗・上限が 0）ときは判定しない。
     def test_warning_needs_both_numbers
       assert_empty(Pgbouncer.warning({}))

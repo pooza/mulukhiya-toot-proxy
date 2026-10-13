@@ -333,8 +333,9 @@ properties:
           warn:
             properties:
               clients_ratio:
-                exclusiveMinimum: 0
+                exclusiveMinimum: true
                 maximum: 1
+                minimum: 0
                 type: number
             required:
               - clients_ratio
