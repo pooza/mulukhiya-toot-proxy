@@ -631,7 +631,7 @@ Web Push サブスクリプションを解除する。
 | 値 | 意味 |
 | --- | --- |
 | `OK` | 正常 |
-| `WARN` | 一時的な遅延・詰まり（例: アプリ側プール枯渇）。サービス自体は継続稼働 |
+| `WARN` | 一時的な遅延・詰まり（例: アプリ側プール枯渇、pgbouncer のクライアント数が上限に近い）。サービス自体は継続稼働 |
 | `NG` | 本当の障害。該当サービスがダウンしている可能性 |
 
 **レスポンス例**:
@@ -702,9 +702,14 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 | admin コンソールへ繋がらない | `{"error": "..."}` のみ。⚠ **`status` は動かない**（下記） |
 | プールの行がまだ無い（誰も繋いでいない） | `{"absent": true}` ＋ `database`・`clients_*`・`total_wait_time_us`。⚠ **0 とは違う** |
 
-⚠⚠ **pgbouncer の観測は `status` を動かさない。**pgbouncer の停止と `max_client_conn` 枯渇は
+⚠⚠ **pgbouncer の観測の失敗は `status` を動かさない。**pgbouncer の停止と `max_client_conn` 枯渇は
 接続失敗からは区別できず、`status` を倒すと再起動のたびに health が揺れて信号として使えなくなる。
 **`pgbouncer.error` があっても `status` は `OK` のまま**なので、監視側はエラーの有無を別に見ること。
+
+**クライアント数が上限に近づくと `WARN` になる**（5.42.0〜、#4695）。`clients_used / clients_max` が
+`/postgres/pgbouncer/warn/clients_ratio`（既定 0.8）以上のとき、`postgres` が `WARN`（`reason: pgbouncer_clients_high`）になる。
+HTTP ステータスは 200 のまま。管理者への「ヘルスステータス変更」の通知は、`WARN` になったときと戻ったときに飛ぶ。
+⚠ **見えるのは「近づいている」間だけ。**上限に達した後は観測自身が繋がらず、上の `pgbouncer.error`（`status` は `OK`）になる。
 ⚠ ただし `/postgres/pgbouncer/enable` が引けない（設定の破損）場合は握らず、`postgres` が `NG` になる（5.39.0〜、#4695）。
 
 ⚠ **観測点は `SELECT 1` の手前**（5.39.0〜、#4695）。`SELECT 1` 自身が待ち行列に並ぶので、後で読むと
@@ -719,6 +724,7 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 | DB 未設定（`/postgres/dsn` なし） | `OK`（`skipped: true`） | ⚠ **無い** |
 | 接続不能 | `NG` | ⚠ **無い** |
 | プール枯渇（`Sequel::PoolTimeout`） | `WARN`（`reason: pool_exhausted`） | 通常はあるが ⚠ **観測に失敗すれば無い** |
+| pgbouncer のクライアント数が上限に近い | `WARN`（`reason: pgbouncer_clients_high`） | ある |
 | **観測だけ失敗**（`SELECT 1` は通る） | 🔴 **`OK`** | ⚠ **無い** |
 | `num_waiting` を持たないプール実装 | `OK` | `pool` はあるが ⚠ **`waiting` だけ無い**（`.compact` で落ちる） |
 

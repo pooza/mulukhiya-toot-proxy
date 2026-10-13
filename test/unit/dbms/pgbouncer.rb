@@ -309,6 +309,7 @@ module Mulukhiya
       config['/postgres/dsn'] = 'postgres://mastodon:secret@127.0.0.1:6432/mastodon'
       config['/postgres/pgbouncer/enable'] = 'auto'
       config['/postgres/pgbouncer/timeout'] = 2
+      config['/postgres/pgbouncer/warn/clients_ratio'] = 0.8
       Postgres.instance_variable_set(:@singleton__instance__, FakeInstance.new)
     end
 
@@ -347,6 +348,43 @@ module Mulukhiya
       assert_equal('OK', health[:status])
       assert_equal({max: 10, allocated: 2, waiting: 0}, health[:pool])
       assert_predicate(health.dig(:pgbouncer, :error), :present?)
+    end
+
+    # 🔴 **箱全体のクライアント数が上限に近づいたら WARN (#4695 の 4 件目)。**2026-08-02 の gomander も
+    # 2026-08-08 の shallu も `max_client_conn` の枯渇で、張り付いていても `/health` は OK のままだった。
+    def test_status_warns_when_clients_approach_the_limit
+      admin = PgbouncerTest::FakeAdmin.new(used_clients: 401, max_client_conn: 500)
+      health = with_admin(admin) {Postgres.health}
+
+      assert_equal('WARN', health[:status])
+      assert_equal('pgbouncer_clients_high', health[:reason])
+      assert_equal(400, health.dig(:pgbouncer, :clients_used))
+      assert_equal({max: 10, allocated: 2, waiting: 0}, health[:pool])
+    end
+
+    # ⚠ 割合の手前では OK のまま（観測自身の 1 本は数えない）。
+    def test_status_stays_ok_below_the_ratio
+      admin = PgbouncerTest::FakeAdmin.new(used_clients: 400, max_client_conn: 500)
+      health = with_admin(admin) {Postgres.health}
+
+      assert_equal('OK', health[:status])
+      assert_nil(health[:reason])
+    end
+
+    # ⚠ 割合は設定で動かせる。
+    def test_warn_ratio_is_configurable
+      config['/postgres/pgbouncer/warn/clients_ratio'] = 0.5
+      admin = PgbouncerTest::FakeAdmin.new(used_clients: 251, max_client_conn: 500)
+
+      assert_equal('WARN', with_admin(admin) {Postgres.health}[:status])
+    end
+
+    # ⚠ 数が読めない（観測の失敗・上限が 0）ときは判定しない。
+    def test_warning_needs_both_numbers
+      assert_empty(Pgbouncer.warning({}))
+      assert_empty(Pgbouncer.warning({pgbouncer: {error: 'refused'}}))
+      assert_empty(Pgbouncer.warning({pgbouncer: {clients_used: 10}}))
+      assert_empty(Pgbouncer.warning({pgbouncer: {clients_used: 10, clients_max: 0}}))
     end
   end
 end

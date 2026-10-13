@@ -329,9 +329,20 @@ properties:
             minimum: 1
             maximum: 30
             type: integer
+          # clients_used / clients_max がこの割合以上なら postgres を WARN にする (#4695)
+          warn:
+            properties:
+              clients_ratio:
+                exclusiveMinimum: 0
+                maximum: 1
+                type: number
+            required:
+              - clients_ratio
+            type: object
         required:
           - enable
           - timeout
+          - warn
         type: object
       pool:
         properties:

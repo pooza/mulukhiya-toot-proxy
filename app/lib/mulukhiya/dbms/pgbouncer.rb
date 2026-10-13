@@ -63,6 +63,23 @@ module Mulukhiya
         end
       end
 
+      # 箱全体のクライアント数が上限に近づいていれば、health の status を WARN にする材料を返す
+      # (#4695 の 4 件目)。近づいていなければ空。`health` の戻り値をそのまま渡す。
+      #
+      # ⚠⚠ **見るのは「近づいている」だけ。**上限に達した後は観測自身が
+      # `no more connections allowed` で繋がらず、`{pgbouncer: {error: ...}}` になる。そちらは
+      # pgbouncer の停止と区別できないので、従来どおり status を動かさない。
+      # ⚠ **NG にはしない。**WARN は HTTP 200 のまま＝ monit は再起動しない
+      # （モロヘイヤを再起動しても pgbouncer は直らない）。
+      # ⚠ WARN になると `StartupNotificationWorker` が管理者へ「ヘルスステータス変更」を送る
+      # （戻ったときにもう 1 通）。
+      def warning(health)
+        used, max = health[:pgbouncer].to_h.values_at(:clients_used, :clients_max)
+        return {} unless used && max&.positive?
+        return {} if used.fdiv(max) < config['/postgres/pgbouncer/warn/clients_ratio']
+        return {status: 'WARN', reason: 'pgbouncer_clients_high'}
+      end
+
       # ⚠ 既定は `auto` ＝ ポートによる自動判定。`true` / `false` で固定できる
       # （⚠ `null` は Ginseng の config が「キーが無い」と同じに扱うので三値は文字列）。
       # config の参照を rescue で握り潰さないこと。既定値は application.yaml が

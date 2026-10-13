@@ -535,6 +535,10 @@ postgres:
   pgbouncer:
     enable: auto
     timeout: 2
+    # クライアント数（clients_used / clients_max）がこの割合以上なら、/health の postgres を WARN にする (#4695)。
+    # ⚠ WARN は HTTP 200 のまま（monit は再起動しない）。管理者への「ヘルスステータス変更」は飛ぶ。
+    warn:
+      clients_ratio: 0.8
   pool:
     size: 10
     timeout: 5
