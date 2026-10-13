@@ -141,8 +141,9 @@ module Mulukhiya
     end
 
     def test_cursor_pagination
-      assert_boolean(attachment_class.cursor_pagination?)
-      assert_equal(!Environment.misskey_type?, attachment_class.cursor_pagination?)
+      # ⚠ Misskey も cursor で送る (#4375)。cursor が `<note_id>.<位置>` の 2 つ組になり、
+      # 添付が複数あるノートでも継ぎ目で落ちなくなった。
+      assert_true(attachment_class.cursor_pagination?)
     end
 
     # ⚠ **ページ送りの継ぎ目 (#4393)。**media_catalog はローカルアカウント駆動の
@@ -158,8 +159,11 @@ module Mulukhiya
       first_ids = first[:items].map {|v| v[:id]}
       following_ids = following[:items].map {|v| v[:id]}
 
-      assert_equal(first_ids.sort.reverse, first_ids)
       assert_empty(first_ids & following_ids)
+      # ⚠ 添付の ID の降順で並ぶのは Mastodon だけ。Misskey はノートの降順・ノートの中は添付の順 (#4375)。
+      return unless Environment.mastodon_type?
+
+      assert_equal(first_ids.sort.reverse, first_ids)
       assert_operator(following_ids.max, :<, first_ids.min) if following_ids.present?
     end
 

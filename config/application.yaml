@@ -500,7 +500,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 5.41.0
+  version: 5.42.0
 parser:
   note:
     fields:
@@ -535,6 +535,11 @@ postgres:
   pgbouncer:
     enable: auto
     timeout: 2
+    # クライアント数（clients_used / clients_max）がこの割合以上なら、/health の postgres を WARN にする (#4695)。
+    # ⚠ WARN は HTTP 200 のまま（monit は再起動しない）。管理者への「ヘルスステータス変更」は飛ぶ。
+    # ⚠ 0 より大きく 1 以下の数値。1 にすると、上限に達するまで WARN にならない。
+    warn:
+      clients_ratio: 0.8
   pool:
     size: 10
     timeout: 5

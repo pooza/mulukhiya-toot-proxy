@@ -11,8 +11,8 @@ module Mulukhiya
     module ClassMethods
       # media_catalog のページング。⚠⚠ **Mastodon / Misskey の 2 ファイルへ
       # 1 バイト違わず複写されていた (#4657)。**#4632 のような境界バグを次に
-      # 直すとき、また片方だけ直す形になる。差分は cursor に使う列だけなので、
-      # そこを `catalog_cursor_key` に切って本体は 1 本にする。
+      # 直すとき、また片方だけ直す形になる。差分は cursor の作り方だけなので、
+      # そこを `catalog_cursor_key` / `catalog_cursor` に切って本体は 1 本にする。
       def catalog(params = {})
         params[:limit] ||= config['/webui/media/catalog/limit']
         unless params[:rule] || params[:skip_cache]
@@ -30,7 +30,7 @@ module Mulukhiya
         has_next = rows.size > params[:limit] && !catalog_last_page?(params)
         page_rows = rows.first(params[:limit])
         result = {items: build_catalog_items(page_rows), has_next:}
-        result[:next_cursor] = page_rows.last[catalog_cursor_key].to_s if has_next && page_rows.last
+        result[:next_cursor] = catalog_cursor(page_rows.last) if has_next && page_rows.last
         result[:page] = params[:page] if params[:page]
         return result
       end
@@ -102,10 +102,16 @@ module Mulukhiya
       # `next_cursor` に使う列。
       #
       # ⚠ Mastodon は `media_attachments.id`（unique）、Misskey は SQL が
-      # note_id ベースで unnest を展開するため `status_id`。**この 1 行が
-      # 2 ファイルを分けていた唯一の差分。**
+      # note_id ベースで unnest を展開するため `status_id`。
+      # ⚠ Misskey はこの列だけでは行が一意に並ばないので、下の `catalog_cursor` も上書きしている (#4375)。
       def catalog_cursor_key
         raise NotImplementedError, "#{self}.catalog_cursor_key"
+      end
+
+      # 行から `next_cursor` を作る。⚠ 行が `catalog_cursor_key` だけで一意に並ばない SNS
+      # （Misskey）は、ここを上書きして 2 つ組にする (#4375)。
+      def catalog_cursor(row)
+        return row[catalog_cursor_key].to_s
       end
     end
 

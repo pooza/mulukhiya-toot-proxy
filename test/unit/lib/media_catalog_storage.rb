@@ -14,7 +14,7 @@ module Mulukhiya
     end
 
     def test_prefix
-      assert_equal('media_catalog_v2', @storage.prefix)
+      assert_equal('media_catalog_v3', @storage.prefix)
     end
 
     def test_get_set

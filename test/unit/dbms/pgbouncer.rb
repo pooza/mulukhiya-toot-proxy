@@ -309,6 +309,7 @@ module Mulukhiya
       config['/postgres/dsn'] = 'postgres://mastodon:secret@127.0.0.1:6432/mastodon'
       config['/postgres/pgbouncer/enable'] = 'auto'
       config['/postgres/pgbouncer/timeout'] = 2
+      config['/postgres/pgbouncer/warn/clients_ratio'] = 0.8
       Postgres.instance_variable_set(:@singleton__instance__, FakeInstance.new)
     end
 
@@ -347,6 +348,81 @@ module Mulukhiya
       assert_equal('OK', health[:status])
       assert_equal({max: 10, allocated: 2, waiting: 0}, health[:pool])
       assert_predicate(health.dig(:pgbouncer, :error), :present?)
+    end
+
+    # 🔴 **箱全体のクライアント数が上限に近づいたら WARN (#4695 の 4 件目)。**2026-08-02 の gomander も
+    # 2026-08-08 の shallu も `max_client_conn` の枯渇で、張り付いていても `/health` は OK のままだった。
+    def test_status_warns_when_clients_approach_the_limit
+      admin = PgbouncerTest::FakeAdmin.new(used_clients: 401, max_client_conn: 500)
+      health = with_admin(admin) {Postgres.health}
+
+      assert_equal('WARN', health[:status])
+      assert_equal('pgbouncer_clients_high', health[:reason])
+      assert_equal(400, health.dig(:pgbouncer, :clients_used))
+      assert_equal({max: 10, allocated: 2, waiting: 0}, health[:pool])
+    end
+
+    # ⚠ 割合の手前では OK のまま（観測自身の 1 本は数えない）。
+    def test_status_stays_ok_below_the_ratio
+      admin = PgbouncerTest::FakeAdmin.new(used_clients: 400, max_client_conn: 500)
+      health = with_admin(admin) {Postgres.health}
+
+      assert_equal('OK', health[:status])
+      assert_nil(health[:reason])
+    end
+
+    # ⚠ 割合は設定で動かせる。
+    def test_warn_ratio_is_configurable
+      config['/postgres/pgbouncer/warn/clients_ratio'] = 0.5
+      admin = PgbouncerTest::FakeAdmin.new(used_clients: 251, max_client_conn: 500)
+
+      assert_equal('WARN', with_admin(admin) {Postgres.health}[:status])
+    end
+
+    # 🔴 上限に達した後も WARN のまま（5.42.0 のリリース前レビュー）。達すると観測自身が断られて数が
+    # 読めない。そこで OK へ戻すと、いちばん悪い瞬間に「WARN → OK」の通知が飛ぶ。
+    def test_status_stays_warn_when_the_limit_is_reached
+      health = with_failing_connect('FATAL:  no more connections allowed (max_client_conn)') {Postgres.health}
+
+      assert_equal('WARN', health[:status])
+      assert_equal('pgbouncer_clients_exhausted', health[:reason])
+      assert_predicate(health.dig(:pgbouncer, :error), :present?)
+    end
+
+    # 🔴 割合の設定が壊れていても NG にしない（5.42.0 のリリース前レビュー）。`Postgres.health` の rescue へ
+    # 落ちると、DB が健全でも 503 になり、monit がモロヘイヤを再起動し続ける。
+    def test_broken_ratio_does_not_turn_health_into_ng
+      admin = PgbouncerTest::FakeAdmin.new(used_clients: 13, max_client_conn: 500)
+      ['0.8', nil].each do |broken|
+        config['/postgres/pgbouncer/warn/clients_ratio'] = broken
+        health = with_admin(admin) {Postgres.health}
+
+        assert_equal('WARN', health[:status], broken.inspect)
+        assert_equal('pgbouncer_warn_config', health[:reason], broken.inspect)
+      end
+    ensure
+      config['/postgres/pgbouncer/warn/clients_ratio'] = 0.8
+    end
+
+    # ⚠ 割合の 0 以下は検査で落とす（PR #4836 の Codex P2）。0 だと観測のたびに WARN になる。
+    # スキーマは draft-04 なので、下限は `minimum` と真偽値の `exclusiveMinimum` の組で書く。
+    def test_schema_rejects_a_non_positive_ratio
+      schema = config.schema.dig('properties', 'postgres', 'properties', 'pgbouncer', 'properties', 'warn')
+
+      assert_empty(JSON::Validator.fully_validate(schema, {'clients_ratio' => 0.8}))
+      assert_empty(JSON::Validator.fully_validate(schema, {'clients_ratio' => 1}))
+      assert_not_empty(JSON::Validator.fully_validate(schema, {'clients_ratio' => 0}))
+      assert_not_empty(JSON::Validator.fully_validate(schema, {'clients_ratio' => -0.5}))
+      assert_not_empty(JSON::Validator.fully_validate(schema, {'clients_ratio' => 1.1}))
+      assert_not_empty(JSON::Validator.fully_validate(schema, {}))
+    end
+
+    # ⚠ 数が読めない（観測の失敗・上限が 0）ときは判定しない。
+    def test_warning_needs_both_numbers
+      assert_empty(Pgbouncer.warning({}))
+      assert_empty(Pgbouncer.warning({pgbouncer: {error: 'refused'}}))
+      assert_empty(Pgbouncer.warning({pgbouncer: {clients_used: 10}}))
+      assert_empty(Pgbouncer.warning({pgbouncer: {clients_used: 10, clients_max: 0}}))
     end
   end
 end

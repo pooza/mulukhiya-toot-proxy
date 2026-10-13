@@ -631,7 +631,7 @@ Web Push サブスクリプションを解除する。
 | 値 | 意味 |
 | --- | --- |
 | `OK` | 正常 |
-| `WARN` | 一時的な遅延・詰まり（例: アプリ側プール枯渇）。サービス自体は継続稼働 |
+| `WARN` | 一時的な遅延・詰まり（例: アプリ側プール枯渇、pgbouncer のクライアント数が上限に近い）。サービス自体は継続稼働 |
 | `NG` | 本当の障害。該当サービスがダウンしている可能性 |
 
 **レスポンス例**:
@@ -702,10 +702,21 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 | admin コンソールへ繋がらない | `{"error": "..."}` のみ。⚠ **`status` は動かない**（下記） |
 | プールの行がまだ無い（誰も繋いでいない） | `{"absent": true}` ＋ `database`・`clients_*`・`total_wait_time_us`。⚠ **0 とは違う** |
 
-⚠⚠ **pgbouncer の観測は `status` を動かさない。**pgbouncer の停止と `max_client_conn` 枯渇は
+⚠⚠ **pgbouncer の観測の失敗は `status` を動かさない。**pgbouncer の停止と `max_client_conn` 枯渇は
 接続失敗からは区別できず、`status` を倒すと再起動のたびに health が揺れて信号として使えなくなる。
-**`pgbouncer.error` があっても `status` は `OK` のまま**なので、監視側はエラーの有無を別に見ること。
+**`pgbouncer.error` があっても `status` は `OK` のまま**なので、監視側はエラーの有無を別に見ること
+（上限に達して断られたときだけは `WARN`。下記）。
 ⚠ ただし `/postgres/pgbouncer/enable` が引けない（設定の破損）場合は握らず、`postgres` が `NG` になる（5.39.0〜、#4695）。
+
+**クライアント数が上限に近づくと `WARN` になる**（5.42.0〜、#4695）。HTTP ステータスは 200 のまま。
+管理者への「ヘルスステータス変更」の通知は、`WARN` になったときと戻ったときに飛ぶ（通知には `reason` が添えられる）。
+⚠ 割合の境目で揺れている間は、5 分ごとに通知が届く。
+
+| `reason` | 状況 |
+|------|------|
+| `pgbouncer_clients_high` | `clients_used / clients_max` が `/postgres/pgbouncer/warn/clients_ratio`（既定 0.8）以上 |
+| `pgbouncer_clients_exhausted` | 上限に達していて、観測自身が `no more connections allowed` で断られた（`pgbouncer.error` に文言が入る） |
+| `pgbouncer_warn_config` | `/postgres/pgbouncer/warn/clients_ratio` が数値として引けない（設定の誤り）。⚠ `NG` にはしない |
 
 ⚠ **観測点は `SELECT 1` の手前**（5.39.0〜、#4695）。`SELECT 1` 自身が待ち行列に並ぶので、後で読むと
 自分の前の待ちが捌けた後の値になる。`pool` も同じ理由で手前へ移してあり、⚠ **コールドプールでは
@@ -719,6 +730,7 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 | DB 未設定（`/postgres/dsn` なし） | `OK`（`skipped: true`） | ⚠ **無い** |
 | 接続不能 | `NG` | ⚠ **無い** |
 | プール枯渇（`Sequel::PoolTimeout`） | `WARN`（`reason: pool_exhausted`） | 通常はあるが ⚠ **観測に失敗すれば無い** |
+| pgbouncer のクライアント数が上限に近い・達した | `WARN`（`reason: pgbouncer_clients_high` ほか） | 通常はあるが ⚠ **観測に失敗すれば無い** |
 | **観測だけ失敗**（`SELECT 1` は通る） | 🔴 **`OK`** | ⚠ **無い** |
 | `num_waiting` を持たないプール実装 | `OK` | `pool` はあるが ⚠ **`waiting` だけ無い**（`.compact` で落ちる） |
 
@@ -1215,7 +1227,7 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 | 名前 | 型 | 必須 | 説明 |
 |------|-----|------|------|
 | `page` | integer | 任意 | ページ番号（デフォルト: 1、1以上。`cursor` 指定時は無視される）。上限は `/webui/media/catalog/max_page`（既定 50）で、超えると 422（5.41.0） |
-| `cursor` | string | 任意 | カーソル（前回レスポンスの `next_cursor` を指定）。ID の形（Mastodon は数字・Misskey は英数字）でなければ 422（5.41.0） |
+| `cursor` | string | 任意 | カーソル（前回レスポンスの `next_cursor` を指定）。ID の形（Mastodon は数字・Misskey は英数字。5.42.0 からは `<英数字>.<数字>` も）でなければ 422（5.41.0） |
 | `q` | string | 任意 | 検索クエリ（認証時のみ有効） |
 | `only_person` | integer | 任意 | 人物のみ（0: 全て / 1: 人物のみ、デフォルト: 0） |
 
@@ -1226,8 +1238,10 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 | `items` | array | メディアオブジェクトの配列 |
 | `page` | integer | 現在のページ番号 |
 | `has_next` | boolean | 次のページが存在するか |
-| `next_cursor` | string | 次ページのカーソル（`has_next` が `true` の場合のみ） |
+| `next_cursor` | string | 次ページのカーソル（`has_next` が `true` の場合のみ）。⚠ **中身は解釈せず、そのまま `cursor` へ渡すこと。**Misskey では `<ノート ID>.<添付の位置>` の形（5.42.0〜、#4375） |
 
+- **並び**: Mastodon は添付の新しい順。Misskey はノートの新しい順で、1 つのノートの中は添付した順（5.42.0〜、#4375）。
+  ⚠ 5.41.x までの Misskey は、添付が複数あるノートがページの境目に当たると、`cursor` で辿ったときに残りの添付が抜けていた
 - **載る範囲（5.41.0 で変更）**: ローカルの**公開**投稿に付いたメディアだけ。未収載（Misskey ではホーム公開）は載らない（5.40.x までは載っていた）。サイレンス・凍結アカウント、ブースト、削除済みは従来どおり載らない
 - **閲覧注意・CW の印（5.41.0 で追加）**: 未認証で届く一覧なので、**ぼかすのはクライアントの責任**
 

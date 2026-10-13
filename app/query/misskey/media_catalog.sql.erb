@@ -1,3 +1,17 @@
+<%#
+  ⚠⚠ **1 つのノートに添付が複数あると、`note_id` だけでは行が一意に並ばない (#4325 / #4375)。**
+  以前は `note_id < cursor` で次のページを取っていたので、ページの境目に当たったノートの
+  残りの添付がどのページにも出なかった。`fileIds` の中の位置（`file_order`）を添えて
+  `(note_id DESC, file_order ASC)` で並べ、cursor も `<note_id>.<file_order>` の 2 つ組にする。
+  ⚠ 位置の無い cursor（5.41.0 までの形）は「そのノートは出し切った」と読む（従来どおり）。
+
+  ⚠ **位置は `generate_subscripts` で取る。**`unnest` と同じ SELECT に並べると、PostgreSQL は 2 つを
+  足並みを揃えて展開する（同じ配列なので必ず対になる）。`LATERAL unnest(...) WITH ORDINALITY` と
+  書くほうが素直だが、副問い合わせが平坦化されて実行計画が変わる（note の主キーを逆順に舐める形。
+  浅いページは速いが、深いページやキーワードつきは note の全件に比例する）。件数の読み違いで
+  重くなる型（2026-05-19）なので、計画はローカルのノート数に比例する従来の形のまま据え置く。
+-%>
+<% cursor_note, cursor_order = params[:cursor].to_s.split('.', 2) if params[:cursor] %>
 SELECT
   drive_file.id,
   drive_file.name,
@@ -5,6 +19,7 @@ SELECT
   drive_file.size AS file_size,
   drive_file.properties AS meta,
   note_file.note_id AS status_id,
+  note_file.file_order,
   note_file.text AS status_text,
   note_file.visibility,
   drive_file."isSensitive" AS sensitive,
@@ -17,6 +32,7 @@ FROM
     SELECT
       note.id as note_id,
       unnest(note."fileIds") as file_id,
+      generate_subscripts(note."fileIds", 1) as file_order,
       note.visibility,
       note.text,
       note.cw,
@@ -34,6 +50,9 @@ FROM
       <% end %>
       <% if test_account %>
         AND ("user".id <> '<%= test_account.id %>')
+      <% end %>
+      <% if cursor_note %>
+        AND (note.id <= '<%= escape(cursor_note) %>')
       <% end %>
     ORDER BY
       note.id DESC
@@ -54,11 +73,14 @@ WHERE (drive_file."userHost" IS null)
       AND (coalesce(drive_file.name, '') NOT LIKE '%<%= escape(keyword) %>%')
     <% end %>
   <% end %>
-  <% if params[:cursor] %>
-    AND (note_file.note_id < '<%= params[:cursor] %>')
+  <% if cursor_note && cursor_order %>
+    AND NOT (note_file.note_id = '<%= escape(cursor_note) %>' AND note_file.file_order <= <%= cursor_order.to_i %>)
+  <% elsif cursor_note %>
+    AND (note_file.note_id < '<%= escape(cursor_note) %>')
   <% end %>
 ORDER BY
-  note_file.note_id DESC
+  note_file.note_id DESC,
+  note_file.file_order ASC
 LIMIT <%= params[:limit] %>
 <% unless params[:cursor] %>
   <%# ページ幅は呼び出し側が計算して渡す。has_next 用の +1 を混ぜない (#4632) -%>

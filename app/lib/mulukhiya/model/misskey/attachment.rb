@@ -34,20 +34,24 @@ module Mulukhiya
         return nil
       end
 
-      # Misskey の media_catalog SQL は note_id ベースで unnest を展開するため、
-      # 単一ノートに複数添付があると同 note_id の行が連続して並ぶ。non-unique な
-      # 並びに対して `note_id < cursor` で次ページを取ると、ページ境界に該当した
-      # ノートの残り添付がキャッシュから抜ける (#4325)。短期対処として cursor を
-      # 更新せず OFFSET ページングのみを使う。SQL 側で複合キー cursor へ移行する
-      # のは将来の改善 (#4323 と合わせて検討)。
+      # ⚠⚠ **cursor は `<note_id>.<fileIds の中の位置>` の 2 つ組 (#4375)。**media_catalog の SQL は
+      # ノートの `fileIds` を展開するので、1 つのノートに添付が複数あると同じ note_id の行が続く。
+      # 以前は note_id だけを cursor にしていて、ページの境目に当たったノートの残りの添付が
+      # どのページにも出なかった (#4325)。そのため巡回ワーカーは OFFSET だけで送っていた。
       def self.cursor_pagination?
-        return false
+        return true
       end
 
-      # Misskey の media_catalog SQL は note_id ベースで unnest を展開するので、
-      # 添付の id ではなく `status_id` を cursor の基準にする。
+      # cursor の前半（ノートの ID）に使う列。後半は `fileIds` の中の位置（`file_order`）。
       def self.catalog_cursor_key
         return :status_id
+      end
+
+      # ⚠ SQL は必ず `file_order` を返す。欠けた行から位置の無い cursor を作ると、辿ったときに
+      # 境目のノートの残りの添付が黙って抜ける (#4325) ので、旧形式へ倒す分岐は置かない
+      # （欠ければ `<note_id>.` になり、契約が 422 で弾く）。
+      def self.catalog_cursor(row)
+        return "#{row[catalog_cursor_key]}.#{row[:file_order]}"
       end
 
       def self.build_catalog_items(rows)

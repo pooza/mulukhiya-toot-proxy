@@ -31,7 +31,7 @@ module Mulukhiya
         reported = previous_status || {}
         new_reported = apply_hysteresis(observed, reported)
         return if reported == new_reported
-        send_notification(health, create_change_message(new_reported, reported))
+        send_notification(health, create_change_message(new_reported, reported, health))
         save_status(new_reported)
       else
         send_notification(health, create_startup_message(health))
@@ -124,20 +124,30 @@ module Mulukhiya
       return lines.join("\n")
     end
 
-    def create_change_message(new_reported, reported)
+    # ⚠ WARN には理由（`reason`）を添える（5.42.0 のリリース前レビュー）。`postgres: OK → WARN` だけだと、
+    # プールの枯渇か pgbouncer のクライアント数かを見分けるのに health を叩き直すことになり、
+    # 叩いた時点で戻っていれば何も残らない。
+    def create_change_message(new_reported, reported, health = {})
       lines = ['ヘルスステータス変更']
       lines << ''
       new_reported.each do |key, status|
         prev = reported[key]
+        label = status_label(status, health[key])
         if prev && prev != status
-          lines << "#{key}: #{prev} → #{status}"
+          lines << "#{key}: #{prev} → #{label}"
         else
-          lines << "#{key}: #{status}"
+          lines << "#{key}: #{label}"
         end
       end
       lines << ''
       lines << overall_status_line(new_reported)
       return lines.join("\n")
+    end
+
+    def status_label(status, component)
+      reason = component[:reason] if component.is_a?(Hash)
+      return status unless status == 'WARN' && reason
+      return "#{status} (#{reason})"
     end
 
     def status_lines(health)
