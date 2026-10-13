@@ -379,6 +379,31 @@ module Mulukhiya
       assert_equal('WARN', with_admin(admin) {Postgres.health}[:status])
     end
 
+    # 🔴 上限に達した後も WARN のまま（5.42.0 のリリース前レビュー）。達すると観測自身が断られて数が
+    # 読めない。そこで OK へ戻すと、いちばん悪い瞬間に「WARN → OK」の通知が飛ぶ。
+    def test_status_stays_warn_when_the_limit_is_reached
+      health = with_failing_connect('FATAL:  no more connections allowed (max_client_conn)') {Postgres.health}
+
+      assert_equal('WARN', health[:status])
+      assert_equal('pgbouncer_clients_exhausted', health[:reason])
+      assert_predicate(health.dig(:pgbouncer, :error), :present?)
+    end
+
+    # 🔴 割合の設定が壊れていても NG にしない（5.42.0 のリリース前レビュー）。`Postgres.health` の rescue へ
+    # 落ちると、DB が健全でも 503 になり、monit がモロヘイヤを再起動し続ける。
+    def test_broken_ratio_does_not_turn_health_into_ng
+      admin = PgbouncerTest::FakeAdmin.new(used_clients: 13, max_client_conn: 500)
+      ['0.8', nil].each do |broken|
+        config['/postgres/pgbouncer/warn/clients_ratio'] = broken
+        health = with_admin(admin) {Postgres.health}
+
+        assert_equal('WARN', health[:status], broken.inspect)
+        assert_equal('pgbouncer_warn_config', health[:reason], broken.inspect)
+      end
+    ensure
+      config['/postgres/pgbouncer/warn/clients_ratio'] = 0.8
+    end
+
     # ⚠ 割合の 0 以下は検査で落とす（PR #4836 の Codex P2）。0 だと観測のたびに WARN になる。
     # スキーマは draft-04 なので、下限は `minimum` と真偽値の `exclusiveMinimum` の組で書く。
     def test_schema_rejects_a_non_positive_ratio

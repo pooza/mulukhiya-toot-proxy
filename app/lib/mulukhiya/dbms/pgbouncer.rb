@@ -40,6 +40,9 @@ module Mulukhiya
     # queue has waited" と定義しており、**キューが捌けば両方 0 に戻る**。
     # スクレイプの合間に起きて終わった詰まりは、この 2 つには残らない
     # （PR #4671 の Codex P2）。**残るのは `SHOW STATS` の `total_wait_time` のほう。**
+    # `max_client_conn` に達した pgbouncer が、新しいクライアントを断るときの文言。
+    EXHAUSTED_MESSAGE = 'no more connections allowed'.freeze
+
     POOL_FIELDS = ['cl_active', 'cl_waiting', 'sv_active', 'sv_idle', 'maxwait'].freeze
 
     class << self
@@ -66,18 +69,38 @@ module Mulukhiya
       # 箱全体のクライアント数が上限に近づいていれば、health の status を WARN にする材料を返す
       # (#4695 の 4 件目)。近づいていなければ空。`health` の戻り値をそのまま渡す。
       #
-      # ⚠⚠ **見るのは「近づいている」だけ。**上限に達した後は観測自身が
-      # `no more connections allowed` で繋がらず、`{pgbouncer: {error: ...}}` になる。そちらは
-      # pgbouncer の停止と区別できないので、従来どおり status を動かさない。
       # ⚠ **NG にはしない。**WARN は HTTP 200 のまま＝ monit は再起動しない
       # （モロヘイヤを再起動しても pgbouncer は直らない）。
       # ⚠ WARN になると `StartupNotificationWorker` が管理者へ「ヘルスステータス変更」を送る
-      # （戻ったときにもう 1 通）。
+      # （戻ったときにもう 1 通）。⚠ 境目で揺れる間は 5 分ごとに届く（揺れるのは詰まりかけている間だけなので、
+      # 間引いていない。5.42.0 のリリース前レビュー）。
+      #
+      # 以下は 5.42.0 のリリース前レビューから。
+      # ⚠⚠ **上限に達した後も WARN のままにする。**達すると観測自身が `no more connections allowed` で
+      # 繋がらず、数が読めない。そこで OK へ戻すと、いちばん悪い瞬間に「WARN → OK」の通知が飛ぶ。
+      # この文言は pgbouncer が上限で断ったときだけ返すので、停止（接続拒否）とは区別できる。
+      # ⚠ それ以外の観測の失敗は、従来どおり status を動かさない。
+      # ⚠⚠ **割合の設定が壊れていても、例外を上げない。**ここで落ちると `Postgres.health` の rescue が
+      # NG にする＝ DB が健全でも 503 になり、monit がモロヘイヤを再起動し続ける。黙って握ると判定が
+      # 無効になったことに気づけないので、WARN（`pgbouncer_warn_config`）で見える形に倒す。
+      # ⚠ 割合を 1 にすると、達した瞬間（＝観測が繋がらない）しか当たらないので、近づいたことは見えなくなる。
       def warning(health)
-        used, max = health[:pgbouncer].to_h.values_at(:clients_used, :clients_max)
+        bouncer = health[:pgbouncer].to_h
+        return warning_of('pgbouncer_clients_exhausted') if exhausted?(bouncer[:error])
+        used, max = bouncer.values_at(:clients_used, :clients_max)
         return {} unless used && max&.positive?
-        return {} if used.fdiv(max) < config['/postgres/pgbouncer/warn/clients_ratio']
-        return {status: 'WARN', reason: 'pgbouncer_clients_high'}
+        ratio = config['/postgres/pgbouncer/warn/clients_ratio'] rescue nil
+        return warning_of('pgbouncer_warn_config') unless ratio.is_a?(Numeric)
+        return {} if used.fdiv(max) < ratio
+        return warning_of('pgbouncer_clients_high')
+      end
+
+      def warning_of(reason)
+        return {status: 'WARN', reason:}
+      end
+
+      def exhausted?(message)
+        return message.to_s.include?(EXHAUSTED_MESSAGE)
       end
 
       # ⚠ 既定は `auto` ＝ ポートによる自動判定。`true` / `false` で固定できる

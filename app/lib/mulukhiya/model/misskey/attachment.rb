@@ -42,13 +42,16 @@ module Mulukhiya
         return true
       end
 
+      # cursor の前半（ノートの ID）に使う列。後半は `fileIds` の中の位置（`file_order`）。
       def self.catalog_cursor_key
         return :status_id
       end
 
+      # ⚠ SQL は必ず `file_order` を返す。欠けた行から位置の無い cursor を作ると、辿ったときに
+      # 境目のノートの残りの添付が黙って抜ける (#4325) ので、旧形式へ倒す分岐は置かない
+      # （欠ければ `<note_id>.` になり、契約が 422 で弾く）。
       def self.catalog_cursor(row)
-        return row[:status_id].to_s unless row[:file_order]
-        return "#{row[:status_id]}.#{row[:file_order]}"
+        return "#{row[catalog_cursor_key]}.#{row[:file_order]}"
       end
 
       def self.build_catalog_items(rows)

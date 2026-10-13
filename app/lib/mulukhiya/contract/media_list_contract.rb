@@ -23,9 +23,9 @@ module Mulukhiya
     end
 
     # ⚠ cursor は ID（Mastodon は数字・Misskey は英数字）。それ以外はクエリへ渡さない。
-    # ⚠ Misskey は `<note_id>.<fileIds の中の位置>` の 2 つ組 (#4375)。位置の無い形（5.41.0 まで）も受ける。
     # Mastodon では bigint への変換に失敗して 500 になり、未認証の要求で alert が鳴る
     # （5.41.0 のリリース前レビュー）。
+    # ⚠ Misskey は `<note_id>.<fileIds の中の位置>` の 2 つ組 (#4375)。位置の無い形（5.41.0 まで）も受ける。
     rule(:cursor) do
       next unless key?
       # ⚠ Mastodon の ID は bigint。桁が多すぎる数字も変換に失敗して 500 になるので、

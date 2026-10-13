@@ -174,6 +174,15 @@ module Mulukhiya
       assert_equal(['いまの作品'], storage.keywords)
     end
 
+    # ⚠ キーワードが配列でなく 1 語で書かれていても落とさない（5.42.0 のリリース前レビュー）。
+    def test_scalar_keyword_is_accepted
+      config['/service/annict/works'] = 'いまの作品'
+      storage = StorageDouble.new
+
+      assert_equal(BUILT, create(AnnictDouble.new(episodes: EPISODES), storage).fetch)
+      assert_equal(['いまの作品'], storage.keywords)
+    end
+
     # 🔴 キーワードが同じなら、空で上書きしない（不調のときの空と見分けがつかない）。
     def test_empty_result_with_same_keywords_keeps_cache
       storage = StorageDouble.new(entries: CACHED, age: FRESH + 60, keywords: ['いまの作品'])
