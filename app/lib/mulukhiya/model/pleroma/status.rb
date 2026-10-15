@@ -8,6 +8,7 @@ module Mulukhiya
       include SNSMethods
 
       attr_reader :id
+      attr_writer :service
 
       def initialize(id)
         @id = id
