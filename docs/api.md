@@ -1748,6 +1748,9 @@ syslog にも残らない穴があった**（#4694 の 1・5.37.0 で是正）�
 「全部通った」と読めてしまう**。⚠ **`missing_attachments` が付いていたら、
 `Idempotency-Key` を変えて送り直すこと**（同じ鍵では何度送っても結果は変わらない）。
 
+⚠ この再送でアップロードした添付はどの投稿にも付かず残るが、**Mastodon 本体の Vacuum（`Vacuum::MediaAttachmentsVacuum`）が
+作成から 1 日で消す**ので、モロヘイヤ側では掃除しない（#4685・2026-10-16 判断）。
+
 ⚠ **本数の突き合わせができない場合は付かない**（`missing_attachments` は
 「0 本欠けている」ではなく「欠けていない、または判定できない」）。上流の応答が
 `media_attachments`（Mastodon）でも `createdNote.files`（Misskey）でもない形のときが該当する。
