@@ -185,8 +185,10 @@ git diff Gemfile.lock
 [マイルストーン 5.43.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/643)。`config/application.yaml` は 5.43.0 へバンプ済み。
 
 - open 8 件（`gh issue list --milestone 5.43.0`）。5.42.0 から #4375 / #4323（Misskey のメディアカタログ）を引き継いだ
-- 📌 **Misskey のメディアカタログの残り**: ダイスキー（vulcan）で有効にする（#4375・**実施の前にユーザーへ声をかける**）→ 24 時間観測 → #4375 / #4323 をクローズ →
-  Misskey の既定値を `true` に戻す（#4838）。vulcan は 5.42.0 で `/mulukhiya/api/media` が 503（無効のまま）
+- 📌 **Misskey のメディアカタログの残り**: ✅ **ダイスキー（vulcan）で有効にした（2026-10-16 06:29・ユーザー承認・#4375 にコメント）**。
+  ワーカー 10.5 秒・`/api/media` 200（0.31 秒）・`/feed/media` 200（1.20 秒）・health 全 OK。バックアップは vulcan の `config/local.yaml.bak-4375`。
+  → 24 時間観測（〜10-17 06:30）→ ⚠ **10-18（日）のニチアサ明けにもう一度見る** → #4375 / #4323 をクローズ → Misskey の既定値を `true` に戻す（#4838）
+- **PR #4841**（PR #4840 の Codex P2）: pgbouncer の WARN の割合が範囲の外（0 以下・1 超）なら `pgbouncer_warn_config`。Codex には返信・リアクション済み。マージ待ち
 - ⚠ **本番のどの辞書ソースに `interval`（5.41.0・#4690）を入れるかは未決**（ユーザー「後で決める」・2026-10-12）。こちらから急かさない
 - リリース前に見送った `bundle update`（json 3.1.0 / net-imap 0.6.8 / rubocop 1.92.0 ほか）は、この周回で上げる
 
@@ -663,7 +665,7 @@ chubo2 の Issue 棚卸し（10-02・14 日）と harness upstream（`last_check
   ⚠ **リリース PR #4840 に、マージ後（10-14 07:54 JST）に届いた P2 が 1 件・未返信**:
   `Pgbouncer#warning`（`app/lib/mulukhiya/dbms/pgbouncer.rb`）は `clients_ratio` を `Numeric` かどうかしか見ていないので、
   `1.1` のような範囲外の値だと割合が超えられず、**上限に達するまで WARN が出ない**（スキーマの検査は既定で非 strict なので起動は通る）。
-  指摘は正しい（0 以下は常に WARN になるので見える側に倒れるが、1 超は黙って無効になる）。**直すかはユーザー判断待ち**
+  指摘は正しい（0 以下は常に WARN になるので見える側に倒れるが、1 超は黙って無効になる）。→ **同日ユーザー判断で直した（PR #4841）・返信とリアクション済み**
 - **5.43.0**: open 8 件 / closed 0 件（docs の記載と一致）。マイルストーンの無い open Issue は on-hold の 10 件だけ
 - **ginseng-\* のピン**: ずれなし（8 本とも最新タグ）
 - **chubo2**: `origin/main` と同一。open 25 件（前回 27）。#270 / #275 / #276 が close
