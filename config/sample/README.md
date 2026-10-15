@@ -65,3 +65,8 @@ Mastodon インスタンス向けの設定。
 ### misskey/
 
 Misskey インスタンス向けの設定。構成は mastodon/ と同一。
+
+### pleroma/
+
+Akkoma（Pleroma 系）インスタンス向けの設定（#4566・**試験的**）。構成は mastodon/ と同一だが、
+`mulukhiya.nginx` は投稿・メディア・絵文字リアクションと `/mulukhiya` だけを通す最小のもの。

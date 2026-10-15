@@ -523,6 +523,56 @@ parser:
       reply_to: in_reply_to_id
       spoiler: spoiler_text
       visibility: visibility
+pleroma:
+  # Akkoma（Pleroma 系）。#4566 で復活。⚠ 最初の段階の対象は health・pre_toot パイプライン・
+  # トークンからのアカウント解決だけで、ストリーミング・メディアカタログ・webhook などは切ってある。
+  attachment:
+    limit: 4
+    types:
+      audio: audio/mpeg
+      image: image/webp
+      video: video/mp4
+    video_codecs:
+      - h264
+  capabilities:
+    media_update: false
+    reaction: true
+    repost: false
+    streaming: false
+  data:
+    account_timeline: false
+    favorite_tags: false
+    futured_tag: false
+    media_catalog: false
+  dbms: postgres
+  display_name: Pleroma
+  features:
+    annict: false
+    announcement: false
+    announcement_push: false
+    feed: false
+    webhook: false
+  oauth:
+    callback:
+      enable: true
+    scopes:
+      - read
+      - write
+  sns_type: mastodon
+  status:
+    default_max_length: 5000
+    delete:
+      limit: 30
+    key: id
+    label: 投稿
+    reblog_label: リピート
+    parser: toot
+    spoiler_text: null
+  streaming:
+    verify_peer: true
+  theme:
+    color: '#593196'
+  url: https://akkoma.example.com/
 postgres:
   dsn: null
   # pgbouncer の待ち行列を /health に載せるか (#4618)。
