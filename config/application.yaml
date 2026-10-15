@@ -2,6 +2,12 @@ account:
   is_cat:
     cache:
       ttl: 3600
+      # 取れなかった acct も、この秒数だけ覚えておく (#4677)。覚えないと、応答しないホストの
+      # acct が通知一覧に居るあいだ、呼び出しのたびに待たされる。
+      failure_ttl: 600
+    # 1 件の取得（WebFinger ＋ actor）全体の締切（秒）。再送はしない。猫耳の表示のための装飾なので
+    # 早く諦める。⚠ capsicum は 5 秒で切るので、その内側に置く。
+    timeout: 4
 agent:
   accts:
     - '@relayctl@hashtag-relay.dtp-mstdn.jp'

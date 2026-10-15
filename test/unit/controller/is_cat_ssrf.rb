@@ -78,9 +78,9 @@ module Mulukhiya
 
     private
 
+    # ⚠ 取得は #4677 で IsCatService へ移った。ストレージは使わないので空のものを渡す。
     def fetch_actor
-      controller = APIController.new!
-      return controller.send(:fetch_actor, HTTP.new, Ginseng::Fediverse::Acct.new(ACCT))
+      return IsCatService.new(storage: Object.new).fetch_actor(Ginseng::Fediverse::Acct.new(ACCT))
     end
   end
 end
