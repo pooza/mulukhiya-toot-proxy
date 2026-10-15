@@ -25,6 +25,24 @@ module Mulukhiya
       assert_equal('toot', PleromaController.parser_name)
     end
 
+    # 上限は `/api/v1/instance` から読む（PR #4844 の Codex P2）。
+    def test_limits_from_instance
+      @service.instance_variable_set(:@instance, {
+        'max_toot_chars' => 8000,
+        'configuration' => {'statuses' => {'max_media_attachments' => 6}},
+      })
+
+      assert_equal(8000, @service.max_post_text_length)
+      assert_equal(6, @service.max_media_attachments)
+    end
+
+    def test_limits_fall_back_to_config
+      @service.instance_variable_set(:@instance, {})
+
+      assert_equal(config['/pleroma/status/default_max_length'], @service.max_post_text_length)
+      assert_equal(config['/pleroma/attachment/limit'], @service.max_media_attachments)
+    end
+
     def test_default_uri
       assert_equal(config['/pleroma/url'], @service.default_uri.to_s)
     end

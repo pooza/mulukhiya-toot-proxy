@@ -11,18 +11,26 @@ module Mulukhiya
       return PleromaController
     end
 
+    # ⚠ 上限は NodeInfo（`info`）ではなく `GET /api/v1/instance` にある（PR #4844 の Codex P2）。
+    def instance
+      @instance ||= http.get('/api/v1/instance').parsed_response.to_h
+      return @instance
+    end
+
     def max_post_text_length
-      length = info.dig('configuration', 'statuses', 'max_characters')
-      length ||= info['max_toot_chars']
+      length = instance['max_toot_chars']
+      length ||= instance.dig('configuration', 'statuses', 'max_characters')
       return length || config['/pleroma/status/default_max_length']
-    rescue
+    rescue => e
+      e.log
       return config['/pleroma/status/default_max_length']
     end
 
     def max_media_attachments
-      limit = info.dig('configuration', 'statuses', 'max_media_attachments')
+      limit = instance.dig('configuration', 'statuses', 'max_media_attachments')
       return limit || config['/pleroma/attachment/limit']
-    rescue
+    rescue => e
+      e.log
       return config['/pleroma/attachment/limit']
     end
 

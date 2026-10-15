@@ -112,7 +112,10 @@ module Mulukhiya
           return first(nickname: nickname_of(acct))
         in {token: token}
           return nil unless token = token.decrypt rescue token
-          return nil unless account = AccessToken.first(token:)&.account
+          # ⚠ 期限切れ（`valid_until`）のトークンで解決しない（PR #4844 の Codex P1）。
+          # Akkoma が拒むトークンでモロヘイヤの API（管理者向けを含む）が通ってしまう。
+          return nil unless (access_token = AccessToken.first(token:))&.valid?
+          account = access_token.account
           account.token = token
           return account
         else
