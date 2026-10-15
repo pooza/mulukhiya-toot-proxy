@@ -45,17 +45,24 @@ module Mulukhiya
       return is_cat
     end
 
+    # ⚠⚠ **名前解決も締切の内側に入れる（PR #4842 の Codex P1・2 件目）。**
+    # `RemoteHost.validate!` と、要求ごと・転送ごとの `host_validator` は独自の締切
+    # （`/remote_host/dns/timeout`）で名前を引くので、HTTP に残り時間を渡すだけでは
+    # 収まらない。取得全体を `Timeout.timeout` で包み、HTTP には残り時間も渡す
+    # （ソケットを締切どおりに閉じるため）。
     def fetch_actor(acct)
       deadline = monotonic + timeout
-      RemoteHost.validate!(acct.host)
-      url = "https://#{acct.host}/.well-known/webfinger?resource=acct:#{acct}"
-      webfinger = fetch_json(url, 'application/jrd+json', deadline)
-      actor_uri = webfinger['links']&.find do |l|
-        l['type'] == 'application/activity+json'
-      end&.dig('href')
-      return nil unless actor_uri
-      RemoteHost.validate!(Ginseng::URI.parse(actor_uri)&.host.to_s)
-      return fetch_json(actor_uri, 'application/activity+json', deadline)
+      return Timeout.timeout(timeout) do
+        RemoteHost.validate!(acct.host)
+        url = "https://#{acct.host}/.well-known/webfinger?resource=acct:#{acct}"
+        webfinger = fetch_json(url, 'application/jrd+json', deadline)
+        actor_uri = webfinger['links']&.find do |l|
+          l['type'] == 'application/activity+json'
+        end&.dig('href')
+        next nil unless actor_uri
+        RemoteHost.validate!(Ginseng::URI.parse(actor_uri)&.host.to_s)
+        next fetch_json(actor_uri, 'application/activity+json', deadline)
+      end
     rescue => e
       e.log(acct: acct.to_s)
       return nil

@@ -117,6 +117,20 @@ module Mulukhiya
       assert_equal([4.0], timeouts)
     end
 
+    # ⚠⚠ 名前解決が遅くても締切で諦める（PR #4842 の Codex P1・2 件目）。
+    def test_slow_dns_is_bounded_by_the_deadline
+      service = create_deadline_service([], [100.0, 100.0, 100.0])
+      service.define_singleton_method(:timeout) {0.2}
+      RemoteHost.validator = lambda do |_host|
+        sleep(2)
+        next '93.184.216.34'
+      end
+      started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
+      assert_nil(service.fetch_actor(Ginseng::Fediverse::Acct.new(ACCT)))
+      assert_operator(Process.clock_gettime(Process::CLOCK_MONOTONIC) - started, :<, 1)
+    end
+
     # ⚠ 装飾なので早く諦める。既定の HTTP（30 秒 × 3 回）のままにしない。
     def test_http_gives_up_early
       http = IsCatService.new(storage: FakeStorage.new).instance_variable_get(:@http)
