@@ -2,6 +2,11 @@ account:
   is_cat:
     cache:
       ttl: 3600
+      # 取れなかった acct も、この秒数だけ覚えておく (#4677)。覚えないと、応答しないホストの
+      # acct が通知一覧に居るあいだ、呼び出しのたびに待たされる。
+      failure_ttl: 600
+    # actor の取得 1 回の締切（秒）。再送はしない。猫耳の表示のための装飾なので早く諦める。
+    timeout: 5
 agent:
   accts:
     - '@relayctl@hashtag-relay.dtp-mstdn.jp'

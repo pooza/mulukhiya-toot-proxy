@@ -1072,25 +1072,7 @@ module Mulukhiya
         @renderer.message = {errors:}
         return @renderer.to_s
       end
-      storage = IsCatStorage.new
-      http = HTTP.new
-      result = Concurrent::Hash.new
-      Parallel.each(params[:accts].uniq, in_threads: Parallel.processor_count) do |acct_str|
-        acct = Ginseng::Fediverse::Acct.new(acct_str)
-        cached = storage.get(acct_str)
-        if cached
-          result[acct_str] = cached['is_cat']
-          next
-        end
-        actor = fetch_actor(http, acct)
-        is_cat = actor&.dig('isCat')
-        result[acct_str] = is_cat
-        storage.set(acct_str, {is_cat:}) unless actor.nil?
-      rescue => e
-        e.log(acct: acct_str)
-        result[acct_str] = nil
-      end
-      @renderer.message = result
+      @renderer.message = IsCatService.new.resolve(params[:accts])
       return @renderer.to_s
     rescue => e
       report_error(e)
@@ -1170,21 +1152,6 @@ module Mulukhiya
     #
     # ⚠ **拒否は nil ではなくログを残して nil。**呼び出し元は acct ごとに nil を
     # 「判定不能」として返すので、黙って nil にすると攻撃の試行が一切見えない。
-    def fetch_actor(http, acct)
-      RemoteHost.validate!(acct.host)
-      url = "https://#{acct.host}/.well-known/webfinger?resource=acct:#{acct}"
-      webfinger = fetch_json(http, url, 'application/jrd+json')
-      actor_uri = webfinger['links']&.find do |l|
-        l['type'] == 'application/activity+json'
-      end&.dig('href')
-      return nil unless actor_uri
-      RemoteHost.validate!(Ginseng::URI.parse(actor_uri)&.host.to_s)
-      return fetch_json(http, actor_uri, 'application/activity+json')
-    rescue => e
-      e.log(acct: acct.to_s)
-      return nil
-    end
-
     # 番組表編集 5 本の rescue (#4629)。
     #
     # ⚠⚠ **`AuthError` と `NotFoundError` が `else` へ落ちて alert していた。**
@@ -1230,14 +1197,6 @@ module Mulukhiya
       @renderer.status = error.status
       @renderer.message = body
       return @renderer.to_s
-    end
-
-    def fetch_json(http, url, accept)
-      response = http.get(url, {
-        headers: {'Accept' => accept},
-        host_validator: RemoteHost.validator,
-      }).parsed_response
-      return response.is_a?(String) ? JSON.parse(response) : response
     end
   end
 end
