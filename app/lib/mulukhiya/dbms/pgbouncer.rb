@@ -84,19 +84,25 @@ module Mulukhiya
       # NG にする＝ DB が健全でも 503 になり、monit がモロヘイヤを再起動し続ける。黙って握ると判定が
       # 無効になったことに気づけないので、WARN（`pgbouncer_warn_config`）で見える形に倒す。
       # ⚠ 割合を 1 にすると、達した瞬間（＝観測が繋がらない）しか当たらないので、近づいたことは見えなくなる。
+      # ⚠ 数値でも範囲（0 より大きく 1 以下）の外は壊れている扱い（PR #4840 の Codex P2）。
+      # 1 を超えると割合が届かず、黙って判定が無効になる。スキーマの検査は既定で非 strict なので起動は通る。
       def warning(health)
         bouncer = health[:pgbouncer].to_h
         return warning_of('pgbouncer_clients_exhausted') if exhausted?(bouncer[:error])
         used, max = bouncer.values_at(:clients_used, :clients_max)
         return {} unless used && max&.positive?
         ratio = config['/postgres/pgbouncer/warn/clients_ratio'] rescue nil
-        return warning_of('pgbouncer_warn_config') unless ratio.is_a?(Numeric)
+        return warning_of('pgbouncer_warn_config') unless valid_ratio?(ratio)
         return {} if used.fdiv(max) < ratio
         return warning_of('pgbouncer_clients_high')
       end
 
       def warning_of(reason)
         return {status: 'WARN', reason:}
+      end
+
+      def valid_ratio?(ratio)
+        return ratio.is_a?(Numeric) && ratio.positive? && ratio <= 1
       end
 
       def exhausted?(message)
