@@ -85,15 +85,10 @@ module Mulukhiya
     #   しかも `/health` の redis は**読みしか試さない**ので OK のまま＝
     #   「Redis の死は /health が見る」という前提が崩れていた
     #
-    # → **`SET NX EX` を再送なしで 1 回**撃つ。⚠⚠ **書けなかったら黙らせない。**
-    # プロセス内の抑止へ倒す（`LocalAlertThrottle`）。**Redis が健全なら
-    # クラスタ全体で 1 回、壊れていればプロセスごとに 1 回**鳴る。どちらでも
-    # 「黙る」ことも「連打する」ことも無い。
+    # → **`SET NX EX` を再送なしで 1 回**撃ち、書けなければプロセス内の抑止へ倒す。
+    # 本体は `AlertThrottle`（メディア変換の締切切れと共有する・#4722）。
     def acquire_alert_slot(key)
-      return Redis.new.acquire(key, ALERT_THROTTLE_SECONDS)
-    rescue => e
-      logger.error(error: 'alert throttle unavailable', class: e.class.to_s, key:)
-      return LocalAlertThrottle.acquire(key, ALERT_THROTTLE_SECONDS)
+      return AlertThrottle.acquire(key, ALERT_THROTTLE_SECONDS)
     end
 
     # 抑止のバケツ。**型だけでは粗すぎる（PR #4712 の Codex P2）。**
