@@ -70,7 +70,7 @@ bundle exec rake test
 # 2b. もしくはハーネスのルートを渡して実行（source 不要）
 MULUKHIYA_HARNESS_DIR=~/repos/chubo2/fedi-test-harness bundle exec rake test
 
-# 3. 後片付け（省略しない。下記「後片付け」）
+# 3. 後片付け（基本は止める。下記「後片付け」）
 ~/repos/chubo2/fedi-test-harness/mastodon/scripts/stop.sh
 ```
 
@@ -94,7 +94,7 @@ cd ~/repos/chubo2/fedi-test-harness/misskey && ./scripts/setup.sh
 cd ~/repos/mulukhiya-toot-proxy
 set -a; source ~/repos/chubo2/fedi-test-harness/misskey/.env.test; set +a
 bundle exec rake test
-~/repos/chubo2/fedi-test-harness/misskey/scripts/stop.sh   # 後片付け（省略しない）
+~/repos/chubo2/fedi-test-harness/misskey/scripts/stop.sh   # 後片付け（基本は止める）
 ```
 
 ## リリースゲートとしての実走（省略不可）
@@ -139,10 +139,11 @@ harness のアカウントは webhook トークンを持たないので、`Webho
 ⚠ **入れてから取る**（`Webhook#initialize` がそのとき `@sns.token` を固定するため）。
 ⚠ teardown で必ず戻す（他のテストが同じアカウントを見る）。
 
-## 後片付け（省略しない）
+## 後片付け
 
-**実走が終わったら、起動した系ごとに必ず `stop.sh` を回す。**開発機のメモリが厳しく、
-ハーネスは常駐させない（pooza/chubo2 の fedi-test-harness README）。
+**使い終わったら、起動した系ごとに `stop.sh` で止めるのが基本。**使わないまま残すのは無駄なので
+ハーネスは常駐させない。ただし続けて使う作業が決まっているなら残してよい
+（pooza/chubo2 の fedi-test-harness README）。開発機は 48GB で、両系を同時に立てても余裕がある。
 
 ```sh
 ~/repos/chubo2/fedi-test-harness/mastodon/scripts/stop.sh
