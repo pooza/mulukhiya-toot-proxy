@@ -15,20 +15,9 @@ module Mulukhiya
           :multi_factor_authentication_settings)
       end
 
-      # ⚠⚠ **API の ID は DB の主キーと違う。**`users.id` は uuid だが、API は同じ 128 ビットを
-      # FlakeId の base62 で返す（`000001a1-41a5-…` → `BBRwXUDu0uwfOACCsy`・dev29 で実測）。
-      # 照合（`verify_account_integrity!`）はこちらで行う。
-      FLAKE_ALPHABET = [*'0'..'9', *'A'..'Z', *'a'..'z'].join.freeze
-
+      # ⚠⚠ **API の ID は DB の主キーと違う**（uuid と FlakeId）。照合はこちらで行う。
       def api_id
-        number = id.to_s.delete('-').to_i(16)
-        return '0' if number.zero?
-        digits = +''
-        while number.positive?
-          number, rest = number.divmod(62)
-          digits.prepend(FLAKE_ALPHABET[rest])
-        end
-        return digits
+        return FlakeId.encode(id)
       end
 
       def acct
