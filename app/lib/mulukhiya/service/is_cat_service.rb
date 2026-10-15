@@ -12,8 +12,16 @@ module Mulukhiya
   # ⚠⚠ **締切は 1 件の取得全体（WebFinger ＋ actor）に掛ける（PR #4842 の Codex P1）。**
   # 要求ごとに数え直すと 2 倍まで延び、capsicum が 5 秒で切るのに間に合わない。
   # 2 回目の要求には残り時間だけを渡す。
+  #
+  # ⚠⚠ **要求全体にも締切を 1 つ置く（PR #4842 の Codex P1・3 件目）。**acct は最大 50 件で、
+  # スレッドは CPU 数（本番 4）なので、応答しない相手が並ぶと 4 秒の波が続いて 50 秒を超えた。
+  # 締切を過ぎた acct は取りに行かずに nil を返し、**覚えない**（試していない）。
+  # ⚠ 要求全体の締切で時間を削られた回の失敗も覚えない。生きている相手を 10 分「猫ではない」
+  # にしてしまうため。自分の持ち時間をほぼ使えた回（削られ方が `SHORTENED_MARGIN` 秒未満）だけ覚える。
   class IsCatService
     include Package
+
+    SHORTENED_MARGIN = 0.5
 
     def initialize(storage: IsCatStorage.new, http: nil)
       @storage = storage
@@ -21,9 +29,10 @@ module Mulukhiya
     end
 
     def resolve(accts)
+      deadline = monotonic + timeout
       result = Concurrent::Hash.new
       Parallel.each(accts.uniq, in_threads: Parallel.processor_count) do |acct_str|
-        result[acct_str] = lookup(acct_str)
+        result[acct_str] = lookup(acct_str, deadline)
       rescue => e
         e.log(acct: acct_str)
         result[acct_str] = nil
@@ -31,13 +40,16 @@ module Mulukhiya
       return result
     end
 
-    def lookup(acct_str)
+    def lookup(acct_str, deadline = nil)
       if cached = @storage.get(acct_str)
         return cached['is_cat']
       end
-      actor = fetch_actor(Ginseng::Fediverse::Acct.new(acct_str))
+      own = monotonic + timeout
+      deadline ||= own
+      return nil unless deadline > monotonic
+      actor = fetch_actor(Ginseng::Fediverse::Acct.new(acct_str), [deadline, own].min)
       if actor.nil?
-        @storage.remember_failure(acct_str)
+        @storage.remember_failure(acct_str) unless deadline < own - SHORTENED_MARGIN
         return nil
       end
       is_cat = actor['isCat']
@@ -50,9 +62,11 @@ module Mulukhiya
     # （`/remote_host/dns/timeout`）で名前を引くので、HTTP に残り時間を渡すだけでは
     # 収まらない。取得全体を `Timeout.timeout` で包み、HTTP には残り時間も渡す
     # （ソケットを締切どおりに閉じるため）。
-    def fetch_actor(acct)
-      deadline = monotonic + timeout
-      return Timeout.timeout(timeout) do
+    def fetch_actor(acct, deadline = nil)
+      deadline ||= monotonic + timeout
+      budget = deadline - monotonic
+      raise Ginseng::GatewayError, 'is_cat deadline exceeded' unless budget.positive?
+      return Timeout.timeout(budget) do
         RemoteHost.validate!(acct.host)
         url = "https://#{acct.host}/.well-known/webfinger?resource=acct:#{acct}"
         webfinger = fetch_json(url, 'application/jrd+json', deadline)

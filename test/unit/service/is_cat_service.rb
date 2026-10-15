@@ -30,7 +30,7 @@ module Mulukhiya
     def create_service(storage, actor: nil, fetcher: nil)
       service = IsCatService.new(storage:, http: Object.new)
       calls = []
-      service.define_singleton_method(:fetch_actor) do |acct|
+      service.define_singleton_method(:fetch_actor) do |acct, *|
         calls.push(acct.to_s)
         next fetcher ? fetcher.call(acct) : actor
       end
@@ -102,7 +102,7 @@ module Mulukhiya
     # ⚠⚠ 締切は取得全体に 1 つ（PR #4842 の Codex P1）。actor には残り時間だけを渡す。
     def test_actor_request_gets_only_the_remaining_time
       timeouts = []
-      service = create_deadline_service(timeouts, [100.0, 100.0, 103.0])
+      service = create_deadline_service(timeouts, [100.0, 100.0, 100.0, 103.0])
 
       assert_true(service.fetch_actor(Ginseng::Fediverse::Acct.new(ACCT))['isCat'])
       assert_equal([4.0, 1.0], timeouts)
@@ -111,7 +111,7 @@ module Mulukhiya
     # 締切を過ぎたら actor を取りに行かない（失敗として覚えられる）。
     def test_actor_is_not_requested_after_the_deadline
       timeouts = []
-      service = create_deadline_service(timeouts, [100.0, 100.0, 104.5])
+      service = create_deadline_service(timeouts, [100.0, 100.0, 100.0, 104.5])
 
       assert_nil(service.fetch_actor(Ginseng::Fediverse::Acct.new(ACCT)))
       assert_equal([4.0], timeouts)
@@ -131,6 +131,53 @@ module Mulukhiya
       assert_operator(Process.clock_gettime(Process::CLOCK_MONOTONIC) - started, :<, 1)
     end
 
+    # ⚠⚠ 要求全体の締切を過ぎた acct は取りに行かず、覚えもしない（PR #4842 の Codex P1・3 件目）。
+    def test_acct_after_the_request_deadline_is_skipped
+      storage = FakeStorage.new
+      service, calls = create_service(storage, actor: {'isCat' => true})
+
+      assert_nil(service.lookup(ACCT, now - 1))
+      assert_empty(calls)
+      assert_empty(storage.failures)
+    end
+
+    # 応答しない相手が並んでも、要求全体はほぼ締切で終わる（波を重ねない）。
+    def test_resolve_is_bounded_by_the_request_deadline
+      storage = FakeStorage.new
+      fetcher = lambda do |_acct|
+        sleep(0.3)
+        next nil
+      end
+      service, = create_service(storage, fetcher:)
+      service.define_singleton_method(:timeout) {0.3}
+      accts = Array.new(Parallel.processor_count * 5) {|i| "u#{i}@example.com"}
+      started = now
+      result = service.resolve(accts)
+
+      assert_operator(now - started, :<, 1.0)
+      assert_equal(accts.size, result.size)
+      assert(result.values.all?(&:nil?))
+    end
+
+    # 要求全体の締切で持ち時間を削られた回の失敗は覚えない（生きている相手を 10 分外さない）。
+    def test_failure_with_a_shortened_deadline_is_not_cached
+      storage = FakeStorage.new
+      service, calls = create_service(storage, actor: nil)
+
+      assert_nil(service.lookup(ACCT, now + 1))
+      assert_equal([ACCT], calls)
+      assert_empty(storage.failures)
+    end
+
+    # 持ち時間をほぼ使えた回の失敗は覚える（本命の「応答しない相手」）。
+    def test_failure_with_the_full_deadline_is_cached
+      storage = FakeStorage.new
+      service, = create_service(storage, actor: nil)
+
+      assert_nil(service.lookup(ACCT, now + config['/account/is_cat/timeout']))
+      assert_equal([ACCT], storage.failures)
+    end
+
     # ⚠ 装飾なので早く諦める。既定の HTTP（30 秒 × 3 回）のままにしない。
     def test_http_gives_up_early
       http = IsCatService.new(storage: FakeStorage.new).instance_variable_get(:@http)
@@ -142,6 +189,10 @@ module Mulukhiya
 
     private
 
+    def now
+      return Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    end
+
     # 時計と締切（4 秒）を差し替え、HTTP へ渡った締切を集める。
     def create_deadline_service(timeouts, clock)
       http = Object.new
@@ -151,7 +202,7 @@ module Mulukhiya
         next Struct.new(:parsed_response).new(JSON.parse(body.to_json))
       end
       service = IsCatService.new(storage: FakeStorage.new, http:)
-      service.define_singleton_method(:monotonic) {clock.shift}
+      service.define_singleton_method(:monotonic) {clock.length > 1 ? clock.shift : clock.first}
       service.define_singleton_method(:timeout) {4}
       return service
     end
