@@ -169,7 +169,7 @@ GEM
     crass (1.0.7)
     csv (3.3.6)
     date (3.6.0)
-    domain_name (0.6.20260921)
+    domain_name (0.7.20261007)
     drb (2.2.3)
     dry-configurable (1.4.0)
       dry-core (~> 1.0)
@@ -246,7 +246,7 @@ GEM
       ice_cube (~> 0.16)
       logger
     ice_cube (0.17.0)
-    json (3.0.2)
+    json (3.1.0)
     json-schema (6.2.1)
       addressable (~> 2.8)
       bigdecimal (>= 3.1, < 5)
@@ -281,7 +281,7 @@ GEM
     net-http (0.10.0)
       net-protocol (>= 0.3.0)
       uri (>= 0.11.1)
-    net-imap (0.6.7)
+    net-imap (0.6.8)
       date
       net-protocol
     net-pop (0.1.2)
@@ -468,7 +468,7 @@ GEM
     uri (1.1.2)
     useragent (0.16.11)
     version_gem (1.1.15)
-    webmock (3.29.0)
+    webmock (3.34.0)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
