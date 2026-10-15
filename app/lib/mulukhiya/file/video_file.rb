@@ -18,11 +18,11 @@ module Mulukhiya
     def convert_type(type)
       dest = create_dest_path(f: __method__, type:)
       command = FFmpegCommandBuilder.remux_video(path, dest, audio: audio?)
-      command.exec(timeout: ffmpeg_timeout)
+      run_ffmpeg(command, 'remux')
       unless command.status.zero?
         log_ffmpeg_error(command, 'remux')
         command = FFmpegCommandBuilder.transcode_video(path, dest, audio: audio?)
-        command.exec(timeout: ffmpeg_timeout)
+        run_ffmpeg(command, 'transcode')
       end
       raise "ffmpeg failed: #{command.stderr}" unless command.status.zero?
       return self.class.new(dest)
@@ -31,7 +31,7 @@ module Mulukhiya
     def transcode(type)
       dest = create_dest_path(f: __method__, type:)
       command = FFmpegCommandBuilder.transcode_video(path, dest, audio: audio?)
-      command.exec(timeout: ffmpeg_timeout)
+      run_ffmpeg(command, 'transcode')
       raise "ffmpeg failed: #{command.stderr}" unless command.status.zero?
       return self.class.new(dest)
     end
@@ -80,6 +80,15 @@ module Mulukhiya
     end
 
     private
+
+    # ⚠ 締切切れ (#4722) は `status` が nil のまま例外になり、呼び出し側の
+    # `log_ffmpeg_error` を通らない。どの段で切れたかをここで残してから上げ直す。
+    def run_ffmpeg(command, phase)
+      return command.exec(timeout: ffmpeg_timeout)
+    rescue Timeout::Error
+      log_ffmpeg_error(command, phase)
+      raise
+    end
 
     def log_ffmpeg_error(command, phase)
       logger.error(
