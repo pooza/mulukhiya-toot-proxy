@@ -37,6 +37,16 @@ module Mulukhiya
       return service, calls
     end
 
+    def setup
+      @original_validator = RemoteHost.validator
+      RemoteHost.validator = ->(_host) {'93.184.216.34'}
+    end
+
+    def teardown
+      super
+      RemoteHost.validator = @original_validator
+    end
+
     # ⚠⚠ **本命。**取れなかった acct も覚える。覚えないと、応答しないホストの acct で
     # 呼び出しのたびに締切まで待たされる（ダイスキーの 504・美食丼の 499）。
     def test_failure_is_cached
@@ -89,6 +99,24 @@ module Mulukhiya
       assert_equal({ACCT => true, 'b@example.com' => nil}, result.to_h)
     end
 
+    # ⚠⚠ 締切は取得全体に 1 つ（PR #4842 の Codex P1）。actor には残り時間だけを渡す。
+    def test_actor_request_gets_only_the_remaining_time
+      timeouts = []
+      service = create_deadline_service(timeouts, [100.0, 100.0, 103.0])
+
+      assert_true(service.fetch_actor(Ginseng::Fediverse::Acct.new(ACCT))['isCat'])
+      assert_equal([4.0, 1.0], timeouts)
+    end
+
+    # 締切を過ぎたら actor を取りに行かない（失敗として覚えられる）。
+    def test_actor_is_not_requested_after_the_deadline
+      timeouts = []
+      service = create_deadline_service(timeouts, [100.0, 100.0, 104.5])
+
+      assert_nil(service.fetch_actor(Ginseng::Fediverse::Acct.new(ACCT)))
+      assert_equal([4.0], timeouts)
+    end
+
     # ⚠ 装飾なので早く諦める。既定の HTTP（30 秒 × 3 回）のままにしない。
     def test_http_gives_up_early
       http = IsCatService.new(storage: FakeStorage.new).instance_variable_get(:@http)
@@ -96,6 +124,22 @@ module Mulukhiya
       assert_equal(config['/account/is_cat/timeout'], http.timeout)
       assert_operator(http.timeout, :<, config['/http/timeout/seconds'])
       assert_equal(1, http.retry_limit)
+    end
+
+    private
+
+    # 時計と締切（4 秒）を差し替え、HTTP へ渡った締切を集める。
+    def create_deadline_service(timeouts, clock)
+      http = Object.new
+      http.define_singleton_method(:get) do |url, options|
+        timeouts.push(options[:timeout])
+        body = url.include?('webfinger') ? {links: [{type: 'application/activity+json', href: 'https://example.com/a'}]} : {isCat: true}
+        next Struct.new(:parsed_response).new(JSON.parse(body.to_json))
+      end
+      service = IsCatService.new(storage: FakeStorage.new, http:)
+      service.define_singleton_method(:monotonic) {clock.shift}
+      service.define_singleton_method(:timeout) {4}
+      return service
     end
   end
 end

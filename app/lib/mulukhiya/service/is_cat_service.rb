@@ -9,6 +9,9 @@ module Mulukhiya
   #
   # ⚠ **is_cat は猫耳の表示のための装飾なので、早く諦めてよい。**既定の HTTP は
   # 30 秒 × 3 回まで粘るので、ここだけ `/account/is_cat/timeout` 秒・再送なしにする。
+  # ⚠⚠ **締切は 1 件の取得全体（WebFinger ＋ actor）に掛ける（PR #4842 の Codex P1）。**
+  # 要求ごとに数え直すと 2 倍まで延び、capsicum が 5 秒で切るのに間に合わない。
+  # 2 回目の要求には残り時間だけを渡す。
   class IsCatService
     include Package
 
@@ -43,15 +46,16 @@ module Mulukhiya
     end
 
     def fetch_actor(acct)
+      deadline = monotonic + timeout
       RemoteHost.validate!(acct.host)
       url = "https://#{acct.host}/.well-known/webfinger?resource=acct:#{acct}"
-      webfinger = fetch_json(url, 'application/jrd+json')
+      webfinger = fetch_json(url, 'application/jrd+json', deadline)
       actor_uri = webfinger['links']&.find do |l|
         l['type'] == 'application/activity+json'
       end&.dig('href')
       return nil unless actor_uri
       RemoteHost.validate!(Ginseng::URI.parse(actor_uri)&.host.to_s)
-      return fetch_json(actor_uri, 'application/activity+json')
+      return fetch_json(actor_uri, 'application/activity+json', deadline)
     rescue => e
       e.log(acct: acct.to_s)
       return nil
@@ -59,17 +63,28 @@ module Mulukhiya
 
     private
 
+    def timeout
+      return config['/account/is_cat/timeout']
+    end
+
+    def monotonic
+      return Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    end
+
     def create_http
       http = HTTP.new
-      http.timeout = config['/account/is_cat/timeout']
+      http.timeout = timeout
       http.retry_limit = 1
       return http
     end
 
-    def fetch_json(url, accept)
+    def fetch_json(url, accept, deadline)
+      remaining = deadline - monotonic
+      raise Ginseng::GatewayError, 'is_cat deadline exceeded' unless remaining.positive?
       response = @http.get(url, {
         headers: {'Accept' => accept},
         host_validator: RemoteHost.validator,
+        timeout: remaining,
       }).parsed_response
       return response.is_a?(String) ? JSON.parse(response) : response
     end

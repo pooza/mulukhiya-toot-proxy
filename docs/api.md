@@ -840,7 +840,7 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 
 - 結果は Redis にキャッシュされる（TTL は `/account/is_cat/cache/ttl` で設定。デフォルト 1 時間）
 - actor の取得に失敗した acct も `null` としてキャッシュする（TTL は `/account/is_cat/cache/failure_ttl`。デフォルト 10 分・#4677）。応答しないサーバーの acct で毎回待たされないため
-- リモートサーバーへの WebFinger + actor GET を行うため、初回問い合わせはレスポンスが遅延する場合がある。1 回の取得は `/account/is_cat/timeout` 秒（デフォルト 5 秒）で諦め、再送しない
+- リモートサーバーへの WebFinger + actor GET を行うため、初回問い合わせはレスポンスが遅延する場合がある。1 件の取得（WebFinger ＋ actor）全体を `/account/is_cat/timeout` 秒（デフォルト 4 秒）で諦め、再送しない
 - 複数 acct は並列に問い合わせる
 - 関連: `pooza/capsicum#148`
 

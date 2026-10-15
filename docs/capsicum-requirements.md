@@ -273,7 +273,7 @@ POST /mulukhiya/api/account/is_cat
 3. actor JSON のトップレベル `isCat` フィールドを取得
 4. `isCat` が `true` → `true`、`false` / 未設定 / actor 取得失敗 → `false`（取得失敗時のみ `null` 許容）
 5. 結果を Redis キャッシュ（TTL **1 時間**。`/account/is_cat/cache/ttl` = `3600`。⚠ 6h → 1h に短縮済み）
-6. 取得に失敗した acct も `null` で Redis キャッシュ（TTL **10 分**。`/account/is_cat/cache/failure_ttl` = `600`・#4677）。1 回の取得は 5 秒（`/account/is_cat/timeout`）で諦め、再送しない
+6. 取得に失敗した acct も `null` で Redis キャッシュ（TTL **10 分**。`/account/is_cat/cache/failure_ttl` = `600`・#4677）。1 件の取得（WebFinger ＋ actor）全体を 4 秒（`/account/is_cat/timeout`）で諦め、再送しない（capsicum の 5 秒の内側）
 
 ### capsicum 側の利用方法
 
