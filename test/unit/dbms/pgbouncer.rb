@@ -391,15 +391,29 @@ module Mulukhiya
 
     # 🔴 割合の設定が壊れていても NG にしない（5.42.0 のリリース前レビュー）。`Postgres.health` の rescue へ
     # 落ちると、DB が健全でも 503 になり、monit がモロヘイヤを再起動し続ける。
+    # ⚠ 数値でも範囲の外は壊れている扱い（PR #4840 の Codex P2）。1 を超えると割合が届かず、
+    # 上限に達するまで黙って OK のままになる。スキーマの検査は既定で非 strict なので起動は通る。
     def test_broken_ratio_does_not_turn_health_into_ng
       admin = PgbouncerTest::FakeAdmin.new(used_clients: 13, max_client_conn: 500)
-      ['0.8', nil].each do |broken|
+      ['0.8', nil, 0, -0.5, 1.1].each do |broken|
         config['/postgres/pgbouncer/warn/clients_ratio'] = broken
         health = with_admin(admin) {Postgres.health}
 
         assert_equal('WARN', health[:status], broken.inspect)
         assert_equal('pgbouncer_warn_config', health[:reason], broken.inspect)
       end
+    ensure
+      config['/postgres/pgbouncer/warn/clients_ratio'] = 0.8
+    end
+
+    # ⚠ 上限の 1 ちょうどは正しい値（達した瞬間だけ当たる）。範囲の検査で落とさない。
+    def test_ratio_of_one_is_valid
+      admin = PgbouncerTest::FakeAdmin.new(used_clients: 13, max_client_conn: 500)
+      config['/postgres/pgbouncer/warn/clients_ratio'] = 1
+      health = with_admin(admin) {Postgres.health}
+
+      assert_equal('OK', health[:status])
+      assert_nil(health[:reason])
     ensure
       config['/postgres/pgbouncer/warn/clients_ratio'] = 0.8
     end
