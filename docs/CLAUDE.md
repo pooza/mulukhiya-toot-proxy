@@ -199,7 +199,9 @@ git diff Gemfile.lock
   `AlertThrottle` へ寄せてコントローラと共有。#4722 の 2・3 は 5.39.0 で済んでいた
 - ✅ #4685（Idempotency-Key の再送で孤児メディア）は**上流に任せてクローズ**（2026-10-16 ユーザー判断）。Mastodon の Vacuum が未添付のメディアを 1 日で消す。`docs/api.md` に一文
 - ✅ #4233 はクローズ（表の 5 件はすべて 5.19.0〜5.25.0 で完了していた・2026-10-16 ユーザー判断）。いま長いのは `POST /annict/review` / `record` で対象外
-- 残り: #4566（Akkoma）がこの版の「前へ進む」枠
+- **#4566（Akkoma）= この版の「前へ進む」枠**。✅ 2026-10-16 に dev29 へモロヘイヤを設置（pooza/chubo2 `3dd85d9`）し、
+  **PR #4844**（controller `pleroma`・最初の段階）で health 200・アカウント解決・pre_toot パイプラインまで dev29 で通った。
+  🔴 Akkoma の API のアカウント ID は uuid ではなく FlakeId の base62 → 照合を `api_id` に。残りはゲート（harness で dev29 に対して緑）
 
 ## リリース済み: 5.42.0（2026-10-14）
 
