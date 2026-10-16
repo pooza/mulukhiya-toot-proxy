@@ -16,6 +16,11 @@ module Mulukhiya
       return []
     end
 
+    # 上流の API が返すアカウントの ID。Mastodon / Misskey は DB の主キーと同じ。
+    def api_id
+      return id.to_s
+    end
+
     def reactionable?
       http = HTTP.new
       http.base_uri = "https://#{acct.host}"

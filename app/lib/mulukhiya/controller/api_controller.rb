@@ -414,7 +414,7 @@ module Mulukhiya
 
     get '/status/:id' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
-      raise Ginseng::NotFoundError, 'Not Found' unless status = status_class[params[:id]]
+      raise Ginseng::NotFoundError, 'Not Found' unless status = find_status(params[:id])
       raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
       @renderer.message = status.to_h.merge(
         account: status.account.to_h.slice(:username, :display_name, :acct),
@@ -430,7 +430,7 @@ module Mulukhiya
     post '/status/tags' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.repost?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
-      raise Ginseng::NotFoundError, 'Not Found' unless status = status_class[params[:id]]
+      raise Ginseng::NotFoundError, 'Not Found' unless status = find_status(params[:id])
       raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
       errors = StatusTagsContract.new.exec(params)
       if errors.present?
@@ -483,8 +483,9 @@ module Mulukhiya
     end
 
     delete '/status/nowplaying' do
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.repost?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
-      raise Ginseng::NotFoundError, 'Not Found' unless status = status_class[params[:id]]
+      raise Ginseng::NotFoundError, 'Not Found' unless status = find_status(params[:id])
       raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
       raise Ginseng::NotFoundError, 'Not Found' unless body = status.parser.body
       errors = StatusContract.new.exec(params)
@@ -1112,6 +1113,15 @@ module Mulukhiya
     end
 
     private
+
+    # ⚠ API で読む系統（Pleroma 系）の投稿は、要求のトークンで読む（PR #4844 の Codex P2）。
+    # 非公開・ダイレクトの投稿は認証なしでは取れず、持ち主の確認より前に落ちる。
+    # DB で読む系統（Mastodon / Misskey）は `service=` を持たないので何もしない。
+    def find_status(id)
+      return nil unless status = status_class[id]
+      status.service = sns if status.respond_to?(:service=)
+      return status
+    end
 
     # webhook URL。トークンが無いアカウントでは nil を返す (#4487 / #4537)。
     def webhook_url

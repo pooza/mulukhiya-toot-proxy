@@ -137,6 +137,8 @@ module Mulukhiya
 
     def admin_role_ids
       return [] unless Environment.dbms_class&.config?
+      # ⚠ Pleroma 系にロールの表は無い（管理者は `users.is_admin`）。
+      return [] if Environment.pleroma?
       if Environment.misskey?
         return Misskey::Role.where(isAdministrator: true).select_map(:id).map(&:to_s)
       end

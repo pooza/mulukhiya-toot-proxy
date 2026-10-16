@@ -346,7 +346,8 @@ module Mulukhiya
       posted_id = response.parsed_response.dig('account', 'id') ||
         response.parsed_response.dig('createdNote', 'user', 'id')
       return unless posted_id
-      return if posted_id.to_s == sns.account&.id.to_s
+      # ⚠ API の ID と DB の主キーが違う系統がある（Pleroma 系は uuid と FlakeId・#4566）。
+      return if posted_id.to_s == sns.account&.api_id.to_s
       logger.error(
         event: 'account_mismatch_detected',
         expected_account: sns.account&.id,
