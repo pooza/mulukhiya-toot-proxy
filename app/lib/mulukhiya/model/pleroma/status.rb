@@ -56,8 +56,9 @@ module Mulukhiya
         return account&.id == target&.id
       end
 
+      # ⚠ `content` は描画済みの HTML。Akkoma は素の本文を `pleroma.content` に持つ。
       def text
-        return data[:content]
+        return data.dig(:pleroma, :content, :'text/plain') || data[:content]
       end
 
       def uri

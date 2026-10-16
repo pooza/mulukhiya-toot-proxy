@@ -483,6 +483,7 @@ module Mulukhiya
     end
 
     delete '/status/nowplaying' do
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.repost?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
       raise Ginseng::NotFoundError, 'Not Found' unless status = find_status(params[:id])
       raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)

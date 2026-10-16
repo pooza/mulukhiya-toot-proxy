@@ -9,9 +9,11 @@ module Mulukhiya
       many_to_one :application, key: :app_id
 
       # 空白だけのトークンも無効とする（Mastodon::AccessToken と同じ・#4487）。
+      # ⚠ Akkoma の停止（`is_active: false`）は OAuth の行を残すので、ここで弾く。
       def valid?
         return false if to_s.blank?
         return false unless account
+        return false unless account.is_active
         return false if valid_until && valid_until < Time.now
         return true
       end
