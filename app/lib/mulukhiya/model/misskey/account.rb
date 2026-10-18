@@ -25,6 +25,12 @@ module Mulukhiya
         return super.except(:token)
       end
 
+      # Misskey の `user.token`（Web の UI が使う本人のトークン）。`access_token` の行が無い (#4845)。
+      def native_token?(token)
+        return false if token.blank? || values[:token].blank?
+        return values[:token] == token
+      end
+
       def display_name
         return name if name.present?
         return username

@@ -1,5 +1,30 @@
 module Mulukhiya
   class APIController < Controller
+    # 書き込みの要求でも、読み取りの意味しかない口 (#4845)。
+    READ_ONLY_POST_PATHS = [
+      '/account/is_cat',
+      '/nowplaying/resolve',
+      '/nowplaying/resolve-url',
+    ].freeze
+
+    # ⚠⚠ **書き込みのスコープを持たないトークンは、書き込みの要求では外す (#4845)。**
+    # 口ごとの判定は `sns.account` / `sns.account.admin?` だけなので、読み取り専用の
+    # トークンでも設定の更新や管理者向けの操作が通っていた（本体なら拒む）。
+    # ここで外せば、どの口も `sns.account` が nil になって 403 で落ちる。後から足した口にも効く。
+    before do
+      next unless self.class.write_scope_required?(request.request_method, request.path_info)
+      next unless sns&.token
+      next if sns.writable_token?
+      logger.info(class: self.class.to_s, message: 'write scope required', path: request.path_info)
+      sns.token = nil
+    end
+
+    def self.write_scope_required?(method, path)
+      return false if ['GET', 'HEAD', 'OPTIONS'].member?(method.to_s.upcase)
+      return false if READ_ONLY_POST_PATHS.member?(path)
+      return true
+    end
+
     get '/about' do
       sns.token ||= sns.default_token
       about = config.about

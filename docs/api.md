@@ -48,6 +48,13 @@ capsicum 等のクライアントアプリが、モロヘイヤ固有の機能�
 | 必須 | `sns.account` が取得できない場合 403 |
 | 管理者 | `sns.account.admin?` が `true` でない場合 403 |
 
+⚠ **`/mulukhiya/api/*` の書き込みの要求（GET / HEAD / OPTIONS 以外）では、書き込みのスコープを持たないトークンは使えない**（#4845）。
+「必須」「管理者」の口は 403 になる。書き込みのスコープは `write` か `write:*` を 1 つでも持つこと（Mastodon の `read write follow push`、
+Misskey の `write:notes` など）。Misskey の本人のトークン（Web の UI が使うもの）はすべての権限を持つので通る。
+
+- 読み取りの意味しかない `POST /account/is_cat`・`POST /nowplaying/resolve`・`POST /nowplaying/resolve-url` は対象外
+- 5.43.x までは、読み取り専用のトークンでも設定の更新や管理者向けの操作が通っていた
+
 ### エラーレスポンス
 
 #### 不正な UTF-8 (400)
