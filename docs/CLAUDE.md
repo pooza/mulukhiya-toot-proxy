@@ -664,6 +664,42 @@ lint 3 本は通過、ginseng-\* との interface の食い違いは無し。行
 
 ## セッション同期の記録
 
+### 2026-10-18 セッション同期の記録
+
+**本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。日曜 13:30 JST・ニチアサ明けに実施。
+chubo2 の Issue 棚卸し（10-02・16 日）はスキップ。
+
+- **ブランチ**: 作業は `feature/4566-pleroma-controller`（PR #4844）。`develop` は `origin/develop` と同一（`e2873ff5`）・CI `success`
+- **Dependabot**: open アラート **0 件**
+- **open PR**: #4842（#4677）/ #4844（#4566）
+- **Codex / 申し送り**: #4840 / #4841 / #4843 は完了（#4841 / #4843 は指摘なし）。#4842 は 4 件とも返信・リアクション済み
+  （10-15 の `@codex review` の後、新しい指摘は来ていない）。
+  ⚠ **#4844 に 10-16 00:32Z の指摘 2 件が未返信だった**:
+  - P1 `Pleroma::HashTag` に `values` が無く、`HashTagMethods#to_h` が落ちる（`/feed/list`・`Pleroma::Status#to_h` が 500）。
+    v4 では `to_h` を上書きしていたのが、戻したときに落ちていた。→ 空の `values` を足して直した（`3c442f23`・テストは修正前に落ちることを確認）。返信・リアクション・`@codex review` 済み
+  - P2 README は `pleroma/` に `local.yaml` があると書いているが、`config/.gitignore` の `local.*` で**未追跡**（mastodon / misskey は強制追加されている）。
+    手元には在る。⚠ `git add -f` はオートモードに止められたので、ユーザー判断待ち
+- **5.43.0**: open 6 件 / closed 2 件（#4685 / #4233）。⚠ **#4722 は PR #4843 で済んだが open のまま**（develop へのマージでは閉じない）。
+  #4375 / #4323 は vulcan の 24 時間観測（〜10-17 06:30）が明けた＝クローズ待ち
+- **ginseng-\* のピン**: ⚠ **ginseng-core が v2.4.2 → v3.0.0（10-15・major・security 4 件）**。モロヘイヤが触る面（`HTTP` / `Logger`）に当たる:
+  `guard_redirects!` で資格情報つきと見なす要求が増える（`follow_redirects:` を明示している呼び出しは従来どおり）、ログのマスク範囲の拡大。
+  `CommandLine#secrets=` に Hash を渡す箇所・外された定数の参照はモロヘイヤに無い。→ 取り込みの判断はユーザー
+- **chubo2**: open 18 件（前回 25）。#269 / #270 / #273 / #274 / #275 / #276 / #277 / #278 が close。
+  🔴 **#277: 10-17 朝、gomander の `pkg upgrade` で ports の openssl が 3.0 → 3.5 に上がり、rbenv の Ruby が起動しなくなった**
+  （Mastodon / モロヘイヤ / cure-api）。10-18 に FreeBSD 全台の Ruby を base の OpenSSL へ作り直した（gomander は 09:20・ニチアサ明け）
+- **Annict の API**: ⚠ `rails/app/graphql` に **2026-10-17「Rails版の表示から非公開・削除済みの人物を除く」**（`beta/annict_schema.rb` +3）。
+  キャスト・スタッフから非公開の人物を除くもので、モロヘイヤが使う面（作品・エピソード・記録）には当たらない。#3157 も動かない。公式アカウントは 10-06 のまま
+- **辞書台帳**: **🔴 の行に差分なし・🔴 死亡 0**。🟡 は前回の gomander の 4 行が 🟢 に戻り、別の 4 行が 1〜3/144（#4659 の型）。再生成を chubo2 へ（`cab7951`）
+- **harness upstream**: 新しい版なし（Mastodon v4.7.3 / Misskey 2026.10.0 のまま）。`last_checked` を 10-18 に
+
+#### Sentry
+
+- unresolved **34 件**（前回 33）。**コメント 0 は 1 件 → 判断を書いて 0 件**（2026-10-18 時点）
+- **-37（新規・count=1）**: gomander・`POST /api/:version/statuses/:id/favourite` で本体が 404。消えた投稿へのお気に入りと見られる。一過性・様子見
+- **-1X（count=110）**: 増分 7 は zugoga（10-18 07:57〜08:12 JST）と gomander（09:05〜09:15 JST）。#277 の再ビルド中にカスタムフィードが作りかけの Ruby で落ちたもの。再起動後は無し
+- **-34 / -2F**: 10-17 09:25〜09:27 JST に zugoga → shallu → gomander の順で Redis 接続拒否。10-17 朝の更新作業で Redis が先に再起動されたと推定。以後なし
+- -2X / -2Y の増分は他者サーバー（`instance-20220704-2044`・5.37.1）の Annict タイムアウト。判断は据え置き
+
 ### 2026-10-16 セッション同期の記録
 
 **本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。金曜に実施。
