@@ -46,10 +46,15 @@ module Mulukhiya
       return super
     end
 
+    # 自サーバーへの OAuth で使うコントローラ。Pleroma 系は差し替える（#4566）。
+    def oauth_controller_class
+      return MastodonController
+    end
+
     def oauth_client
-      return nil unless scopes = MastodonController.oauth_scopes
+      return nil unless scopes = oauth_controller_class.oauth_scopes
       body = {
-        client_name: MastodonController.oauth_client_name,
+        client_name: oauth_controller_class.oauth_client_name,
         website: config['/package/url'],
         redirect_uris: oauth_callback_uri,
         scopes: scopes.join(' '),
@@ -73,7 +78,7 @@ module Mulukhiya
       return nil unless oauth_client
       return {
         client_id: oauth_client['client_id'],
-        scope: MastodonController.oauth_scopes.join(' '),
+        scope: oauth_controller_class.oauth_scopes.join(' '),
       }
     end
 

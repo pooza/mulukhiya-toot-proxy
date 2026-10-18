@@ -22,7 +22,12 @@ module Mulukhiya
       return launcher_pattern('listener_daemon.rb')
     end
 
+    # ⚠ ストリーミングを切った系統（`capabilities/streaming: false`）と、listener のクラスが無い系統は
+    # 起動対象に入れない（PR #4844 の Codex P1）。入れると `nil.start` で落ち、`/health` も 503 になる。
+    # Mastodon / Misskey は既定で true なので挙動は変わらない。
     def self.disable?
+      return true unless Environment.controller_class&.streaming?
+      return true unless Environment.listener_class
       return true unless Environment.dbms_class&.config?
       return true unless Environment.account_class.info_token
       return true if [:follow, :mention].sum {|v| Event.new(v).count}.zero?

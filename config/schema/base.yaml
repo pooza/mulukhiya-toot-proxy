@@ -158,6 +158,7 @@ properties:
     enum:
       - mastodon
       - misskey
+      - pleroma
     type: string
   daemon:
     # ⚠ 宣言が無いと、local.yaml に書いた正当な `/daemon/*` が `Config#audit` の unknown_keys に出る。

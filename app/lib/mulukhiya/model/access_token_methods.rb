@@ -18,8 +18,14 @@ module Mulukhiya
       return controller_class.oauth_scopes == scopes
     end
 
+    # ⚠⚠ **更新用のトークンは出さない（PR #4844 の Codex P1）。**`GET /config` がこの hash を
+    # 返すので、残すとアクセストークンを持つだけで更新用トークンが手に入り、期限切れの後も
+    # 新しいトークンを作れる。Akkoma は `refresh_token` を発行する。Mastodon（Doorkeeper）の
+    # 表にも同じ列があるので、系統を問わずここで落とす。
+    SECRET_COLUMNS = [:refresh_token, :previous_refresh_token].freeze
+
     def to_h
-      @hash ||= values.deep_symbolize_keys.merge(
+      @hash ||= values.deep_symbolize_keys.except(*SECRET_COLUMNS).merge(
         account:,
         digest: webhook_digest,
         is_scopes_valid: scopes_valid?,
