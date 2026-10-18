@@ -22,6 +22,23 @@ module Mulukhiya
       assert_operator(@storage.ttl, :>, 0)
     end
 
+    def test_failure_ttl
+      assert_kind_of(Integer, @storage.failure_ttl)
+      assert_operator(@storage.failure_ttl, :<, @storage.ttl)
+    end
+
+    # 取れなかった acct も覚えておく (#4677)。読んだ側は `is_cat` が nil の当たりになる。
+    def test_remember_failure
+      @storage.remember_failure(@key)
+      result = @storage.get(@key)
+
+      assert_kind_of(Hash, result)
+      assert_nil(result['is_cat'])
+      assert_true(result['failed'])
+    ensure
+      @storage.unlink(@key)
+    end
+
     def test_get_set
       assert_nil(@storage.get(@key))
 
