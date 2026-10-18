@@ -184,7 +184,7 @@ git diff Gemfile.lock
 
 [マイルストーン 5.43.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/643)。`config/application.yaml` は 5.43.0 へバンプ済み。
 
-- open 8 件（`gh issue list --milestone 5.43.0`）。5.42.0 から #4375 / #4323（Misskey のメディアカタログ）を引き継いだ
+- open 7 件（`gh issue list --milestone 5.43.0`・2026-10-18 に #4845 を足した）。5.42.0 から #4375 / #4323（Misskey のメディアカタログ）を引き継いだ
 - 📌 **Misskey のメディアカタログの残り**: ✅ **ダイスキー（vulcan）で有効にした（2026-10-16 06:29・ユーザー承認・#4375 にコメント）**。
   ワーカー 10.5 秒・`/api/media` 200（0.31 秒）・`/feed/media` 200（1.20 秒）・health 全 OK。バックアップは vulcan の `config/local.yaml.bak-4375`。
   ダイスキーの実況は不定期でごく稀なので、日曜の見直しは要らない（2026-10-16 ユーザー指摘）。
@@ -192,7 +192,7 @@ git diff Gemfile.lock
 - ✅ **PR #4841**（PR #4840 の Codex P2）: pgbouncer の WARN の割合が範囲の外（0 以下・1 超）なら `pgbouncer_warn_config`。**2026-10-16 マージ（`3187aaa2`）**
 - ⚠ **本番のどの辞書ソースに `interval`（5.41.0・#4690）を入れるかは未決**（ユーザー「後で決める」・2026-10-12）。こちらから急かさない
 - ✅ `bundle update` は 2026-10-16 に develop へ直接（`a141799d`・json 3.1.0 / webmock 3.34.0 / domain_name / net-imap 0.6.8・rubocop は ginseng-style の固定で据え置き）。lint・test とも 0 failures
-- **PR #4842（#4677）**: is_cat は取れなかった acct も 600 秒覚え、1 件の取得全体を 4 秒・再送なしで諦める。本体は `IsCatService` へ。
+- ✅ **PR #4842（#4677）**: **2026-10-18 マージ（`880f5756`）**。is_cat は取れなかった acct も 600 秒覚え、1 件の取得全体を 4 秒・再送なしで諦める。本体は `IsCatService` へ。
   ダイスキーの 504 は 09-08 が最後（相手が通知一覧から外れたと見られる）だが、美食丼は今も 1 日 1〜3 件の 499。
   Codex の P1（締切が要求ごとに数え直されて 2 倍に延びる）を `5a5af9d5` で直し、`@codex review` 済み
 - ✅ **PR #4843（#4722）**: **2026-10-16 マージ（`1cd535ac`）**。メディア変換の締切切れはハンドラごとに 300 秒に 1 回だけ alert（残りは log）・動画は段を残す。
@@ -202,6 +202,9 @@ git diff Gemfile.lock
 - **#4566（Akkoma）= この版の「前へ進む」枠**。✅ 2026-10-16 に dev29 へモロヘイヤを設置（pooza/chubo2 `3dd85d9`）し、
   **PR #4844**（controller `pleroma`・最初の段階）で health 200・アカウント解決・pre_toot パイプラインまで dev29 で通った。
   🔴 Akkoma の API のアカウント ID は uuid ではなく FlakeId の base62 → 照合を `api_id` に。残りはゲート（harness で dev29 に対して緑）
+  ✅ **PR #4844 は 2026-10-18 マージ（`28d80436`）**。Codex の指摘はすべて返信・リアクション済み。
+  先送りの受け皿: **#4845**（スコープを見ずにトークンからアカウントを解決している・全系統・5.43.0）/
+  **#4846**（#4566 の非ゴール＝ハンドラ・listener・SQL 7 本・on-hold）。⚠ Pleroma では `post_reaction` を流していない（#4846 に記載）
 
 ## リリース済み: 5.42.0（2026-10-14）
 
