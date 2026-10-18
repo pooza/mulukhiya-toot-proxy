@@ -184,11 +184,11 @@ git diff Gemfile.lock
 
 [マイルストーン 5.43.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/643)。`config/application.yaml` は 5.43.0 へバンプ済み。
 
-- open 7 件（`gh issue list --milestone 5.43.0`・2026-10-18 に #4845 を足した）。5.42.0 から #4375 / #4323（Misskey のメディアカタログ）を引き継いだ
+- open 4 件（`gh issue list --milestone 5.43.0`）。2026-10-18 に #4845 を足し、#4722 / #4375 / #4323 をクローズ（ユーザー判断）。次の [5.44.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/644) を作った（#4847 Pleroma の webhook・#4848 ginseng-core）。5.42.0 から #4375 / #4323（Misskey のメディアカタログ）を引き継いだ
 - 📌 **Misskey のメディアカタログの残り**: ✅ **ダイスキー（vulcan）で有効にした（2026-10-16 06:29・ユーザー承認・#4375 にコメント）**。
   ワーカー 10.5 秒・`/api/media` 200（0.31 秒）・`/feed/media` 200（1.20 秒）・health 全 OK。バックアップは vulcan の `config/local.yaml.bak-4375`。
   ダイスキーの実況は不定期でごく稀なので、日曜の見直しは要らない（2026-10-16 ユーザー指摘）。
-  → 24 時間観測（〜10-17 06:30）→ #4375 / #4323 をクローズ → Misskey の既定値を `true` に戻す（#4838）
+  → 24 時間観測（〜10-17 06:30）→ ✅ #4375 / #4323 をクローズ（10-18）→ **次は Misskey の既定値を `true` に戻す（#4838）**
 - ✅ **PR #4841**（PR #4840 の Codex P2）: pgbouncer の WARN の割合が範囲の外（0 以下・1 超）なら `pgbouncer_warn_config`。**2026-10-16 マージ（`3187aaa2`）**
 - ⚠ **本番のどの辞書ソースに `interval`（5.41.0・#4690）を入れるかは未決**（ユーザー「後で決める」・2026-10-12）。こちらから急かさない
 - ✅ `bundle update` は 2026-10-16 に develop へ直接（`a141799d`・json 3.1.0 / webmock 3.34.0 / domain_name / net-imap 0.6.8・rubocop は ginseng-style の固定で据え置き）。lint・test とも 0 failures
@@ -686,7 +686,8 @@ chubo2 の Issue 棚卸し（10-02・16 日）はスキップ。
   #4375 / #4323 は vulcan の 24 時間観測（〜10-17 06:30）が明けた＝クローズ待ち
 - **ginseng-\* のピン**: ⚠ **ginseng-core が v2.4.2 → v3.0.0（10-15・major・security 4 件）**。モロヘイヤが触る面（`HTTP` / `Logger`）に当たる:
   `guard_redirects!` で資格情報つきと見なす要求が増える（`follow_redirects:` を明示している呼び出しは従来どおり）、ログのマスク範囲の拡大。
-  `CommandLine#secrets=` に Hash を渡す箇所・外された定数の参照はモロヘイヤに無い。→ 取り込みの判断はユーザー
+  `CommandLine#secrets=` に Hash を渡す箇所・外された定数の参照はモロヘイヤに無い。同日 v4.0.0 も出た。
+  → **② 次の版で取り込む**（緊急性なし・ユーザー判断）。取り込むときの最新 major を入れる（#4848・5.44.0）
 - **chubo2**: open 18 件（前回 25）。#269 / #270 / #273 / #274 / #275 / #276 / #277 / #278 が close。
   🔴 **#277: 10-17 朝、gomander の `pkg upgrade` で ports の openssl が 3.0 → 3.5 に上がり、rbenv の Ruby が起動しなくなった**
   （Mastodon / モロヘイヤ / cure-api）。10-18 に FreeBSD 全台の Ruby を base の OpenSSL へ作り直した（gomander は 09:20・ニチアサ明け）
@@ -1926,6 +1927,8 @@ Issue #4233 の APIController 段階的リファクタは「1〜2 マイルス�
 
 ### Pleroma 系（Akkoma）対応の復活トラック（2026-08-10 起票）
 
+⚠ **2026-10-18 から設計と進み具合は [pleroma.md](pleroma.md) が正本。**総まとめは #4846（on-hold）、段階ごとのサブ Issue を 1 マイルストーンに 1 つずつ載せる（ユーザー判断）。以下は経緯。
+
 5.0 で「削除ではなく未対応」として保留した Pleroma 系を、**Akkoma を対象に**戻す趣味枠。正本は #4566。
 **動機は実用ではなく「少しずつ元の形に戻す」こと**なので、リリース作業・番組表・実況まわりより常に後回しでよい。
 
@@ -1965,6 +1968,7 @@ Issue #4233 の APIController 段階的リファクタは「1〜2 マイルス�
 - [ginseng-config-internals.md](ginseng-config-internals.md) — Ginseng::Config 内部構造
 - [test-harness.md](test-harness.md) — #4379 chubo2 fedi-test-harness を使った実サーバーテストの手順
 - [capsicum-requirements.md](capsicum-requirements.md) — capsicum プロジェクトからの依頼事項
+- [pleroma.md](pleroma.md) — Pleroma 系（Akkoma）対応の設計と進み具合（**進捗はこの表で管理**・2026-10-18）
 
 ### 手順（Claude Code のスキル・`.claude/skills/`）
 
