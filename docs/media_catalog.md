@@ -2,19 +2,22 @@
 
 モロヘイヤが提供する **メディアカタログ** （`/mulukhiya/api/media`、`/mulukhiya/feed/media`、`MediaCatalogUpdateWorker`）は、当該サーバーのローカル投稿に添付されたメディア（画像・動画・音声）をページング可能なカタログとして配信する機能。capsicum などのクライアントがメディア一覧画面を提供するために利用する。
 
-**既定値は Mastodon が有効（5.41.0・#4789）、Misskey が無効（#4375 まで）。**
+**既定値は Mastodon・Misskey とも有効**（Mastodon は 5.41.0・#4789、Misskey は 5.43.0・#4838）。
 
 | 版 | Mastodon | Misskey |
 | --- | --- | --- |
 | 〜5.22.x | 有効 | 有効 |
 | 5.23.0〜5.40.x | 無効（実験的扱い・#4343） | 無効 |
-| 5.41.0〜 | **有効** | 無効 |
+| 5.41.0〜5.42.x | **有効** | 無効 |
+| 5.43.0〜 | **有効** | **有効** |
 
 Mastodon の既定を戻したのは、クエリの書き直し（#4393 の B 案）で **追加の index なしに** 1 秒未満になり、本番 3 台で実績ができたため。
+Misskey は、5.42.0 の cursor の修正（#4375）のあと、ダイスキーで有効にして 24 時間観測し、問題が無かったため（2026-10-16〜17）。
 
-- 重さは **ローカルアカウント数にほぼ比例**する（温まった状態の 1 クエリで、47 アカウントが数十 ms、384 アカウントが 0.5〜0.6 秒）。⚠ **384 を超える規模は未検証**。キャッシュが空の初回は 384 アカウントで 12 秒かかったことがある
+- Mastodon の重さは **ローカルアカウント数にほぼ比例**する（温まった状態の 1 クエリで、47 アカウントが数十 ms、384 アカウントが 0.5〜0.6 秒）。⚠ **384 を超える規模は未検証**。キャッシュが空の初回は 384 アカウントで 12 秒かかったことがある
+- Misskey の重さは **ローカルのノート数に比例**する。ダイスキー（添付つきの公開ノート約 1,400・`note` 約 33 万行）では、追加の index なしで 1 ページ目 69 ms・OFFSET 2500 で 153 ms、`MediaCatalogUpdateWorker` は 10.5 秒だった。⚠ **ローカルのノートが桁で多いサーバーは未検証**
 - 有効になると、`MediaCatalogUpdateWorker` が定期的に動き、WebUI にメディアフィードが出る
-- 重いと感じたら、overlay（`local.yaml`）に `/mastodon/data/media_catalog: false` を書けば、5.23.0〜5.40.x と同じ状態（503 を返す）に戻る。データは失われない
+- 重いと感じたら、overlay（`local.yaml`）に `/mastodon/data/media_catalog: false`（Misskey は `/misskey/data/media_catalog: false`）を書けば、無効だった版と同じ状態（503 を返す）に戻る。データは失われない
 - アップグレード直後は `/mulukhiya/api/health` の `postgres.pool.waiting` が 0 のままかを見る
 - **載るのは公開の投稿だけ**（5.41.0）。未収載（Misskey ではホーム公開）は載せない。閲覧注意・CW つきは `sensitive` / `status.spoiler_text` の印を付けて返し、CW つきは本文を返さない。WebUI は押すまで表示しない。RSS（`/feed/media`）には閲覧注意・CW つきを載せない
 - 未認証で引けるページには上限がある（`/webui/media/catalog/max_page`・既定 50）
@@ -60,12 +63,12 @@ mastodon:
     media_catalog: false
 ```
 
-**Misskey サーバー**（既定は無効。有効にする）:
+**Misskey サーバー**（5.43.0 から既定は有効。重いときに無効へ戻す）:
 
 ```yaml
 misskey:
   data:
-    media_catalog: true
+    media_catalog: false
 ```
 
 ### 反映
@@ -89,7 +92,7 @@ curl -s https://your.instance/mulukhiya/api/about | jq '.config.features.media_c
 
 ## 有効にして動かすときのチェックリスト
 
-Mastodon は既定で有効になる。ローカルアカウントが多いサーバー（目安として 384 を超える規模は未検証）と、Misskey で有効にする場合は、以下を確認することを推奨する:
+Mastodon・Misskey とも既定で有効になる。ローカルアカウントが多い Mastodon（目安として 384 を超える規模は未検証）と、ローカルのノートが多い Misskey（ダイスキーより桁で多い規模は未検証）では、以下を確認することを推奨する:
 
 1. **本番データ規模の把握** — `statuses` 行数、`media_attachments` 行数、local 比率（`SELECT count(*) FILTER (WHERE local) * 1.0 / count(*) FROM statuses`）。
 2. **ベースライン EXPLAIN 取得** — [`bin/diag/media_catalog_index.sql`](../bin/diag/media_catalog_index.sql) §1–§2 を本番 DB で実行。底値が数百 ms 級ならリスクは低い。⚠ **秒単位で遅くても index は足さない**（効かないことが分かっている）。その場合は無効に戻し、ローカルアカウント数と実行計画を添えて報告する。

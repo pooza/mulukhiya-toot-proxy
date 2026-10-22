@@ -383,7 +383,7 @@ mastodon:
     # ⚠ Mastodon は 5.41.0 で既定を true に戻した (#4789)。重さはローカルアカウント数に
     # ほぼ比例する（47 で数十 ms、384 で 0.5〜0.6 秒／温まった状態の 1 クエリ）。
     # 重ければ overlay で false にすれば、5.23.0〜5.40.x と同じ「503 を返す」状態に戻る。
-    # ⚠ Misskey は false のまま（#4375）。
+    # Misskey も 5.43.0 で true に戻した (#4838)。
     media_catalog: true
   dbms: postgres
   display_name: Mastodon
@@ -445,7 +445,11 @@ misskey:
     account_timeline: true
     favorite_tags: true
     futured_tag: true
-    media_catalog: false
+    # ⚠ Misskey は 5.43.0 で既定を true に戻した (#4838)。重さはローカルのノート数に比例する
+    # （ダイスキー＝添付つきの公開ノート約 1,400・note 約 33 万行で、1 ページ目 69 ms・
+    # ワーカー 10.5 秒）。桁で多いサーバーは未検証。重ければ overlay で false にすれば、
+    # 5.23.0〜5.42.x と同じ「503 を返す」状態に戻る。
+    media_catalog: true
   dbms: postgres
   display_name: Misskey
   redis:

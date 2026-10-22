@@ -495,7 +495,7 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
 
 **`features.annict` / `features.annict_linked`**: `features.annict` は **サーバーレベル**の設定（当該モロヘイヤサーバーで Annict の client_id/secret が設定済みか）。`features.annict_linked` は **ユーザーレベル**の状態で、リクエストの Bearer トークンに紐付く SNS アカウントに Annict access_token が保管済みなら `true`（未連携・トークン無しは `false`、無認証リクエストでも `false`）。token 存在のみで判定し liveness/refresh の確認は行わない。capsicum は両者を組み合わせ、「サーバーは Annict 対応かつ当該ユーザーが連携済み」のときのみ感想投稿ボタンを表示する（`pooza/capsicum#298`）。
 
-**`features.media_catalog`**: メディアカタログ機能の現在のオン/オフ状態。実体は `/{controller}/data/media_catalog` を `/about` で features 側に合流させたもの（discovery を features 一本に集約するため、`annict_linked` と同じ動的合流パターン、#4343）。既定値は Mastodon が `true`（5.41.0 で戻した・#4789）、Misskey が `false`。5.23.0〜5.40.x は両方 `false`（実験的扱い）だった。`false` のとき `/media`・`/feed/media` はいずれも **404 ではなく 503** を返す。`/media`（JSON）は body に `{"available": false, "items": [], "has_next": false}` を含める。`/feed/media`（RSS 2.0）は body 形式維持のため空 channel のみを返し（JSON フィールドは付かない）、HTTP ステータスのみで状態を示す。capsicum 等のクライアントは本フラグを参照して「メンテナンス中」表示に切り替える（`pooza/capsicum#606`）。`Retry-After` ヘッダは付与しない（再開タイミングが運用判断ベースで見積もり不能なため、クライアントは `/about` を polling して features を見る）。「機能未提供」(404) と「現在 OFF」(503) の区別が目的。
+**`features.media_catalog`**: メディアカタログ機能の現在のオン/オフ状態。実体は `/{controller}/data/media_catalog` を `/about` で features 側に合流させたもの（discovery を features 一本に集約するため、`annict_linked` と同じ動的合流パターン、#4343）。既定値は Mastodon・Misskey とも `true`（Mastodon は 5.41.0・#4789、Misskey は 5.43.0・#4838 で戻した）。5.23.0〜5.40.x は両方 `false`（実験的扱い）、5.41.0〜5.42.x は Misskey だけ `false` だった。`false` のとき `/media`・`/feed/media` はいずれも **404 ではなく 503** を返す。`/media`（JSON）は body に `{"available": false, "items": [], "has_next": false}` を含める。`/feed/media`（RSS 2.0）は body 形式維持のため空 channel のみを返し（JSON フィールドは付かない）、HTTP ステータスのみで状態を示す。capsicum 等のクライアントは本フラグを参照して「メンテナンス中」表示に切り替える（`pooza/capsicum#606`）。`Retry-After` ヘッダは付与しない（再開タイミングが運用判断ベースで見積もり不能なため、クライアントは `/about` を polling して features を見る）。「機能未提供」(404) と「現在 OFF」(503) の区別が目的。
 
 **`features.program_editable`**: 番組表エディタ（`/admin/program/entry/*` 5 ルート）の書き込み API が現在利用可能か。`livecure?` が `true`（番組表機能対応 controller）かつ `/program/auto_update` が `false`（自動更新無効）のときのみ `true`（#4272）。`true` でも管理者権限が必要なのは従来通り。`false` のとき書き込み 5 ルートは 409 Conflict（メッセージ「自動更新が有効のため、編集できません。」）を返す。WebUI 側は本フラグを見て編集ボタン類を非表示・案内表示に切り替える。`livecure?` 自体が `false` のサーバーでは番組表機能が無いので常に `false`。⚠ **`true` でも 409 は起こりうる**（5.33.0〜 / #4534 の書き込みロック競合）。**本フラグと 409 を「編集不可」として同一視しないこと**——ロック競合の 409 は一過性で、再試行すれば通る。5.38.0〜 は 409 の `code` で区別できる（`auto_update` / `locked`、#4579）。
 
@@ -1222,7 +1222,7 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 メディアカタログを取得する。
 
 - **認証**: オプショナル（認証時は検索クエリ `q` が使用可能）
-- **前提条件**: `/{controller}/data/media_catalog` が `true`（既定値は Mastodon が `true`・Misskey が `false`。5.23.0〜5.40.x は両方 `false`）。無効時は **503** + body `{"available": false, "items": [], "has_next": false}` を返す。クライアントは `/about` の `features.media_catalog` で事前に有効/無効を判定可能（#4343）
+- **前提条件**: `/{controller}/data/media_catalog` が `true`（既定値は Mastodon・Misskey とも `true`。5.23.0〜5.40.x は両方 `false`、5.41.0〜5.42.x は Misskey だけ `false`）。無効時は **503** + body `{"available": false, "items": [], "has_next": false}` を返す。クライアントは `/about` の `features.media_catalog` で事前に有効/無効を判定可能（#4343）
 - **パラメータ**:
 
 | 名前 | 型 | 必須 | 説明 |
