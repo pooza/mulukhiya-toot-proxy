@@ -670,6 +670,28 @@ lint 3 本は通過、ginseng-\* との interface の食い違いは無し。行
 
 ## セッション同期の記録
 
+### 2026-10-23 セッション同期の記録
+
+**本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。chubo2 の Issue 棚卸し（10-02・21 日）はスキップ。
+
+- **ブランチ**: `develop` は `origin/develop` と同一（`a527a0e7`）
+- **Dependabot**: open アラート **0 件**
+- **open PR**: **#4849（#4845）は CI 緑（mastodon / misskey）・MERGEABLE・Codex 指摘なし＝引き続きマージ待ち**
+- **Codex / 申し送り**: #4840〜#4844・#4849 とも完了（未返信・リアクション漏れなし）
+- **ginseng-\* のピン**: ginseng-core v2.4.2 → v4.0.0 のずれのみ（#4848・5.44.0 の判断どおり）
+- **Annict の API**: 10-18 と同じ（`rails/app/graphql` の最新は 10-17・公式アカウントは 10-06 のまま）
+- **辞書台帳**: **🔴 死亡 0**。🔴 直書き（gomander の GAS）は既知の 1 行で、今回 1/144 の間欠。🟡 は #4659 の型の入れ替わり。再生成を chubo2 へ（`7751789`）
+- **harness upstream**: 新しい版なし（Mastodon v4.7.3 / Misskey 2026.10.0。Misskey 2026.10.1-alpha.1 は alpha）。`last_checked` を 10-23 に
+- **chubo2**: open 22 件（前回 21）。新規は #284（FreeBSD の Node を 10 月のセキュリティリリースへ・pkg 待ち。vulcan は 26.12.1 済み `f7cb78d`）
+
+#### Sentry
+
+- unresolved **35 件**。**コメント 0 は 0 件**（2026-10-23 時点）
+- ⚠ **-1X（count=349・前回 10-18 は 110）**: 増分の 238 件は **zugoga で 2026-10-22T01:27Z から 5 分おきに継続中**。
+  カスタムフィードが `www.dqdai-official.com:443` へつなげない（Connection refused）。手元からも 443 が拒否される＝**相手のサイトの停止**。
+  対応なし・復旧待ち（Sentry にコメント）。復旧後も止まらなければ URL の移転を疑う。残り 1 件は gomander の 502（一過性）
+- -J（count=168）の増分は他者サーバー（`server_name=mulukhiya`・5.37.1）の Redis 接続拒否（10-19 / 10-21）。族の判断（09-02）は据え置き
+
 ### 2026-10-20 セッション同期の記録
 
 **本番には触っていない。**急ぎの件の確認に絞った簡易同期（辞書台帳・Annict・chubo2 の棚卸しは省略。harness の upstream は `last_checked` から 2 日でスキップ）。
