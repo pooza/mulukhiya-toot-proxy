@@ -189,6 +189,8 @@ git diff Gemfile.lock
   ワーカー 10.5 秒・`/api/media` 200（0.31 秒）・`/feed/media` 200（1.20 秒）・health 全 OK。バックアップは vulcan の `config/local.yaml.bak-4375`。
   ダイスキーの実況は不定期でごく稀なので、日曜の見直しは要らない（2026-10-16 ユーザー指摘）。
   → 24 時間観測（〜10-17 06:30）→ ✅ #4375 / #4323 をクローズ（10-18）→ **次は Misskey の既定値を `true` に戻す（#4838）**
+  → **PR #4852（#4838）**: `/misskey/data/media_catalog` の既定を `true` に。lint・test とも 0 failures。**2026-10-23 時点で CI・Codex の結果待ち**。
+  ⚠ リリースノートに戻し方と見るもの（`postgres.pool.waiting`）を書く・Wiki（メディアカタログ）はリリース時に反映
 - ✅ **PR #4841**（PR #4840 の Codex P2）: pgbouncer の WARN の割合が範囲の外（0 以下・1 超）なら `pgbouncer_warn_config`。**2026-10-16 マージ（`3187aaa2`）**
 - **PR #4849（#4845）**: `/mulukhiya/api/*` の書き込みの要求（GET / HEAD / OPTIONS 以外）では、`write` / `write:*` を持たないトークンを外す（403）。
   読み取りの POST 3 本（is_cat・nowplaying/resolve・resolve-url）は除外、Misskey の本人のトークンは通す。harness 両系 0 failures、実トークンで通る側・弾く側とも確認済み。
