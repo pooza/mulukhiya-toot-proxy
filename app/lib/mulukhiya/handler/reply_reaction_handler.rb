@@ -2,6 +2,8 @@ module Mulukhiya
   class ReplyReactionHandler < Handler
     def disable?
       return true unless controller_class.reaction?
+      # Pleroma 系は `post_reaction` を流していない（docs/pleroma.md の段階 4）。
+      return true if Environment.pleroma?
       return super
     end
 

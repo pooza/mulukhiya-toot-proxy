@@ -2,6 +2,8 @@ module Mulukhiya
   class AttachmentTest < TestCase
     def disable?
       return true unless Environment.dbms_class&.config?
+      # Pleroma 系はカタログの SQL を持たない（docs/pleroma.md の段階 5）。
+      return true if Environment.pleroma?
       return super
     end
 

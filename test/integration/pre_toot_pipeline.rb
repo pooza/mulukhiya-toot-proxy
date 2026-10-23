@@ -3,7 +3,7 @@ require 'webmock/test_unit'
 module Mulukhiya
   class PreTootPipelineTest < TestCase
     def setup
-      WebMock.disable_net_connect!(allow_localhost: true)
+      disable_net_connect_except_harness!
       # pipeline は GroupTagHandler を含み、community-map を外部（pf.korako.me）から取得する。
       # 実サーバー非依存にするためスタブに閉じる（harness=localhost は allow_localhost で通す）。
       stub_community_map

@@ -97,6 +97,31 @@ bundle exec rake test
 ~/repos/chubo2/fedi-test-harness/misskey/scripts/stop.sh   # 後片付け（基本は止める）
 ```
 
+## 手順（Pleroma 系・Akkoma）
+
+⚠ **chubo2 の harness ではなく、Akkoma のステージング dev29（`st.akkoma.b-shock.org`）を相手にする**（#4566）。
+`PLEROMA_*` の接続情報は自分で組む。値は dev29 の上にあり、**リポジトリには置かない**（scratchpad に 0600 で）。
+
+| 変数 | 出どころ |
+| --- | --- |
+| `PLEROMA_URL` | `https://st.akkoma.b-shock.org` |
+| `PLEROMA_ACCESS_TOKEN` | `/home/akkoma/test-user-token.txt`（ユーザー `test`） |
+| `PLEROMA_INFO_ACCESS_TOKEN` | `/home/akkoma/info-user-token.txt`（ユーザー `info`・2026-10-24 作成） |
+| `PLEROMA_DB_DSN` | モロヘイヤの `config/local.yaml` の `postgres.dsn` を、SSH の転送先（下では 5435）へ書き換えたもの |
+
+```sh
+ssh -f -N -L 5435:127.0.0.1:5432 dev29   # DB は 127.0.0.1 待ち受けなので転送する
+~/repos/chubo2/fedi-test-harness/mulukhiya-redis/ctl.sh up
+MULUKHIYA_HARNESS_DIR=<scratchpad>/harness bundle exec rake test   # <scratchpad>/harness/pleroma/.env.test
+~/repos/chubo2/fedi-test-harness/mulukhiya-redis/ctl.sh down
+pkill -f '[5]435:127.0.0.1:5432'   # ⚠ 角括弧が無いと pkill が自分のシェルまで殺す
+```
+
+- harness の SNS が localhost でないので、外部への通信を止めるテストは
+  `disable_net_connect_except_harness!`（`TestCase`）を使う。`allow_localhost: true` だけだと dev29 を止める
+- 切ってある機能（メディアカタログ＝段階 5・`post_reaction` のハンドラ＝段階 4）のテストは Pleroma では止まる（[pleroma.md](pleroma.md)）
+- ⚠ **`Environment.pleroma?` で止めたテストは、段階を進めたら外す**
+
 ## リリースゲートとしての実走（省略不可）
 
 ⚠ **手順は `harness-gate` スキル（[.claude/skills/harness-gate/SKILL.md](../.claude/skills/harness-gate/SKILL.md)）へ移した**（#4731）。
