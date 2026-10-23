@@ -58,6 +58,19 @@ module Mulukhiya
       return @access_token
     end
 
+    # 書き込みに使ってよいトークンか (#4845)。⚠ 引けなかったときは使わせない側に倒す。
+    def writable_token?
+      return true if access_token&.writable?
+      return account&.native_token?(token) || false
+    end
+
+    # ⚠ gem の `token=` は `@account` しか捨てない。`@access_token` も捨てないと、
+    # 外したトークンの行が残って `writable_token?` が古い答えを返す。
+    def token=(token)
+      @access_token = nil
+      super
+    end
+
     def clear_oauth_client
       oauth_client_storage.clear
     end
