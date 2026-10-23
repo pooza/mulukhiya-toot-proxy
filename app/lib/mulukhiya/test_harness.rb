@@ -7,7 +7,8 @@ module Mulukhiya
   class TestHarness
     include Package
 
-    PREFIXES = {'mastodon' => 'MASTODON', 'misskey' => 'MISSKEY'}.freeze
+    # pleroma は chubo2 の harness ではなく、Akkoma のステージング（dev29）を指す (#4566)。
+    PREFIXES = {'mastodon' => 'MASTODON', 'misskey' => 'MISSKEY', 'pleroma' => 'PLEROMA'}.freeze
 
     class << self
       # announce の一度きり判定。run をまたがないのでテストから戻せる。

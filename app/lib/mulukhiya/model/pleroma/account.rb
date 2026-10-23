@@ -74,7 +74,13 @@ module Mulukhiya
         return []
       end
 
+      # ⚠ 投稿は `Status` と同じく API で読む（`objects` の JSON を開く SQL は持たない）。
       def recent_status
+        response = service.fetch_account_statuses(api_id, {limit: 1})
+        return nil unless id = response.parsed_response&.first&.dig('id')
+        return Status[id]
+      rescue => e
+        e.log(acct: acct.to_s)
         return nil
       end
 
@@ -99,6 +105,16 @@ module Mulukhiya
         acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)
         return acct.username if acct.host.nil? || acct.host == Environment.domain_name
         return acct.to_s.sub(/^@/, '')
+      end
+
+      # ⚠ 作成日時は `created_at` ではなく `inserted_at`（Ecto）。
+      def self.founded_at
+        return @founded_at if defined?(@founded_at) && @founded_at
+        return nil unless account = where(local: true).order(:inserted_at).first
+        return @founded_at = account.inserted_at.getlocal
+      rescue => e
+        e.log
+        return nil
       end
 
       # ⚠ `users` には `domain` / `host` が無い。ローカルかどうかは `local` 列。

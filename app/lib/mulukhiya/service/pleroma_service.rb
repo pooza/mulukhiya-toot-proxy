@@ -34,6 +34,13 @@ module Mulukhiya
       return config['/pleroma/attachment/limit']
     end
 
+    # ⚠ `id` は API の ID（FlakeId の base62）。DB の `users.id`（uuid）ではない。
+    def fetch_account_statuses(id, params = {})
+      return http.get("/api/v1/accounts/#{id}/statuses?limit=#{params[:limit] || 20}", {
+        headers: create_headers(params[:headers]),
+      })
+    end
+
     def reaction(id, emoji, params = {})
       return http.put("/api/v1/pleroma/statuses/#{id}/reactions/#{emoji}", {
         headers: create_headers(params[:headers]),
