@@ -7,6 +7,9 @@ module Mulukhiya
       '/nowplaying/resolve-url',
     ].freeze
 
+    # API で読む投稿（Pleroma 系）を「無い」とみなす上流の応答。→ `find_status`
+    NOT_FOUND_SOURCE_STATUSES = [401, 403, 404].freeze
+
     # ⚠⚠ **書き込みのスコープを持たないトークンは、書き込みの要求では外す (#4845)。**
     # 口ごとの判定は `sns.account` / `sns.account.admin?` だけなので、読み取り専用の
     # トークンでも設定の更新や管理者向けの操作が通っていた（本体なら拒む）。
@@ -53,7 +56,7 @@ module Mulukhiya
 
     get '/config' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
-      sns.account.user_config.token = token
+      remember_token
       @renderer.message = {
         account: sns.account.to_h,
         config: sns.account.user_config.to_h,
@@ -1121,13 +1124,29 @@ module Mulukhiya
 
     private
 
+    # 要求のトークンを、アカウントの保存トークンにする。⚠ 保存したトークンは Webhook と
+    # デコレーションの worker が書き込みに使うので、書き込みのスコープを持たないトークンでは
+    # 保存し直さない。GET は #4845 の判定の外なので、ここで見る（5.43.0 のリリース前レビュー）。
+    def remember_token
+      return unless sns.writable_token?
+      sns.account.user_config.token = token
+    end
+
     # ⚠ API で読む系統（Pleroma 系）の投稿は、要求のトークンで読む（PR #4844 の Codex P2）。
     # 非公開・ダイレクトの投稿は認証なしでは取れず、持ち主の確認より前に落ちる。
     # DB で読む系統（Mastodon / Misskey）は `service=` を持たないので何もしない。
+    # ⚠ API で読む系統の `Status.[]` は nil を返さないので、ここで一度取ってみる。
+    # 上流が「無い・見えない」と答えたら nil（404）にする。取りに行くのを後回しにすると、
+    # 上流の 404 が 502 とアラートに化けていた（5.43.0 のリリース前レビュー）。
     def find_status(id)
       return nil unless status = status_class[id]
-      status.service = sns if status.respond_to?(:service=)
+      return status unless status.respond_to?(:service=)
+      status.service = sns
+      status.data
       return status
+    rescue Ginseng::GatewayError => e
+      return nil if NOT_FOUND_SOURCE_STATUSES.member?(e.source_status)
+      raise
     end
 
     # webhook URL。トークンが無いアカウントでは nil を返す (#4487 / #4537)。

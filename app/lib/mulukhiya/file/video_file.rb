@@ -78,26 +78,5 @@ module Mulukhiya
       e.log(file: path)
       return nil
     end
-
-    private
-
-    # ⚠ 締切切れ (#4722) は `status` が nil のまま例外になり、呼び出し側の
-    # `log_ffmpeg_error` を通らない。どの段で切れたかをここで残してから上げ直す。
-    def run_ffmpeg(command, phase)
-      return command.exec(timeout: ffmpeg_timeout)
-    rescue Timeout::Error
-      log_ffmpeg_error(command, phase)
-      raise
-    end
-
-    def log_ffmpeg_error(command, phase)
-      logger.error(
-        class: self.class.to_s,
-        phase:,
-        status: command.status,
-        stderr: command.stderr&.then {|s| s.lines.last(5).join},
-        file: path,
-      )
-    end
   end
 end

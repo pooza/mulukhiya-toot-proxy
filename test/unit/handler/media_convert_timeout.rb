@@ -60,6 +60,19 @@ module Mulukhiya
       assert_equal(['transcode'], lines.map {|v| v[:phase]})
     end
 
+    # 音声も同じ経路を通る（5.43.0 のリリース前レビュー）。直に `exec` すると段が残らない。
+    def test_audio_file_runs_ffmpeg_with_phase
+      file = AudioFile.new(File.join(Environment.dir, 'public/mulukhiya/media/hugttocatch.mp3'))
+      phases = []
+      file.define_singleton_method(:run_ffmpeg) do |_command, phase|
+        phases.push(phase)
+        raise Timeout::Error, 'execution expired'
+      end
+
+      assert_raise(Timeout::Error) {file.convert_type('audio/mpeg')}
+      assert_equal(['remux'], phases)
+    end
+
     private
 
     def create_handler(name = :video_format_convert)
