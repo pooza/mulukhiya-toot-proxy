@@ -221,6 +221,16 @@ git diff Gemfile.lock
   先送りの受け皿: **#4845**（スコープを見ずにトークンからアカウントを解決している・全系統・5.43.0）/
   **#4846**（#4566 の非ゴール＝ハンドラ・listener・SQL 7 本・on-hold）。⚠ Pleroma では `post_reaction` を流していない（#4846 に記載）
 
+### リリース準備の現在地（2026-10-24）
+
+- ✅ 掃除 PR #4858 をマージ（`3f2ca5cd`）。CI の mastodon が 40 分かかったのは `apt install` の段（38 分・ミラー側）で、テストは 49 秒
+- ✅ **harness（develop `3f2ca5cd`）**: `TestHarness: controller=mastodon url=http://localhost:3000` 1858 tests・0 failures・0 errors・158 omissions /
+  `controller=misskey url=http://localhost:3001` 1861 tests・0 failures・0 errors・145 omissions /
+  （参考・必須外）`controller=pleroma url=https://st.akkoma.b-shock.org` 1846 tests・0 failures・0 errors・201 omissions
+- ✅ **ステージング 4 台（`3f2ca5cd`）**: health 200（全項目 OK）・about 5.43.0・Ruby 4.0.9・YJIT 有効・`/mulukhiya/app/home` 200。
+  ⚠ 4 台とも `gem install bundler -v 4.0.18` が要った（4.0.9 同梱は 4.0.20 だけ）。dev27 は `/api/media` 200（0.65 秒）・`/feed/media` 200（1.25 秒）・`media_catalog: true`
+- 同日に別セッションで Mastodon 本体も 4.0.9 へ上げている（ユーザー）。デプロイ後に 4 台の health を取り直して puma の脱落が無いことを確認
+
 ### リリース前レビュー（5 観点）の結果（2026-10-24）
 
 対象は `v5.42.0..develop`（PR 8 本・66 ファイル）。**赤 0・黄 6・緑 6**。行き先はユーザーが承認（「提案どおり」）。
