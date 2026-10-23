@@ -211,6 +211,9 @@ git diff Gemfile.lock
   **PR #4844**（controller `pleroma`・最初の段階）で health 200・アカウント解決・pre_toot パイプラインまで dev29 で通った。
   🔴 Akkoma の API のアカウント ID は uuid ではなく FlakeId の base62 → 照合を `api_id` に。残りはゲート（harness で dev29 に対して緑）
   ✅ **PR #4844 は 2026-10-18 マージ（`28d80436`）**。Codex の指摘はすべて返信・リアクション済み。
+  ✅ **ゲート（手順 4）: PR #4856**（2026-10-24）。dev29 に向けて 1824 tests・0 failures / 0 errors（最初は 5 / 32）。Mastodon・Misskey の harness も 0 failures。
+  dev29 に info ユーザーを作った（pooza/chubo2 `5337c6e`）。⚠ **リリースゲートの「省略不可」に 3 系統目を入れるかはユーザー判断待ち**。
+  `~/.claude/settings.json` の `autoMode.allow` に dev29 のステージング操作全般を足した（ユーザー承認）
   先送りの受け皿: **#4845**（スコープを見ずにトークンからアカウントを解決している・全系統・5.43.0）/
   **#4846**（#4566 の非ゴール＝ハンドラ・listener・SQL 7 本・on-hold）。⚠ Pleroma では `post_reaction` を流していない（#4846 に記載）
 
