@@ -196,6 +196,9 @@ git diff Gemfile.lock
 - **PR #4849（#4845）**: `/mulukhiya/api/*` の書き込みの要求（GET / HEAD / OPTIONS 以外）では、`write` / `write:*` を持たないトークンを外す（403）。
   読み取りの POST 3 本（is_cat・nowplaying/resolve・resolve-url）は除外、Misskey の本人のトークンは通す。harness 両系 0 failures、実トークンで通る側・弾く側とも確認済み。
   **2026-10-18 時点で CI・Codex の結果待ち・マージ待ち**
+- ✅ **2026-10-24 に 4 本マージ（ユーザー承認）**: PR #4849（#4845・`ad41ea57`）/ #4852（#4838・`90bba540`）/ #4855（#4853・`1141725e`）/ #4856（#4566・`626879f7`）。
+  develop の CI 緑（`626879f7`）。Issue 4 件は open のまま（クローズはラップ時の判断）。
+  Pleroma のゲートを必須にするのは**もう少し後**（ユーザー判断）→ 受け皿 **#4857**（5.44.0）
 - **PR #4855（#4853）**: `.ruby-version` を 4.0.9 へ。mulukhiya が動く 9 台（本番 4 台・dev24〜27・dev29）すべてに 4.0.9（YJIT 有効）が入ったのを 2026-10-24 に確認してから出した。
   ローカルの 4.0.9 で lint・test とも 0 failures。⚠ **4.0.9 の同梱 bundler は 4.0.20 だけ＝デプロイ時は `bundle install` の前に `gem install bundler -v 4.0.18`**（4.0.7 のときと同じ罠）。
   lint の途中で出た crass 1.0.7 の advisory（GHSA-pq4g-8rxf-4g29）は 4.0.9 と無関係で、develop へ直接（`1c5a2f48`）
