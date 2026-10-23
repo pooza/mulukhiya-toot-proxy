@@ -94,9 +94,11 @@ curl -s https://your.instance/mulukhiya/api/about | jq '.config.features.media_c
 
 Mastodon・Misskey とも既定で有効になる。ローカルアカウントが多い Mastodon（目安として 384 を超える規模は未検証）と、ローカルのノートが多い Misskey（ダイスキーより桁で多い規模は未検証）では、以下を確認することを推奨する:
 
-1. **本番データ規模の把握** — `statuses` 行数、`media_attachments` 行数、local 比率（`SELECT count(*) FILTER (WHERE local) * 1.0 / count(*) FROM statuses`）。
-2. **ベースライン EXPLAIN 取得** — [`bin/diag/media_catalog_index.sql`](../bin/diag/media_catalog_index.sql) §1–§2 を本番 DB で実行。底値が数百 ms 級ならリスクは低い。⚠ **秒単位で遅くても index は足さない**（効かないことが分かっている）。その場合は無効に戻し、ローカルアカウント数と実行計画を添えて報告する。
-3. ⚠ **partial index の追加は不要**（#4393 の B 案で決着済み）。`bin/diag/media_catalog_index.sql` §4 で再計測して裏を取る。
+1. **本番データ規模の把握と EXPLAIN** — サーバーの種類で見るテーブルが違う。
+   - **Mastodon**: `statuses` 行数、`media_attachments` 行数、local 比率（`SELECT count(*) FILTER (WHERE local) * 1.0 / count(*) FROM statuses`）。続けて [`bin/diag/media_catalog_index.sql`](../bin/diag/media_catalog_index.sql) §1–§2 を本番 DB で実行する。
+   - **Misskey**: [`bin/diag/misskey_media_catalog.sql`](../bin/diag/misskey_media_catalog.sql) を本番 DB で実行する（読み取りのみ）。§1 で `note`・`drive_file` の行数とカタログに載るノートの数を、§2 で 1 ページ目と深いページ（OFFSET 2500）の実行計画を取る。ダイスキーでは 69 ms / 153 ms だった。⚠ Mastodon 用の `media_catalog_index.sql` は `statuses` を見るので Misskey では使えない。
+2. **判定** — 底値が数百 ms 級ならリスクは低い。秒単位なら無効に戻し、件数と実行計画を添えて報告する。⚠ **Mastodon は index を足さない**（効かないことが分かっている）。Misskey の index は検証していない（ダイスキーでは要らなかった）ので、報告を受けてから決める。
+3. ⚠ **partial index の追加は不要**（Mastodon は #4393 の B 案で決着済み。`bin/diag/media_catalog_index.sql` §4 で再計測して裏を取る）。
 4. **sidekiq 余力の確認** — `MediaCatalogUpdateWorker` は専用キュー（`media_catalog`、concurrency 1、`config/application.yaml` の `sidekiq.capsule.media_catalog`）で隔離されているが、worker 起動中は当該クエリが DB に居座る。pgbouncer の `pool_mode = transaction` 等で他の接続を圧迫しない構成になっているか確認。
 5. **段階適用** — 開発・ステージング → 本番の順で `local.yaml` 切替・再起動・観測（pgbouncer の `SHOW POOLS`、sidekiq dashboard、Sentry レイテンシ）。
 
