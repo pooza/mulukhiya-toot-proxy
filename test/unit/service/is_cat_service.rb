@@ -159,6 +159,29 @@ module Mulukhiya
       assert(result.values.all?(&:nil?))
     end
 
+    # 打ち切った acct の数を、要求ごとに 1 行だけ残す（5.43.0 のリリース前レビュー）。
+    def test_resolve_logs_skipped_accts_once
+      fetcher = lambda do |_acct|
+        sleep(0.3)
+        next nil
+      end
+      service, = create_service(FakeStorage.new, fetcher:)
+      service.define_singleton_method(:timeout) {0.3}
+      logs = capture_logs(service)
+      service.resolve(Array.new(Parallel.processor_count * 5) {|i| "u#{i}@example.com"})
+
+      assert_equal(1, logs.size)
+      assert_operator(logs.first[:skipped], :>, 0)
+    end
+
+    def test_resolve_does_not_log_without_skipped_accts
+      service, = create_service(FakeStorage.new, actor: {'isCat' => true})
+      logs = capture_logs(service)
+      service.resolve([ACCT])
+
+      assert_empty(logs)
+    end
+
     # 要求全体の締切で持ち時間を削られた回の失敗は覚えない（生きている相手を 10 分外さない）。
     def test_failure_with_a_shortened_deadline_is_not_cached
       storage = FakeStorage.new
@@ -191,6 +214,14 @@ module Mulukhiya
 
     def now
       return Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    end
+
+    def capture_logs(service)
+      logs = []
+      logger = Object.new
+      logger.define_singleton_method(:info) {|message| logs.push(message)}
+      service.define_singleton_method(:logger) {logger}
+      return logs
     end
 
     # 時計と締切（4 秒）を差し替え、HTTP へ渡った締切を集める。

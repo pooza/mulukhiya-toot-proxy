@@ -53,7 +53,7 @@ capsicum 等のクライアントアプリが、モロヘイヤ固有の機能�
 Misskey の `write:notes` など）。Misskey の本人のトークン（Web の UI が使うもの）はすべての権限を持つので通る。
 
 - 読み取りの意味しかない `POST /account/is_cat`・`POST /nowplaying/resolve`・`POST /nowplaying/resolve-url` は対象外
-- 5.43.x までは、読み取り専用のトークンでも設定の更新や管理者向けの操作が通っていた
+- 5.42.x までは、読み取り専用のトークンでも設定の更新や管理者向けの操作が通っていた
 
 ### エラーレスポンス
 
@@ -225,7 +225,7 @@ Bad response 404` のように内部メソッド名と上流ステータスが�
 ⚠ **クライアントは「404 でないから使える」と判断しないこと。**導線の出し分けは
 `features.media_update` を見て決める。
 
-主要なフラグ（Mastodon / Misskey 共通で `true`）:
+主要なフラグ（Mastodon / Misskey 共通で `true`。⚠ Pleroma 系は `repost` などが `false`。[pleroma.md](pleroma.md) の「進み具合」）:
 
 | 設定パス | 依存するエンドポイント |
 |----------|----------------------|
@@ -278,7 +278,7 @@ capsicum のような汎用クライアントが、接続先サーバーにモ�
 ```
 
 - `package.version`: セマンティックバージョニング。クライアント側で API 互換性を判断する材料
-- `config.controller`: `mastodon` または `misskey`。SNS タイプに応じた API パスの切り替えに使用
+- `config.controller`: `mastodon`・`misskey`・`pleroma`（5.43.0〜・Akkoma・試験的）のいずれか。SNS タイプに応じた API パスの切り替えに使用
 
 ### 検出後の追加確認（任意）
 
@@ -723,7 +723,7 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 |------|------|
 | `pgbouncer_clients_high` | `clients_used / clients_max` が `/postgres/pgbouncer/warn/clients_ratio`（既定 0.8）以上 |
 | `pgbouncer_clients_exhausted` | 上限に達していて、観測自身が `no more connections allowed` で断られた（`pgbouncer.error` に文言が入る） |
-| `pgbouncer_warn_config` | `/postgres/pgbouncer/warn/clients_ratio` が数値として引けない（設定の誤り）。⚠ `NG` にはしない |
+| `pgbouncer_warn_config` | `/postgres/pgbouncer/warn/clients_ratio` が数値として引けない、または範囲の外（0 以下・1 超。5.43.0〜）。どちらも設定の誤り。⚠ `NG` にはしない |
 
 ⚠ **観測点は `SELECT 1` の手前**（5.39.0〜、#4695）。`SELECT 1` 自身が待ち行列に並ぶので、後で読むと
 自分の前の待ちが捌けた後の値になる。`pool` も同じ理由で手前へ移してあり、⚠ **コールドプールでは
@@ -823,10 +823,11 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 
 ```json
 {
-  "token": "...",
   "accts": ["pooza@misskey.delmulin.com", "user@mastodon.example.com"]
 }
 ```
+
+⚠ トークンは `Authorization: Bearer ...` ヘッダで送る。本文の `token` は読まない
 
 **レスポンス例**:
 

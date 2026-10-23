@@ -28,14 +28,26 @@ module Mulukhiya
       @http = http || create_http
     end
 
+    # ⚠ 要求全体の締切で打ち切った acct は、要求ごとに 1 行だけ数を残す。打ち切りは
+    # 「相手が失敗した」（`fetch_actor` が log する）と違って何も残らず、猫耳が出ない理由を
+    # syslog から追えなかった（5.43.0 のリリース前レビュー）。
     def resolve(accts)
       deadline = monotonic + timeout
+      @skipped = Concurrent::AtomicFixnum.new
       result = Concurrent::Hash.new
       Parallel.each(accts.uniq, in_threads: Parallel.processor_count) do |acct_str|
         result[acct_str] = lookup(acct_str, deadline)
       rescue => e
         e.log(acct: acct_str)
         result[acct_str] = nil
+      end
+      if @skipped.value.positive?
+        logger.info(
+          class: self.class.to_s,
+          message: 'deadline exceeded',
+          skipped: @skipped.value,
+          accts: result.size,
+        )
       end
       return result
     end
@@ -46,7 +58,10 @@ module Mulukhiya
       end
       own = monotonic + timeout
       deadline ||= own
-      return nil unless deadline > monotonic
+      unless deadline > monotonic
+        @skipped&.increment
+        return nil
+      end
       actor = fetch_actor(Ginseng::Fediverse::Acct.new(acct_str), [deadline, own].min)
       if actor.nil?
         @storage.remember_failure(acct_str) unless deadline < own - SHORTENED_MARGIN
