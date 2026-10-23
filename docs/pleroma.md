@@ -39,10 +39,10 @@ v4 の実装は `git show 46c4f4e2^:<path>` で取り出せる（SQL は `app/qu
 | トークン → アカウント（DB） | ✅ 5.43.0 | — | #4566（PR #4844） |
 | pre_toot パイプライン（投稿） | ✅ 5.43.0 | — | #4566（PR #4844） |
 | 絵文字リアクション（中継） | ✅ 5.43.0 | `capabilities/reaction` | #4566。⚠ **`post_reaction` は流していない**（ハンドラは段階 4） |
-| ゲート（harness の Akkoma 系） | ⬜ | — | #4566 の手順 4 |
+| ゲート（harness の Akkoma 系） | ✅ 5.43.0 | — | #4566 の手順 4。dev29 に向けて 0 failures（手順は [test-harness.md](test-harness.md)「手順（Pleroma 系・Akkoma）」） |
 | webhook | ⬜ | `features/webhook` | 段階 1（#4847） |
 | タグのフィード | ⬜ | `features/feed` | 段階 2（`tag_timeline` / `tagged_accounts`） |
-| アカウントの直近の投稿・添付の参照 | ⬜ | — | 段階 3（`recent_toot` / `attachment`） |
+| アカウントの直近の投稿・添付の参照 | 🟡 | — | 段階 3。`recent_toot` は ✅ 5.43.0（API で読む・ゲートが要った）。`attachment` は未 |
 | ハンドラ（post_reaction ほか） | ⬜ | — | 段階 4（1 本ずつ） |
 | メディアカタログ | ⬜ | `data/media_catalog` | 段階 5（`media_catalog`・重い） |
 | ストリーミング（listener） | ⬜ | `capabilities/streaming` | 段階 6 |
