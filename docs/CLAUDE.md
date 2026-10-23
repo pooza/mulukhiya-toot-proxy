@@ -221,6 +221,18 @@ git diff Gemfile.lock
   先送りの受け皿: **#4845**（スコープを見ずにトークンからアカウントを解決している・全系統・5.43.0）/
   **#4846**（#4566 の非ゴール＝ハンドラ・listener・SQL 7 本・on-hold）。⚠ Pleroma では `post_reaction` を流していない（#4846 に記載）
 
+### リリース前レビュー（5 観点）の結果（2026-10-24）
+
+対象は `v5.42.0..develop`（PR 8 本・66 ファイル）。**赤 0・黄 6・緑 6**。行き先はユーザーが承認（「提案どおり」）。
+
+- **掃除 PR #4858**（size:S を全部）: Pleroma の `find_status` が nil を返さず 502 とアラートに化ける／`GET /config` が読み取り専用のトークンで保存トークンを上書き／
+  is_cat の Redis の読み書きが再送を踏む／is_cat の締切で打ち切った acct が無言／音声の ffmpeg の段が残らない／文書 5 件（`docs/api.md` の「5.43.x まで」の誤りほか）
+- **記録のみ**:
+  - `write:*` を 1 つ持てば管理者向けの口（ハンドラ設定・ボットのトークン・puma 再起動）も通る。意図した粗さ。管理者が狭いスコープでサードパーティのアプリを認可したときだけ
+  - Misskey の media_catalog 既定 true で、未認証の `/feed/media` と cursor つきの `/api/media` が生の SQL を撃つ。Mastodon と同じ構造。戻し方はリリースノートと `docs/media_catalog.md`
+  - `POST /program/update` に認証が無い（`67080251` から・今回の差分の外）。番組表の更新ジョブを積むだけ
+  - `SNSServiceMethods#account` / `#access_token` の `rescue nil` で、DB の一部障害が 403 の log 止めに化ける（既存・#4845 は悪化させていない）
+
 ## リリース済み: 5.42.0（2026-10-14）
 
 **本番デプロイ: 4 台完了**（2026-10-14 07:53〜07:56、shallu → zugoga → gomander → vulcan の順・水曜の朝。
