@@ -2,19 +2,22 @@
 
 モロヘイヤが提供する **メディアカタログ** （`/mulukhiya/api/media`、`/mulukhiya/feed/media`、`MediaCatalogUpdateWorker`）は、当該サーバーのローカル投稿に添付されたメディア（画像・動画・音声）をページング可能なカタログとして配信する機能。capsicum などのクライアントがメディア一覧画面を提供するために利用する。
 
-**既定値は Mastodon が有効（5.41.0・#4789）、Misskey が無効（#4375 まで）。**
+**既定値は Mastodon・Misskey とも有効**（Mastodon は 5.41.0・#4789、Misskey は 5.43.0・#4838）。
 
 | 版 | Mastodon | Misskey |
 | --- | --- | --- |
 | 〜5.22.x | 有効 | 有効 |
 | 5.23.0〜5.40.x | 無効（実験的扱い・#4343） | 無効 |
-| 5.41.0〜 | **有効** | 無効 |
+| 5.41.0〜5.42.x | **有効** | 無効 |
+| 5.43.0〜 | **有効** | **有効** |
 
 Mastodon の既定を戻したのは、クエリの書き直し（#4393 の B 案）で **追加の index なしに** 1 秒未満になり、本番 3 台で実績ができたため。
+Misskey は、5.42.0 の cursor の修正（#4375）のあと、ダイスキーで有効にして 24 時間観測し、問題が無かったため（2026-10-16〜17）。
 
-- 重さは **ローカルアカウント数にほぼ比例**する（温まった状態の 1 クエリで、47 アカウントが数十 ms、384 アカウントが 0.5〜0.6 秒）。⚠ **384 を超える規模は未検証**。キャッシュが空の初回は 384 アカウントで 12 秒かかったことがある
+- Mastodon の重さは **ローカルアカウント数にほぼ比例**する（温まった状態の 1 クエリで、47 アカウントが数十 ms、384 アカウントが 0.5〜0.6 秒）。⚠ **384 を超える規模は未検証**。キャッシュが空の初回は 384 アカウントで 12 秒かかったことがある
+- Misskey の重さは **ローカルのノート数に比例**する。ダイスキー（添付つきの公開ノート約 1,400・`note` 約 33 万行）では、追加の index なしで 1 ページ目 69 ms・OFFSET 2500 で 153 ms、`MediaCatalogUpdateWorker` は 10.5 秒だった。⚠ **ローカルのノートが桁で多いサーバーは未検証**
 - 有効になると、`MediaCatalogUpdateWorker` が定期的に動き、WebUI にメディアフィードが出る
-- 重いと感じたら、overlay（`local.yaml`）に `/mastodon/data/media_catalog: false` を書けば、5.23.0〜5.40.x と同じ状態（503 を返す）に戻る。データは失われない
+- 重いと感じたら、overlay（`local.yaml`）に `/mastodon/data/media_catalog: false`（Misskey は `/misskey/data/media_catalog: false`）を書けば、無効だった版と同じ状態（503 を返す）に戻る。データは失われない
 - アップグレード直後は `/mulukhiya/api/health` の `postgres.pool.waiting` が 0 のままかを見る
 - **載るのは公開の投稿だけ**（5.41.0）。未収載（Misskey ではホーム公開）は載せない。閲覧注意・CW つきは `sensitive` / `status.spoiler_text` の印を付けて返し、CW つきは本文を返さない。WebUI は押すまで表示しない。RSS（`/feed/media`）には閲覧注意・CW つきを載せない
 - 未認証で引けるページには上限がある（`/webui/media/catalog/max_page`・既定 50）
@@ -60,12 +63,12 @@ mastodon:
     media_catalog: false
 ```
 
-**Misskey サーバー**（既定は無効。有効にする）:
+**Misskey サーバー**（5.43.0 から既定は有効。重いときに無効へ戻す）:
 
 ```yaml
 misskey:
   data:
-    media_catalog: true
+    media_catalog: false
 ```
 
 ### 反映
@@ -89,11 +92,13 @@ curl -s https://your.instance/mulukhiya/api/about | jq '.config.features.media_c
 
 ## 有効にして動かすときのチェックリスト
 
-Mastodon は既定で有効になる。ローカルアカウントが多いサーバー（目安として 384 を超える規模は未検証）と、Misskey で有効にする場合は、以下を確認することを推奨する:
+Mastodon・Misskey とも既定で有効になる。ローカルアカウントが多い Mastodon（目安として 384 を超える規模は未検証）と、ローカルのノートが多い Misskey（ダイスキーより桁で多い規模は未検証）では、以下を確認することを推奨する:
 
-1. **本番データ規模の把握** — `statuses` 行数、`media_attachments` 行数、local 比率（`SELECT count(*) FILTER (WHERE local) * 1.0 / count(*) FROM statuses`）。
-2. **ベースライン EXPLAIN 取得** — [`bin/diag/media_catalog_index.sql`](../bin/diag/media_catalog_index.sql) §1–§2 を本番 DB で実行。底値が数百 ms 級ならリスクは低い。⚠ **秒単位で遅くても index は足さない**（効かないことが分かっている）。その場合は無効に戻し、ローカルアカウント数と実行計画を添えて報告する。
-3. ⚠ **partial index の追加は不要**（#4393 の B 案で決着済み）。`bin/diag/media_catalog_index.sql` §4 で再計測して裏を取る。
+1. **本番データ規模の把握と EXPLAIN** — サーバーの種類で見るテーブルが違う。
+   - **Mastodon**: `statuses` 行数、`media_attachments` 行数、local 比率（`SELECT count(*) FILTER (WHERE local) * 1.0 / count(*) FROM statuses`）。続けて [`bin/diag/media_catalog_index.sql`](../bin/diag/media_catalog_index.sql) §1–§2 を本番 DB で実行する。
+   - **Misskey**: [`bin/diag/misskey_media_catalog.sql`](../bin/diag/misskey_media_catalog.sql) を本番 DB で実行する（読み取りのみ）。§1 で `note`・`drive_file` の行数とカタログに載るノートの数を、§2 で 1 ページ目と深いページ（OFFSET 2500）の実行計画を取る。ダイスキーでは 69 ms / 153 ms だった。⚠ Mastodon 用の `media_catalog_index.sql` は `statuses` を見るので Misskey では使えない。
+2. **判定** — 底値が数百 ms 級ならリスクは低い。秒単位なら無効に戻し、件数と実行計画を添えて報告する。⚠ **Mastodon は index を足さない**（効かないことが分かっている）。Misskey の index は検証していない（ダイスキーでは要らなかった）ので、報告を受けてから決める。
+3. ⚠ **partial index の追加は不要**（Mastodon は #4393 の B 案で決着済み。`bin/diag/media_catalog_index.sql` §4 で再計測して裏を取る）。
 4. **sidekiq 余力の確認** — `MediaCatalogUpdateWorker` は専用キュー（`media_catalog`、concurrency 1、`config/application.yaml` の `sidekiq.capsule.media_catalog`）で隔離されているが、worker 起動中は当該クエリが DB に居座る。pgbouncer の `pool_mode = transaction` 等で他の接続を圧迫しない構成になっているか確認。
 5. **段階適用** — 開発・ステージング → 本番の順で `local.yaml` 切替・再起動・観測（pgbouncer の `SHOW POOLS`、sidekiq dashboard、Sentry レイテンシ）。
 

@@ -82,10 +82,10 @@ cure-api 独立化（#4144）でカスタム API（`/api/custom`）は完全削�
 
 cure-api 側を触るときに「カスタムフィードも一緒に整理」と思い込まないこと。両者は名前が似ているが完全に別系統。
 
-## media_catalog の既定値（Mastodon は有効・Misskey は無効）
+## media_catalog の既定値（Mastodon・Misskey とも有効）
 
 `media_catalog` 機能（`/mulukhiya/api/media`、`/feed/media`、`MediaCatalogUpdateWorker`、Mastodon WebUI のメディアフィード）の既定値は、
-**Mastodon が `true`（5.41.0・#4789）、Misskey が `false`（#4375 まで）**。5.23.0〜5.40.x は両方 `false`（実験的扱い・#4343）だった。
+**Mastodon・Misskey とも `true`**（Mastodon は 5.41.0・#4789、Misskey は 5.43.0・#4838）。5.23.0〜5.40.x は両方 `false`（実験的扱い・#4343）、5.41.0〜5.42.x は Misskey だけ `false` だった。
 
 **経緯**: 2026-05-19 に、底値 175 秒級の重い SQL が DB の接続プールを専有して全サーバーが投稿不可になり、5.23.0 で既定を無効にした。
 決着は #4393 の **B 案（ローカルアカウント駆動の LATERAL merge・PR #4613）**で、🔴 **追加の index は要らない**。
@@ -97,9 +97,10 @@ cure-api 側を触るときに「カスタムフィードも一緒に整理」�
 - `/features` API で `media_catalog: bool` を露出（capsicum / モロヘイヤ WebUI の事前判定用）
 - 無効のときの API は 503 + `{ "available": false, "items": [] }`（404 と区別し「機能未提供」ではなく「現在 OFF」を伝える）
 - 重さは**ローカルアカウント数にほぼ比例**（温まった 1 クエリで 47 アカウントが数十 ms、384 が 0.5〜0.6 秒）。⚠ 384 超は未検証・冷えた初回は 384 で 12 秒
-- 戻し方は overlay に `/mastodon/data/media_catalog: false`。見るものは `/mulukhiya/api/health` の `postgres.pool.waiting`
+- Misskey の重さはローカルのノート数に比例（ダイスキーで 1 ページ目 69 ms・ワーカー 10.5 秒）。⚠ 桁で多いサーバーは未検証
+- 戻し方は overlay に `/mastodon/data/media_catalog: false`（Misskey は `/misskey/data/media_catalog: false`）。見るものは `/mulukhiya/api/health` の `postgres.pool.waiting`
 - ⚠ **他の運用者への責任は注意書きまで**（2026-10-01 の合意）。アカウント数を見て警告する等の自動の安全策は入れない。index の作成も案内しない
-- ⚠ Misskey 側（`/misskey/data/media_catalog`）は #4375 が済むまで `false` のまま。きゅあすきー等の他者運用がある
+- ⚠ Misskey はきゅあすきー等の他者運用があり、5.43.0 へ上げただけで有効になる。リリースノートに戻し方と見るものを書く（#4838）
 
 詳細は [media_catalog.md](media_catalog.md)。
 

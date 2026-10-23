@@ -19,8 +19,8 @@ module Mulukhiya
       # media_catalog が OFF のときも「seed はあるのに <item> が無い」で落ちていた (#4516)。
       #
       # 1. media_catalog が無効なら #fetch は entries を空にして即 return する。
-      #    5.23.0 (#4343) から既定 OFF なので、この状態で <item> が無いのは仕様どおり。
-      omit('media_catalog が無効（5.23.0 から既定 OFF・#4343）') unless controller_class.media_catalog?
+      #    既定は ON（#4789 / #4838）だが、overlay で OFF にしたサーバーで <item> が無いのは仕様どおり。
+      omit('media_catalog が無効（overlay で OFF）') unless controller_class.media_catalog?
 
       # 2. <item> は media が seed されている時のみ現れる。harness は media を seed
       #    しないため harness 駆動時のみ omit する。seed 追加は chubo2#64。
