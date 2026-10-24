@@ -197,7 +197,8 @@ git diff Gemfile.lock
 
 [マイルストーン 5.44.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/644)。2026-10-25 着手・`config/application.yaml` は 5.44.0 へバンプ済み（`f20cf2d0`）。
 
-- open 6 件: #4857（Pleroma のゲートを必須に）/ #4854（タグ付けの誤爆）/ #4851・#4850（Mastodon 5.0）/ #4848（ginseng-core v4）/ #4847（Pleroma の webhook）
+- open 7 件: #4857（Pleroma のゲートを必須に）/ #4854（タグ付けの誤爆）/ #4851・#4850（Mastodon 5.0）/ #4848（ginseng-core v4）/ #4847（Pleroma の webhook・段階 1）/ #4860（Pleroma のタグのフィード・段階 2）
+- 次の版: [マイルストーン 5.45.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/645) を 2026-10-25 に作成。#4861（Pleroma の添付・段階 3 の残り）を先に載せた（Akkoma の Issue は 2 件切らさない・docs/pleroma.md）
 - ✅ **頭でやること（済み・`9861ba4b`）**: `BUNDLED WITH` を Ruby 4.0.9 の同梱版 4.0.20 へそろえ、ginseng-piefed を v0.4.1 へ（login の排他のみ）。`rake lint` / `rake test` 通過（1785 tests・0 failures / 0 errors）。
   ⚠ ステージング・本番は bundler 4.0.20 が Ruby 4.0.9 に同梱なので追加の `gem install` は要らない見込み
 - 📌 **手順 12（掃除 PR）**: 5.43.0 のリリース前レビューの②は PR #4858 で消化済み＝持ち越しなし
