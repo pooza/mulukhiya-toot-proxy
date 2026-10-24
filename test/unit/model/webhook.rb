@@ -99,7 +99,8 @@ module Mulukhiya
       status = JSON.parse(command.stdout)
 
       assert_kind_of(Hash, status)
-      assert_includes(['id', 'account', 'createdNote'], status.keys.first)
+      # ⚠ 先頭のキーでは見ない（Akkoma は `url` が先頭・#4847）。
+      refute_empty(status.keys & ['id', 'createdNote'])
     end
 
     private

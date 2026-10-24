@@ -34,6 +34,19 @@ module Mulukhiya
       return config['/pleroma/attachment/limit']
     end
 
+    # ⚠⚠ **`media_ids` は文字列で送る (#4847)。**gem の `MastodonService#upload` は ID を
+    # `to_i` で返すが、Akkoma は整数の要素を 400 で拒む（`/media_ids/0: Invalid string. Got: integer`）。
+    # Mastodon は整数でも受けるので、ここだけで直す。
+    def post(body, params = {})
+      if body.is_a?(Hash)
+        body = body.deep_symbolize_keys
+        body[:media_ids] = Array(body[:media_ids]).map(&:to_s) if body.key?(:media_ids)
+      end
+      return super
+    end
+
+    alias toot post
+
     # ⚠ `id` は API の ID（FlakeId の base62）。DB の `users.id`（uuid）ではない。
     def fetch_account_statuses(id, params = {})
       return http.get("/api/v1/accounts/#{id}/statuses?limit=#{params[:limit] || 20}", {
