@@ -51,10 +51,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-piefed.git
-  revision: 2f216baf34d06132fe4ebcff5f64903b503ebab8
-  tag: v0.4.0
+  revision: 3e9ad942aac9a454465efbffc989535e196095fb
+  tag: v0.4.1
   specs:
-    ginseng-piefed (0.4.0)
+    ginseng-piefed (0.4.1)
       ginseng-core (>= 2.0.0)
 
 GIT
@@ -533,4 +533,4 @@ RUBY VERSION
   ruby 4.0.6
 
 BUNDLED WITH
-  4.0.18
+  4.0.20
