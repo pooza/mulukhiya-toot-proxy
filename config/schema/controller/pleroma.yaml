@@ -1,0 +1,83 @@
+properties:
+  attachment:
+    properties:
+      limit:
+        minimum: 1
+        type: integer
+      base_url:
+        format: uri
+        type: string
+      types:
+        properties:
+          animation_image:
+            type: string
+          audio:
+            type: string
+          image:
+            type: string
+          video:
+            type: string
+        type: object
+    type: object
+  capabilities:
+    properties:
+      media_update:
+        type: boolean
+      reaction:
+        type: boolean
+      repost:
+        type: boolean
+      streaming:
+        type: boolean
+    type: object
+  data:
+    properties:
+      account_timeline:
+        type: boolean
+      favorite_tags:
+        type: boolean
+      futured_tag:
+        type: boolean
+      media_catalog:
+        type: boolean
+    type: object
+  features:
+    properties:
+      annict:
+        type: boolean
+      announcement:
+        type: boolean
+      announcement_push:
+        type: boolean
+      feed:
+        type: boolean
+      webhook:
+        type: boolean
+    type: object
+  status:
+    properties:
+      label:
+        type: string
+      reblog_label:
+        type: string
+      spoiler_text:
+        type: string
+    type: object
+  streaming:
+    properties:
+      root_cert_file:
+        type: string
+      verify_peer:
+        type: boolean
+    type: object
+  theme:
+    properties:
+      color:
+        type: string
+    type: object
+  url:
+    format: uri
+    type: string
+required:
+  - url
+type: object

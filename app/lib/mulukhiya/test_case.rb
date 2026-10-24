@@ -43,6 +43,16 @@ module Mulukhiya
       return TestHarness.active?
     end
 
+    # 外部への通信を止め、harness の SNS だけ通す。`allow_localhost` だけだと、
+    # localhost でない harness（Akkoma のステージング dev29・#4566）を止めてしまう。
+    def disable_net_connect_except_harness!
+      allow = []
+      if harness? && (url = config["/#{Environment.controller_name}/url"] rescue nil)
+        allow.push(Ginseng::URI.parse(url).host)
+      end
+      WebMock.disable_net_connect!(allow_localhost: true, allow:)
+    end
+
     def self.load(cases = nil)
       ENV['TEST'] = Package.full_name
       TestHarness.apply!

@@ -1,0 +1,15 @@
+controller: pleroma
+crypt:
+  password: your_password
+environment: production
+handler:
+  default_tag:
+    tags:
+      - your_default_hash_tag
+pleroma:
+  url: https://akkoma.example.com/
+postgres:
+  dsn: postgres://akkoma:password@127.0.0.1:5432/akkoma
+sidekiq:
+  auth:
+    password: your_password

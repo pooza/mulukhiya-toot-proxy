@@ -2,6 +2,129 @@
 
 CLAUDE.md から分離した過去のリリースノート。直近リリースは [CLAUDE.md](../CLAUDE.md) を参照。
 
+## リリース済み: 5.39.0（2026-10-04）
+
+**本番デプロイ: 4 台完了**（2026-10-04 10:07〜10:16、shallu → zugoga → gomander → vulcan の順。
+全台 version 5.39.0 / health 200 / `yjit_enabled: true` / **Ruby 4.0.7**（4.0.6 から変更）/ FreeBSD 3 台は monit 復帰）。
+`main` の `ae98f890` / [v5.39.0](https://github.com/pooza/mulukhiya-toot-proxy/releases/tag/v5.39.0)（PR #4788）。
+マイルストーン 5.39.0 は閉じた（#4792 は 5.40.0 へ移した）。
+
+### 本番デプロイで見たこと
+
+- ✅ **#4792（puma が上がらない）は 4 台とも出ていない。**vulcan は 3 ユニットとも `NRestarts=0`。
+  ⚠ サービスの再起動（PID が大きく変わらない）では踏みにくい。**OS の再起動のあとが本番**
+- ⚠ **Ruby 4.0.7 には bundler 4.0.18 が入っていなかった**（4 台とも）。`bundle install` の前に
+  `gem list bundler -i -v 4.0.18 || gem install bundler -v 4.0.18` を挟んだ。⚠ **Ruby の版を上げる回は毎回要る**
+  （FreeBSD では bundler の自己インストール → 再 exec が落ちる既知の罠）
+- ⚠ **gomander の `/feed/media` は再起動直後 12.4 秒**（キャッシュが空で DB を直に引く・09-30 に測った「冷えた初回」と同じ形）。
+  数分後は 0.9 秒。退行と読まない
+- ⚠ shallu に `Bad response 502`（`https://mstdn.delmulin.com/mulukhiya/api/program`）が 6 行。
+  **zugoga の puma を再起動している数秒に、shallu の番組表の取得が当たった**だけ
+- ⚠ デプロイ前、gomander の monit が `mulukhiya` を `Connection failed` と出していた。10:03:20 の 1 回だけ health が 5 秒かかった
+  （同じ瞬間に Annict への接続もタイムアウト＝外向き通信の一時的な詰まり）。次の周期で OK に戻った
+- ⚠ **Claude Code の自動モードは `gh pr merge` と `gh release create` を止める。**手動モードで続行した。
+  `.claude/settings.local.json` の ask に 2 つを足した（ユーザー「確認ありで実行できるようにしたい」）
+
+### リリース前レビュー（5 観点）の結果（2026-10-04）
+
+- 🔴 **赤 1: フィードの enclosure のホスト検証に URL 全体を渡していた**（#4749 の回帰・セキュリティ観点が検出）→ `0dddc2f6`。
+  `RSS20FeedRenderer#fetch_image` は **String** の URL を `MediaMetadataStorage#push` へ渡すが、`RemoteHost.validate!` は
+  `host` を持たない値をホスト名として扱う。URL 全体を DNS に引いて**公開ホストまで必ず拒否**し、空を 100 日キャッシュしていた。
+  ⚠⚠ **既存のテストは `Ginseng::URI` を渡して「内部アドレスを拒否する」ことだけを見ていた**＝「String × 公開ホストが通る」正テストが無かった。
+  ⚠ **ステージングはカスタムフィードを持たないので踏まない**（#4728 と同じ形）。dev24 の実機で、公開 URL は取れ内部アドレスは `{}` になることを確認した
+- 🟡 **本リリースで直した 1 件**: 上流の 429 で解除まで 60 秒以内のとき puma スレッドを持ったまま最大 60 秒眠る
+  （ginseng-core v1.25.1 から）→ `/http/retry/max_seconds: 5`（`ecf74cfa`）
+- 🟡 **Issue 1 件**: ffmpeg / ffprobe の締切が効かない → **#4794**（5.40.0）
+- 📌 **掃除 PR（手順 12）→ PR #4795**: ① 「話数 ＋」の 409 が、待っても解けない場合（特番・期またぎ・作品 ID 誤り）にも
+  「時間を置いて」と案内する ② 最上位 `error do` の非 Ginseng 分岐で、ログと Sentry から path が消えた
+  （`error.alert(origin: ...)` を渡す）③ `docs/api.md` の `episode/increment` に、返らなくなった `not_found` の説明が 1 文残る
+  ④ `NowplayingResolver#artwork_pixel` が生の `config['/handler/...']` を読む（`ItunesImageHandler.handler_config(:pixel)` へ）
+  ⑤ `MediaFileDownloadMethods#valid_content_length?` の既定引数 `options = {}`（検証なしで撃てる死んだ口）
+  ⑥ `public_error_message` のコメントに「当てているのは OAuth の 2 経路だけ」と足す
+  ⑦ `SentryExtra` が URI オブジェクトなど String 以外の値を伏せない（今の呼び出し元は該当なし）
+- **記録のみ**: `SentryExtra` は `status` / `code` / `title` / `value` のキーを診断値でも伏せる（syslog 側は出る）。
+  今の呼び出し元は該当キーを渡していない
+- Codex は PR #4788 に指摘なし（👍）
+- **harness（`ecf74cfa`）**: Mastodon 1618 tests / 0 failures / 0 errors / 159 omissions（`controller=mastodon`）、
+  Misskey 1621 tests / 0 failures / 0 errors / 145 omissions（`controller=misskey`）
+- **bundle update**: facets 3.2.2 → **4.0.0**（メジャー・09-27 公開。ginseng-core が `Time.elapse` だけを使う）/ pg 1.7.0 / sentry-ruby 7.1.0 / sequel 5.109.0
+
+### 5.39.0 の中身
+
+version は `0a40287b` で 5.39.0 へ上げた。
+
+- **最初に #4771**（番組表: Annict にまだ無い話数では「話数 ＋」を断る）。⚠ **運用に直結する修正は優先順位を上げる**
+  （2026-09-26 ユーザー「この様な、運用に直結する修正こそ優先順位を上げたいですね」）。
+  #4765 の警告をステージングで見てもらった場で、放送直後に押すと Annict が未登録で `not_found` になる、という
+  心当たりが出てきた（ユーザーは半日待ってから押して回避していた）。`failed` は今の警告のまま +1 する
+  - ✅ **PR #4776（2026-09-28）**: `not_found` のときは +1 も保存もせず 409（`code: annict_not_found`）で断る。
+    画面は `code` を見て info の案内に切り替える。
+    Codex P2 × 3 に対処（`40b9a1d7` / `764ac823`）: ① 引いている間に別の編集が入った `not_found` では断らない（`superseded`）
+    ② api.md の置換が他の節にも当たっていた ③ 🔴 **`AnnictService#episodes` がサブタイトルの無い回を落とすので、登録済みでも
+    `not_found` に化けていた** → `episodes(untitled: true)` で回の有無を引き、サブタイトルが無ければ +1 して新しい状態 `untitled`（画面は警告）。
+    1457 tests・0 failures。
+    📌 **dev25 をこのブランチにしてある**（`764ac823`）。**目視はユーザーが後で**（admin に本物の Annict トークンが要る。
+    #4765 のダミーのトークンでは `failed` しか出せない）
+    ✅ **2026-10-04: リリース後に本番でユーザーが動作を確認した**
+- ✅ **PR #4777（#4775・2026-09-28）**: 上流のステータスを透過するとき `Retry-After` / `X-RateLimit-*` を許可リストで中継する。
+  Controller が ClassLength を超えたので `upstream_error_code` と合わせて `UpstreamErrorMethods` へ切り出した。
+  Codex 指摘なし。✅ **dev26 で実際の 429 を起こして確認**（#4777 + #4778 を手元で合わせたブランチ・301 本目で 429）:
+  修正前は**モロヘイヤが 1 秒おきに 3 回叩き直して 2.92 秒・ヘッダなし**、修正後は**1 回で諦めて 0.63 秒・`X-RateLimit-*` が届く**。
+  結果は #4775 / PR #4777 / PR #4778 にコメント済み
+- ✅ **PR #4778（#4747・2026-09-28）**: ginseng-core v1.25.1。**dev26（rc.d）/ dev27（systemd）で 3 サービスの stop / start / restart を実走**して
+  全部 rc=0・二重起動なし・health 200。dev26 で sidekiq を `kill -9` → start も pid ファイルが入れ替わって通った。
+  ⚠ その直後 約 45 秒は health 503（`Sidekiq::ProcessSet` に旧プロセスが生存通知の期限まで残る・以前からの挙動）。
+  Codex 指摘なし。📌 **dev27 はこのブランチのまま**（マージ後に develop へ戻す）
+- ✅ **PR #4779（#4746・2026-09-28）**: ginseng-redis v2.0.8。`key?` が EXISTS になり、**`[]` を含む URL のキーで格納済みなのに false**
+  だったのが直る（手元で v2.0.6 false → v2.0.8 true を実測）＝フィードの画像メタデータのキャッシュが効いていなかった
+- ✅ **PR #4780（#4749・2026-09-28）**: ginseng-web v3.0.3。🔴 **gem が塞いだフィード画像の SSRF はモロヘイヤに届かない**
+  （`fetch_image` を上書きして `MediaMetadataStorage#push` へ委譲しており、そちらは無検証で GET していた）→
+  `push(uri, host_validator:)` を足し、フィードの enclosure からだけ `RemoteHost.unpinned_validator` を渡す。添付には掛けない。
+  dev26 で画面 3 ページが前後一致。📌 **dev26 はこのブランチ**
+- ✅ **PR #4781（#4750・2026-09-28）**: ginseng-piefed v0.1.2。⚠ **版だけでは no-op**（`Ginseng::Piefed::Service` を直に作っていた）→
+  `http_class` だけ上書きする `PiefedService`。`include Package` は gem の設定が引けなくなるのでしない。
+  ✅ **後半も同じ PR に載せた（2026-09-29・`44d37ec3`）**: 宛先を **piefed v0.2.0**（pooza/ginseng-piefed#18 の着地）へ。
+  `PiefedClippingWorker` は `clip` の戻り値 `nil` を `not public` としてログに残して終わる（再試行・Sentry なし）。
+  `raise Ginseng::ConfigError "..."` のカンマ抜けも直した。テスト `piefed_clipping_worker_result`（修正を外すと 2 件落ちる）。
+  1451 tests・0 failures。PR 本文は `Closes #4750` に変えた
+- ✅ **PR #4782（#4769・機能が前へ進む枠・2026-09-28）**: ナウプレ enrich に `artwork_url`（キーは常に返す）。
+  一辺は `itunes_image` の `pixel`（480）。Spotify は `pixel` 以上で最小の画像。
+  dev24 の実データで Apple Music 480×480・Spotify 640×640 の画像が取れることを確認。📌 **dev24 はこのブランチ**。
+  マージ後に pooza/capsicum#1133 へ知らせる。
+  ✅ **Codex P2 に対処（2026-09-29・`6ba7d3bc`）**: `width` が null の画像を 0 扱いで並べて、先頭の最大画像を取り逃していた →
+  サイズ不明は「足りる候補」から外し、足りなければ Spotify の並びの先頭を返す
+- ✅ **PR #4785（#4745・2026-09-29）**: `alert(values)` の values を Sentry の extra へ。新しい `SentryExtra` が
+  `LogScrubber` → `Logger#create_message`（syslog と同じマスク）を通す（`scrub_sentry_event` は extra を伏せないため）。
+  fail closed（`{scrub_failed: true}`）。`LockDegradationMethods#report` の payload も同じ扱い。1454 tests・0 failures
+- ✅ **PR #4786（#4731・2026-09-29）**: 手順書 4 本を `.claude/skills/`（sync / release / release-review / harness-gate）へ。
+  正本はスキル、docs の同名の節はポインタ。置き場所は repo・同期は 1 本＋同梱スクリプト（ユーザー判断）。
+  release / release-review は `disable-model-invocation`。⚠ **マージまでは docs 側の手順が正本のまま**
+- **PR #4768**（レビュー由来の残件約 30 項目・#4635 / #4697 / #4698 / #4721 / #4723 / #4724 / #4725 を閉じる）。
+  5.38.0 の出荷後に develop を取り込んで ready にした（1501 tests・0 failures）
+- **#4352**（media_catalog を shallu / gomander へ横展開）は 5.38.0 から移した。⚠ リリースと束ねない。
+  shallu の本番 `EXPLAIN` → flip → 24 時間観測 → gomander（日曜午前を外す）。flip の前にユーザーの確認を取る
+  - ✅ **shallu を flip した（2026-09-30 11:44 JST・ユーザー承認済み）**。EXPLAIN は `bin/diag/media_catalog_rollout.sql`
+    （現行の B 案だけ・読み取り専用・`statement_timeout` 30s）。⚠ `media_catalog_subsecond.sql` は旧クエリ入りなので本番で流さない。
+    **partial index 無しでも zugoga と同じ B 案のプラン**。page1 3,876ms（冷えた初回）→ flip 後 36ms、only_person 20→24ms、cursor 19→21ms。
+    比較は #4323 にコメント済み。📌 **24 時間観測中（〜10-01 11:45）**、日曜を過ぎたところで再確認
+  - ⚠ **shallu は `config/local.yaml`（リポジトリ内）が効いている**（`/usr/local/etc` より先に読まれる）。2 つは同一内容なので**両方を書き換えた**
+    （バックアップは各 `.bak-4352`）。rollback は両方を `false` に戻して sidekiq → puma を再起動
+  - ⚠ Claude Code の自動モードでは、本番の flag の書き換え後の再起動が「機能フラグの書き込み」として止められた。手動モードで続行した
+  - ✅ **gomander も flip した（2026-09-30 11:52 JST・shallu の観測を待たずに進めた＝ユーザー判断）**。構成は shallu と同じ（2 ファイル・`.bak-4352`）。
+    🔴 **ローカルアカウントが 384**（shallu 47 / zugoga 19）で、温まっていても page1 604ms / only_person 517ms / cursor 614ms
+    （shallu の約 20 倍・1 本約 12.5 万バッファ）。冷えた初回の page1 は 12,288ms。基準（1,000ms 未満）は満たすが余裕は小さい。
+    page 1〜3 は worker（60 分おき）のキャッシュから返るので、直に DB を引くのは 4 ページ目以降とルール付きだけ。#4323 にコメント済み。
+    📌 **24 時間観測中（〜10-01 11:53）**。⚠ **ニチアサ（10-04 日曜 08:30-09:00）を過ぎたところで必ず見直す**
+  - ✅ **24 時間観測は両台とも問題なし（10-01 14:20 JST・#4323 にコメント）**。ERROR / WARN 0、`pool.waiting` 0。
+    gomander のワーカーは 4.4〜5.6s（1 回だけ 18.1s）。残りは 10-04 のニチアサ明けの見直しだけ。
+    既定を `true` に戻すのは **#4789（5.40.0）**
+  - ✅ **ニチアサ明けの見直しも問題なし（10-04 09:17 JST・#4323 にコメント）→ #4352 クローズ。**
+    ⚠ 朝の OS 再起動でワーカーの実行時刻が毎時 :17 にずれ、実況窓（08:30-09:00）の中では走っていない（08:17 と 09:17 で挟んだ）
+- ginseng-\* の版上げ（#4746 / #4747 / #4749 / #4750）。⚠ **2026-09-28 時点の宛先**: core **v1.25.1**（pooza/makoto2 の依頼）/
+  redis **v2.0.8** / web **v3.0.3** / piefed ~~v0.1.2~~ **v0.2.0**（09-29 に差し替え）。core **v2.0.0**（破壊的変更）は **#4784 として 5.40.0 へ**（09-29 ユーザー判断: 緊急性が無いので準備したマイルストーンで。#4748 と対）
+- 📥 **#4775（pooza/makoto2 からの依頼・2026-09-28 に 5.39.0 へ）**: 上流の 429 を透過するときに
+  `X-RateLimit-Reset` 等のヘッダを中継していない。**#4747（v1.25.1）と対になる**ので、429 を実際に起こして一緒に確かめる
+
 ## リリース済み: 5.38.1（ホットフィックス・2026-09-26・#4772）
 
 **Ruby 同梱の `resolv` 0.7.0 の脆弱性（CVE-2026-80212 / 80213）。**Gemfile で `resolv ~> 0.7.2` を宣言した。

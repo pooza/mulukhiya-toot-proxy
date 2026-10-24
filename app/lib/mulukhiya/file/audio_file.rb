@@ -16,10 +16,10 @@ module Mulukhiya
     def convert_type(type)
       dest = create_dest_path(f: __method__, type:)
       command = FFmpegCommandBuilder.remux_audio(path, dest)
-      command.exec(timeout: ffmpeg_timeout)
+      run_ffmpeg(command, 'remux')
       unless command.status.zero?
         command = FFmpegCommandBuilder.transcode_audio(path, dest)
-        command.exec(timeout: ffmpeg_timeout)
+        run_ffmpeg(command, 'transcode')
       end
       return self.class.new(dest)
     end

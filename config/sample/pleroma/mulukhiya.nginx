@@ -1,0 +1,29 @@
+# Akkoma（Pleroma 系）用（#4566）。Akkoma は 127.0.0.1:4000、モロヘイヤは 3008。
+# ⚠ 最初の段階で通すのは投稿・メディア・絵文字リアクションと /mulukhiya だけ。
+# バックエンドを localhost でなく 127.0.0.1 で書く理由は mastodon/mulukhiya.nginx を参照。
+
+# === http context に追加 ===
+map $http_x_mulukhiya $mulukhiya_backend {
+  default http://127.0.0.1:3008;
+  "~.+"   http://127.0.0.1:4000;
+}
+
+# === server context に追加 ===
+location ~ ^/api/v[0-9]+/(statuses|media)$ {
+  include /path/to/mulukhiya_proxy.conf;
+  proxy_pass $mulukhiya_backend;
+}
+location ~ ^/api/v[0-9]+/pleroma/statuses/[^/]+/reactions/ {
+  include /path/to/mulukhiya_proxy.conf;
+  proxy_pass $mulukhiya_backend;
+}
+location ^~ /mulukhiya {
+  include /path/to/mulukhiya_proxy.conf;
+  proxy_pass http://127.0.0.1:3008;
+}
+location ^~ /mulukhiya/sidekiq {
+  allow YOUR_IP_OR_CIDR;
+  deny all;
+  include /path/to/mulukhiya_proxy.conf;
+  proxy_pass http://127.0.0.1:3008;
+}

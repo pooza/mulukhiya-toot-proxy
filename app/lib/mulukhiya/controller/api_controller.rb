@@ -1,5 +1,33 @@
 module Mulukhiya
   class APIController < Controller
+    # 書き込みの要求でも、読み取りの意味しかない口 (#4845)。
+    READ_ONLY_POST_PATHS = [
+      '/account/is_cat',
+      '/nowplaying/resolve',
+      '/nowplaying/resolve-url',
+    ].freeze
+
+    # API で読む投稿（Pleroma 系）を「無い」とみなす上流の応答。→ `find_status`
+    NOT_FOUND_SOURCE_STATUSES = [401, 403, 404].freeze
+
+    # ⚠⚠ **書き込みのスコープを持たないトークンは、書き込みの要求では外す (#4845)。**
+    # 口ごとの判定は `sns.account` / `sns.account.admin?` だけなので、読み取り専用の
+    # トークンでも設定の更新や管理者向けの操作が通っていた（本体なら拒む）。
+    # ここで外せば、どの口も `sns.account` が nil になって 403 で落ちる。後から足した口にも効く。
+    before do
+      next unless self.class.write_scope_required?(request.request_method, request.path_info)
+      next unless sns&.token
+      next if sns.writable_token?
+      logger.info(class: self.class.to_s, message: 'write scope required', path: request.path_info)
+      sns.token = nil
+    end
+
+    def self.write_scope_required?(method, path)
+      return false if ['GET', 'HEAD', 'OPTIONS'].member?(method.to_s.upcase)
+      return false if READ_ONLY_POST_PATHS.member?(path)
+      return true
+    end
+
     get '/about' do
       sns.token ||= sns.default_token
       about = config.about
@@ -28,7 +56,7 @@ module Mulukhiya
 
     get '/config' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
-      sns.account.user_config.token = token
+      remember_token
       @renderer.message = {
         account: sns.account.to_h,
         config: sns.account.user_config.to_h,
@@ -414,7 +442,7 @@ module Mulukhiya
 
     get '/status/:id' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
-      raise Ginseng::NotFoundError, 'Not Found' unless status = status_class[params[:id]]
+      raise Ginseng::NotFoundError, 'Not Found' unless status = find_status(params[:id])
       raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
       @renderer.message = status.to_h.merge(
         account: status.account.to_h.slice(:username, :display_name, :acct),
@@ -430,7 +458,7 @@ module Mulukhiya
     post '/status/tags' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.repost?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
-      raise Ginseng::NotFoundError, 'Not Found' unless status = status_class[params[:id]]
+      raise Ginseng::NotFoundError, 'Not Found' unless status = find_status(params[:id])
       raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
       errors = StatusTagsContract.new.exec(params)
       if errors.present?
@@ -483,8 +511,9 @@ module Mulukhiya
     end
 
     delete '/status/nowplaying' do
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.repost?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
-      raise Ginseng::NotFoundError, 'Not Found' unless status = status_class[params[:id]]
+      raise Ginseng::NotFoundError, 'Not Found' unless status = find_status(params[:id])
       raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
       raise Ginseng::NotFoundError, 'Not Found' unless body = status.parser.body
       errors = StatusContract.new.exec(params)
@@ -1072,25 +1101,7 @@ module Mulukhiya
         @renderer.message = {errors:}
         return @renderer.to_s
       end
-      storage = IsCatStorage.new
-      http = HTTP.new
-      result = Concurrent::Hash.new
-      Parallel.each(params[:accts].uniq, in_threads: Parallel.processor_count) do |acct_str|
-        acct = Ginseng::Fediverse::Acct.new(acct_str)
-        cached = storage.get(acct_str)
-        if cached
-          result[acct_str] = cached['is_cat']
-          next
-        end
-        actor = fetch_actor(http, acct)
-        is_cat = actor&.dig('isCat')
-        result[acct_str] = is_cat
-        storage.set(acct_str, {is_cat:}) unless actor.nil?
-      rescue => e
-        e.log(acct: acct_str)
-        result[acct_str] = nil
-      end
-      @renderer.message = result
+      @renderer.message = IsCatService.new.resolve(params[:accts])
       return @renderer.to_s
     rescue => e
       report_error(e)
@@ -1112,6 +1123,31 @@ module Mulukhiya
     end
 
     private
+
+    # 要求のトークンを、アカウントの保存トークンにする。⚠ 保存したトークンは Webhook と
+    # デコレーションの worker が書き込みに使うので、書き込みのスコープを持たないトークンでは
+    # 保存し直さない。GET は #4845 の判定の外なので、ここで見る（5.43.0 のリリース前レビュー）。
+    def remember_token
+      return unless sns.writable_token?
+      sns.account.user_config.token = token
+    end
+
+    # ⚠ API で読む系統（Pleroma 系）の投稿は、要求のトークンで読む（PR #4844 の Codex P2）。
+    # 非公開・ダイレクトの投稿は認証なしでは取れず、持ち主の確認より前に落ちる。
+    # DB で読む系統（Mastodon / Misskey）は `service=` を持たないので何もしない。
+    # ⚠ API で読む系統の `Status.[]` は nil を返さないので、ここで一度取ってみる。
+    # 上流が「無い・見えない」と答えたら nil（404）にする。取りに行くのを後回しにすると、
+    # 上流の 404 が 502 とアラートに化けていた（5.43.0 のリリース前レビュー）。
+    def find_status(id)
+      return nil unless status = status_class[id]
+      return status unless status.respond_to?(:service=)
+      status.service = sns
+      status.data
+      return status
+    rescue Ginseng::GatewayError => e
+      return nil if NOT_FOUND_SOURCE_STATUSES.member?(e.source_status)
+      raise
+    end
 
     # webhook URL。トークンが無いアカウントでは nil を返す (#4487 / #4537)。
     def webhook_url
@@ -1170,21 +1206,6 @@ module Mulukhiya
     #
     # ⚠ **拒否は nil ではなくログを残して nil。**呼び出し元は acct ごとに nil を
     # 「判定不能」として返すので、黙って nil にすると攻撃の試行が一切見えない。
-    def fetch_actor(http, acct)
-      RemoteHost.validate!(acct.host)
-      url = "https://#{acct.host}/.well-known/webfinger?resource=acct:#{acct}"
-      webfinger = fetch_json(http, url, 'application/jrd+json')
-      actor_uri = webfinger['links']&.find do |l|
-        l['type'] == 'application/activity+json'
-      end&.dig('href')
-      return nil unless actor_uri
-      RemoteHost.validate!(Ginseng::URI.parse(actor_uri)&.host.to_s)
-      return fetch_json(http, actor_uri, 'application/activity+json')
-    rescue => e
-      e.log(acct: acct.to_s)
-      return nil
-    end
-
     # 番組表編集 5 本の rescue (#4629)。
     #
     # ⚠⚠ **`AuthError` と `NotFoundError` が `else` へ落ちて alert していた。**
@@ -1230,14 +1251,6 @@ module Mulukhiya
       @renderer.status = error.status
       @renderer.message = body
       return @renderer.to_s
-    end
-
-    def fetch_json(http, url, accept)
-      response = http.get(url, {
-        headers: {'Accept' => accept},
-        host_validator: RemoteHost.validator,
-      }).parsed_response
-      return response.is_a?(String) ? JSON.parse(response) : response
     end
   end
 end

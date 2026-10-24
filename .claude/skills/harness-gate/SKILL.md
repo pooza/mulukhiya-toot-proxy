@@ -7,7 +7,7 @@ description: chubo2 の fedi-test-harness で develop を Mastodon 系・Misskey
 
 ⚠ この手順の正本はこのファイル（#4731 で `docs/test-harness.md` と `docs/harness-verified-versions.yaml` の冒頭から移した）。
 harness の仕組み・起動・後片付けは [test-harness.md](../../../docs/test-harness.md) を読む。
-⚠⚠ **使い終わったらすぐ teardown する**（`test-harness.md`「後片付け」）。
+**使い終わったら `stop.sh` で止めるのが基本**（続けて使う作業が決まっていれば残してよい。`test-harness.md`「後片付け」）。
 
 ## リリースゲートとしての実走（省略不可）
 

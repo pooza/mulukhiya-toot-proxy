@@ -6,14 +6,22 @@ properties:
         properties:
           cache:
             properties:
+              failure_ttl:
+                minimum: 1
+                type: integer
               ttl:
                 minimum: 0
                 type: integer
             required:
               - ttl
+              - failure_ttl
             type: object
+          timeout:
+            minimum: 1
+            type: integer
         required:
           - cache
+          - timeout
         type: object
     required:
       - is_cat
@@ -150,6 +158,7 @@ properties:
     enum:
       - mastodon
       - misskey
+      - pleroma
     type: string
   daemon:
     # ⚠ 宣言が無いと、local.yaml に書いた正当な `/daemon/*` が `Config#audit` の unknown_keys に出る。

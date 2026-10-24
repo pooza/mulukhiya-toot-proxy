@@ -2,6 +2,12 @@ account:
   is_cat:
     cache:
       ttl: 3600
+      # 取れなかった acct も、この秒数だけ覚えておく (#4677)。覚えないと、応答しないホストの
+      # acct が通知一覧に居るあいだ、呼び出しのたびに待たされる。
+      failure_ttl: 600
+    # 1 件の取得（WebFinger ＋ actor）全体の締切（秒）。再送はしない。猫耳の表示のための装飾なので
+    # 早く諦める。⚠ capsicum は 5 秒で切るので、その内側に置く。
+    timeout: 4
 agent:
   accts:
     - '@relayctl@hashtag-relay.dtp-mstdn.jp'
@@ -377,7 +383,7 @@ mastodon:
     # ⚠ Mastodon は 5.41.0 で既定を true に戻した (#4789)。重さはローカルアカウント数に
     # ほぼ比例する（47 で数十 ms、384 で 0.5〜0.6 秒／温まった状態の 1 クエリ）。
     # 重ければ overlay で false にすれば、5.23.0〜5.40.x と同じ「503 を返す」状態に戻る。
-    # ⚠ Misskey は false のまま（#4375）。
+    # Misskey も 5.43.0 で true に戻した (#4838)。
     media_catalog: true
   dbms: postgres
   display_name: Mastodon
@@ -439,7 +445,11 @@ misskey:
     account_timeline: true
     favorite_tags: true
     futured_tag: true
-    media_catalog: false
+    # ⚠ Misskey は 5.43.0 で既定を true に戻した (#4838)。重さはローカルのノート数に比例する
+    # （ダイスキー＝添付つきの公開ノート約 1,400・note 約 33 万行で、1 ページ目 69 ms・
+    # ワーカー 10.5 秒）。桁で多いサーバーは未検証。重ければ overlay で false にすれば、
+    # 5.23.0〜5.42.x と同じ「503 を返す」状態に戻る。
+    media_catalog: true
   dbms: postgres
   display_name: Misskey
   redis:
@@ -500,7 +510,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 5.42.0
+  version: 5.43.0
 parser:
   note:
     fields:
@@ -523,6 +533,56 @@ parser:
       reply_to: in_reply_to_id
       spoiler: spoiler_text
       visibility: visibility
+pleroma:
+  # Akkoma（Pleroma 系）。#4566 で復活。⚠ 最初の段階の対象は health・pre_toot パイプライン・
+  # トークンからのアカウント解決だけで、ストリーミング・メディアカタログ・webhook などは切ってある。
+  attachment:
+    limit: 4
+    types:
+      audio: audio/mpeg
+      image: image/webp
+      video: video/mp4
+    video_codecs:
+      - h264
+  capabilities:
+    media_update: false
+    reaction: true
+    repost: false
+    streaming: false
+  data:
+    account_timeline: false
+    favorite_tags: false
+    futured_tag: false
+    media_catalog: false
+  dbms: postgres
+  display_name: Pleroma
+  features:
+    annict: false
+    announcement: false
+    announcement_push: false
+    feed: false
+    webhook: false
+  oauth:
+    callback:
+      enable: true
+    scopes:
+      - read
+      - write
+  sns_type: mastodon
+  status:
+    default_max_length: 5000
+    delete:
+      limit: 30
+    key: id
+    label: 投稿
+    reblog_label: リピート
+    parser: toot
+    spoiler_text: null
+  streaming:
+    verify_peer: true
+  theme:
+    color: '#593196'
+  url: https://akkoma.example.com/
 postgres:
   dsn: null
   # pgbouncer の待ち行列を /health に載せるか (#4618)。

@@ -1,5 +1,7 @@
 module Mulukhiya
   class MediaConvertHandler < Handler
+    ALERT_THROTTLE_SECONDS = ControllerErrorMethods::ALERT_THROTTLE_SECONDS
+
     attr_reader :image_field, :file
 
     def handle_pre_upload(payload, params = {})
@@ -14,7 +16,7 @@ module Mulukhiya
       # 通知先が遅いと外側の締切（`Event#run_handler` の join）に kill され、
       # 後ろに置いた `errors.push` へ届かない（#4722）。
       errors.push(class: e.class.to_s, message: e.message, file: file&.path)
-      e.alert
+      e.is_a?(Timeout::Error) ? alert_timeout(e) : e.alert
     end
 
     def handle_pre_thumbnail(payload, params = {})
@@ -58,6 +60,25 @@ module Mulukhiya
       extname = dest_file.recommended_extname || File.extname(@dest.path)
       basename = File.basename(payload[image_field][:filename], '.*')
       payload[image_field][:filename] = "#{basename}#{extname}"
+    end
+
+    # 変換の締切切れ (#4722)。
+    #
+    # ⚠⚠ **締切切れは素の `e.alert` へ流さない。**ffmpeg の内側の締切（`ffmpeg_timeout`）が
+    # 先に切れると `Timeout::Error` がここへ直行し、**長い動画 1 本ごとに Sentry と
+    # slack / line / mail が鳴っていた。**ハンドラごとに窓のあいだ 1 回だけ鳴らし、
+    # 残りは log に落とす（`ControllerErrorMethods#throttled_alert` と同じ考え方）。
+    # ⚠ コマンドと締切は ginseng-core の `log_expired` が、段（remux / transcode）は
+    # `VideoFile` が error の行に残している。
+    def alert_timeout(error)
+      values = {handler: underscore, file: file&.path}
+      acquired = AlertThrottle.acquire(timeout_alert_key(error), ALERT_THROTTLE_SECONDS)
+      return error.alert(values) if acquired
+      return error.log(values.merge(throttled: true))
+    end
+
+    def timeout_alert_key(error)
+      return [ControllerErrorMethods::ALERT_THROTTLE_KEY_PREFIX, error.class, self.class].join('/')
     end
   end
 end

@@ -7,6 +7,12 @@ module Mulukhiya
       return @user_config
     end
 
+    # アプリを介さない本人のトークンか (#4845)。スコープを持たず、すべての権限を持つ。
+    # Mastodon / Pleroma には無い（Misskey だけが上書きする）。
+    def native_token?(_token)
+      return false
+    end
+
     def acct
       @acct ||= Acct.new("@#{username}@#{host}")
       return @acct
@@ -14,6 +20,11 @@ module Mulukhiya
 
     def roles
       return []
+    end
+
+    # 上流の API が返すアカウントの ID。Mastodon / Misskey は DB の主キーと同じ。
+    def api_id
+      return id.to_s
     end
 
     def reactionable?

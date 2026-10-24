@@ -18,8 +18,25 @@ module Mulukhiya
       return controller_class.oauth_scopes == scopes
     end
 
+    # 書き込みのスコープ（`write` か `write:*`）を 1 つでも持つか (#4845)。
+    # ⚠ 設定のスコープとの一致では判定しない。モロヘイヤ以外のアプリ（capsicum など）が
+    # 発行したトークンも通るので、持ち方はアプリごとに違う。
+    # ⚠ スコープが読めないときは持たないとみなす（Misskey の壊れた permission など）。
+    def writable?
+      return scopes.any? {|v| v == 'write' || v.start_with?('write:')}
+    rescue => e
+      e.log
+      return false
+    end
+
+    # ⚠⚠ **更新用のトークンは出さない（PR #4844 の Codex P1）。**`GET /config` がこの hash を
+    # 返すので、残すとアクセストークンを持つだけで更新用トークンが手に入り、期限切れの後も
+    # 新しいトークンを作れる。Akkoma は `refresh_token` を発行する。Mastodon（Doorkeeper）の
+    # 表にも同じ列があるので、系統を問わずここで落とす。
+    SECRET_COLUMNS = [:refresh_token, :previous_refresh_token].freeze
+
     def to_h
-      @hash ||= values.deep_symbolize_keys.merge(
+      @hash ||= values.deep_symbolize_keys.except(*SECRET_COLUMNS).merge(
         account:,
         digest: webhook_digest,
         is_scopes_valid: scopes_valid?,

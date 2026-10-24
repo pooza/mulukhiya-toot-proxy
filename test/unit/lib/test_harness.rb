@@ -6,6 +6,7 @@ module Mulukhiya
     ENV_KEYS = [
       'MASTODON_URL', 'MASTODON_ACCESS_TOKEN', 'MASTODON_INFO_ACCESS_TOKEN', 'MASTODON_DB_DSN',
       'MISSKEY_URL', 'MISSKEY_ACCESS_TOKEN', 'MISSKEY_INFO_ACCESS_TOKEN', 'MISSKEY_DB_DSN',
+      'PLEROMA_URL', 'PLEROMA_ACCESS_TOKEN', 'PLEROMA_INFO_ACCESS_TOKEN', 'PLEROMA_DB_DSN',
       'MULUKHIYA_HARNESS_DIR'
     ].freeze
 
@@ -99,6 +100,17 @@ module Mulukhiya
       assert_equal('misskey_token', conn[:token])
       assert_equal('misskey', config['/controller'])
       assert_equal('http://localhost:3001', config['/misskey/url'])
+    end
+
+    def test_apply_selects_pleroma
+      config['/controller'] = 'mastodon'
+      ENV['PLEROMA_URL'] = 'https://st.akkoma.example'
+      ENV['PLEROMA_ACCESS_TOKEN'] = 'pleroma_token'
+      conn = TestHarness.apply!
+
+      assert_equal('pleroma_token', conn[:token])
+      assert_equal('pleroma', config['/controller'])
+      assert_equal('https://st.akkoma.example', config['/pleroma/url'])
     end
 
     # ⚠ 両系の .env.test を同じシェルで source した状態。接続情報が 2 つ揃うと
