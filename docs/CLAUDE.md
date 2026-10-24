@@ -108,6 +108,18 @@ cure-api 側を触るときに「カスタムフィードも一緒に整理」�
 
 詳細は [tomato-shrieker-integration.md](tomato-shrieker-integration.md) を参照。Webhook digest の生成要素・連携フロー・インシデント履歴をまとめている。
 
+## Ruby の版を上げる
+
+1. **サーバーが先。**chubo2 で全台の rbenv に新しい版を入れ、YJIT まで確かめてから `.ruby-version` の PR を出す（逆にすると起動しない・#4853）
+2. ⚠ **同じ PR で `Gemfile.lock` の `BUNDLED WITH` を、その Ruby の同梱の bundler へそろえる**（2026-10-24 ユーザー承認）。
+   同梱の版は `RBENV_VERSION=<版> gem list bundler` の `default:` で見て、`bundle update --bundler=<その版>`。
+   そろえておけば、サーバー側は `rbenv install` だけで済む
+3. **Ruby を上げない回は `BUNDLED WITH` を動かさない。**動いていたら PR の差分で戻す
+
+⚠ 以前は決まった段が無く、手元の bundler の版が書き込まれるだけで 4.0.6 → 4.0.18 と十数回動いていた。
+5.43.0（Ruby 4.0.9・同梱 4.0.20・lock 4.0.18）ではステージングと本番の全台で `gem install bundler -v 4.0.18` が要った。
+**5.44.0 の頭で 4.0.20 へそろえる。**Ruby の配布は ginseng-style（pooza/ginseng-style#131 の型）が全リポジトリへ回している。
+
 ## ブランチ戦略
 
 | ブランチ | バージョン | 目的 |
