@@ -201,7 +201,10 @@ git diff Gemfile.lock
 もとの 5.44.0 の Issue は名前ごと 1 つ後ろへずらした（旧 5.44.0 → [5.45.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/644)、旧 5.45.0 → [5.46.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/645)）。
 develop にすでに載っている bundler 4.0.20・ginseng-piefed v0.4.1・docs は、そのまま 5.44.0 で出る。
 
-- open 1 件: #4865。計画は [#4865 のコメント](https://github.com/pooza/mulukhiya-toot-proxy/issues/4865#issuecomment-6395147645)。エピソードブラウザの認証は `feature/4865-annict-terms`（`21c811c0`・未 push）にある。⚠ **pooza/capsicum#1338（v2.6）のリリースより前にマージしない**。回答待ちの区切りは 2026-11-10 ごろ
+- open 1 件: #4865。**2026-10-26 に Annict の運営者から回答**（[要旨と改めた計画](https://github.com/pooza/mulukhiya-toot-proxy/issues/4865#issuecomment-6399902495)）。2（タグ照会）・4（番組表）は変えない。⚠ **施行日（11-25）を過ぎてもよいと言われたが、間に合わせる**（ユーザー）
+  - **PR #4866**: エピソードブラウザの口に SNS の認証（capsicum v2.6.0 は 10-25 に出た＝マージしてよい）
+  - **PR #4867**: エピソード辞書の口に鍵（`/service/annict/dictionary/keys` ＋ `?key=`）。✅ **本番 3 台の鍵は 10-26 に設置済み**（PR のコメント）。今の 5.43.0 は `?key=` を読み飛ばすので、辞書は途切れない
+  - 残り: 2 本のマージ → リリース → wiki（Annictの設定項目・公開API）に他の運用者向けの注意書き。きゅあすきーの管理人への連絡はユーザーがする
 - ⚠ **旧 5.44.0 の PR #4862（#4848 ginseng-core v4.1.0）・#4863（#4847 Akkoma の webhook）は 5.45.0 の分。**develop へマージすると割り込みの版に混ざるので、5.44.0 を出すまで待つ
 - 5.45.0 は open 7 件: #4857 / #4854 / #4851・#4850 / #4848 / #4847 / #4860。5.46.0 は #4861 / #4864
 - ✅ **頭でやること（済み・`9861ba4b`）**: `BUNDLED WITH` を Ruby 4.0.9 の同梱版 4.0.20 へそろえ、ginseng-piefed を v0.4.1 へ（login の排他のみ）。`rake lint` / `rake test` 通過（1785 tests・0 failures / 0 errors）。
