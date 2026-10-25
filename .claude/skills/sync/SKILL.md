@@ -218,7 +218,8 @@ chubo2 の [docs/infra-note.md](https://github.com/pooza/chubo2/blob/main/docs/i
 ruby .claude/skills/sync/scripts/annict_api_watch.rb
 ```
 
-- ⚠ **基準（2026-10-06）**: `rails/app/graphql` の直近は **2026-01-28「Canary GraphQL API の実装ファイルを削除」**、
+- ⚠ **基準（2026-10-25）**: `rails/app/graphql` の直近は **2026-10-17「Rails版の表示から非公開・削除済みの人物を除く」**
+  （キャスト・スタッフの絞り込み。モロヘイヤの `app/query/annict/*.graphql` は人物を引かないので影響なし）、
   Go 側に API らしきディレクトリは**なし**。**これと同じなら報告不要**
 - 変わっていたら、コミットの中身を読んで、モロヘイヤが使う面（`app/query/annict/*.graphql` の項目・
   認証・エンドポイント）に当たるかを見る。`Record` 型に Web の URL 用の番号が足されていたら #3157 を動かす
@@ -227,7 +228,7 @@ ruby .claude/skills/sync/scripts/annict_api_watch.rb
 - ⚠ **Annict の遅さ・タイムアウトは平常として扱う**（#4801）。辞書台帳の `annict/episodes` の失敗数で様子は分かる
 - **公式アカウント（`@annict@mastodon.social`）の直近 5 件も同じスクリプトが出す**（2026-10-10 追加・ユーザー提案）。
   障害・仕様変更・開発者向けドキュメントの告知はここに出る。**前回の同期より新しい投稿があれば読む**
-  （基準: 最新は **2026-10-06「海外からのリクエストが大量に来ていた影響で繋がりにくかった」**）。
+  （基準: 最新は **2026-10-25「API利用規約を定め、レート制限を見直しました」**＝ #4865）。
   ⚠ 2026-10-04〜06 のタイムアウト（Sentry `-2X` が 1 日 100〜180 件）の原因はこの投稿で分かった。
   **Sentry の件数が跳ねたら、内訳を掘る前にまずここを見る**
 
