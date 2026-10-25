@@ -100,6 +100,14 @@ module Mulukhiya
       assert_false(AnnictEpisodeDictionary.key?(''))
     end
 
+    # ⚠ 短い鍵は設定にあっても通さない（PR #4867 の Codex P2）。スキーマの検査が効かないため。
+    def test_short_configured_key_is_ignored
+      config['/service/annict/dictionary/keys'] = ['x', '0123456789abcde']
+
+      assert_false(AnnictEpisodeDictionary.key?('x'))
+      assert_false(AnnictEpisodeDictionary.key?('0123456789abcde'))
+    end
+
     def test_builds_and_stores_without_cache
       storage = StorageDouble.new
       dictionary = create(AnnictDouble.new(episodes: EPISODES), storage)

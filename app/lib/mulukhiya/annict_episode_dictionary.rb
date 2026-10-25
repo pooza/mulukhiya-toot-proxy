@@ -34,14 +34,20 @@ module Mulukhiya
 
     KEY = 'episodes'.freeze
 
+    # 鍵として認める最短の長さ (#4865)。
+    MIN_KEY_LENGTH = 16
+
     attr_reader :error
 
     # 辞書の口（`GET /tagging/dic/annict/episodes`）の鍵か (#4865)。
     # ⚠ 鍵が 1 つも無ければ、誰も通さない。
+    # ⚠ **短い鍵は設定にあっても無視する**（PR #4867 の Codex P2）。スキーマの `/annict/*` は
+    # 実際の設定（`/service/annict/*`）と場所が違い、検査が効かない。`service` に properties を
+    # 足すと `Config#audit` がほかの `/service/*` を軒並み unknown_keys にするので、ここで落とす。
     def self.key?(key)
       return false unless key.is_a?(String) && key.present?
       return Array(Config.instance['/service/annict/dictionary/keys']).any? do |v|
-        v.is_a?(String) && v.present? && Rack::Utils.secure_compare(v, key)
+        v.is_a?(String) && MIN_KEY_LENGTH <= v.length && Rack::Utils.secure_compare(v, key)
       end
     end
 
