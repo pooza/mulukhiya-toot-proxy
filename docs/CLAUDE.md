@@ -195,10 +195,15 @@ git diff Gemfile.lock
 
 ## 開発中: 5.44.0
 
-[マイルストーン 5.44.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/644)。2026-10-25 着手・`config/application.yaml` は 5.44.0 へバンプ済み（`f20cf2d0`）。
+[マイルストーン 5.44.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/646)。2026-10-25 着手・`config/application.yaml` は 5.44.0 へバンプ済み（`f20cf2d0`）。
 
-- open 7 件: #4857（Pleroma のゲートを必須に）/ #4854（タグ付けの誤爆）/ #4851・#4850（Mastodon 5.0）/ #4848（ginseng-core v4）/ #4847（Pleroma の webhook・段階 1）/ #4860（Pleroma のタグのフィード・段階 2）
-- 次の版: [マイルストーン 5.45.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/645) を 2026-10-25 に作成。#4861（Pleroma の添付・段階 3 の残り）を先に載せた（Akkoma の Issue は 2 件切らさない・docs/pleroma.md）
+⚠⚠ **割り込みの版（2026-10-25 ユーザー判断）。**Annict の API 利用規約（**2026-11-25 施行**）への対応 #4865 と、あれば脆弱性・バグの修正だけを載せる。**施行日までに出す。**
+もとの 5.44.0 の Issue は名前ごと 1 つ後ろへずらした（旧 5.44.0 → [5.45.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/644)、旧 5.45.0 → [5.46.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/645)）。
+develop にすでに載っている bundler 4.0.20・ginseng-piefed v0.4.1・docs は、そのまま 5.44.0 で出る。
+
+- open 1 件: #4865。計画は [#4865 のコメント](https://github.com/pooza/mulukhiya-toot-proxy/issues/4865#issuecomment-6395147645)。エピソードブラウザの認証は `feature/4865-annict-terms`（`21c811c0`・未 push）にある。⚠ **pooza/capsicum#1338（v2.6）のリリースより前にマージしない**。回答待ちの区切りは 2026-11-10 ごろ
+- ⚠ **旧 5.44.0 の PR #4862（#4848 ginseng-core v4.1.0）・#4863（#4847 Akkoma の webhook）は 5.45.0 の分。**develop へマージすると割り込みの版に混ざるので、5.44.0 を出すまで待つ
+- 5.45.0 は open 7 件: #4857 / #4854 / #4851・#4850 / #4848 / #4847 / #4860。5.46.0 は #4861 / #4864
 - ✅ **頭でやること（済み・`9861ba4b`）**: `BUNDLED WITH` を Ruby 4.0.9 の同梱版 4.0.20 へそろえ、ginseng-piefed を v0.4.1 へ（login の排他のみ）。`rake lint` / `rake test` 通過（1785 tests・0 failures / 0 errors）。
   ⚠ ステージング・本番は bundler 4.0.20 が Ruby 4.0.9 に同梱なので追加の `gem install` は要らない見込み
 - 📌 **手順 12（掃除 PR）**: 5.43.0 のリリース前レビューの②は PR #4858 で消化済み＝持ち越しなし
