@@ -64,57 +64,6 @@ properties:
             type: string
         type: object
     type: object
-  annict:
-    properties:
-      dictionary:
-        properties:
-          cache:
-            properties:
-              alert:
-                minimum: 0
-                type: integer
-              fresh:
-                minimum: 0
-                type: integer
-              ttl:
-                minimum: 1
-                type: integer
-            type: object
-        type: object
-      episodes:
-        properties:
-          ruby:
-            properties:
-              pattern:
-                format: regex
-                type: string
-              trim:
-                type: boolean
-            type: object
-        type: object
-      oauth:
-        properties:
-          client:
-            properties:
-              id:
-                type: string
-              secret:
-                type: string
-            required:
-              - id
-              - secret
-            type: object
-        required:
-          - client
-        type: object
-      works:
-        items:
-          format: regex
-          type: string
-        type: array
-    required:
-      - oauth
-    type: object
   api:
     properties:
       cache:
@@ -276,20 +225,6 @@ properties:
           max_bytes:
             minimum: 1
             type: integer
-        type: object
-    type: object
-  peer_tube:
-    properties:
-      hosts:
-        properties:
-          default:
-            # ⚠ **`format: hostname` は json-schema に検証実装が無く素通しだった (#4597)。**
-            # `not a hostname!` も `http://example.com` も `.....` も通っていた。
-            # RFC 1123 のラベル（英数字とハイフン・先頭末尾はハイフン不可）で書き直す。
-            # ⚠ `^` / `$` ではなく `\A` / `\z`。Ruby の `^` / `$` は行ごとに一致するので、
-            # `"x\nexample.com"` のような複数行の値が通ってしまう。
-            pattern: '\A[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*\z'
-            type: string
         type: object
     type: object
   piefed:
@@ -525,7 +460,119 @@ properties:
         minimum: 0
         type: number
     type: object
+  # ⚠⚠ **外部サービスの設定は `/service/*` の下 (#4869)。**以前は annict / spotify / peer_tube を
+  # トップレベルに宣言していて、どれも検査されていなかった（設定とコードは `/service/*` を読む）。
+  # ⚠ properties があると `Config#audit` は宣言の無い `/service/*` を unknown_keys にする。
+  # 既定にキーを足したら、ここにも宣言を足す（既定が 0 件であることをテストで見ている）。
+  # ⚠ `required` は付けない。既定が枝を持つので、使わないサーバーで検査が落ちる。
   service:
+    properties:
+      amazon:
+        type: object
+      annict:
+        properties:
+          browser:
+            type: object
+          dictionary:
+            properties:
+              cache:
+                properties:
+                  alert:
+                    minimum: 0
+                    type: integer
+                  fresh:
+                    minimum: 0
+                    type: integer
+                  ttl:
+                    minimum: 1
+                    type: integer
+                type: object
+              # 辞書の口の鍵 (#4865)。⚠ 16 文字未満は `AnnictEpisodeDictionary.key?` も無視する。
+              keys:
+                items:
+                  minLength: 16
+                  type: string
+                type: array
+            type: object
+          episodes:
+            properties:
+              ruby:
+                properties:
+                  pattern:
+                    format: regex
+                    type: string
+                  trim:
+                    type: boolean
+                type: object
+            type: object
+          oauth:
+            properties:
+              client:
+                properties:
+                  id:
+                    type: string
+                  secret:
+                    type: string
+                type: object
+              redirect_uri:
+                type: string
+              scopes:
+                type: object
+            type: object
+          record:
+            type: object
+          review:
+            type: object
+          timeout:
+            minimum: 1
+            type: integer
+          urls:
+            type: object
+          works:
+            items:
+              format: regex
+              type: string
+            type: array
+        type: object
+      itunes:
+        type: object
+      line:
+        type: object
+      peer_tube:
+        properties:
+          hosts:
+            items:
+              # ⚠ **`format: hostname` は json-schema に検証実装が無く素通しだった (#4597)。**
+              # `not a hostname!` も `http://example.com` も `.....` も通っていた。
+              # RFC 1123 のラベル（英数字とハイフン・先頭末尾はハイフン不可）で書き直す。
+              # ⚠ `^` / `$` ではなく `\A` / `\z`。Ruby の `^` / `$` は行ごとに一致するので、
+              # `"x\nexample.com"` のような複数行の値が通ってしまう。
+              pattern: '\A[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*\z'
+              type: string
+            type: array
+          urls:
+            type: object
+        type: object
+      spotify:
+        properties:
+          client:
+            properties:
+              id:
+                type: string
+              secret:
+                type: string
+            type: object
+          language:
+            type: string
+          oauth:
+            type: object
+          patterns:
+            type: array
+          retry:
+            type: object
+          urls:
+            type: object
+        type: object
     type: object
   spoiler:
     properties:
@@ -542,21 +589,6 @@ properties:
     type: string
   preopened_on:
     type: string
-  spotify:
-    properties:
-      client:
-        properties:
-          id:
-            type: string
-          secret:
-            type: string
-        required:
-          - id
-          - secret
-        type: object
-    required:
-      - client
-    type: object
   user_config:
     properties:
       redis:
