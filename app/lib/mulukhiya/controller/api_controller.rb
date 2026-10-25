@@ -821,8 +821,13 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    # ⚠⚠ **鍵（`?key=`）が無ければ 403 (#4865)。**辞書を丸ごと誰でも取れる URL に置くのは、Annict の
+    # API 利用規約 第 6 条の「まとまったデータを誰でも取得できる URL」にあたる（2026-10-26 運営者の回答）。
+    # 取りに来るのは自分と姉妹サーバーのモロヘイヤだけなので、配る側が鍵を決めて、辞書の URL に添えてもらう。
+    # ⚠ SNS のトークンでは通さない。登録が開いているサーバーでは、誰でもトークンを持てるため。
     get '/tagging/dic/annict/episodes' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.annict?
+      raise Ginseng::AuthError, 'Unauthorized' unless AnnictEpisodeDictionary.key?(params[:key])
       raise Ginseng::AuthError, 'Unauthorized' unless annict = account_class.info_account.annict
       # ⚠ Annict が落ちていても、直近の成功結果があればそれを 200 で返す (#4801)。
       # 鳴らすのは「古い結果で凌げなくなってきた」ときだけ（`AnnictEpisodeDictionary#alert?`）。

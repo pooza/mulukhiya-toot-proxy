@@ -36,6 +36,15 @@ module Mulukhiya
 
     attr_reader :error
 
+    # 辞書の口（`GET /tagging/dic/annict/episodes`）の鍵か (#4865)。
+    # ⚠ 鍵が 1 つも無ければ、誰も通さない。
+    def self.key?(key)
+      return false unless key.is_a?(String) && key.present?
+      return Array(Config.instance['/service/annict/dictionary/keys']).any? do |v|
+        v.is_a?(String) && v.present? && Rack::Utils.secure_compare(v, key)
+      end
+    end
+
     def initialize(annict, storage: AnnictDictionaryStorage.new)
       @annict = annict
       @storage = storage
