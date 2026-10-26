@@ -1601,7 +1601,7 @@ JSON オブジェクトは仕様上「順序なし」だが、キーは SHA256 �
 
 Annict 作品をキーワード検索する。
 
-- **認証**: オプショナル（ユーザーの Annict トークンがあれば使用、なければお知らせボットの Annict トークンにフォールバック。いずれもない場合 403）
+- **認証**: 必要（SNS のトークン。無ければ 403・#4865）。Annict はユーザーのトークンがあればそれを、なければお知らせボットのトークンを使う（いずれもない場合 403）
 - **前提条件**: `/{controller}/features/annict` が `true` かつ Annict OAuth が設定済みであること
 - **パラメータ**:
 
@@ -1640,7 +1640,7 @@ Annict 作品をキーワード検索する。
 
 指定した作品のエピソード一覧を取得する。
 
-- **認証**: 不要（お知らせボットの Annict トークンを使用。未設定の場合 403）
+- **認証**: 必要（SNS のトークン。無ければ 403・#4865）。Annict はお知らせボットのトークンを使う（未設定の場合 403）
 - **前提条件**: `/{controller}/features/annict` が `true` かつ Annict OAuth が設定済みであること
 - **注意**: capsicum 等のクライアントからはモロヘイヤの Bearer トークン認証不要。Annict の別トークンも不要（サーバー側のお知らせボットが Annict API にアクセスする）
 
@@ -1838,7 +1838,7 @@ capsicum のエピソードブラウザが利用する。
 
 - `/{controller}/features/annict` が `true` であること（`GET /about` の `config.features.annict` で確認可能）
 - `AnnictService.config?` が `true`（`/service/annict/oauth/client/id` と `/service/annict/oauth/client/secret` が設定済み）
-- 作品検索（`GET /program/works`）はユーザーの Annict トークンがなくてもお知らせボットのトークンで動作する。エピソード取得（`GET /program/works/:id/episodes`、`GET /tagging/dic/annict/episodes`）はお知らせボットのトークンのみ使用する。ユーザーの Annict OAuth が必要なのは `POST /annict/auth`（トークン取得）と、`GET /program/works` で視聴ステータスを取得する場合のみ
+- 作品検索（`GET /program/works`）とエピソード取得（`GET /program/works/:id/episodes`）は SNS のトークンが要る（#4865。Annict の API 利用規約 第 6 条＝取得したデータを誰でも取得できる URL に置かない）。作品検索はユーザーの Annict トークンがなくてもお知らせボットのトークンで動作する。エピソード取得（`GET /program/works/:id/episodes`、`GET /tagging/dic/annict/episodes`）はお知らせボットのトークンのみ使用する。ユーザーの Annict OAuth が必要なのは `POST /annict/auth`（トークン取得）と、`GET /program/works` で視聴ステータスを取得する場合のみ
 
 #### 認証フロー
 
@@ -1998,14 +1998,14 @@ Annict に作品全体の感想（review）を投稿する。劇場版のよう�
 
 Annict の作品をキーワード検索する。パラメータ・レスポンスの詳細は上記 P4 セクションを参照。
 
-- **認証**: オプショナル（ユーザーの Annict トークンがあれば使用、なければお知らせボットの Annict トークンにフォールバック。いずれもない場合 403）
+- **認証**: 必要（SNS のトークン。無ければ 403・#4865）。Annict はユーザーのトークンがあればそれを、なければお知らせボットのトークンを使う（いずれもない場合 403）
 - **前提条件**: `/{controller}/features/annict` が `true` かつ Annict OAuth が設定済みであること
 
 #### GET /mulukhiya/api/program/works/:id/episodes
 
 指定した作品のエピソード一覧を取得する。パラメータ・レスポンスの詳細は上記 P4 セクションを参照。
 
-- **認証**: 不要（お知らせボットの Annict トークンを使用。未設定の場合 403）
+- **認証**: 必要（SNS のトークン。無ければ 403・#4865）。Annict はお知らせボットのトークンを使う（未設定の場合 403）
 - **前提条件**: `/{controller}/features/annict` が `true` かつ Annict OAuth が設定済みであること
 
 #### GET /mulukhiya/api/tagging/dic/annict/episodes

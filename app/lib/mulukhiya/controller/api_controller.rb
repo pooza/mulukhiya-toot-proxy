@@ -326,8 +326,14 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    # ⚠⚠ **エピソードブラウザの 2 つの口は、SNS のトークンが要る (#4865)。**お知らせボットの
+    # Annict トークンで引いた作品・各話を返すので、認証なしだと第三者がまとめて取り出せる。
+    # Annict の API 利用規約（2026-11-25 施行）の第 6 条は、画面への表示は認めるが、誰でも
+    # 取得できる URL や自分の API での再提供は禁じている。呼び出し元は Web の画面（ログイン時だけ
+    # 検索を出す）と capsicum（pooza/capsicum#1338 で Bearer を送る）。
     get '/program/works' do
-      annict = sns.account&.annict || account_class.info_account.annict
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      annict = sns.account.annict || account_class.info_account.annict
       raise Ginseng::AuthError, 'Unauthorized' unless annict
       errors = AnnictWorkListContract.new.exec(params)
       if errors.present?
@@ -349,6 +355,7 @@ module Mulukhiya
     end
 
     get '/program/works/:id/episodes' do
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
       raise Ginseng::AuthError, 'Unauthorized' unless annict = account_class.info_account.annict
       @renderer.message = annict.episodes([params[:id].to_i]).map do |episode|
         episode.merge(
