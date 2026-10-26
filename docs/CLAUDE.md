@@ -214,6 +214,9 @@ develop にすでに載っている bundler 4.0.20・ginseng-piefed v0.4.1・doc
   - 黄・**手順 12 の掃除 PR へ**: 辞書の口で断った理由（鍵が無い・違う・16 文字未満で無視・ボットの Annict トークンが無い）がログで区別できない。姉妹サーバーが鍵を設定するときに原因が読めない
   - 黄・**記録のみ**: 配る側の nginx の access log の伏せ字（`combined_masked`）が `key=` を見ていないかもしれない（実機の conf は未確認）。syslog と同じ理由（そのログを読める人は `local.yaml` も読める）で直さない
   - 黄・**wiki の注意書きへ**: 鍵を切り替える順序。合わないと取りに来る側の辞書は last-good で最大 24 時間しのいだあと、エピソードの語が抜ける（本番 3 台は 10-26 に切り替え済み）
+- ✅ **harness（develop `7cdb9668`・2026-10-26）**: `TestHarness: controller=mastodon url=http://localhost:3000` 1866 tests・0 failures・0 errors・158 omissions /
+  `controller=misskey url=http://localhost:3001` 1869 tests・0 failures・0 errors・145 omissions。omission は 5.43.0 と同数
+- ✅ **手順 3（セキュリティ）**: Dependabot アラート 0・bundler-audit 脆弱性なし。rack-test（PR #4868・開発用）と ginseng-core v4（PR #4862）は 5.45.0 で扱う
 - ✅ **頭でやること（済み・`9861ba4b`）**: `BUNDLED WITH` を Ruby 4.0.9 の同梱版 4.0.20 へそろえ、ginseng-piefed を v0.4.1 へ（login の排他のみ）。`rake lint` / `rake test` 通過（1785 tests・0 failures / 0 errors）。
   ⚠ ステージング・本番は bundler 4.0.20 が Ruby 4.0.9 に同梱なので追加の `gem install` は要らない見込み
 - 📌 **手順 12（掃除 PR）**: 5.43.0 のリリース前レビューの②は PR #4858 で消化済み＝持ち越しなし
