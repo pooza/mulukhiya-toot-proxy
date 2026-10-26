@@ -24,7 +24,11 @@ module Mulukhiya
       # ⚠ アクセストークン本体。`i` は Misskey がボディで渡す（MisskeyController#token
       #   のフォールバック）。/logger/mask_query_params は URL のクエリにしか効かない
       #   ので、ボディ側はここで落とす。両方揃って #4511 の掃討が完成する。
-      'i', 'access_token'
+      'i', 'access_token',
+      # ⚠ エピソード辞書の口の鍵（`?key=`・#4865）。`/logger/mask_query_params` の `key` は
+      #   URL の文字列にしか効かず、配る側のリクエストログ（パースした Hash）では平文になる
+      #   （PR #4867 の Codex P1）。番組表エディタの番組のキーも巻き込むが、伏せる側に倒す。
+      'key'
     ].freeze
 
     # ⚠⚠ **webhook の digest は資格情報そのもの (#4655)。**
