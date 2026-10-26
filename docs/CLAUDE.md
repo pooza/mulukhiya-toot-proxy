@@ -216,6 +216,11 @@ develop にすでに載っている bundler 4.0.20・ginseng-piefed v0.4.1・doc
   - 黄・**wiki の注意書きへ**: 鍵を切り替える順序。合わないと取りに来る側の辞書は last-good で最大 24 時間しのいだあと、エピソードの語が抜ける（本番 3 台は 10-26 に切り替え済み）
 - ✅ **harness（develop `7cdb9668`・2026-10-26）**: `TestHarness: controller=mastodon url=http://localhost:3000` 1866 tests・0 failures・0 errors・158 omissions /
   `controller=misskey url=http://localhost:3001` 1869 tests・0 failures・0 errors・145 omissions。omission は 5.43.0 と同数
+- ✅ **ステージング 4 台（`54fc149b`・2026-10-26）**: `config: OK`・3 サービスの restart rc=0・health 200（全項目 OK・Ruby 4.0.9・YJIT 有効）・about 5.44.0・`/app/home` と `/app/episode` 200。
+  未認証の `/program/works` と鍵なしの辞書は 403（dev27 の辞書は Annict 無効で 404）。配られた HTML に PR #4871 の修正（リンクの `v-if`・ログイン時だけ `getWorks()`）が入っていることを確認。
+  ⚠ トークン付きの `/program/works` も 403 になるのは、ステージングのお知らせボットに Annict のトークンが無いため（`/config` は 200 で、SNS のトークンは通っている）。
+  ⚠ **dev25 の test bot のトークンが Mastodon 側で失効している**（公開 URL の `verify_credentials` が 401）。今回の差分とは無関係・未対処。
+  ブラウザでの目視は Chrome の許可待ちで取れなかった
 - ✅ **手順 3（セキュリティ）**: Dependabot アラート 0・bundler-audit 脆弱性なし。rack-test（PR #4868・開発用）と ginseng-core v4（PR #4862）は 5.45.0 で扱う
 - ✅ **頭でやること（済み・`9861ba4b`）**: `BUNDLED WITH` を Ruby 4.0.9 の同梱版 4.0.20 へそろえ、ginseng-piefed を v0.4.1 へ（login の排他のみ）。`rake lint` / `rake test` 通過（1785 tests・0 failures / 0 errors）。
   ⚠ ステージング・本番は bundler 4.0.20 が Ruby 4.0.9 に同梱なので追加の `gem install` は要らない見込み
