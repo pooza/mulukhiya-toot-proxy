@@ -270,14 +270,6 @@ export const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
-    globals.methods.getEpisodeTags = async () => {
-      const indicator = new ActivityIndicator()
-      indicator.show()
-      return axios.get('/mulukhiya/api/tagging/dic/annict/episodes')
-        .then(e => e.data)
-        .finally(e => indicator.hide())
-    }
-
     globals.methods.getEpisodes = async id => {
       const indicator = new ActivityIndicator()
       indicator.show()

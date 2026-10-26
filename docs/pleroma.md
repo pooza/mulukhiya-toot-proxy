@@ -4,7 +4,8 @@
 **進み具合はこのファイルの「進み具合」の表で管理する。**1 段進めたら表と「段階」を書き換える。
 
 - 起点: #4566（最初の段階＝ health・pre_toot・アカウント解決・ゲート）
-- 受け皿: #4846（非ゴールとして切ったものの総まとめ・on-hold）。個々の段階はサブ Issue として**マイルストーンに 1 つずつ**載せる
+- 受け皿: #4846（非ゴールとして切ったものの総まとめ・on-hold）。個々の段階はサブ Issue として切り出す
+- ⚠ **基本の機能がそろうまで、Akkoma の Issue を切らさない**（2026-10-25 ユーザー判断）。常に「いま進めている段階＋次の段階」の **2 件**を起票してマイルストーンに載せておき、1 件閉じたらその場で次の段階を起票して補充する
 - 検証環境: dev29 `https://st.akkoma.b-shock.org`（Akkoma 3.20.1・pooza/chubo2#164）。構成は chubo2 の `docs/infra-servers.md`「dev29」
 
 ## 前提と決めたこと
@@ -41,8 +42,8 @@ v4 の実装は `git show 46c4f4e2^:<path>` で取り出せる（SQL は `app/qu
 | 絵文字リアクション（中継） | ✅ 5.43.0 | `capabilities/reaction` | #4566。⚠ **`post_reaction` は流していない**（ハンドラは段階 4） |
 | ゲート（harness の Akkoma 系） | ✅ 5.43.0 | — | #4566 の手順 4。dev29 に向けて 0 failures（手順は [test-harness.md](test-harness.md)「手順（Pleroma 系・Akkoma）」） |
 | webhook | ⬜ | `features/webhook` | 段階 1（#4847） |
-| タグのフィード | ⬜ | `features/feed` | 段階 2（`tag_timeline` / `tagged_accounts`） |
-| アカウントの直近の投稿・添付の参照 | 🟡 | — | 段階 3。`recent_toot` は ✅ 5.43.0（API で読む・ゲートが要った）。`attachment` は未 |
+| タグのフィード | ⬜ | `features/feed` | 段階 2（#4860・`tag_timeline` / `tagged_accounts`） |
+| アカウントの直近の投稿・添付の参照 | 🟡 | — | 段階 3。`recent_toot` は ✅ 5.43.0（API で読む・ゲートが要った）。`attachment` は #4861 |
 | ハンドラ（post_reaction ほか） | ⬜ | — | 段階 4（1 本ずつ） |
 | メディアカタログ | ⬜ | `data/media_catalog` | 段階 5（`media_catalog`・重い） |
 | ストリーミング（listener） | ⬜ | `capabilities/streaming` | 段階 6 |
@@ -51,12 +52,12 @@ v4 の実装は `git show 46c4f4e2^:<path>` で取り出せる（SQL は `app/qu
 
 ## 段階
 
-各段階は **1 マイルストーンに 1 つ**を目安に、サブ Issue として切り出す。順番は小さく閉じるもの・ほかの段階の土台になるものを先にした。
+各段階はサブ Issue として切り出し、上の「2 件を切らさない」に沿って順に起票する。順番は小さく閉じるもの・ほかの段階の土台になるものを先にした。
 
 1. **webhook**（#4847）: `webhook_tokens` を `oauth_tokens` / `apps` / `users` で戻し、`features/webhook` を true に。
    dev29 で webhook から投稿が届くことを確かめる。v4 の SQL は 13 行で、現行の `Webhook.find_token_by_digest` はそのまま使える
-2. **タグのフィード**: `tag_timeline` / `tagged_accounts`。`objects.data->'tag'` を開く SQL で、件数が増えると重くなりうる（dev29 では測れないので形だけ）
-3. **直近の投稿・添付**: `recent_toot` / `attachment`。nowplaying の置き換えや webhook の添付が使う
+2. **タグのフィード**（#4860）: `tag_timeline` / `tagged_accounts`。`objects.data->'tag'` を開く SQL で、件数が増えると重くなりうる（dev29 では測れないので形だけ）。⚠ v4 の SQL は公開範囲を見ていない
+3. **直近の投稿・添付**: `recent_toot`（✅ 5.43.0）/ `attachment`（#4861）。nowplaying の置き換えや webhook の添付が使う
 4. **ハンドラ**: 判断が要るので 1 本ずつ。最初は `post_reaction` を流すところから
 5. **メディアカタログ**: Mastodon / Misskey でも重かった（[media_catalog.md](media_catalog.md)）。最後に回す
 6. **ストリーミング**: v4 の `PleromaListener` を戻す。Akkoma のストリーミングは Mastodon 互換

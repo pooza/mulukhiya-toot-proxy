@@ -23,12 +23,24 @@ mastodon:
   verified_at: '2026-10-02'
 
 misskey:
-  verified: 2026.10.0
-  verified_at: '2026-10-02'
+  verified: 2026.10.1
+  verified_at: '2026-10-24'
 
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
-last_checked: '2026-10-23'
+last_checked: '2026-10-24'
 
+# 2026-10-24 チェック結果:
+#   - Mastodon: 最新 stable は **v4.7.3（2026-10-01）＝ verified と同じ**。新しい RC も v5.0 のタグも無い（#4850）。
+#   - Misskey: **2026.10.1（2026-10-23T23:34Z）が出たので検証し、verified を昇格した。**
+#     harness を 2026.10.1 で再構築（update-version.sh → reset.sh）し、develop `bcea75db` で
+#     `TestHarness: controller=misskey url=http://localhost:3001` 1861 tests / 3953 assertions /
+#     **0 failures / 0 errors** / 145 omissions（5.43.0 のリリースゲートと tests・omissions とも同数）。
+#   - 差分の読み取り（2026.10.0...2026.10.1）: モロヘイヤに効く変更は無い。
+#     ハッシュタグの正規化が normalizeForSearch → normalizeTag に変わったが中身は同じ
+#     （256 code unit 超で NFKC を省くだけ）＝ tag_timeline.sql.erb の照合は不変。
+#     /api/announcements は自動アーカイブ日時を過ぎたものを有効一覧から外す（望ましい側）。
+#     /api/i/update はセンシティブな画像をアイコン・バナーにできなくなった（モロヘイヤは送らない）。
+#     マイグレーション 3 本はモロヘイヤが読まない列。Sentry SDK v11 の設定変更は Misskey 本体の運用側の話。
 # 2026-10-23 チェック結果:
 #   - **新しいものは無い。実走・bump とも不要。**`last_checked` の更新のみ。
 #   - Mastodon: 最新 stable は **v4.7.3（2026-10-01）＝ verified と同じ**。v4.7.3 より新しい RC は無い。v5.0 のタグもまだ無い（#4850）。

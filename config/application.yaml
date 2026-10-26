@@ -510,7 +510,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 5.43.0
+  version: 5.44.0
 parser:
   note:
     fields:
@@ -705,6 +705,10 @@ service:
         alert: 21600
         # 結果を持っておく秒数。過ぎると、Annict の失敗がそのまま 502 になる。
         ttl: 604800
+      # 辞書の口の鍵 (#4865)。取りに来る側は、辞書の URL に `?key=` で添える。
+      # ⚠ 空なら誰も取れない。鍵は local.yaml に置き、リポジトリに入れない。
+      # ⚠ 16 文字未満の鍵は無視する。
+      keys: []
     timeout: 5
     urls:
       api:
