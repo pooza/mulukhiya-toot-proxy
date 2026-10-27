@@ -81,6 +81,25 @@ module Mulukhiya
       end
     end
 
+    # 🔴 **外部サービスの宣言は `/service/*` の下 (#4869)。**以前はトップレベルにあり、
+    # annict / spotify / peer_tube の検査が丸ごと効いていなかった。
+    def test_service_constraints_are_applied
+      assert_not_empty(validate(service: {annict: {dictionary: {keys: ['x']}}}))
+      assert_not_empty(validate(service: {annict: {timeout: '5'}}))
+      assert_not_empty(validate(service: {peer_tube: {hosts: 'example.com'}}))
+      assert_empty(validate(service: {annict: {dictionary: {keys: ['0123456789abcdef']}}}))
+    end
+
+    # ⚠⚠ **既定値そのものが検査を通り、unknown_keys も出さない (#4869)。**`service` に properties が
+    # あるので、既定に宣言の無いキーを足すと全サーバーの `Config#audit` に出る。`required` を
+    # 付けると、その枝を使わないサーバーで検査が落ちる（既定が枝を持つため）。
+    def test_service_defaults_are_declared
+      defaults = YAML.load_file(File.join(Mulukhiya.dir, 'config/application.yaml'))['service']
+
+      assert_empty(validate(service: defaults))
+      assert_empty(config.send(:detect_unknown_keys, {'service' => defaults}, config.schema))
+    end
+
     private
 
     # ⚠ 必須項目（`controller` / DSN など）の不足は環境ごとに違うので、見たい枝だけを検査する。
