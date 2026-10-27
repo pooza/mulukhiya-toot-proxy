@@ -398,7 +398,7 @@ develop にすでに載っている bundler 4.0.20・ginseng-piefed v0.4.1・doc
   括弧の閉じていない作品名などが設定エラーになる（値は GraphQL の titles と `include?` に渡す文字列で、正規表現ではない）。
   指摘は正しい → `a7f05fd0` で外して push、返信・👍 済み（P2 なので `@codex review` はしない）。`rake yaml:lint` 通過
 - 🔴 **bundler-audit が sanitize 7.0.0 の新しい advisory（GHSA-wgw9-qhqg-8hv5・CSS のネストで許可リストをすり抜ける・7.0.1 で修正）を出している。**
-  ginseng-core（`>= 6.0.2`）経由。Dependabot のアラートはまだ立っていない。⚠ **develop の `rake lint` はこれで落ちる**
+  ginseng-core（`>= 6.0.2`）経由。Dependabot のアラートはまだ立っていない。develop の `rake lint` がこれで落ちていた → ✅ **同日 7.0.1 へ上げた（develop へ直接・ユーザー承認）**。`rake lint` 脆弱性なし・`rake test` 1795 tests・0 failures / 0 errors
 - **マイルストーン**: 前回と同じ（5.45.0 は Issue 8 件＋PR 4 件、5.46.0 は 2 件）。on-hold 以外でマイルストーン無しは 0 件
 - **ginseng-\* のピン**: 前回と同じ（ginseng-core v2.4.2 → v4.2.0 ＝ #4862 を 5.45.0 で v4.2.0 へ）
 - **Annict の API**: 前回と同じ（`rails/app/graphql` の最新は 10-17・公式アカウントの最新は 10-25 の規約の告知）
