@@ -198,7 +198,7 @@ git diff Gemfile.lock
 [マイルストーン 5.45.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/644)。着手時に `config/application.yaml` を 5.45.0 へバンプする。
 
 - open 8 件: #4857 / #4854 / #4851・#4850 / #4848 / #4847 / #4860 / #4869
-- 待っている PR: #4862（#4848 ginseng-core v4.1.0）・#4863（#4847 Akkoma の webhook）・#4870（#4869 スキーマの `/service/*`）・#4868（dependabot の rack-test）。5.44.0 を出したのでマージしてよい
+- ✅ **2026-10-28 に PR 4 本をマージ（ユーザー承認・CI 両系緑）**: #4868（rack-test 2.3.0）/ #4863（#4847 Akkoma の webhook）/ #4862（#4848・**マージ前に v4.2.0 へ上げた** `46f3942a`・手元で rubocop 無指摘・`rake test` 1793 tests・0 failures / 0 errors）/ #4870（#4869）。Issue は open のまま（クローズはラップ時の判断）
 - 📌 **手順 12（掃除 PR）**: 5.44.0 のリリース前レビューの黄 1 件（辞書の口で断った理由をログで区別する）
 - 5.46.0 は #4861 / #4864
 
