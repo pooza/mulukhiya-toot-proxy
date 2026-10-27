@@ -210,7 +210,7 @@ git diff Gemfile.lock
 [マイルストーン 5.44.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/646)。
 
 - ✅ **辞書の鍵の実物**: 配る側の gomander（鍵 1 本）・zugoga（2 本）とも、鍵ありで 200・鍵なし / 違う鍵で 403。取りに来る側の gomander・zugoga は再起動後の更新で `empty_sources: 0`・語数も前と同じ。syslog に `Bad response 403` なし
-- 残り: wiki（Annictの設定項目・公開API）に他の運用者向けの注意書き → **Annict の運営者へリリースの報告**。きゅあすきーの管理人への連絡はユーザーがする。#4865 は報告のあとで閉じる
+- ✅ wiki（Annictの設定項目・公開API）に他の運用者向けの注意書き → ✅ **Annict の運営者（榛葉さん）へリリースの報告（10-26 15:31 JST・ユーザーが送信）**。返事は無いが了解されている理解。残りは #4865 のクローズ
 
 ### 開発の記録
 
