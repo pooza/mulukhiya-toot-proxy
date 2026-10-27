@@ -528,9 +528,9 @@ properties:
             type: integer
           urls:
             type: object
+          # 作品名の検索語。GraphQL の titles と `include?` に渡す文字列で、正規表現ではない
           works:
             items:
-              format: regex
               type: string
             type: array
         type: object
