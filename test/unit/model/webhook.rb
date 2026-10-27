@@ -94,12 +94,18 @@ module Mulukhiya
       # JSON.parse / assert で落とす。harness 側の provisioning は chubo2#63。
       omit('mulukhiya webhook エンドポイント未提供（chubo2#63）') \
         if harness? && endpoint_missing?(command.stdout, @test_hook.uri.path)
+      # ⚠ Pleroma 系（dev29）は前段に本物のモロヘイヤが居るが、digest に混ざる `/crypt/salt` が
+      # 手元と違うので、手元で作った digest は引き当てられない (#4847)。これも検証側の食い違いなので
+      # harness のときだけ omit する。⚠ 自分の digest の「見つからない」に限る（ほかの応答は落とす）。
+      omit('前段のモロヘイヤと salt が違い digest が一致しない（#4847）') \
+        if harness? && digest_unknown_upstream?(command.stdout)
 
       assert_predicate(command.status, :zero?)
       status = JSON.parse(command.stdout)
 
       assert_kind_of(Hash, status)
-      assert_includes(['id', 'account', 'createdNote'], status.keys.first)
+      # ⚠ 先頭のキーでは見ない（Akkoma は `url` が先頭・#4847）。
+      refute_empty(status.keys & ['id', 'createdNote'])
     end
 
     private
@@ -120,6 +126,12 @@ module Mulukhiya
     #
     # ここが将来 Fastify の文言変更で外れた場合は omit されず assert で赤くなる
     # （実退行を飲むより、検証条件のズレに気づけるほうを採る）。
+    def digest_unknown_upstream?(body)
+      parsed = JSON.parse(body) rescue nil
+      return false unless parsed.is_a?(Hash)
+      return parsed['error'] == "Webhook not found (digest: #{@test_hook.digest[0, 12]}...)"
+    end
+
     def endpoint_missing?(body, path)
       return true if body.lstrip.start_with?('<')
       parsed = JSON.parse(body) rescue nil

@@ -88,8 +88,9 @@ html lang='ja' data-theme='light'
               .then(e => {
                 this.account = this.methods.createAccountInfo(e)
                 this.disabled_tags = this.methods.dig(e, 'config', 'tagging', 'tags', 'disabled')
+                // 未ログインでは断られる (#4865)
+                if (this.account.username) this.getWorks()
               })
-            this.getWorks()
           },
           methods: {
             copyToClipboard (text) {

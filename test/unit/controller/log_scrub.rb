@@ -23,6 +23,11 @@ module Mulukhiya
       assert_equal('[FILTERED]', scrub('access_token' => 'SECRET')['access_token'])
     end
 
+    # ⚠ エピソード辞書の口の鍵 (#4865・PR #4867 の Codex P1)。
+    def test_scrubs_dictionary_key
+      assert_equal('[FILTERED]', scrub('key' => '0123456789abcdef')['key'])
+    end
+
     def test_scrubs_post_body
       scrubbed = scrub('text' => '本文', 'cw' => '注釈')
 

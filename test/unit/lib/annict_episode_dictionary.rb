@@ -68,6 +68,7 @@ module Mulukhiya
 
     def setup
       @saved = ['fresh', 'alert'].to_h {|k| [k, config["/service/annict/dictionary/cache/#{k}"]]}
+      @dictionary_keys = config['/service/annict/dictionary/keys']
       @keywords = AnnictService.keywords
       config['/service/annict/works'] = ['いまの作品']
       config['/service/annict/dictionary/cache/fresh'] = FRESH
@@ -77,6 +78,34 @@ module Mulukhiya
     def teardown
       @saved.each {|k, v| config["/service/annict/dictionary/cache/#{k}"] = v}
       config['/service/annict/works'] = @keywords
+      config['/service/annict/dictionary/keys'] = @dictionary_keys
+    end
+
+    # 辞書の口の鍵 (#4865)。
+    def test_key_matches_configured_keys
+      config['/service/annict/dictionary/keys'] = ['0123456789abcdef', 'fedcba9876543210']
+
+      assert(AnnictEpisodeDictionary.key?('fedcba9876543210'))
+      assert_false(AnnictEpisodeDictionary.key?('0123456789abcdeX'))
+      assert_false(AnnictEpisodeDictionary.key?(''))
+      assert_false(AnnictEpisodeDictionary.key?(nil))
+      assert_false(AnnictEpisodeDictionary.key?(['fedcba9876543210']))
+    end
+
+    # ⚠ 鍵が 1 つも無ければ、誰も通さない。
+    def test_key_without_configured_keys
+      config['/service/annict/dictionary/keys'] = []
+
+      assert_false(AnnictEpisodeDictionary.key?('0123456789abcdef'))
+      assert_false(AnnictEpisodeDictionary.key?(''))
+    end
+
+    # ⚠ 短い鍵は設定にあっても通さない（PR #4867 の Codex P2）。スキーマの検査が効かないため。
+    def test_short_configured_key_is_ignored
+      config['/service/annict/dictionary/keys'] = ['x', '0123456789abcde']
+
+      assert_false(AnnictEpisodeDictionary.key?('x'))
+      assert_false(AnnictEpisodeDictionary.key?('0123456789abcde'))
     end
 
     def test_builds_and_stores_without_cache
@@ -272,6 +301,7 @@ module Mulukhiya
       source = File.read(File.join(Environment.dir, 'app/lib/mulukhiya/controller/api_controller.rb'))
       route = source[%r{get '/tagging/dic/annict/episodes' do.*?\n    end\n}m]
 
+      assert_match(/AnnictEpisodeDictionary\.key\?\(params\[:key\]\)/, route)
       assert_match(/AnnictEpisodeDictionary\.new\(annict\)/, route)
       assert_match(/report_error\(dictionary\.error\) if dictionary\.alert\?/, route)
     end
