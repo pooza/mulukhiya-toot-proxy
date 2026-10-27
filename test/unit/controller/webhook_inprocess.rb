@@ -65,8 +65,8 @@ module Mulukhiya
 
       assert_equal(200, last_response.status, last_response.body.to_s[0, 200])
       body = JSON.parse(last_response.body)
-      # ⚠ Mastodon は `id` / `account`、Misskey は `createdNote`。
-      assert_includes(['id', 'account', 'createdNote'], body.keys.first)
+      # ⚠ Mastodon・Akkoma は `id`、Misskey は `createdNote`。⚠ 先頭のキーでは見ない（Akkoma は `url` が先頭）。
+      refute_empty(body.keys & ['id', 'createdNote'])
     end
 
     # ⚠ **GET は疎通確認だけ。**投稿はしない。
