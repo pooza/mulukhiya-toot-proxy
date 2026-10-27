@@ -389,6 +389,24 @@ develop にすでに載っている bundler 4.0.20・ginseng-piefed v0.4.1・doc
 
 ## セッション同期の記録
 
+### 2026-10-28 セッション同期の記録
+
+**本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。chubo2 の Issue 棚卸し（10-25）はスキップ。
+
+- **ブランチ**: `develop` は `origin/develop` と同一（`fc507620`）。open PR **4 件**（#4862・#4863・#4870 ＝ 5.45.0、#4868 ＝ dependabot の rack-test）・Dependabot アラート **0 件**
+- ⚠ **Codex: PR #4870 に未返信の P2 が 1 件**（10-25 22:45Z）。`/service/annict/works` に `format: regex` を付けたまま検査の効く場所へ移したので、
+  括弧の閉じていない作品名などが設定エラーになる（値は GraphQL の titles と `include?` に渡す文字列で、正規表現ではない）。
+  指摘は正しい → `a7f05fd0` で外して push、返信・👍 済み（P2 なので `@codex review` はしない）。`rake yaml:lint` 通過
+- 🔴 **bundler-audit が sanitize 7.0.0 の新しい advisory（GHSA-wgw9-qhqg-8hv5・CSS のネストで許可リストをすり抜ける・7.0.1 で修正）を出している。**
+  ginseng-core（`>= 6.0.2`）経由。Dependabot のアラートはまだ立っていない。⚠ **develop の `rake lint` はこれで落ちる**
+- **マイルストーン**: 前回と同じ（5.45.0 は Issue 8 件＋PR 4 件、5.46.0 は 2 件）。on-hold 以外でマイルストーン無しは 0 件
+- **ginseng-\* のピン**: 前回と同じ（ginseng-core v2.4.2 → v4.2.0 ＝ #4862 を 5.45.0 で v4.2.0 へ）
+- **Annict の API**: 前回と同じ（`rails/app/graphql` の最新は 10-17・公式アカウントの最新は 10-25 の規約の告知）
+- **辞書台帳**: **🔴 の新規なし**（直書き 1・台帳に無い 2 は既知）。🟡 の増減のみ。再生成を chubo2 へ（`3dd81c1`）
+- **harness upstream**: 新しい版なし（Mastodon v4.7.3 / Misskey 2026.10.1）。`last_checked` を 10-28 に
+- **chubo2**: open 15 件（前回と同じ）
+- **Sentry**: unresolved **32 件**・**コメント 0 は 0 件**（2026-10-28 時点）。前回の同期以降の新しいイベントはなし（最新は -31 の 10-23T22:35Z）
+
 ### 2026-10-26 セッション同期の記録
 
 **本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。harness の upstream 確認（10-24）と chubo2 の Issue 棚卸し（10-25）はスキップ。
