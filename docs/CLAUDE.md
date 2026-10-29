@@ -204,7 +204,7 @@ git diff Gemfile.lock
   多いのは**短いカタカナの語が長いカタカナ語の中に当たる誤爆**（gomander 2,687 当たり中 250・zugoga 186 中 25。3 文字以下の語に集中）。
   方針は 3 文字以下・カタカナの語の前後にカタカナがあれば当てない（[調査結果のコメント](https://github.com/pooza/mulukhiya-toot-proxy/issues/4854#issuecomment-6455055573)）。
   「印＋手がかり」の設計は **#4873（on-hold）** へ切り出した。この版の「機能が前へ進む」枠は #4854 のまま
-- 5.46.0 は #4861 / #4864
+- 5.46.0 は #4861 / #4864 / #4874 / #4875 / #4876（ginseng-\* の告知 3 件は 2026-10-30 に追加。緊急性なし＝ユーザー判断）
 
 ## リリース済み: 5.44.0（2026-10-26）
 
@@ -402,7 +402,8 @@ develop にすでに載っている bundler 4.0.20・ginseng-piefed v0.4.1・doc
   差分にマイグレーション無し・モロヘイヤに効く変更なし（詳細は harness-verified-versions.yaml）。harness は `stop.sh` で止めた
 - **ブランチ**: `develop` は `origin/develop` と同一（`ac1f316d`）。open PR **0 件**・Dependabot アラート **0 件**
 - **Codex**: 未対応なし（直近マージ 8 本。#4867 の P1・P2、#4870 の P2 とも返信・👍 済み）。PR 本体への申し送りもなし
-- ⚠ **マイルストーン無しの Issue が 3 件増えた**（10-28 23:40Z・ginseng-\* 当番からの告知）: #4874（ginseng-piefed 0.5.0）/ #4875（ginseng-fediverse 6.0.1）/ #4876（ginseng-core 4.3.0 で `TestCase.load` の写しを消せる）。割り当てはユーザー判断待ち
+- ⚠ **マイルストーン無しの Issue が 3 件増えた**（10-28 23:40Z・ginseng-\* 当番からの告知）: #4874（ginseng-piefed 0.5.0）/ #4875（ginseng-fediverse 6.0.1）/ #4876（ginseng-core 4.3.0 で `TestCase.load` の写しを消せる）。→ **3 件とも 5.46.0 へ**（ユーザー判断: 緊急性なし。漏れる先は運用者だけが読めるログで、問い合わせる相手は信頼できる姉妹サーバーだけ）。
+  fediverse は 7.0.1 まで上げる案を #4875 にコメントした（7.0.0 の破壊的変更は `RemoteTagHandler` の rescue で受けられる）。piefed 0.6 系は、アカウントのオブジェクトがジョブごとに作り直されるかを着手時に確かめる
 - **ginseng-\* のピン**: 7 本ずれ。core v4.2.0 → v4.3.0（#4876）/ **fediverse v6.0.0 → v7.0.1（major・`fix!: MulukhiyaService もリダイレクトのガードを通す`（#320）。告知 Issue は 6.0.1 の #4875 だけ）** / piefed v0.4.1 → v0.6.1（#4874 の先・ログイン失敗でログインし直さない）/
   postgres・redis・web・youtube は patch（ginseng-style の参照と、テストの `TestCase.load` の写しを消しただけ＝**見送り**・実害なし）
 - **Annict の API**: 前回と同じ（`rails/app/graphql` の最新は 10-17・公式アカウントの最新は 10-25 の規約の告知）
