@@ -393,6 +393,23 @@ develop にすでに載っている bundler 4.0.20・ginseng-piefed v0.4.1・doc
 
 ## セッション同期の記録
 
+### 2026-10-30 セッション同期の記録
+
+**本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。harness の upstream 確認は前回から 2 日だが、Mastodon v4.7.4 が出たので回した（下記）。chubo2 の Issue 棚卸し（10-25）はスキップ。
+
+- ✅ **Mastodon v4.7.4（10-29 リリース）の互換性を確認し、verified を昇格した**（ユーザー依頼）。develop `ac1f316d` で
+  `TestHarness: controller=mastodon url=http://localhost:3000` 1869 tests・**0 failures / 0 errors**・158 omissions。
+  差分にマイグレーション無し・モロヘイヤに効く変更なし（詳細は harness-verified-versions.yaml）。harness は `stop.sh` で止めた
+- **ブランチ**: `develop` は `origin/develop` と同一（`ac1f316d`）。open PR **0 件**・Dependabot アラート **0 件**
+- **Codex**: 未対応なし（直近マージ 8 本。#4867 の P1・P2、#4870 の P2 とも返信・👍 済み）。PR 本体への申し送りもなし
+- ⚠ **マイルストーン無しの Issue が 3 件増えた**（10-28 23:40Z・ginseng-\* 当番からの告知）: #4874（ginseng-piefed 0.5.0）/ #4875（ginseng-fediverse 6.0.1）/ #4876（ginseng-core 4.3.0 で `TestCase.load` の写しを消せる）。割り当てはユーザー判断待ち
+- **ginseng-\* のピン**: 7 本ずれ。core v4.2.0 → v4.3.0（#4876）/ **fediverse v6.0.0 → v7.0.1（major・`fix!: MulukhiyaService もリダイレクトのガードを通す`（#320）。告知 Issue は 6.0.1 の #4875 だけ）** / piefed v0.4.1 → v0.6.1（#4874 の先・ログイン失敗でログインし直さない）/
+  postgres・redis・web・youtube は patch（ginseng-style の参照と、テストの `TestCase.load` の写しを消しただけ＝**見送り**・実害なし）
+- **Annict の API**: 前回と同じ（`rails/app/graphql` の最新は 10-17・公式アカウントの最新は 10-25 の規約の告知）
+- **辞書台帳**: **🔴 の新規なし**。vulcan の delmulin `common.json` が 🟡 → 🟢。再生成を chubo2 へ（`7bcc12a`）
+- **chubo2**: open 18 件（前回 15）。増えたのは #289〜#292（DMARC・DNS・miki のシークレット・MAKOTO ライブ週末の apt 凍結）で、こちらへの影響なし
+- **Sentry**: unresolved **32 件**・**コメント 0 は 0 件**（2026-10-30 時点）。**-38 に 10-29 の新しいイベント 5 件**（instance-20220704-2044 の 5.43.0 で 2 件・きゅあすきーの 5.44.0 で 3 件。どちらも 1 秒以内の Redis 接続拒否＝更新に伴う再起動の起動順）。count=11 で判断をコメントした
+
 ### 2026-10-28 セッション同期の記録
 
 **本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。chubo2 の Issue 棚卸し（10-25）はスキップ。
