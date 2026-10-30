@@ -45,10 +45,22 @@ module Mulukhiya
     # 実際の設定（`/service/annict/*`）と場所が違い、検査が効かない。`service` に properties を
     # 足すと `Config#audit` がほかの `/service/*` を軒並み unknown_keys にするので、ここで落とす。
     def self.key?(key)
-      return false unless key.is_a?(String) && key.present?
-      return Array(Config.instance['/service/annict/dictionary/keys']).any? do |v|
-        v.is_a?(String) && MIN_KEY_LENGTH <= v.length && Rack::Utils.secure_compare(v, key)
-      end
+      return key_rejection(key).nil?
+    end
+
+    # 鍵を断る理由。通すなら nil。
+    #
+    # ⚠ **理由はログで区別するためのもの**（5.44.0 のリリース前レビューの黄）。姉妹サーバーが
+    # 鍵を設定するとき、取りに来る側には `Bad response 403` しか残らないので、配る側のログで
+    # 原因を読む。⚠ 応答の本文には出さない（`Unauthorized` のまま）。鍵そのものも残さない。
+    def self.key_rejection(key)
+      return :missing unless key.is_a?(String) && key.present?
+      keys = Array(Config.instance['/service/annict/dictionary/keys']).grep(String)
+      return :not_configured unless keys.any?(&:present?)
+      keys = keys.select {|v| MIN_KEY_LENGTH <= v.length}
+      return :too_short unless keys.present?
+      return nil if keys.any? {|v| Rack::Utils.secure_compare(v, key)}
+      return :mismatch
     end
 
     def initialize(annict, storage: AnnictDictionaryStorage.new)

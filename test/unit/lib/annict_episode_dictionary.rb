@@ -100,6 +100,24 @@ module Mulukhiya
       assert_false(AnnictEpisodeDictionary.key?(''))
     end
 
+    # 断る理由はログで区別する（5.44.0 のリリース前レビューの黄）。
+    def test_key_rejection
+      config['/service/annict/dictionary/keys'] = ['0123456789abcdef']
+
+      assert_nil(AnnictEpisodeDictionary.key_rejection('0123456789abcdef'))
+      assert_equal(:missing, AnnictEpisodeDictionary.key_rejection(nil))
+      assert_equal(:missing, AnnictEpisodeDictionary.key_rejection(''))
+      assert_equal(:mismatch, AnnictEpisodeDictionary.key_rejection('0123456789abcdeX'))
+
+      config['/service/annict/dictionary/keys'] = []
+
+      assert_equal(:not_configured, AnnictEpisodeDictionary.key_rejection('0123456789abcdef'))
+
+      config['/service/annict/dictionary/keys'] = ['0123456789abcde']
+
+      assert_equal(:too_short, AnnictEpisodeDictionary.key_rejection('0123456789abcde'))
+    end
+
     # ⚠ 短い鍵は設定にあっても通さない（PR #4867 の Codex P2）。スキーマの検査が効かないため。
     def test_short_configured_key_is_ignored
       config['/service/annict/dictionary/keys'] = ['x', '0123456789abcde']
@@ -301,7 +319,7 @@ module Mulukhiya
       source = File.read(File.join(Environment.dir, 'app/lib/mulukhiya/controller/api_controller.rb'))
       route = source[%r{get '/tagging/dic/annict/episodes' do.*?\n    end\n}m]
 
-      assert_match(/AnnictEpisodeDictionary\.key\?\(params\[:key\]\)/, route)
+      assert_match(/AnnictEpisodeDictionary\.key_rejection\(params\[:key\]\)/, route)
       assert_match(/AnnictEpisodeDictionary\.new\(annict\)/, route)
       assert_match(/report_error\(dictionary\.error\) if dictionary\.alert\?/, route)
     end
