@@ -536,7 +536,7 @@ parser:
 pleroma:
   # Akkoma（Pleroma 系）。#4566 で復活。⚠ 最初の段階の対象は health・pre_toot パイプライン・
   # トークンからのアカウント解決だけで、ストリーミング・メディアカタログなどは切ってある。
-  # webhook は段階 1（#4847）で戻した。進み具合は docs/pleroma.md。
+  # webhook は段階 1（#4847）、タグのフィードは段階 2（#4860）で戻した。進み具合は docs/pleroma.md。
   attachment:
     limit: 4
     types:
@@ -552,7 +552,7 @@ pleroma:
     streaming: false
   data:
     account_timeline: false
-    favorite_tags: false
+    favorite_tags: true
     futured_tag: false
     media_catalog: false
   dbms: postgres
@@ -561,7 +561,7 @@ pleroma:
     annict: false
     announcement: false
     announcement_push: false
-    feed: false
+    feed: true
     webhook: true
   oauth:
     callback:
