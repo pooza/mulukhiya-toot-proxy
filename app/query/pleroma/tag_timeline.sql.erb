@@ -1,6 +1,6 @@
 SELECT
   objects.data->>'id' AS uri,
-  (objects.data->>'published')::timestamptz AT TIME ZONE 'UTC' AS created_at,
+  objects.data->>'published' AS created_at,
   split_part(users.nickname, '@', 1) AS username,
   CASE WHEN users.local THEN null ELSE split_part(users.nickname, '@', 2) END AS domain,
   users.name AS display_name,
