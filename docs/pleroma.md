@@ -42,7 +42,7 @@ v4 の実装は `git show 46c4f4e2^:<path>` で取り出せる（SQL は `app/qu
 | 絵文字リアクション（中継） | ✅ 5.43.0 | `capabilities/reaction` | #4566。⚠ **`post_reaction` は流していない**（ハンドラは段階 4） |
 | ゲート（harness の Akkoma 系） | ✅ 5.43.0 | — | #4566 の手順 4。dev29 に向けて 0 failures（手順は [test-harness.md](test-harness.md)「手順（Pleroma 系・Akkoma）」） |
 | webhook | ✅ 5.44.0 | `features/webhook` | 段階 1（#4847）。⚠ `media_ids` は文字列で送る（`PleromaService#post`） |
-| タグのフィード | ⬜ | `features/feed` | 段階 2（#4860・`tag_timeline` / `tagged_accounts`） |
+| タグのフィード・お気に入りタグ | ✅ 5.45.0 | `features/feed` / `data/favorite_tags` | 段階 2（#4860）。⚠ タグは `hashtags` / `hashtags_objects` の表で引く（v4 は JSON の配列を開いていた） |
 | アカウントの直近の投稿・添付の参照 | 🟡 | — | 段階 3。`recent_toot` は ✅ 5.43.0（API で読む・ゲートが要った）。`attachment` は #4861 |
 | ハンドラ（post_reaction ほか） | ⬜ | — | 段階 4（1 本ずつ） |
 | メディアカタログ | ⬜ | `data/media_catalog` | 段階 5（`media_catalog`・重い） |
@@ -58,7 +58,12 @@ v4 の実装は `git show 46c4f4e2^:<path>` で取り出せる（SQL は `app/qu
    ローカルは `users.local`、期限は `valid_until`（UTC の naive な時刻）で見る。dev29 の本物の webhook URL で本文・添付とも投稿できた。
    ⚠ **Akkoma は `media_ids` の要素に文字列を求める**（gem の `upload` は `to_i` で返す・Mastodon は整数でも受ける）。
    ⚠ `WebhookTest#test_command` は dev29 の前段のモロヘイヤと `/crypt/salt` が違うので、harness のときは omit になる（手元の digest が通じない）
-2. **タグのフィード**（#4860）: `tag_timeline` / `tagged_accounts`。`objects.data->'tag'` を開く SQL で、件数が増えると重くなりうる（dev29 では測れないので形だけ）。⚠ v4 の SQL は公開範囲を見ていない
+2. ✅ **タグのフィード**（#4860・5.45.0）: `tag_timeline` / `tagged_accounts`。
+   - ⚠ **JSON の中身は、索引の要らない用途にだけ使う。**Akkoma は「JSON のまま、よく引く経路にだけ式の索引を張る。それでも重いものは本物の列・表へ出す」作りで、索引の無い JSON の経路を条件に使うと全件を読む。
+     タグは後から `hashtags` / `hashtags_objects` へ出されたので、それで引く。JSON を見るのは、タグで絞った後の `type` と公開範囲（`to` に `#Public`＝公開。`cc` だけなら未収載）、取り出す列だけ
+   - ⚠ **日時は `published` を ISO の文字列のまま返す。**タイムゾーン無しの時刻にすると JST として読まれ、9 時間ずれる（#4864 と同じ形）
+   - ⚠ 本文はローカルの投稿なら `source.content`（Akkoma 3.x はオブジェクト）、リモートの投稿は `content`（HTML）
+   - ついでに直したもの: `NodeInfo#update` が Pleroma 系で自分のキャッシュを読み直し、ノード名を落としていた（フィードのチャンネル名が空になる）
 3. **直近の投稿・添付**: `recent_toot`（✅ 5.43.0）/ `attachment`（#4861）。nowplaying の置き換えや webhook の添付が使う
 4. **ハンドラ**: 判断が要るので 1 本ずつ。最初は `post_reaction` を流すところから
 5. **メディアカタログ**: Mastodon / Misskey でも重かった（[media_catalog.md](media_catalog.md)）。最後に回す
