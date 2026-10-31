@@ -197,14 +197,14 @@ git diff Gemfile.lock
 
 [マイルストーン 5.46.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/645)。`config/application.yaml` は 5.45.0 のまま（着手時にバンプする）。
 
-- 5.46.0 は #4850 / #4851 / #4861 / #4864 / #4874 / #4875 / #4876 / #4880（ginseng-\* の告知 3 件は 2026-10-30 に追加。緊急性なし＝ユーザー判断）
+- 5.46.0 は #4850 / #4851 / #4861 / #4864 / #4884 / #4874 / #4875 / #4876 / #4880（ginseng-\* の告知 3 件は 2026-10-30 に追加。緊急性なし＝ユーザー判断）
 
 ## リリース済み: 5.45.0（2026-10-31）
 
 本番 4 台へデプロイ済み（12:07〜12:13・shallu → zugoga → gomander → vulcan・`main` の `c02001d6`・Ruby 4.0.9 据え置き）。[リリースノート](https://github.com/pooza/mulukhiya-toot-proxy/releases/tag/v5.45.0)。
 
 - ⚠ デプロイ直後の `/nodeinfo/2.0` は、次の `nodeinfo_update`（5 分ごと）まで旧版を返す。公開面で版を見るなら 10 分待つか `/mulukhiya/api/about` を見る
-- Issue はラップ時に判断するので 6 件とも open のまま。#4860 を閉じるときに Akkoma の段階 4 を起票する（`docs/pleroma.md`「2 件を切らさない」）
+- Issue 6 件とマイルストーンは 2026-10-31 に閉じた（ユーザー判断）。Akkoma の次は段階 4 の #4884（`docs/pleroma.md`「2 件を切らさない」）
 
 [マイルストーン 5.45.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/644)。`config/application.yaml` は 5.45.0 へバンプ済み（2026-10-28）。
 
