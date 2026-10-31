@@ -207,6 +207,17 @@ git diff Gemfile.lock
   「印＋手がかり」の設計は **#4873（on-hold）** へ切り出した。この版の「機能が前へ進む」枠は #4854 のまま
 - 5.46.0 は #4850 / #4851 / #4861 / #4864 / #4874 / #4875 / #4876 / #4880（ginseng-\* の告知 3 件は 2026-10-30 に追加。緊急性なし＝ユーザー判断）
 
+### リリース準備の現在地（2026-10-31）
+
+- **セキュリティ**: Dependabot 0 件・bundler-audit 脆弱性なし。`bundle update` は `ac9c86b3`（ginseng-\* は動かず・bundler 4.0.20 のまま）
+- **3 系統の実走**（develop `ac9c86b3`）: すべて 0 failures / 0 errors
+  - `controller=mastodon url=http://localhost:3000`（v4.7.4）: 1887 tests・159 omissions
+  - `controller=misskey url=http://localhost:3001`（2026.10.1）: 1890 tests・146 omissions
+  - `controller=pleroma url=https://st.akkoma.b-shock.org`（3.20.1）: 1877 tests・189 omissions
+- **ステージング 4 台**（dev24〜27・`ac9c86b3`）: `config: OK`・health 200・version 5.45.0。WebUI は dev25 / dev27 を目視。dev24 の `/feed/media` の 503 は `media_catalog: false` の設定どおり
+- **dev29**: develop へ切り替えた（古い feature ブランチのままだった）。存在しないタグは 404、タグのリンクは `/tag/…` を実機で確認
+- **未了**: main へのマージ・タグ・本番デプロイ
+
 ### リリース前レビュー（5 観点）の結果（2026-10-31）
 
 対象は `v5.44.0..develop`。**赤 0・黄 5・緑 7**。size:S は掃除 PR で直した。
