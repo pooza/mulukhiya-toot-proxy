@@ -77,6 +77,11 @@ module Mulukhiya
       end
     end
 
+    # ⚠ Akkoma のタグのページは `/tag/`。`/tags/` は Atom / RSS の口で、HTML を求めると 406 になる。
+    def create_tag_uri(tag)
+      return create_uri("/tag/#{tag.to_hashtag_base}")
+    end
+
     def default_uri
       return URI.parse(config['/pleroma/url'])
     end

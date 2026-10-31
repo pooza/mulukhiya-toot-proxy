@@ -41,9 +41,8 @@ module Mulukhiya
 
     # 辞書の口（`GET /tagging/dic/annict/episodes`）の鍵か (#4865)。
     # ⚠ 鍵が 1 つも無ければ、誰も通さない。
-    # ⚠ **短い鍵は設定にあっても無視する**（PR #4867 の Codex P2）。スキーマの `/annict/*` は
-    # 実際の設定（`/service/annict/*`）と場所が違い、検査が効かない。`service` に properties を
-    # 足すと `Config#audit` がほかの `/service/*` を軒並み unknown_keys にするので、ここで落とす。
+    # ⚠ **短い鍵は設定にあっても無視する**（PR #4867 の Codex P2）。スキーマの検査（#4869）は
+    # `strict` が false の間は起動を止めないので、ここでも落とす。
     def self.key?(key)
       return key_rejection(key).nil?
     end

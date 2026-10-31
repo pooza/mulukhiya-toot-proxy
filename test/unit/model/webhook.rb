@@ -126,12 +126,6 @@ module Mulukhiya
     #
     # ここが将来 Fastify の文言変更で外れた場合は omit されず assert で赤くなる
     # （実退行を飲むより、検証条件のズレに気づけるほうを採る）。
-    def digest_unknown_upstream?(body)
-      parsed = JSON.parse(body) rescue nil
-      return false unless parsed.is_a?(Hash)
-      return parsed['error'] == "Webhook not found (digest: #{@test_hook.digest[0, 12]}...)"
-    end
-
     def endpoint_missing?(body, path)
       return true if body.lstrip.start_with?('<')
       parsed = JSON.parse(body) rescue nil
@@ -139,6 +133,12 @@ module Mulukhiya
       return false unless parsed['statusCode'] == 404
       return false unless parsed['error'] == 'Not Found'
       return parsed['message'].to_s == "Route POST:#{path} not found"
+    end
+
+    def digest_unknown_upstream?(body)
+      parsed = JSON.parse(body) rescue nil
+      return false unless parsed.is_a?(Hash)
+      return parsed['error'] == "Webhook not found (digest: #{@test_hook.digest[0, 12]}...)"
     end
   end
 end
