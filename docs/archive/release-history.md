@@ -2,6 +2,73 @@
 
 CLAUDE.md から分離した過去のリリースノート。直近リリースは [CLAUDE.md](../CLAUDE.md) を参照。
 
+## リリース済み: 5.42.0（2026-10-14）
+
+**本番デプロイ: 4 台完了**（2026-10-14 07:53〜07:56、shallu → zugoga → gomander → vulcan の順・水曜の朝。
+全台 version 5.42.0 / health 200 / Ruby 4.0.7（据え置き）/ `postgres.pool.waiting` 0 / FreeBSD 3 台は monit 復帰 / vulcan は 3 ユニットとも `NRestarts=0`）。
+`main` の `41c0d4e0` / [v5.42.0](https://github.com/pooza/mulukhiya-toot-proxy/releases/tag/v5.42.0)（PR #4840）。
+[マイルストーン 5.42.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/642)（7 件・クローズ済み）。
+
+### 本番デプロイで見たこと
+
+- **4 台とも 1 回で通った**（1 台あたり約 45 秒）。`config:lint` は 4 台とも `config: OK`・起動後のエラー行 0。rc.d / systemd unit・Ruby・gem の変更なし
+- 事前確認: 4 台とも `main` の `95855040`・作業ツリーに変更なし（vulcan の `vendor/` は未追跡で従来どおり）
+- **pgbouncer の実物で WARN の判定を通した**（ステージングは pgbouncer を挟んでいないので、ここが初めて）: shallu 15 / 500・zugoga 9 / 500・gomander 15 / 500 で `postgres` は `OK`・`reason` なし
+- **再起動の直後に `rake mulukhiya:media_catalog:update` を打った**（FreeBSD 3 台）。キャッシュの鍵は `media_catalog_v3`（shallu 4 本・zugoga 6 本・gomander 6 本）。
+  外から `/mulukhiya/api/media?page=2` は 3 台とも 200（0.07〜0.10 秒）・`/feed/media` は 0.86〜1.10 秒
+- vulcan は `/mulukhiya/api/media` が 503（メディアカタログは無効のまま＝ flip は別途）
+- ⚠ **リリースノートの「アップグレードの前に」は 3 点**: pgbouncer の WARN と通知／キャッシュの鍵（更新タスク）／Misskey の `next_cursor` の形
+- ⚠ **Wiki**: 公開API（health の WARN・`/media` の cursor）と PostgreSQL の設定項目（`clients_ratio`）を更新
+
+### 開発時の記録
+
+
+- ✅ **2026-10-14 に PR を 3 本マージした（ユーザー承認・CI 両系 SUCCESS・Codex の P2 は対処済み）**: #4835（`52a4e4fd`）/ #4836（`ebc31225`）/ #4837（`d5a07b24`）。**#4695 はクローズ**
+  - **ステージング 4 台（dev24〜27）を develop（`d5a07b24`）へ揃えた**（`config: OK`・3 サービスの restart rc=0・health 200）
+  - **develop（`d5a07b24`）で harness を実走（系ごとに別シェル）**:
+    Mastodon 1798 tests / 3829 assertions / **0 failures / 0 errors** / 158 omissions（`TestHarness: controller=mastodon url=http://localhost:3000`）、
+    Misskey 1797 tests / 3877 assertions / **0 failures / 0 errors** / 145 omissions（`TestHarness: controller=misskey url=http://localhost:3001`）。
+    ⚠ リリースゲートとして読むなら、この後に develop へコードが入っていないこと
+  - **Misskey のメディアカタログの段取り（2026-10-14 ユーザー判断）**: 5.42.0 を出荷 → **ダイスキー（vulcan）で有効にする**（#4375）→ 観測 →
+    Misskey の既定値を `true` に戻す（**#4838・5.43.0**）。既定値は一旦据え置き。
+    ⚠ vulcan の flip は 5.42.0 の出荷後（5.41.0 のままだと、cursor で辿ったときに添付が抜ける）
+- ✅ **リリース前レビュー（5 観点・`v5.41.0..develop`・2026-10-14）: 赤 0 / 黄 6 / 緑 9**（重複は 1 件に数えた）。行き先はユーザーが決めた
+  - **本リリースで直した（PR #4839・`b6b1003b`・Codex は指摘なし）**:
+    割合の設定が壊れていても health を NG にしない（`pgbouncer_warn_config`。NG だと monit が再起動し続ける）／
+    上限に達した後も WARN のまま（`pgbouncer_clients_exhausted`。観測が `no more connections allowed` で断られると OK に戻り、いちばん悪い瞬間に「WARN → OK」が飛ぶ形だった）／
+    Annict のキーワードが 1 語でも落とさない／通知の WARN に理由を添える／Misskey の `catalog_cursor` の整理／コメント・`docs/api.md`・スキーマの並び
+  - **記録のみ（ユーザー判断・Issue にしない）**:
+    - WARN の判定が境目で揺れると、通知が 5 分ごとに届く。本番 3 台の平常は 500 のうち 10〜16（10-14 の公開 health）＝揺れるのは詰まりかけている間だけ
+    - キーワードの変更と Annict の不調が重なると、凌ぐ用のキャッシュが空になる（変えた直後だけ）
+    - `cursor_pagination?` が両系 `true` になり、分岐の意味が無い（Akkoma で 3 系目が要るかもしれないので残した）
+    - 設定名 `warn/clients_ratio` は既存の `threshold` 系と不揃い（意味は通るのでそのまま）
+  - **デプロイ手順に織り込む**: キャッシュの鍵が `media_catalog_v3` に変わるので、再起動の直後に `rake mulukhiya:media_catalog:update` を打つ
+    （打たないと、最初の巡回まで最長 30 分、2・3 ページ目の要求ごとに SQL が走る）
+- ✅ **リリースゲート（`b6b1003b`・2026-10-14・系ごとに別シェル）**:
+  Mastodon 1802 tests / 3840 assertions / **0 failures / 0 errors** / 158 omissions（`TestHarness: controller=mastodon url=http://localhost:3000`）、
+  Misskey 1801 tests / 3888 assertions / **0 failures / 0 errors** / 145 omissions（`TestHarness: controller=misskey url=http://localhost:3001`）。
+  ステージング 4 台も `b6b1003b`（`config: OK`・3 サービスの restart rc=0・health 200・`/api/about` は 5.42.0・`/app/media` 200）。
+  ⚠ この後に develop へコードが入ったら回し直す
+  - **dev27 でメディアカタログを有効にした（ダイスキーの flip のリハーサル）**: `config/local.yaml` に `misskey.data.media_catalog: true`（バックアップは `config/local.yaml.bak-4375`）。
+    再起動 → `rake mulukhiya:media_catalog:update` → `media_catalog_v3:page:1:*` が 2 本。`/api/media` 200（13 件）・`?cursor=asas0399u2.1` は同じノートの 2 枚目から・
+    位置の無い cursor は次のノートから・不正な形 4 種は 422・`/feed/media` 200。**dev27 は有効のまま慣らす**
+  - **リリース前の `bundle update` は入れていない**: Dependabot 0 件・bundler-audit 指摘なし。動くのは json 3.1.0 / net-imap / rubocop など（セキュリティ上の理由が無いので次の周回で）
+- 3 本の中身:
+  - **PR #4835**: Annict のエピソード辞書は、キーワード（`/service/annict/works`）を入れ替えた後の空でキャッシュを置き換える（PR #4834 にマージ後に届いた Codex P2）。
+    ⚠ 見分けるのは設定のキーワードで、Annict が返した作品の ID ではない（不調のときは作品の検索も欠ける）
+  - **PR #4836（#4695 の残り 1 件）**: pgbouncer の `clients_used / clients_max` が `/postgres/pgbouncer/warn/clients_ratio`（既定 0.8）以上で
+    `postgres` を `WARN`（`reason: pgbouncer_clients_high`）。HTTP は 200 のまま・管理者へ「ヘルスステータス変更」が飛ぶ。
+    ⚠ **ステージング 4 台は pgbouncer を挟んでいない**ので実物では未確認（出荷後に本番 3 台の health で見る）
+  - **PR #4837（#4375 の手順 3）**: Misskey の cursor を `<note_id>.<fileIds の中の位置>` の 2 つ組に。`cursor_pagination?` は両系 `true`。キャッシュの鍵は `media_catalog_v3`。
+    dev27 で添付 3 枚のノート 2 本を作って全 13 行と突き合わせた（修正前は cursor で 9〜11 行）。
+    ⚠ **位置は `generate_subscripts` で取る**（`LATERAL unnest ... WITH ORDINALITY` は副問い合わせが平坦化され、note の主キーを逆順に舐める計画に変わる。
+    vulcan で OFFSET 2500 が 583 ms・note 33 万行のうち 31 万行を捨てた）
+  - **#4375 の残りは判断だけ**: ダイスキー（vulcan）は追加の index なしで 1 ページ目 69 ms / OFFSET 2500 で 153 ms（#4375 にコメント）。
+    有効にするか（本番の設定変更）・Misskey の既定値を戻すかはユーザーが決める。#4323（メタ）は #4375 が閉じれば閉じられる
+- ⚠ **本番のどの辞書ソースに `interval`（5.41.0・#4690）を入れるかは未決**（ユーザー「後で決める」・2026-10-12）。こちらから急かさない
+- capsicum のメディアカタログのぼかしは pooza/capsicum#1284（依頼済み）
+- zugoga にだけある index を揃えるかは pooza/chubo2#272（先送り・pooza のインフラだけの話）
+
 ## リリース済み: 5.41.0（2026-10-12）
 
 **本番デプロイ: 4 台完了**（2026-10-12 17:17〜17:22、shallu → zugoga → gomander → vulcan の順。
