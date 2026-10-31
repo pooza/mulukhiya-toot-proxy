@@ -98,6 +98,7 @@ module Mulukhiya
     # ⚠ 本体キャッシュの署名（`TaggingDictionary#signature`）には含めない。含めると
     # 版を上げた直後の読み込みで本体を捨て、次の更新まで辞書タグが付かない。
     # 本体は次の定時の更新（10 分以内）で新しい規則の辞書に入れ替わる。
+    # ⚠ ただし常に失敗するソースが 1 本でもあると、本体は据え置かれ、最大 24 時間は古い規則のまま。
     def cache_signature
       params = @params.reject {|key, _| key.to_s == '/interval'}
       return Digest::SHA256.hexdigest([self.class.name, PATTERN_VERSION, params.sort].to_json)

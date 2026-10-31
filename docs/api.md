@@ -1014,10 +1014,10 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 **レスポンス例**:
 
 ```json
-[
-  {"name": "precure", "url": "https://mstdn.example.com/tags/precure"},
-  {"name": "delmulin", "url": "https://mstdn.example.com/tags/delmulin"}
-]
+{
+  "precure": {"url": "https://mstdn.example.com/tags/precure", "count": 12},
+  "delmulin": {"url": "https://mstdn.example.com/tags/delmulin", "count": 3}
+}
 ```
 
 #### POST /mulukhiya/api/tagging/tag/search

@@ -43,8 +43,35 @@ module Mulukhiya
       assert_equal(config['/pleroma/attachment/limit'], @service.max_media_attachments)
     end
 
+    # ⚠ Akkoma は `media_ids` の整数の要素を 400 で拒む (#4847)。
+    def test_post_sends_media_ids_as_strings
+      assert_equal(['1', '2'], posted_body(:post)[:media_ids])
+      assert_equal(['1', '2'], posted_body(:toot)[:media_ids])
+    end
+
+    # `/tags/` は Atom / RSS の口で、HTML を求めると 406 になる（dev29 で確認）。
+    def test_create_tag_uri
+      http = Object.new
+      http.define_singleton_method(:create_uri) {|path| Ginseng::URI.parse("https://akkoma.example.com#{path}")}
+      @service.define_singleton_method(:http) {http}
+
+      assert_equal('/tag/nowplaying', @service.create_tag_uri('nowplaying').path)
+    end
+
     def test_default_uri
       assert_equal(config['/pleroma/url'], @service.default_uri.to_s)
+    end
+
+    private
+
+    def posted_body(method)
+      posted = nil
+      http = Object.new
+      http.define_singleton_method(:post) {|_path, options| posted = options[:body]}
+      @service.define_singleton_method(:http) {http}
+      @service.define_singleton_method(:create_headers) {|_headers| {}}
+      @service.send(method, {status: 'text', media_ids: [1, 2]})
+      return posted
     end
   end
 end

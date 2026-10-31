@@ -5,6 +5,19 @@ module Mulukhiya
       @dic = RemoteDictionary.create('url' => 'https://example.jp/api/dic/v1/a.json', 'type' => 'related')
     end
 
+    # 規則の版を上げたら、last-good の鍵も変わること。
+    def test_cache_signature_follows_pattern_version
+      before = @dic.cache_signature
+      version = RemoteDictionary::PATTERN_VERSION
+      RemoteDictionary.send(:remove_const, :PATTERN_VERSION)
+      RemoteDictionary.const_set(:PATTERN_VERSION, version + 1)
+
+      assert_not_equal(before, @dic.cache_signature)
+    ensure
+      RemoteDictionary.send(:remove_const, :PATTERN_VERSION)
+      RemoteDictionary.const_set(:PATTERN_VERSION, version)
+    end
+
     def test_short_katakana_inside_longer_katakana
       assert_no_match(pattern('ニコ'), 'ニコニコ動画で見た')
       assert_no_match(pattern('ラリー'), 'ギャラリーの展示')

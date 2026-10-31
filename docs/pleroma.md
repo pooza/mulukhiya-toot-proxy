@@ -27,7 +27,7 @@
 | アプリ | `Pleroma::Application`（`apps`） | |
 | 投稿 | `Pleroma::Status`（**API で読む**・DB ではない） | 本文は `pleroma.content["text/plain"]` を優先 |
 | 添付 | `Pleroma::Attachment`（`objects`） | |
-| タグ | `Pleroma::HashTag`（名前だけ・表は無い） | タグは `objects` の JSON の中 |
+| タグ | `Pleroma::HashTag`（名前だけ） | 表は `hashtags` / `hashtags_objects`。読むのはフィード（`tag_timeline`）と存否（`listable?`）だけ |
 
 DB の対応は Mastodon の `accounts` / `statuses` / `oauth_access_tokens` に対して、Akkoma は `users` / `objects` / `activities` / `oauth_tokens`。
 v4 の実装は `git show 46c4f4e2^:<path>` で取り出せる（SQL は `app/query/pleroma/*.sql.erb` の 7 本）。
@@ -41,7 +41,7 @@ v4 の実装は `git show 46c4f4e2^:<path>` で取り出せる（SQL は `app/qu
 | pre_toot パイプライン（投稿） | ✅ 5.43.0 | — | #4566（PR #4844） |
 | 絵文字リアクション（中継） | ✅ 5.43.0 | `capabilities/reaction` | #4566。⚠ **`post_reaction` は流していない**（ハンドラは段階 4） |
 | ゲート（harness の Akkoma 系） | ✅ 5.43.0・**5.45.0 からリリースゲートの必須** | — | #4566 の手順 4・#4857。dev29 に向けて 0 failures（手順は [test-harness.md](test-harness.md)「手順（Pleroma 系・Akkoma）」） |
-| webhook | ✅ 5.44.0 | `features/webhook` | 段階 1（#4847）。⚠ `media_ids` は文字列で送る（`PleromaService#post`） |
+| webhook | ✅ 5.45.0 | `features/webhook` | 段階 1（#4847）。⚠ `media_ids` は文字列で送る（`PleromaService#post`） |
 | タグのフィード・お気に入りタグ | ✅ 5.45.0 | `features/feed` / `data/favorite_tags` | 段階 2（#4860）。⚠ タグは `hashtags` / `hashtags_objects` の表で引く（v4 は JSON の配列を開いていた） |
 | アカウントの直近の投稿・添付の参照 | 🟡 | — | 段階 3。`recent_toot` は ✅ 5.43.0（API で読む・ゲートが要った）。`attachment` は #4861 |
 | ハンドラ（post_reaction ほか） | ⬜ | — | 段階 4（1 本ずつ） |
@@ -54,7 +54,7 @@ v4 の実装は `git show 46c4f4e2^:<path>` で取り出せる（SQL は `app/qu
 
 各段階はサブ Issue として切り出し、上の「2 件を切らさない」に沿って順に起票する。順番は小さく閉じるもの・ほかの段階の土台になるものを先にした。
 
-1. ✅ **webhook**（#4847・5.44.0）: `webhook_tokens` を `oauth_tokens` / `apps` / `users` で戻し、`features/webhook` を true にした。
+1. ✅ **webhook**（#4847・5.45.0）: `webhook_tokens` を `oauth_tokens` / `apps` / `users` で戻し、`features/webhook` を true にした。
    ローカルは `users.local`、期限は `valid_until`（UTC の naive な時刻）で見る。dev29 の本物の webhook URL で本文・添付とも投稿できた。
    ⚠ **Akkoma は `media_ids` の要素に文字列を求める**（gem の `upload` は `to_i` で返す・Mastodon は整数でも受ける）。
    ⚠ `WebhookTest#test_command` は dev29 の前段のモロヘイヤと `/crypt/salt` が違うので、harness のときは omit になる（手元の digest が通じない）
