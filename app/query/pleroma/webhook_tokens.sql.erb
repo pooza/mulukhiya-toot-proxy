@@ -1,0 +1,14 @@
+SELECT
+  token.id
+FROM
+  oauth_tokens AS token
+  INNER JOIN apps ON token.app_id = apps.id
+  INNER JOIN users ON token.user_id = users.id
+WHERE (users.local = true)
+  AND (users.is_active = true)
+  AND (apps.client_name LIKE '<%= package_class.short_name %>%')
+  AND ((token.valid_until IS null) OR (token.valid_until > (now() AT TIME ZONE 'UTC')))
+GROUP BY
+  token.id
+ORDER BY
+  token.id DESC

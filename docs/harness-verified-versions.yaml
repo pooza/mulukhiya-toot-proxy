@@ -19,16 +19,44 @@
 # 運用方針の詳細は MEMORY の feedback_upstream-release-harness-verification 参照。
 
 mastodon:
-  verified: v4.7.3
-  verified_at: '2026-10-02'
+  verified: v4.7.4
+  verified_at: '2026-10-30'
 
 misskey:
   verified: 2026.10.1
   verified_at: '2026-10-24'
 
-# upstream 最新リリースを最後に確認した日（同期手順が更新する）。
-last_checked: '2026-10-24'
+# Akkoma は chubo2 の harness ではなくステージングの dev29 で検証する（#4857）。
+pleroma:
+  verified: v3.20.1
+  verified_at: '2026-10-31'
 
+# upstream 最新リリースを最後に確認した日（同期手順が更新する）。
+last_checked: '2026-10-30'
+
+# 2026-10-31 Akkoma を台帳に追加（#4857）:
+#   - dev29 の Akkoma 3.20.1 に対し、develop `480834ee` で
+#     `TestHarness: controller=pleroma url=https://st.akkoma.b-shock.org` 1871 tests / 3946 assertions /
+#     **0 failures / 0 errors** / 189 omissions。upstream の最新 stable も v3.20.1（2026-09-27）。
+#   - Mastodon / Misskey は確認していないので `last_checked` は動かしていない。
+
+# 2026-10-30 チェック結果:
+#   - Mastodon: **v4.7.4（2026-10-29T14:00Z・セキュリティ修正の patch）が出たので検証し、verified を昇格した。**
+#     harness を v4.7.4 で再構築（update-version.sh → reset.sh）し、develop `ac1f316d` で
+#     `TestHarness: controller=mastodon url=http://localhost:3000` 1869 tests / 3986 assertions /
+#     **0 failures / 0 errors** / 158 omissions（5.44.0 のリリースゲートと omissions は同数・tests は +3 で 5.45.0 の分）。
+#     `DB 接続に失敗したためスキップ: … user "u"` の 1 行は既知（TestHarnessTest がわざと差す偽 DSN）。
+#   - 差分の読み取り（v4.7.3...v4.7.4・19 コミット）: マイグレーション無し・`db/` の変更無し。
+#     ActivityPub の識別子の検証強化（GHSA-288h-6j8h-6x5j）、長く使っていないユーザーのログインにメールでの確認、
+#     `TagFeed` にカーソルの絞り込み（Mastodon 自身の API の話で、モロヘイヤの tag_timeline.sql.erb は不変）。
+#     ⚠ `.ruby-version` が 4.0.6 → 4.0.9（本番の Mastodon を上げるときの話。モロヘイヤはすでに 4.0.9）。
+#     同時に v4.6.10 / v4.5.20 / v4.4.27 も出ている（対象外）。
+#   - Misskey: 最新 stable は **2026.10.1 ＝ verified と同じ**。
+
+# 2026-10-28 チェック結果:
+#   - **新しいものは無い。実走・bump とも不要。**`last_checked` の更新のみ。
+#   - Mastodon: 最新 stable は **v4.7.3 ＝ verified と同じ**。新しい RC も v5.0 のタグも無い（#4850）。
+#   - Misskey: 最新 stable は **2026.10.1 ＝ verified と同じ**。2026.10.1 以降に新しい prerelease は無い。
 # 2026-10-24 チェック結果:
 #   - Mastodon: 最新 stable は **v4.7.3（2026-10-01）＝ verified と同じ**。新しい RC も v5.0 のタグも無い（#4850）。
 #   - Misskey: **2026.10.1（2026-10-23T23:34Z）が出たので検証し、verified を昇格した。**

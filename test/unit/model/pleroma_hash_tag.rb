@@ -1,5 +1,5 @@
 module Mulukhiya
-  # Akkoma（Pleroma 系）のタグ (#4566)。⚠ 表を持たないので DB に繋がない。
+  # Akkoma（Pleroma 系）のタグ (#4566)。⚠ `listable?` のほかは DB に繋がない。
   class PleromaHashTagTest < TestCase
     def setup
       @tag = Pleroma::HashTag.get(tag: 'NowPlaying')
@@ -17,6 +17,16 @@ module Mulukhiya
       assert_equal('#NowPlaying', h[:tag])
       assert_kind_of(String, h[:url])
       assert_kind_of(String, h[:feed_url])
+    end
+
+    # 表に無いタグのフィードは 404 にする。
+    def test_listable
+      omit('Akkoma の DB が要る') unless Environment.pleroma?
+
+      assert_false(Pleroma::HashTag.get(tag: 'mulukhiya_no_such_tag').listable?)
+      omit('hashtags が空') unless name = Sequel::Model.db[:hashtags].get(:name)
+
+      assert_predicate(Pleroma::HashTag.get(tag: name), :listable?)
     end
   end
 end

@@ -834,8 +834,14 @@ module Mulukhiya
     # ⚠ SNS のトークンでは通さない。登録が開いているサーバーでは、誰でもトークンを持てるため。
     get '/tagging/dic/annict/episodes' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.annict?
-      raise Ginseng::AuthError, 'Unauthorized' unless AnnictEpisodeDictionary.key?(params[:key])
-      raise Ginseng::AuthError, 'Unauthorized' unless annict = account_class.info_account.annict
+      # ⚠ 断った理由はログにだけ残す。応答は `Unauthorized` のまま（`key_rejection`）。
+      reason = AnnictEpisodeDictionary.key_rejection(params[:key])
+      annict = account_class.info_account.annict unless reason
+      reason ||= :no_bot_token unless annict
+      if reason
+        logger.info(class: self.class.to_s, message: 'annict dictionary rejected', reason:)
+        raise Ginseng::AuthError, 'Unauthorized'
+      end
       # ⚠ Annict が落ちていても、直近の成功結果があればそれを 200 で返す (#4801)。
       # 鳴らすのは「古い結果で凌げなくなってきた」ときだけ（`AnnictEpisodeDictionary#alert?`）。
       dictionary = AnnictEpisodeDictionary.new(annict)

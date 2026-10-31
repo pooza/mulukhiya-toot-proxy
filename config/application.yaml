@@ -510,7 +510,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 5.44.0
+  version: 5.45.0
 parser:
   note:
     fields:
@@ -535,7 +535,8 @@ parser:
       visibility: visibility
 pleroma:
   # Akkoma（Pleroma 系）。#4566 で復活。⚠ 最初の段階の対象は health・pre_toot パイプライン・
-  # トークンからのアカウント解決だけで、ストリーミング・メディアカタログ・webhook などは切ってある。
+  # トークンからのアカウント解決だけで、ストリーミング・メディアカタログなどは切ってある。
+  # webhook は段階 1（#4847）、タグのフィードは段階 2（#4860）で戻した。進み具合は docs/pleroma.md。
   attachment:
     limit: 4
     types:
@@ -551,7 +552,7 @@ pleroma:
     streaming: false
   data:
     account_timeline: false
-    favorite_tags: false
+    favorite_tags: true
     futured_tag: false
     media_catalog: false
   dbms: postgres
@@ -560,8 +561,8 @@ pleroma:
     annict: false
     announcement: false
     announcement_push: false
-    feed: false
-    webhook: false
+    feed: true
+    webhook: true
   oauth:
     callback:
       enable: true

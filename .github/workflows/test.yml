@@ -22,11 +22,14 @@ jobs:
         # 2026-09-26 (#4698): 実クラスでの catalog の配線テスト
         # （`AttachmentTest#test_catalog_is_wired_on_the_real_class`）を足したので +1。
         # DB が要るクラスなので CI では omission になる。実測: mastodon 327 / misskey 316。
+        #
+        # 2026-10-31: Akkoma の DB が要るテスト（`PleromaHashTagTest#test_listable`）を足したので +1。
+        # 実測: mastodon 328 / misskey 317。
         include:
           - controller: mastodon
-            omission_baseline: 327
+            omission_baseline: 328
           - controller: misskey
-            omission_baseline: 316
+            omission_baseline: 317
     services:
       redis:
         image: redis:7

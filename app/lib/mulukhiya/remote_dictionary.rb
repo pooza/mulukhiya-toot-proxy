@@ -2,6 +2,11 @@ module Mulukhiya
   class RemoteDictionary
     include Package
 
+    # 語から正規表現を作る規則（`create_pattern`）の版。変えたら上げる。
+    PATTERN_VERSION = 2
+    # 前後の文字を見る短いカタカナの語の長さ (#4854)。
+    KATAKANA_GUARD_MAX_LENGTH = 3
+
     def name
       return @params['/name'] || uri.path.split('/').last
     end
@@ -87,9 +92,16 @@ module Mulukhiya
     # ⚠ **`interval` は含めない（5.41.0 のリリース前レビュー）。**取得結果の解釈に効かない
     # 設定なので、含めると `interval` を足した・変えただけで last-good が別の鍵になり、
     # 直後の 1 回が上流の失敗に当たると埋め戻せない。
+    #
+    # ⚠ **`PATTERN_VERSION` を含める (#4854)。**last-good は作った正規表現ごと残るので、
+    # 含めないと規則を変えたあと最大 24 時間、古い規則の辞書で埋め戻される。
+    # ⚠ 本体キャッシュの署名（`TaggingDictionary#signature`）には含めない。含めると
+    # 版を上げた直後の読み込みで本体を捨て、次の更新まで辞書タグが付かない。
+    # 本体は次の定時の更新（10 分以内）で新しい規則の辞書に入れ替わる。
+    # ⚠ ただし常に失敗するソースが 1 本でもあると、本体は据え置かれ、最大 24 時間は古い規則のまま。
     def cache_signature
       params = @params.reject {|key, _| key.to_s == '/interval'}
-      return Digest::SHA256.hexdigest([self.class.name, params.sort].to_json)
+      return Digest::SHA256.hexdigest([self.class.name, PATTERN_VERSION, params.sort].to_json)
     end
 
     def self.all(&block)
@@ -155,7 +167,25 @@ module Mulukhiya
       ].each do |v|
         pattern = pattern.gsub(Regexp.new("[#{v}]"), "[#{v}]")
       end
-      return Regexp.new(pattern)
+      return Regexp.new(guard_katakana_boundary(word.nfkc, pattern))
+    end
+
+    # ⚠⚠ **短いカタカナの語は、長いカタカナ語の中に当てない (#4854)。**本番 2 台の 30 日分では
+    # ニコ⊂ニコニコ・シリー⊂シリーズ・ラリー⊂ギャラリー・キング⊂メタルキングコインのような
+    # 当たりが gomander で 250 件あり、**3 文字以下の語はほぼ全部が誤爆**だった。
+    # 先頭（末尾）がカタカナの語に限り、その側の隣がカタカナなら当てない。
+    #
+    # ⚠ **直前の「ー」は、その前がカタカナのときだけカタカナと見なす。**「やったーニコ」の
+    # 「ー」まで見ると、正しい当たりを落とす（調査で唯一の取りこぼし）。
+    # ⚠ 4 文字以上の語には掛けない。正しい当たり（キュアアンサーグリーティング）と誤爆が
+    # 混ざっていて件数も少ないので、直すなら辞書の語の側で直す。
+    # ⚠ **規則を変えたら `PATTERN_VERSION` を上げる。**ソースごとの last-good は作った
+    # 正規表現ごと Redis に残る（`cache_signature`）。
+    def guard_katakana_boundary(key, pattern)
+      return pattern if KATAKANA_GUARD_MAX_LENGTH < key.length
+      pattern = "(?<!\\p{Katakana}|\\p{Katakana}[ーｰ])#{pattern}" if key.match?(/\A\p{Katakana}/)
+      pattern = "#{pattern}(?!\\p{Katakana}|[ーｰ])" if key.match?(/\p{Katakana}ー*\z/)
+      return pattern
     end
 
     def initialize(params)
