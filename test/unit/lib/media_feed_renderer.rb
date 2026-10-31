@@ -35,6 +35,10 @@ module Mulukhiya
       assert_kind_of(Ginseng::URI, MediaFeedRenderer.uri)
       assert_predicate(MediaFeedRenderer.uri, :absolute?)
 
+      # media_catalog が無効なら、口は 503（disabled_response）を返すのが仕様。
+      # Pleroma 系は段階 5 まで無効のまま（#4860 で feed を有効にして、ここに届くようになった）。
+      omit('media_catalog が無効') unless controller_class.media_catalog?
+
       # http.get は mulukhiya の HTTP エンドポイント（/mulukhiya/feed/media）に到達する。
       # harness はこれを提供せず 404 を返すため、harness 駆動時の 404 でのみ omit する。
       # 非 harness の 404（＝本番でエンドポイント消失）や 404 以外の異常はそのまま失敗させ

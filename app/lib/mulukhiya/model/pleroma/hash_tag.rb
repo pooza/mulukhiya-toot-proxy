@@ -1,6 +1,7 @@
 module Mulukhiya
   module Pleroma
-    # ⚠ Akkoma にタグの表は無い（`objects` の JSON の中）。名前だけを持つ（v4 と同じ）。
+    # 名前だけを持つ（v4 と同じ）。⚠ Akkoma には `hashtags` / `hashtags_objects` の表があり、
+    # フィードの SQL（`tag_timeline`）はそれで引く（#4860）。このモデルは表を読まない。
     class HashTag
       include Package
       include HashTagMethods

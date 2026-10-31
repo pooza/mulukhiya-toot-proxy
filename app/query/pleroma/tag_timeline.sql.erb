@@ -1,0 +1,32 @@
+SELECT
+  objects.data->>'id' AS uri,
+  objects.data->>'published' AS created_at,
+  split_part(users.nickname, '@', 1) AS username,
+  CASE WHEN users.local THEN null ELSE split_part(users.nickname, '@', 2) END AS domain,
+  users.name AS display_name,
+  coalesce(objects.data->'source'->>'content', objects.data->>'content') AS text,
+  objects.data->>'summary' AS spoiler_text
+FROM
+  hashtags
+  INNER JOIN hashtags_objects ON hashtags_objects.hashtag_id = hashtags.id
+  INNER JOIN objects ON hashtags_objects.object_id = objects.id
+  INNER JOIN users ON users.ap_id = objects.data->>'actor'
+WHERE (hashtags.name = '<%= params[:tag].downcase %>')
+  AND (objects.data->>'type' IN ('Note', 'Question'))
+  AND (objects.data->'to' @> '["https://www.w3.org/ns/activitystreams#Public"]')
+  <% if params[:local] %>
+    AND (
+      (users.local = true)
+      <% params[:default_tags].each do |tag| %>
+        OR (hashtags.name = '<%= tag.downcase %>')
+      <% end %>
+    )
+  <% end %>
+  AND (users.is_active = true)
+  AND (users.invisible = false)
+  <% if test_account %>
+    AND (users.id <> '<%= test_account.id %>')
+  <% end %>
+ORDER BY
+  objects.id DESC
+LIMIT <%= params[:limit] %> OFFSET 0
