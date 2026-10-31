@@ -393,7 +393,18 @@ develop にすでに載っている bundler 4.0.20・ginseng-piefed v0.4.1・doc
 
 ## セッション同期の記録
 
-### 2026-10-30 セッション同期の記録
+### 2026-10-31 セッション同期の記録
+
+**本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。harness の upstream 確認は前回から 1 日なのでスキップ。
+
+- **ブランチ**: `develop` は `origin/develop` と同一（`c25e1a4b`）。Dependabot アラート **0 件**
+- **open PR 4 件**（いずれも CI 緑・Codex 指摘なし）: #4877（#4854）/ #4878（#4860）/ #4879（手順 12 の掃除）/ #4881（5.45 のリリース PR・draft）
+- **Codex**: 未対応なし（直近マージ 8 本と open 4 本）。PR 本体への申し送りもなし
+- **ginseng-\* のピン**: 前回と同じ 7 本のずれ（core v4.3.0 / fediverse v7.0.1 / piefed v0.6.1 / postgres・redis・web・youtube は patch）。判断は 10-30 のまま
+- **Annict の API**: 前回と同じ（`rails/app/graphql` の最新は 10-17・公式アカウントの最新は 10-25）
+- **辞書台帳**: **🔴 の新規なし**。vulcan の delmulin `common.json` が 🟢 → 🟡（間欠 1/144）
+- **chubo2**: open 19 件（前回 18）。増えたのは #293（pve の再起動とカーネル更新）
+- **Sentry**: unresolved **31 件**・**コメント 0 は 0 件**（2026-10-31 時点）。最新イベントは前回確認済みの -38（10-29）で、新しいイベントなし
 
 **本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。harness の upstream 確認は前回から 2 日だが、Mastodon v4.7.4 が出たので回した（下記）。chubo2 の Issue 棚卸し（10-25）はスキップ。
 
