@@ -199,6 +199,14 @@ git diff Gemfile.lock
 
 - 5.46.0 は #4850 / #4851 / #4861 / #4864 / #4884 / #4874 / #4875 / #4876 / #4880（ginseng-\* の告知 3 件は 2026-10-30 に追加。緊急性なし＝ユーザー判断）
 
+## 予定: 5.47.0
+
+[マイルストーン 5.47.0](https://github.com/pooza/mulukhiya-toot-proxy/milestones)。2026-10-31 に on-hold を見直し、止める条件が無くなっていたものを載せた。
+
+- #4195 → #4196 → #4197（ユーザー向けハンドラートグル。依存の #4194 はクローズ済み）
+- #4229（rails-erb-lint の更新が無いので `erb_lint` へ替えて `ostruct` を消す）
+- on-hold のまま: #4734（`libheif` は ports に 1.23.6 があるが、本番の pkg は 1.22.2_3・vulcan は Ubuntu の 1.21.2）/ #3877（本文が無く設計から）/ #4301（capsicum#344 が open）/ #4298・#3157（相手側待ち）/ #4832・#4873（報告待ち）/ #4846（総まとめ）
+
 ## リリース済み: 5.45.0（2026-10-31）
 
 本番 4 台へデプロイ済み（12:07〜12:13・shallu → zugoga → gomander → vulcan・`main` の `c02001d6`・Ruby 4.0.9 据え置き）。[リリースノート](https://github.com/pooza/mulukhiya-toot-proxy/releases/tag/v5.45.0)。
