@@ -241,6 +241,7 @@ ruby .claude/skills/sync/scripts/annict_api_watch.rb
 
 - [harness-verified-versions.yaml](../../../docs/harness-verified-versions.yaml) の `last_checked` を見る。**当日から 4 日以上経過していれば**以下を実行（経過していなければスキップ）:
   - `gh api 'repos/mastodon/mastodon/releases?per_page=15'` と `gh api 'repos/misskey-dev/misskey/releases?per_page=15'` で最新リリースを取得（ローカル `gh` は認証済み）
+  - Akkoma は `curl -s 'https://akkoma.dev/api/v1/repos/AkkomaGang/akkoma/releases?limit=3'`（GitHub ではない）。新しい stable があれば報告するが、**検証は急かさない**（実運用していない系統）
   - 台帳の `mastodon.verified` / `misskey.verified` より**厳密に新しい** stable、または Mastodon の新しい RC（`vX.Y.Z-rc.N`、ベース版が verified より新しいもの）があるか判定
   - 新しいものがあれば、検証を促す（Mastodon RC=約1週間の RC 期間中／Mastodon stable=リリース直後／Misskey=リリース後数日でデプロイ前）。検証フローは `harness-gate` スキルの「upstream の新しい版の検証」。実検証・bump はその場で着手するか Issue 化するかを相談する
   - 確認したら台帳の `last_checked` を当日に更新してコミット（新規が無くても更新する）
