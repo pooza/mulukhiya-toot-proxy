@@ -1,6 +1,6 @@
 ---
 name: harness-gate
-description: chubo2 の fedi-test-harness で develop を Mastodon 系・Misskey 系の両方で実走するリリースゲートと、upstream（Mastodon / Misskey）の新しい版の互換性検証。リリース前、または同期で新しい upstream 版を見つけたときに使う。
+description: develop を Mastodon 系・Misskey 系（chubo2 の fedi-test-harness）と Pleroma 系（dev29 の Akkoma）の 3 系統で実走するリリースゲートと、upstream（Mastodon / Misskey / Akkoma）の新しい版の互換性検証。リリース前、または同期で新しい upstream 版を見つけたときに使う。
 ---
 
 # harness 実走（リリースゲート）と upstream 版の検証
@@ -40,6 +40,9 @@ Mastodon をもう一度走らせたまま「両系緑」とゲートを通せ�
   ⚠ ただし**判定の主は `controller=` の側**のままにする。`url=` はポート設定に依存し、
   下記のとおり古い `.env` を持つ環境では両系とも 3000 を出すため。
 
+⚠ **Pleroma 系は harness を使わない。**相手はステージングの dev29（`st.akkoma.b-shock.org`）で、接続情報は自分で組む。
+手順は [test-harness.md](../../../docs/test-harness.md)「手順（Pleroma 系・Akkoma）」。これも別のシェルで回し、`controller=pleroma` を確かめる。
+
 **両ハーネスは同時に起動できる**（Mastodon 3000 / Misskey 3001、DB も 5433 / 5434 で非衝突。
 2026-08-16 に同時稼働と両系実走を確認）。片方ずつ `teardown.sh` → `setup.sh` する必要は無くなった。
 
@@ -55,15 +58,15 @@ Mastodon をもう一度走らせたまま「両系緑」とゲートを通せ�
 
 判定基準:
 
-- **Mastodon 系・Misskey 系の両方で `0 failures / 0 errors`。**片系だけでは不可
+- **Mastodon 系・Misskey 系・Pleroma 系の 3 系統すべてで `0 failures / 0 errors`。**1 系統でも欠けたら不可（Pleroma 系は #4857 で必須にした）
 - **実走ごとの `TestHarness: controller=...` が、狙った系と一致している**
-- 両系とも `develop` の同一 HEAD で走らせる
+- 3 系統とも `develop` の同一 HEAD で走らせる
 - omission は許容する（harness が構造的に提供しない範囲 = デーモン層・webhook・streaming・
   nodeinfo・seed 等を `harness?` で omit しているため）。ただし**件数が前回から大きく増えて
   いたら中身を見る**。無害な omit の増加と、前提が壊れて実行されなくなった退行は区別がつかない
 
-**既知例外は無い。**両系とも 0 failures / 0 errors を実際に満たしている（#4492 を 2026-08-09 に
-解消したため）。落ちたら例外を作らず原因を切り分ける。
+**既知例外は無い。**3 系統とも 0 failures / 0 errors を実際に満たしている（#4492 を 2026-08-09 に
+解消した。Pleroma 系は 2026-10-31 の実走）。落ちたら例外を作らず原因を切り分ける。
 
 参考値（2026-08-09 実測・両系とも同一 HEAD、クリーン再構築した harness）:
 
@@ -71,6 +74,8 @@ Mastodon をもう一度走らせたまま「両系緑」とゲートを通せ�
 | --- | --- |
 | Mastodon（harness v4.6.5） | 1001 tests / 2007 assertions / **0 failures / 0 errors** / 152 omissions |
 | Misskey（harness 2026.7.0） | 1004 tests / 2062 assertions / **0 failures / 0 errors** / 141 omissions |
+
+Pleroma 系（2026-10-31 実測・Akkoma 3.20.1・develop `480834ee`）: 1871 tests / 3946 assertions / **0 failures / 0 errors** / 189 omissions。
 
 ⚠ **assertion 数は同一 HEAD でも数件ぶれる**（seed データ量に依存するテストがあるため）。
 tests / failures / errors / omissions の 4 つで見る。
@@ -98,9 +103,13 @@ upstream リリースの参照先（GitHub）:
 
 - Mastodon: `mastodon/mastodon`（stable は `vX.Y.Z`、RC は `vX.Y.Z-rc.N`）
 - Misskey: `misskey-dev/misskey`（stable は `YYYY.M.P`、alpha / beta は prerelease）。⚠ Docker Hub の `misskey/misskey` とは別
+- Akkoma: `https://akkoma.dev/api/v1/repos/AkkomaGang/akkoma/releases`（⚠ GitHub ではない。stable は `vX.Y.Z`）
 
 1. `cd ~/repos/chubo2/fedi-test-harness/<mastodon|misskey>`
 2. `./scripts/update-version.sh` — upstream 最新に追従
 3. `./scripts/reset.sh` — 新イメージ＋クリーン DB で再構築
 4. モロヘイヤ側で harness テストを実走する（上の「リリースゲートとしての実走」と同じ作法。モロヘイヤ自前の Redis も harness が上げる）
 5. 緑なら chubo2 の `.env.example` と `harness-verified-versions.yaml` の `verified` / `verified_at` を新しい版に更新する
+
+⚠ **Akkoma は harness の版を上げる手順が無い。**dev29 の Akkoma を上げてから Pleroma 系を実走し、緑なら台帳の `pleroma` を更新する。
+実運用していない系統なので、新しい版が出ても急がない。リリース直後の検証の時機はここには当てはめない（[pleroma.md](../../../docs/pleroma.md)）

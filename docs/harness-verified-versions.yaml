@@ -26,8 +26,19 @@ misskey:
   verified: 2026.10.1
   verified_at: '2026-10-24'
 
+# Akkoma は chubo2 の harness ではなくステージングの dev29 で検証する（#4857）。
+pleroma:
+  verified: v3.20.1
+  verified_at: '2026-10-31'
+
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
 last_checked: '2026-10-30'
+
+# 2026-10-31 Akkoma を台帳に追加（#4857）:
+#   - dev29 の Akkoma 3.20.1 に対し、develop `480834ee` で
+#     `TestHarness: controller=pleroma url=https://st.akkoma.b-shock.org` 1871 tests / 3946 assertions /
+#     **0 failures / 0 errors** / 189 omissions。upstream の最新 stable も v3.20.1（2026-09-27）。
+#   - Mastodon / Misskey は確認していないので `last_checked` は動かしていない。
 
 # 2026-10-30 チェック結果:
 #   - Mastodon: **v4.7.4（2026-10-29T14:00Z・セキュリティ修正の patch）が出たので検証し、verified を昇格した。**

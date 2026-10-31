@@ -121,11 +121,14 @@ pkill -f '[5]435:127.0.0.1:5432'   # ⚠ 角括弧が無いと pkill が自分�
   `disable_net_connect_except_harness!`（`TestCase`）を使う。`allow_localhost: true` だけだと dev29 を止める
 - 切ってある機能（メディアカタログ＝段階 5・`post_reaction` のハンドラ＝段階 4）のテストは Pleroma では止まる（[pleroma.md](pleroma.md)）
 - ⚠ **`Environment.pleroma?` で止めたテストは、段階を進めたら外す**
+- ⚠ **`local.yaml` は `/home/akkoma/repos/mulukhiya-toot-proxy/config/local.yaml` を読む。**`find` で探すと `config/sample/misskey/local.yaml` を拾い、別物の DSN になる（2026-10-31 に踏んだ）
+- ⚠ **`pkill` はトンネルを張ったのと別のコマンドで打つ。**同じコマンドの中に `5435:127.0.0.1:5432` の文字列があると、角括弧を付けていても自分のシェルに当たる（2026-10-31 に踏んだ）
+- `DB 接続に失敗したためスキップ: ... port 5433` の行は既知（`TestHarnessTest` がわざと差す偽の DSN）
 
 ## リリースゲートとしての実走（省略不可）
 
 ⚠ **手順は `harness-gate` スキル（[.claude/skills/harness-gate/SKILL.md](../.claude/skills/harness-gate/SKILL.md)）へ移した**（#4731）。
-判定は **Mastodon 系・Misskey 系の両方で 0 failures / 0 errors**。⚠ 系ごとにシェルを分ける（#4559）。CI の緑はこのゲートの代わりにならない（#4503）。
+判定は **Mastodon 系・Misskey 系・Pleroma 系の 3 系統すべてで 0 failures / 0 errors**（Pleroma 系は #4857 で必須にした）。⚠ 系ごとにシェルを分ける（#4559）。CI の緑はこのゲートの代わりにならない（#4503）。
 
 ## webhook 投稿経路の検証（#4428）
 

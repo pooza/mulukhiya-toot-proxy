@@ -40,7 +40,7 @@ v4 の実装は `git show 46c4f4e2^:<path>` で取り出せる（SQL は `app/qu
 | トークン → アカウント（DB） | ✅ 5.43.0 | — | #4566（PR #4844） |
 | pre_toot パイプライン（投稿） | ✅ 5.43.0 | — | #4566（PR #4844） |
 | 絵文字リアクション（中継） | ✅ 5.43.0 | `capabilities/reaction` | #4566。⚠ **`post_reaction` は流していない**（ハンドラは段階 4） |
-| ゲート（harness の Akkoma 系） | ✅ 5.43.0 | — | #4566 の手順 4。dev29 に向けて 0 failures（手順は [test-harness.md](test-harness.md)「手順（Pleroma 系・Akkoma）」） |
+| ゲート（harness の Akkoma 系） | ✅ 5.43.0・**5.45.0 からリリースゲートの必須** | — | #4566 の手順 4・#4857。dev29 に向けて 0 failures（手順は [test-harness.md](test-harness.md)「手順（Pleroma 系・Akkoma）」） |
 | webhook | ✅ 5.44.0 | `features/webhook` | 段階 1（#4847）。⚠ `media_ids` は文字列で送る（`PleromaService#post`） |
 | タグのフィード・お気に入りタグ | ✅ 5.45.0 | `features/feed` / `data/favorite_tags` | 段階 2（#4860）。⚠ タグは `hashtags` / `hashtags_objects` の表で引く（v4 は JSON の配列を開いていた） |
 | アカウントの直近の投稿・添付の参照 | 🟡 | — | 段階 3。`recent_toot` は ✅ 5.43.0（API で読む・ゲートが要った）。`attachment` は #4861 |
@@ -72,4 +72,4 @@ v4 の実装は `git show 46c4f4e2^:<path>` で取り出せる（SQL は `app/qu
 ## 残っている穴
 
 - ✅ ~~#4845: トークンからアカウントを引くとき、スコープを見ていない~~ → 5.43.0 で書き込みの口はスコープを見るようになった（PR #4849・全系統）
-- 3 系統目のゲートを維持し続けられるかが唯一の争点（使わない系統は腐る。gem の `PleromaService` がその実例）
+- 3 系統目のゲートを維持し続けられるかが唯一の争点（使わない系統は腐る。gem の `PleromaService` がその実例）。5.45.0 から必須にした（#4857）ので、dev29 が使えないとリリースが止まる
