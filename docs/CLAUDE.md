@@ -195,7 +195,7 @@ git diff Gemfile.lock
 
 ## 開発中: 5.46.0
 
-[マイルストーン 5.46.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/645)。`config/application.yaml` は 5.45.0 のまま（着手時にバンプする）。
+[マイルストーン 5.46.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/645)。`config/application.yaml` は 5.46.0 へバンプ済み（2026-11-05）。
 
 - 5.46.0 は #4850 / #4851 / #4861 / #4864 / #4884 / #4874 / #4875 / #4876 / #4880（ginseng-\* の告知 3 件は 2026-10-30 に追加。緊急性なし＝ユーザー判断）
 
