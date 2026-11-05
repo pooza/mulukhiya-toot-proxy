@@ -25,11 +25,16 @@ jobs:
         #
         # 2026-10-31: Akkoma の DB が要るテスト（`PleromaHashTagTest#test_listable`）を足したので +1。
         # 実測: mastodon 328 / misskey 317。
+        #
+        # 2026-11-05 (#4876): `TestCase.load` を ginseng-core に任せたので +50。テストが増えたのではなく、
+        # 写しの `load` が `- case:` の 1 行だけで黙って読み飛ばしていたファイル（ハンドラ・ワーカーの
+        # `disable?` の判定が DB 無しで落ちるもの）が、`skip_case?` で omission として数えられるようになった分。
+        # 実測: mastodon 378 / misskey 365（CI。misskey は読み飛ばしていたファイルが 48 本）。
         include:
           - controller: mastodon
-            omission_baseline: 328
+            omission_baseline: 378
           - controller: misskey
-            omission_baseline: 317
+            omission_baseline: 365
     services:
       redis:
         image: redis:7
