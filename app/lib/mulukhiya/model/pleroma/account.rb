@@ -107,11 +107,11 @@ module Mulukhiya
         return acct.to_s.sub(/^@/, '')
       end
 
-      # ⚠ 作成日時は `created_at` ではなく `inserted_at`（Ecto）。
+      # ⚠ 作成日時は `created_at` ではなく `inserted_at`（Ecto）。UTC（タイムゾーンなし）なので読み直す (#4864)。
       def self.founded_at
         return @founded_at if defined?(@founded_at) && @founded_at
         return nil unless account = where(local: true).order(:inserted_at).first
-        return @founded_at = account.inserted_at.getlocal
+        return @founded_at = NaiveTime.utc(account.inserted_at).getlocal
       rescue => e
         e.log
         return nil
