@@ -367,6 +367,26 @@ develop にすでに載っている bundler 4.0.20・ginseng-piefed v0.4.1・doc
 
 ## セッション同期の記録
 
+### 2026-11-05 セッション同期の記録
+
+**本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。harness の upstream 確認は前回（11-04）から 1 日なのでスキップ。
+
+- **ブランチ**: `develop` は `origin/develop` と同一（`fae63fe7`）。open PR は #4885（5.46 のリリース PR・draft・CI 緑）だけ。Dependabot アラート **0 件**
+- **Codex**: 未対応なし（直近マージ 5 本と open 1 本。どれも指摘なし）。PR 本体への申し送りもなし
+- **マイルストーン**: 5.46.0 は 9 件すべて open。マイルストーン無しは on-hold の 7 件だけ
+- **ginseng-\* のピン**: 前回から 2 本が進んだ。
+  - **core v4.3.0 → v5.0.0（major）**: 文字列の key=value とパスワードの無い userinfo を伏せる（#661 / #717）、資格情報として読む名前を足す（#718・破壊的）。
+    破壊的変更は `RedirectGuard` を挿した口で `X-Admin-Key` などのヘッダ・`private_token` などのクエリを持つ要求の 3xx を `GatewayError` にするもの。
+    向こうの調べではモロヘイヤはこれらの名前を送っていない → **② #4876 と一緒に 5.46.0 で v5.0.0 まで上げる**
+  - **fediverse v7.0.1 → v7.1.0**: `MastodonService.escape_sigils` を足した（#321）。モロヘイヤは `escape_sigils` / `sanitize_status` を呼んでいない＝**触る面に当たらない** → **② #4875 と一緒に 5.46.0 で**
+  - piefed・postgres・redis・web・youtube は前回と同じ（判断は 10-30 のまま）
+- **Annict の API**: `rails/app/graphql` は前回と同じ（10-17）。⚠ **Go 側に REST API V2 の土台が入った**（11-04・`go/internal/apihandler` ほか。
+  フィーチャーフラグの裏で、作品・エピソード・anime・旧 ID の変換・OpenAPI 記述の読み取りだけ）。記録・感想の口は無く、**今のモロヘイヤには影響なし**。
+  同期手順の基準を更新した。公式アカウントの新しい投稿は 2 件（11-02 Annict DB のエピソード手動登録・11-03 二要素認証）で、API には関わらない
+- **辞書台帳**: **🔴 の新規なし**（直書き・台帳に無い はどれも既知）。gomander の `fairy.json` と shallu の b-shock `common.json` が 🟢 → 🟡（間欠 1/144）、vulcan の delmulin `common.json` が 🟡 → 🟢。delmulin の `pron.json` が ⚪ → 🟡 未使用。再生成を chubo2 へ（`215f13a`）
+- **chubo2**: open 16 件（前回 19）。増えたのは #295（writersbase-tools v1.12.0）/ #296（常時起動の見張り）で、こちらへの影響なし。ドキュメント棚卸しは 10-31 で 30 日未満
+- **Sentry**: unresolved **30 件**・**コメント 0 は 0 件**（2026-11-05 時点）。最新イベントは前回確認済みの -38（10-29）で、新しいイベントなし
+
 ### 2026-10-31 セッション同期の記録
 
 **本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。harness の upstream 確認は前回から 1 日なのでスキップ。
