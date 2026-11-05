@@ -3,10 +3,10 @@ ruby '>= 4.0.2', '< 5.0'
 gem 'concurrent-ruby'
 gem 'dry-validation'
 gem 'faye-websocket', github: 'pooza/faye-websocket-ruby'
-gem 'ginseng-core', github: 'pooza/ginseng-core', tag: 'v4.2.0', require: 'ginseng'
-gem 'ginseng-fediverse', github: 'pooza/ginseng-fediverse', tag: 'v6.0.0',
+gem 'ginseng-core', github: 'pooza/ginseng-core', tag: 'v5.0.0', require: 'ginseng'
+gem 'ginseng-fediverse', github: 'pooza/ginseng-fediverse', tag: 'v7.1.0',
   require: 'ginseng/fediverse'
-gem 'ginseng-piefed', github: 'pooza/ginseng-piefed', tag: 'v0.4.1', require: 'ginseng/piefed'
+gem 'ginseng-piefed', github: 'pooza/ginseng-piefed', tag: 'v0.6.1', require: 'ginseng/piefed'
 gem 'ginseng-postgres', github: 'pooza/ginseng-postgres', tag: 'v2.0.1'
 gem 'ginseng-redis', github: 'pooza/ginseng-redis', tag: 'v2.0.8', require: 'ginseng/redis'
 gem 'ginseng-web', github: 'pooza/ginseng-web', tag: 'v3.0.4', require: 'ginseng/web'
