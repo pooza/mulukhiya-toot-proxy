@@ -392,6 +392,7 @@ develop にすでに載っている bundler 4.0.20・ginseng-piefed v0.4.1・doc
 - 5.46.0 は Mastodon 5.0 の stable を待たない。5.46.0 のほかの Issue が片付いた時点で出ていなければ、#4850 / #4851 は 5.47.0 へ送る
 - ginseng-core は #4876 で **v5.0.0** まで、ginseng-fediverse は #4875 で **v7.1.0** まで上げる
 - #4734（HEIF）は 5.47.0 のまま
+- #4880（`dic.json` を related 形式へ）は、着手時の実測次第で 5.47.0 へ先送りしてよい
 - #4851 は移植を待たずに 2 項目を dev24 で見た（[結果](https://github.com/pooza/mulukhiya-toot-proxy/issues/4851)）。コマンド投稿の DM は新 UI のホームとプロフィールから消える（予想どおり）。
   dev24 では info からの通知 DM が通知リクエストへ振り分けられた（Mastodon 4.3 の通知ポリシー・5.0 の変更ではない）。
   **本番は `mastodon_follow`（毎時）で全員が info をフォローしているので起きない**（ユーザー指摘）。
