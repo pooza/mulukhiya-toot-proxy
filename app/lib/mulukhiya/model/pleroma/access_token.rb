@@ -14,8 +14,15 @@ module Mulukhiya
         return false if to_s.blank?
         return false unless account
         return false unless account.is_active
-        return false if valid_until && valid_until < Time.now
+        return false if expired?
         return true
+      end
+
+      # ⚠ `valid_until` は UTC（タイムゾーンなし）。そのまま比べると 9 時間早く切れる (#4864)。
+      # webhook の一覧（`webhook_tokens.sql.erb`）は SQL で `now() AT TIME ZONE 'UTC'` と比べるので、ここと揃う。
+      def expired?(now = Time.now)
+        return false unless expires_at = NaiveTime.utc(valid_until)
+        return expires_at < now
       end
 
       # ⚠ Akkoma 3.20 では配列型（`{read,write}`）。pg_array を読み込んでいない接続では
