@@ -9,7 +9,7 @@ module Mulukhiya
       payload[status_key] ||= payload[:status_id]
       payload[:reaction] ||= payload[:emoji]
       return unless payload[:reaction].present?
-      return unless status = status_class[payload[status_key]]
+      return unless status = target_status(payload)
       return unless receipt = status.account
       return if receipt.reactionable? && !Environment.test?
       visibility = bridge_account?(receipt) ? :public : :unlisted
@@ -18,6 +18,15 @@ module Mulukhiya
         visibility_field => controller_class.visibility_name(visibility),
       }, {reply: status.to_h})
       result.push(reply: status.id, reaction: payload[:reaction])
+    end
+
+    # ⚠ API で読む投稿（`Pleroma::Status`）は、リアクションした本人のサービスで読む（PR #4891 の Codex P2）。
+    # 既定のサービスは設定のトークンなので、フォロワー限定・DM の投稿が読めず、返信を投稿できない。
+    # DB から読む投稿（Mastodon・Misskey）は `service=` を持たないので何もしない。
+    def target_status(payload)
+      return nil unless status = status_class[payload[status_key]]
+      status.service = sns if status.respond_to?(:service=)
+      return status
     end
 
     def create_status(params)
