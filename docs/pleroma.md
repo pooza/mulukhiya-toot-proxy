@@ -43,7 +43,7 @@ v4 の実装は `git show 46c4f4e2^:<path>` で取り出せる（SQL は `app/qu
 | ゲート（harness の Akkoma 系） | ✅ 5.43.0・**5.45.0 からリリースゲートの必須** | — | #4566 の手順 4・#4857。dev29 に向けて 0 failures（手順は [test-harness.md](test-harness.md)「手順（Pleroma 系・Akkoma）」） |
 | webhook | ✅ 5.45.0 | `features/webhook` | 段階 1（#4847）。⚠ `media_ids` は文字列で送る（`PleromaService#post`） |
 | タグのフィード・お気に入りタグ | ✅ 5.45.0 | `features/feed` / `data/favorite_tags` | 段階 2（#4860）。⚠ タグは `hashtags` / `hashtags_objects` の表で引く（v4 は JSON の配列を開いていた） |
-| アカウントの直近の投稿・添付の参照 | 🟡 | — | 段階 3。`recent_toot` は ✅ 5.43.0（API で読む・ゲートが要った）。`attachment` は #4861 |
+| アカウントの直近の投稿・添付の参照 | ✅ | 5.46.0 | 段階 3。`recent_toot` は 5.43.0（API で読む・ゲートが要った）。添付は #4861（ID で引く経路は元から通っていた・`Account#attachments` を actor と `Document` で引く） |
 | ハンドラ（post_reaction ほか） | ⬜ | — | 段階 4（1 本ずつ）。`post_reaction` は #4884 |
 | メディアカタログ | ⬜ | `data/media_catalog` | 段階 5（`media_catalog`・重い） |
 | ストリーミング（listener） | ⬜ | `capabilities/streaming` | 段階 6 |
@@ -64,7 +64,10 @@ v4 の実装は `git show 46c4f4e2^:<path>` で取り出せる（SQL は `app/qu
    - ⚠ **日時は `published` を ISO の文字列のまま返す。**タイムゾーン無しの時刻にすると JST として読まれ、9 時間ずれる（#4864 と同じ形）
    - ⚠ 本文はローカルの投稿なら `source.content`（Akkoma 3.x はオブジェクト）、リモートの投稿は `content`（HTML）
    - ついでに直したもの: `NodeInfo#update` が Pleroma 系で自分のキャッシュを読み直し、ノード名を落としていた（フィードのチャンネル名が空になる）
-3. **直近の投稿・添付**: `recent_toot`（✅ 5.43.0）/ `attachment`（#4861）。nowplaying の置き換えや webhook の添付が使う
+3. **直近の投稿・添付**: `recent_toot`（✅ 5.43.0）/ 添付（✅ 5.46.0・#4861）。nowplaying の置き換えや webhook の添付が使う。
+   ⚠ 添付は v4 の `attachment.sql.erb`（URL の JSON の式で引く）を戻していない。v4 でも呼び出し元が無く、索引も効かない。
+   投稿の `media_ids` は API のメディア ID ＝ `objects` の主キーなので `attachment_class[id]` で引ける。
+   アカウントの添付は `data->>'actor'` と `data->>'type' = 'Document'` で引く（Akkoma の索引 `objects_actor_type` が効く）
 4. **ハンドラ**: 判断が要るので 1 本ずつ。最初は `post_reaction` を流すところから（#4884）
 5. **メディアカタログ**: Mastodon / Misskey でも重かった（[media_catalog.md](media_catalog.md)）。最後に回す
 6. **ストリーミング**: v4 の `PleromaListener` を戻す。Akkoma のストリーミングは Mastodon 互換
