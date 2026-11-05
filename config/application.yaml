@@ -24,6 +24,11 @@ agent:
     token: null
     username: test
 akkoma:
+  # ⚠ Akkoma は絵文字リアクションを受けて表示できる（`EmojiReact`）。`AccountMethods#reactionable?` は
+  # 受け手のサーバーの nodeinfo の `software.name`（`akkoma`）でここを引くので、無いと Akkoma の
+  # 利用者へもリアクションを伝える返信を投稿していた（#4884）。
+  capabilities:
+    reaction: true
   display_name: Akkoma
   sns_type: mastodon
 api:
@@ -315,6 +320,12 @@ handler:
           - spotify_image
           - you_tube_image
           - emoji_spacing
+    # Pleroma 系（Akkoma）の絵文字リアクション（段階 4・#4884）。Misskey と同じ組。
+    # ⚠ ほかのハンドラはこの段階に含めない（1 本ずつ判断する・docs/pleroma.md）。
+    pleroma:
+      post_reaction:
+        - reply_reaction
+        - result_notification
 http:
   retry:
     limit: 3
