@@ -39,12 +39,12 @@ v4 の実装は `git show 46c4f4e2^:<path>` で取り出せる（SQL は `app/qu
 | health・起動 | ✅ 5.43.0 | — | #4566（PR #4844） |
 | トークン → アカウント（DB） | ✅ 5.43.0 | — | #4566（PR #4844） |
 | pre_toot パイプライン（投稿） | ✅ 5.43.0 | — | #4566（PR #4844） |
-| 絵文字リアクション（中継） | ✅ 5.43.0 | `capabilities/reaction` | #4566。⚠ **`post_reaction` は流していない**（ハンドラは段階 4） |
+| 絵文字リアクション（中継） | ✅ 5.43.0 | `capabilities/reaction` | #4566。`post_reaction` は 5.46.0 から流す（#4884） |
 | ゲート（harness の Akkoma 系） | ✅ 5.43.0・**5.45.0 からリリースゲートの必須** | — | #4566 の手順 4・#4857。dev29 に向けて 0 failures（手順は [test-harness.md](test-harness.md)「手順（Pleroma 系・Akkoma）」） |
 | webhook | ✅ 5.45.0 | `features/webhook` | 段階 1（#4847）。⚠ `media_ids` は文字列で送る（`PleromaService#post`） |
 | タグのフィード・お気に入りタグ | ✅ 5.45.0 | `features/feed` / `data/favorite_tags` | 段階 2（#4860）。⚠ タグは `hashtags` / `hashtags_objects` の表で引く（v4 は JSON の配列を開いていた） |
 | アカウントの直近の投稿・添付の参照 | 🟡 | — | 段階 3。`recent_toot` は ✅ 5.43.0（API で読む・ゲートが要った）。`attachment` は #4861 |
-| ハンドラ（post_reaction ほか） | ⬜ | — | 段階 4（1 本ずつ）。`post_reaction` は #4884 |
+| ハンドラ（post_reaction ほか） | 🟡 | — | 段階 4（1 本ずつ）。`post_reaction`（`reply_reaction`・`result_notification`）は ✅ 5.46.0（#4884）。ほかは未着手 |
 | メディアカタログ | ⬜ | `data/media_catalog` | 段階 5（`media_catalog`・重い） |
 | ストリーミング（listener） | ⬜ | `capabilities/streaming` | 段階 6 |
 | 投稿の一括削除 | ⬜ | — | `deletable_statuses` |
@@ -65,7 +65,9 @@ v4 の実装は `git show 46c4f4e2^:<path>` で取り出せる（SQL は `app/qu
    - ⚠ 本文はローカルの投稿なら `source.content`（Akkoma 3.x はオブジェクト）、リモートの投稿は `content`（HTML）
    - ついでに直したもの: `NodeInfo#update` が Pleroma 系で自分のキャッシュを読み直し、ノード名を落としていた（フィードのチャンネル名が空になる）
 3. **直近の投稿・添付**: `recent_toot`（✅ 5.43.0）/ `attachment`（#4861）。nowplaying の置き換えや webhook の添付が使う
-4. **ハンドラ**: 判断が要るので 1 本ずつ。最初は `post_reaction` を流すところから（#4884）
+4. **ハンドラ**: 判断が要るので 1 本ずつ。最初は `post_reaction` を流すところから（✅ 5.46.0・#4884）。
+   判断の中心は `reactionable?`。受け手のサーバーの nodeinfo は `software.name` が `akkoma` なので、設定の `akkoma.capabilities.reaction` を立てた。
+   Akkoma の利用者は絵文字リアクションを自分で見られるので、リアクションを伝える返信は投稿しない（Misskey 系から Akkoma の利用者へのリアクションも同じ）
 5. **メディアカタログ**: Mastodon / Misskey でも重かった（[media_catalog.md](media_catalog.md)）。最後に回す
 6. **ストリーミング**: v4 の `PleromaListener` を戻す。Akkoma のストリーミングは Mastodon 互換
 
