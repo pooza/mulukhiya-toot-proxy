@@ -43,10 +43,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: d59aea22270a771e1f8775355d8d6fb7e5283d6e
-  tag: v6.0.0
+  revision: 8bdda3798900508890ad22829de908042257c717
+  tag: v7.1.0
   specs:
-    ginseng-fediverse (6.0.0)
+    ginseng-fediverse (7.1.0)
       ginseng-core (>= 2.1.0)
 
 GIT
