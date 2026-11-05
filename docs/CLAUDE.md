@@ -198,16 +198,17 @@ git diff Gemfile.lock
 [マイルストーン 5.46.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/645)。`config/application.yaml` は 5.46.0 へバンプ済み（2026-11-05）。
 
 - 5.46.0 は #4850 / #4851 / #4861 / #4864 / #4884 / #4874 / #4875 / #4876 （ginseng-\* の告知 3 件は 2026-10-30 に追加。緊急性なし＝ユーザー判断）
-- ✅ **2026-11-05 に PR 6 本を出した**（どれも develop 宛て・Issue は open のまま）:
+- ✅ **2026-11-05 に PR 6 本を出し、同日にマージした**（ユーザー承認・どれも CI 緑・Issue は open のまま＝クローズはラップ時の判断）:
   - #4886（#4876・ginseng-core v5.0.0・`TestCase.load` を core に任せる）。⚠ **写しは 50 ファイルを黙って読み飛ばしていた**（手元は DB が無く `disable?` の判定で落ちる）。`skip_case?` で理由を添えて omission にした
   - #4887（#4875・ginseng-fediverse v7.1.0）/ #4888（#4874・ginseng-piefed v0.6.1）
   - #4889（#4864・Akkoma のタイムゾーンの無い時刻。`founded_at` も同じ原因で一緒に直した）
   - #4890（#4861・Akkoma の添付。v4 の `attachment.sql.erb` は v4 でも死んでいたので戻さない）
-  - #4891（#4884・Akkoma の `post_reaction`。`akkoma.capabilities.reaction` を立てた＝ Misskey 系から Akkoma の利用者へのリアクションも返信しなくなる）。⚠ **dev29 はこのブランチのまま**。マージしたら develop へ戻す
+  - #4891（#4884・Akkoma の `post_reaction`。`akkoma.capabilities.reaction` を立てた＝ Misskey 系から Akkoma の利用者へのリアクションも返信しなくなる）。dev29 はマージ後に develop（`4863f797`）へ戻した（health 200・`config: OK`）
     Codex の P2（リアクションした投稿を本人のサービスで読む）は `668ac53d` で直し、返信・👍 済み
-  - ⚠ **6 本のうち 4 本（#4886 / #4889 / #4890 / #4891）が CI の omission の上限（#4503）を上げている。**どれも
-    `.github/workflows/test.yml` の同じ行なので、**2 本目以降のマージで衝突する**。上げ幅は #4886 が +50（misskey は +48）、
-    #4889 / #4891 が +1、#4890 が +2。衝突したら足し算で解き、CI の実測（ジョブサマリの「omission N 件 / 上限 M」）で合わせる
+  - 4 本（#4886 / #4889 / #4890 / #4891）が CI の omission の上限（#4503）を上げていたので、マージのたびに衝突を足し算で解いた。
+    develop の上限は **mastodon 382 / misskey 369**。衝突を解いた状態でも、そのつど手元の全件と CI を通した
+  - ⚠ **CI の misskey のジョブが `apt install` で止まることが 3 回あった**（10 分以上・`apt update` のミラー待ち）。ステップに時間の上限が無いので、
+    取り消して回し直した。上限を付けるかは未判断
 - ✅ develop へ直接: Rails 8.1.4.1 ほか bundler-audit の勧告 12 件（`9d70fa5d`）。同期の時点の Dependabot は 0 件だった（勧告のデータベースが先に更新された）
 - ⚠ **#4880 は 2026-11-05 の実測で 5.47.0 へ送った**（[実測](https://github.com/pooza/mulukhiya-toot-proxy/issues/4880)）。形式を変えても同じ 2,407 語を載せるので誤爆は減らない。手順 1 の deploy は pooza/cure-api#389 待ち
 
