@@ -33,11 +33,14 @@ jobs:
         #
         # 2026-11-05 (#4864): Akkoma の DB が要るテスト（`PleromaNaiveTimeTest#test_expired`）を足したので +1。
         # 実測: mastodon 379 / misskey 366（develop の値に足した）。
+        #
+        # 2026-11-05 (#4861): Akkoma の DB が要るテスト（`PleromaAttachmentTest` の 2 本）を足したので +2。
+        # 実測: mastodon 381 / misskey 368（develop の値に足した）。
         include:
           - controller: mastodon
-            omission_baseline: 379
+            omission_baseline: 381
           - controller: misskey
-            omission_baseline: 366
+            omission_baseline: 368
     services:
       redis:
         image: redis:7
