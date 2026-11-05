@@ -210,6 +210,8 @@ git diff Gemfile.lock
   - ⚠ **CI の misskey のジョブが `apt install` で止まることが 3 回あった**（10 分以上・`apt update` のミラー待ち）。ステップに時間の上限が無いので、
     取り消して回し直した。上限を付けるかは未判断
 - ✅ develop へ直接: Rails 8.1.4.1 ほか bundler-audit の勧告 12 件（`9d70fa5d`）。同期の時点の Dependabot は 0 件だった（勧告のデータベースが先に更新された）
+- **5.46.0 は Mastodon 5.0 RC 待ち**（2026-11-05 ユーザー）。残りは #4850 / #4851 だけ。
+  ⚠ **Misskey の次の stable（2026.10.2 の見込み・10-31 に alpha.0）が RC より先に出たら、その harness 検証も 5.46.0 に含める**（ユーザー判断。メジャーでなくても検証する）
 - ⚠ **#4880 は 2026-11-05 の実測で 5.47.0 へ送った**（[実測](https://github.com/pooza/mulukhiya-toot-proxy/issues/4880)）。形式を変えても同じ 2,407 語を載せるので誤爆は減らない。手順 1 の deploy は pooza/cure-api#389 待ち
 
 ## 予定: 5.47.0
