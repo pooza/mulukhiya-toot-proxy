@@ -6,6 +6,8 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
+    # ふだんは 3 分前後。どこかで止まっても、既定の 6 時間まで待たない。
+    timeout-minutes: 30
     strategy:
       matrix:
         # omission_baseline は「CI（実サーバー非保持）で omission になるテストの
@@ -54,12 +56,15 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: .ruby-version
+      # ⚠ 上限を付ける（2026-11-05）。ミラー（azure.archive.ubuntu.com）が遅い日に 10 分を超えて
+      # 終わらず、既定の 6 時間まで待つところだった（3 回・取り消して回し直した）。
+      # ⚠ 推奨パッケージは入れない。ffmpeg の推奨（音声認識のモデル・各種ドライバ）が取得の大半で、
+      # テストには要らない。
       - name: apt install
+        timeout-minutes: 10
         run: |
-          sudo apt update
-          sudo apt install ffmpeg
-          sudo apt install libidn11-dev
-          sudo apt install libvips-dev
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ffmpeg libidn11-dev libvips-dev
       - name: Fix gem directory permissions
         run: chmod -R o-w "$(gem environment gemdir)"
       - name: Create CI config
