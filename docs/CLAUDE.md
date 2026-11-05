@@ -197,7 +197,19 @@ git diff Gemfile.lock
 
 [マイルストーン 5.46.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/645)。`config/application.yaml` は 5.46.0 へバンプ済み（2026-11-05）。
 
-- 5.46.0 は #4850 / #4851 / #4861 / #4864 / #4884 / #4874 / #4875 / #4876 / #4880（ginseng-\* の告知 3 件は 2026-10-30 に追加。緊急性なし＝ユーザー判断）
+- 5.46.0 は #4850 / #4851 / #4861 / #4864 / #4884 / #4874 / #4875 / #4876 （ginseng-\* の告知 3 件は 2026-10-30 に追加。緊急性なし＝ユーザー判断）
+- ✅ **2026-11-05 に PR 6 本を出した**（どれも develop 宛て・Issue は open のまま）:
+  - #4886（#4876・ginseng-core v5.0.0・`TestCase.load` を core に任せる）。⚠ **写しは 50 ファイルを黙って読み飛ばしていた**（手元は DB が無く `disable?` の判定で落ちる）。`skip_case?` で理由を添えて omission にした
+  - #4887（#4875・ginseng-fediverse v7.1.0）/ #4888（#4874・ginseng-piefed v0.6.1）
+  - #4889（#4864・Akkoma のタイムゾーンの無い時刻。`founded_at` も同じ原因で一緒に直した）
+  - #4890（#4861・Akkoma の添付。v4 の `attachment.sql.erb` は v4 でも死んでいたので戻さない）
+  - #4891（#4884・Akkoma の `post_reaction`。`akkoma.capabilities.reaction` を立てた＝ Misskey 系から Akkoma の利用者へのリアクションも返信しなくなる）。⚠ **dev29 はこのブランチのまま**。マージしたら develop へ戻す
+    Codex の P2（リアクションした投稿を本人のサービスで読む）は `668ac53d` で直し、返信・👍 済み
+  - ⚠ **6 本のうち 4 本（#4886 / #4889 / #4890 / #4891）が CI の omission の上限（#4503）を上げている。**どれも
+    `.github/workflows/test.yml` の同じ行なので、**2 本目以降のマージで衝突する**。上げ幅は #4886 が +50（misskey は +48）、
+    #4889 / #4891 が +1、#4890 が +2。衝突したら足し算で解き、CI の実測（ジョブサマリの「omission N 件 / 上限 M」）で合わせる
+- ✅ develop へ直接: Rails 8.1.4.1 ほか bundler-audit の勧告 12 件（`9d70fa5d`）。同期の時点の Dependabot は 0 件だった（勧告のデータベースが先に更新された）
+- ⚠ **#4880 は 2026-11-05 の実測で 5.47.0 へ送った**（[実測](https://github.com/pooza/mulukhiya-toot-proxy/issues/4880)）。形式を変えても同じ 2,407 語を載せるので誤爆は減らない。手順 1 の deploy は pooza/cure-api#389 待ち
 
 ## 予定: 5.47.0
 
@@ -205,6 +217,7 @@ git diff Gemfile.lock
 
 - #4195 → #4196 → #4197（ユーザー向けハンドラートグル。依存の #4194 はクローズ済み）
 - #4229（rails-erb-lint の更新が無いので `erb_lint` へ替えて `ostruct` を消す）
+- #4880（`dic.json` を related 形式へ・5.46.0 から送った）。本番で引くのは gomander だけ。読む側の削除は注意書きを出した版の次にする
 - #4734（HEIF を戻す）。FreeBSD は quarterly の pkg に `libheif` 1.23.6 が来ている（ports のビルドは要らない）。⚠ `pkg update` していないホストは古いカタログで 1.22.2_3 に見える。凍結（11/1〜11/4）の後に上げる。vulcan は Ubuntu の 1.21.2-3ubuntu0.6 で、版の条件を満たさない
 - on-hold のまま: #3877（本文が無く設計から）/ #4301（capsicum#344 が open）/ #4298・#3157（相手側待ち）/ #4832・#4873（報告待ち）/ #4846（総まとめ）
 
