@@ -204,6 +204,10 @@ git diff Gemfile.lock
   - #4889（#4864・Akkoma のタイムゾーンの無い時刻。`founded_at` も同じ原因で一緒に直した）
   - #4890（#4861・Akkoma の添付。v4 の `attachment.sql.erb` は v4 でも死んでいたので戻さない）
   - #4891（#4884・Akkoma の `post_reaction`。`akkoma.capabilities.reaction` を立てた＝ Misskey 系から Akkoma の利用者へのリアクションも返信しなくなる）。⚠ **dev29 はこのブランチのまま**。マージしたら develop へ戻す
+    Codex の P2（リアクションした投稿を本人のサービスで読む）は `668ac53d` で直し、返信・👍 済み
+  - ⚠ **6 本のうち 4 本（#4886 / #4889 / #4890 / #4891）が CI の omission の上限（#4503）を上げている。**どれも
+    `.github/workflows/test.yml` の同じ行なので、**2 本目以降のマージで衝突する**。上げ幅は #4886 が +50（misskey は +48）、
+    #4889 / #4891 が +1、#4890 が +2。衝突したら足し算で解き、CI の実測（ジョブサマリの「omission N 件 / 上限 M」）で合わせる
 - ✅ develop へ直接: Rails 8.1.4.1 ほか bundler-audit の勧告 12 件（`9d70fa5d`）。同期の時点の Dependabot は 0 件だった（勧告のデータベースが先に更新された）
 - ⚠ **#4880 は 2026-11-05 の実測で 5.47.0 へ送った**（[実測](https://github.com/pooza/mulukhiya-toot-proxy/issues/4880)）。形式を変えても同じ 2,407 語を載せるので誤爆は減らない。手順 1 の deploy は pooza/cure-api#389 待ち
 
