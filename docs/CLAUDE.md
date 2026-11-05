@@ -393,7 +393,9 @@ develop にすでに載っている bundler 4.0.20・ginseng-piefed v0.4.1・doc
 - ginseng-core は #4876 で **v5.0.0** まで、ginseng-fediverse は #4875 で **v7.1.0** まで上げる
 - #4734（HEIF）は 5.47.0 のまま
 - #4851 は移植を待たずに 2 項目を dev24 で見た（[結果](https://github.com/pooza/mulukhiya-toot-proxy/issues/4851)）。コマンド投稿の DM は新 UI のホームとプロフィールから消える（予想どおり）。
-  ⚠ **info からの通知 DM は 4.3 以降、info をフォローしていない利用者には通知リクエストへ振り分けられる**（5.0 の変更ではない・本番でも起きているはず）
+  dev24 では info からの通知 DM が通知リクエストへ振り分けられた（Mastodon 4.3 の通知ポリシー・5.0 の変更ではない）。
+  **本番は `mastodon_follow`（毎時）で全員が info をフォローしているので起きない**（ユーザー指摘）。
+  ⚠ **ステージングには `mastodon_follow` が無い**ので、通知 DM を確かめるときは先に test から info をフォローしておく
 
 ### 2026-10-31 セッション同期の記録
 
