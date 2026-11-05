@@ -25,11 +25,14 @@ jobs:
         #
         # 2026-10-31: Akkoma の DB が要るテスト（`PleromaHashTagTest#test_listable`）を足したので +1。
         # 実測: mastodon 328 / misskey 317。
+        #
+        # 2026-11-05 (#4884): Akkoma の DB が要るテスト（`PleromaReactionTest#test_put_and_delete`）を足したので +1。
+        # 実測: mastodon 329（手元）。
         include:
           - controller: mastodon
-            omission_baseline: 328
+            omission_baseline: 329
           - controller: misskey
-            omission_baseline: 317
+            omission_baseline: 318
     services:
       redis:
         image: redis:7
