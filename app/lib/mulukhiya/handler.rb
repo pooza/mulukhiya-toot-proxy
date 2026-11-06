@@ -183,8 +183,10 @@ module Mulukhiya
       return @break.present?
     end
 
+    # ⚠ 利用者の設定は `toggleable?` なものにだけ効かせる (#4196)。`/config/update` からは
+    # 切り替えられないハンドラも止められるので、ここで読まないようにする（既に止めている設定も無視する）。
     def disable?
-      return true if sns.account&.disable?(self)
+      return true if toggleable? && sns.account&.disable?(self)
       return true if config.disable?(self)
       return false
     rescue Ginseng::ConfigError

@@ -416,6 +416,7 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
 - `POST /mulukhiya/api/handler/config` で 1 つのハンドラーを切り替え（#4196）。`toggleable: false` のものは 422 で拒む
 - `POST /mulukhiya/api/config/update` でユーザー設定を変更
 - `toggleable: true` に設定されたハンドラーはユーザーが ON/OFF 可能
+- `toggleable: false` のハンドラーには、利用者の設定（`/handler/{name}/disable`）は効かない。`/config/update` で書けても無視される（#4196）
 - 設定パス: `/handler/{handler_name}/disable` を `true` / `false` で切り替え
 
 ## エンドポイント一覧
