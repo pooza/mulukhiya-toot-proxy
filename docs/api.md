@@ -413,6 +413,7 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
 
 ハンドラーの有効/無効はアカウント単位で制御可能。
 
+- `POST /mulukhiya/api/handler/config` で 1 つのハンドラーを切り替え（#4196）。`toggleable: false` のものは 422 で拒む
 - `POST /mulukhiya/api/config/update` でユーザー設定を変更
 - `toggleable: true` に設定されたハンドラーはユーザーが ON/OFF 可能
 - 設定パス: `/handler/{handler_name}/disable` を `true` / `false` で切り替え
@@ -983,6 +984,34 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 **`errors`**: JSON Schema バリデーションエラーの配列。正常な設定では空配列。
 
 **`unknown_keys`**: スキーマに定義されていないキーのドット区切りパス。移行済みの旧設定や、廃止されたハンドラーのパラメータが残っている場合に検出される。不要であれば `local.yaml` から削除を検討する。
+
+#### POST /mulukhiya/api/handler/config
+
+ログイン中の利用者の設定で、1 つのハンドラーを有効/無効にする（#4196）。保存先は利用者の設定
+（`/handler/{name}/disable`）で、サーバー全体の設定は変えない（そちらは `POST /mulukhiya/api/admin/handler/config`）。
+
+- **認証**: ユーザートークン（Bearer・書き込みのスコープが要る）
+- **パラメータ**:
+
+| 名前 | 型 | 必須 | 説明 |
+|------|-----|------|------|
+| `handler` | string | 必須 | ハンドラー識別子（underscore 名） |
+| `disable` | boolean | 必須 | `true` で無効、`false` で有効。文字列の `"true"` / `"false"` も受け付ける |
+
+**レスポンス例**:
+
+```json
+{"name": "default_tag", "disabled": true}
+```
+
+**エラー**:
+
+| ステータス | 条件 |
+|-----------|------|
+| 400 | `handler` が無い |
+| 403 | 未認証 |
+| 404 | 知らないハンドラー、またはサーバー全体で無効なハンドラー |
+| 422 | `toggleable: false` のハンドラー、または `disable` が真偽値でない |
 
 #### GET /mulukhiya/api/admin/handler/list
 

@@ -335,6 +335,22 @@ module Mulukhiya
       handlers.compact.sort_by(&:underscore).each(&block)
     end
 
+    # 利用者が切り替えてよいハンドラの名前を返す (#4196)。だめなら例外。
+    # ⚠ 名前は利用者の入力なので、constantize より先に一覧と突き合わせる。
+    # ⚠ インスタンスは作らない（`new` は SNS を介して DB を触る）。設定はクラスから読む。
+    def self.user_toggleable(name, names = all_names)
+      name = name.to_s
+      raise Ginseng::RequestError, 'handler required' if name.empty?
+      unless names&.member?(name) && (config["/handler/#{name}/disable"] rescue nil) != true
+        raise Ginseng::NotFoundError, "Handler '#{name}' not found"
+      end
+      handler_class = "Mulukhiya::#{name.camelize}Handler".constantize
+      unless handler_class.handler_config(:toggleable) == true
+        raise Ginseng::ValidateError, "Handler '#{name}' is not toggleable"
+      end
+      return name
+    end
+
     def self.search(pattern)
       return names.select {|v| v.match?(pattern) && !config.disable?(v)}.to_set
     end
