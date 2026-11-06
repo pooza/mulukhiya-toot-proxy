@@ -383,6 +383,21 @@ develop にすでに載っている bundler 4.0.20・ginseng-piefed v0.4.1・doc
 
 ## セッション同期の記録
 
+### 2026-11-06 セッション同期の記録
+
+**本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。harness の upstream 確認は前回（11-04）から 2 日なのでスキップ（参考に覗いた範囲では、Mastodon は v5.0.0-beta.1 が最新で RC はまだ・Misskey は 2026.10.2-alpha.0 のまま）。
+
+- **ブランチ**: `develop` は `origin/develop` と同一（`d2011602`）。open PR は #4885（5.46 のリリース PR・draft）だけ。Dependabot アラート **0 件**
+- **Codex**: 未対応なし（直近マージ 6 本と open 1 本。#4891 の P2 は返信・👍 済み）。PR 本体への申し送りもなし
+- **マイルストーン**: 5.46.0 は変化なし（Mastodon 5.0 RC 待ち）
+- **ginseng-\* のピン**: postgres v2.0.1 → v2.0.2・redis v2.0.8 → v2.0.9・web v3.0.4 → v3.0.5・youtube v3.0.2 → v3.0.3 のずれ。
+  中身はどれも ginseng-style の参照の更新と、`TestCase` の load / names / dir の写しを消して ginseng-core のものを使う変更だけ（各 gem の `test_case.rb`）。
+  **モロヘイヤが触る面に当たらない → ③ 見送り**（次にこれらの gem を上げる用事ができたときに一緒に上げる）。core / fediverse / piefed / style は最新
+- **Annict の API**: 前回と同じ（`rails/app/graphql` は 10-17、Go 側は API の 4 ディレクトリ）。公式アカウントの新しい投稿なし
+- **辞書台帳**: **🔴 の新規なし**。gomander の `fairy.json` と shallu の b-shock `common.json` が 🟡 → 🟢。delmulin の `pron.json` が 🟡 未使用 → ⚪ 他所のみ。再生成を chubo2 へ（`84c0e34`）
+- **chubo2**: open 17 件（前回 16）。増えたのは #297（seas の MINC のバックアップ先）で、こちらへの影響なし。Issue 棚卸し 10-25・ドキュメント棚卸し 10-31 でどちらも 30 日未満
+- **Sentry**: unresolved **29 件**・**コメント 0 は 0 件**（2026-11-06 時点）。最新イベントは前回確認済みの -38（10-29）で、新しいイベントなし
+
 ### 2026-11-05 セッション同期の記録
 
 **本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。harness の upstream 確認は前回（11-04）から 1 日なのでスキップ。
