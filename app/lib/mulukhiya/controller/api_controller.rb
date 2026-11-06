@@ -1036,6 +1036,17 @@ module Mulukhiya
       return render_error(e)
     end
 
+    get '/handler/list' do
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      @renderer.message = Handler.user_list(sns.account)
+      return @renderer.to_s
+    rescue => e
+      report_error(e)
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     get '/admin/handler/list' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
       @renderer.message = Handler.all.map do |handler|
