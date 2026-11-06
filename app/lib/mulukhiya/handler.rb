@@ -183,8 +183,10 @@ module Mulukhiya
       return @break.present?
     end
 
+    # ⚠ 利用者の設定は `toggleable?` なものにだけ効かせる (#4196)。`/config/update` からは
+    # 切り替えられないハンドラも止められるので、ここで読まないようにする（既に止めている設定も無視する）。
     def disable?
-      return true if sns.account&.disable?(self)
+      return true if toggleable? && sns.account&.disable?(self)
       return true if config.disable?(self)
       return false
     rescue Ginseng::ConfigError
@@ -333,6 +335,22 @@ module Mulukhiya
         e.log(name:)
       end
       handlers.compact.sort_by(&:underscore).each(&block)
+    end
+
+    # 利用者が切り替えてよいハンドラの名前を返す (#4196)。だめなら例外。
+    # ⚠ 名前は利用者の入力なので、constantize より先に一覧と突き合わせる。
+    # ⚠ インスタンスは作らない（`new` は SNS を介して DB を触る）。設定はクラスから読む。
+    def self.user_toggleable(name, names = all_names)
+      name = name.to_s
+      raise Ginseng::RequestError, 'handler required' if name.empty?
+      unless names&.member?(name) && (config["/handler/#{name}/disable"] rescue nil) != true
+        raise Ginseng::NotFoundError, "Handler '#{name}' not found"
+      end
+      handler_class = "Mulukhiya::#{name.camelize}Handler".constantize
+      unless handler_class.handler_config(:toggleable) == true
+        raise Ginseng::ValidateError, "Handler '#{name}' is not toggleable"
+      end
+      return name
     end
 
     def self.search(pattern)
