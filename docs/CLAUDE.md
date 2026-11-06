@@ -219,6 +219,10 @@ git diff Gemfile.lock
 [マイルストーン 5.47.0](https://github.com/pooza/mulukhiya-toot-proxy/milestones)。2026-10-31 に on-hold を見直し、止める条件が無くなっていたものを載せた。
 
 - #4195 → #4196 → #4197（ユーザー向けハンドラートグル。依存の #4194 はクローズ済み）
+  - ✅ 2026-11-06 に #4195（PR #4894）・#4196（PR #4895）を draft で出した。⚠ **develop は 5.46.0 のリリース PR の元なので、5.46.0 を出すまでマージしない**（ユーザー判断）。
+    2 本は別々に develop から切った（`docs/api.md` の同じ箇所に足しているので、後の方で衝突を解く）
+  - #4196 で `Handler#disable?` が `toggleable` を見ていなかったのを直した（ユーザー判断 A）。`invalid_command`・`remote_tag` は利用者の設定では止まらなくなる。既に止めている設定も無視される
+  - #4197（設定画面）は **2 本のマージを待って着手する**（ユーザー判断）
 - #4229（rails-erb-lint の更新が無いので `erb_lint` へ替えて `ostruct` を消す）
 - #4880（`dic.json` を related 形式へ・5.46.0 から送った）。本番で引くのは gomander だけ。読む側の削除は注意書きを出した版の次にする
 - #4734（HEIF を戻す）。FreeBSD は quarterly の pkg に `libheif` 1.23.6 が来ている（ports のビルドは要らない）。⚠ `pkg update` していないホストは古いカタログで 1.22.2_3 に見える。凍結（11/1〜11/4）の後に上げる。vulcan は Ubuntu の 1.21.2-3ubuntu0.6 で、版の条件を満たさない
