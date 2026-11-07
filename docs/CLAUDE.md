@@ -211,7 +211,7 @@ git diff Gemfile.lock
     取り消して回し直した。上限を付けるかは未判断
 - ✅ develop へ直接: Rails 8.1.4.1 ほか bundler-audit の勧告 12 件（`9d70fa5d`）。同期の時点の Dependabot は 0 件だった（勧告のデータベースが先に更新された）
 - **5.46.0 は Mastodon 5.0 RC 待ち**（2026-11-05 ユーザー）。残りは #4850 / #4851 だけ。
-  ⚠ **Misskey の次の stable（2026.10.2 の見込み・10-31 に alpha.0）が RC より先に出たら、その harness 検証も 5.46.0 に含める**（ユーザー判断。メジャーでなくても検証する）
+  ⚠ **Misskey の次の stable（10-31 に 2026.10.2-alpha.0、11-06 に 2026.11.0-alpha.0 が出たので 2026.11.0 の見込み）が RC より先に出たら、その harness 検証も 5.46.0 に含める**（ユーザー判断。メジャーでなくても検証する）
 - ⚠ **#4880 は 2026-11-05 の実測で 5.47.0 へ送った**（[実測](https://github.com/pooza/mulukhiya-toot-proxy/issues/4880)）。形式を変えても同じ 2,407 語を載せるので誤爆は減らない。手順 1 の deploy は pooza/cure-api#389 待ち
 
 ## 予定: 5.47.0
@@ -387,6 +387,21 @@ develop にすでに載っている bundler 4.0.20・ginseng-piefed v0.4.1・doc
   - `SNSServiceMethods#account` / `#access_token` の `rescue nil` で、DB の一部障害が 403 の log 止めに化ける（既存・#4845 は悪化させていない）
 
 ## セッション同期の記録
+
+### 2026-11-08 セッション同期の記録
+
+**本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。
+
+- **ブランチ**: `develop` は `origin/develop` と同一（`c339bab6`）。open PR は #4885（5.46 のリリース PR）・#4894 / #4895（5.47.0 の #4195 / #4196・draft）。Dependabot アラート **0 件**
+- **Codex**: 未対応なし（直近マージ 5 本と open 3 本。#4891 の P2 は返信・👍 済み）。PR 本体への申し送りもなし
+- **Issue**: 前回から増減なし。#4896・#4897 はマイルストーン無しのまま（箱はユーザーが決める）
+- **ginseng-\* のピン**: 前回からの変化は **postgres v2.0.2 → v2.0.3** だけ（`QueryTemplate#params=` が引数の Hash を書き換えなくなった・pooza/ginseng-postgres#118、上書きへの印・pooza/ginseng-style#149）。
+  モロヘイヤの `Mulukhiya::QueryTemplate` は `escape` と `dir` を差し替えるだけで、`params=` を渡したあとの Hash を読み直す箇所も無い（`announce_handler` / `mention_handler` の `params=` は `Template` 側）→ **③ 見送りのまま**（#4896 で core を上げるときに一緒に上げてよい）。core v6.0.0（#4896）・style v1.1.15 は 11-07 の判断（② #4896）のまま
+- **Annict の API**: 前回と同じ（`rails/app/graphql` は 10-17、Go 側は API の 4 ディレクトリ）。公式アカウントの新しい投稿なし
+- **辞書台帳**: **🔴 の新規なし**。状態の列は変化なし（取得回数だけ動いた）。再生成を chubo2 へ（`7f886f3`）
+- **chubo2**: open 16 件（前回 15）。増えたのは #299（ginseng-\* 由来の上書きの洗い出し・`/ginseng:audit-overrides`）で、#4898 の chubo2 版。こちらへの影響なし。Issue 棚卸し 10-25・ドキュメント棚卸し 10-31 でどちらも 30 日未満
+- **Sentry**: unresolved **29 件**・**コメント 0 は 0 件**（2026-11-08 時点）。最新イベントは前回確認済みの -34 / -2F（11-07 08:23 JST の Redis 再起動）で、新しいイベントなし
+- **harness の upstream**（前回 11-04 から 4 日）: 新しい stable・RC なし。Mastodon は v5.0.0-beta.1 のまま、Misskey は prerelease の **2026.11.0-alpha.0（11-06）** が出た、Akkoma は v3.20.1 のまま。`last_checked` を 11-08 へ
 
 ### 2026-11-07 セッション同期の記録
 
