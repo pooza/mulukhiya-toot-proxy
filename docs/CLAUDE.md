@@ -226,6 +226,7 @@ git diff Gemfile.lock
 - #4229（rails-erb-lint の更新が無いので `erb_lint` へ替えて `ostruct` を消す）
 - #4880（`dic.json` を related 形式へ・5.46.0 から送った）。本番で引くのは gomander だけ。読む側の削除は注意書きを出した版の次にする
 - #4734（HEIF を戻す）。FreeBSD は quarterly の pkg に `libheif` 1.23.6 が来ている（ports のビルドは要らない）。⚠ `pkg update` していないホストは古いカタログで 1.22.2_3 に見える。凍結（11/1〜11/4）の後に上げる。vulcan は Ubuntu の 1.21.2-3ubuntu0.6 で、版の条件を満たさない
+- #4898（ginseng-\* 由来の上書きの見直し・size:M・2026-11-07 起票）。上流に入っている写し（`MisskeyService#oauth_server_metadata`）と、gem の決め打ちで写すしかなかった `Redis#initialize` を消し、Redis のロックの道具・JSON の `get` / `set`・Postgres の接続まわりを返すか決める。規約側のたたき台は pooza/ginseng-style#147
 - on-hold のまま: #3877（本文が無く設計から）/ #4301（capsicum#344 が open）/ #4298・#3157（相手側待ち）/ #4893（Mastodon 5.0 の用語の ja 訳待ち・2026-11-06 に on-hold へ）/ #4832・#4873（報告待ち）/ #4846（総まとめ）
 
 ## リリース済み: 5.45.0（2026-10-31）
