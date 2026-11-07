@@ -53,19 +53,40 @@ module Mulukhiya
       WebMock.disable_net_connect!(allow_localhost: true, allow:)
     end
 
+    # ⚠⚠ **ファイルを読む本体は core に任せる（#4876・pooza/ginseng-core#696）。**以前はここに写しを
+    # 持っていたので、読めなかったテストファイルが `- case:` の 1 行で黙って消え、終了コードは 0 のままだった。
+    # core の `load` は読めなかったファイルを失敗として数える。前処理だけをここに残す。
     def self.load(cases = nil)
       ENV['TEST'] = Package.full_name
       TestHarness.apply!
       invalidate_shared_caches
       Sidekiq::Testing.fake!
-      file_map(cases).each do |name, path|
-        raise 'disabled' if name.end_with?('_handler') && Handler.create(name).disable?
-        raise 'disabled' if name.end_with?('_worker') && Worker.create(name).disable?
-        puts "+ case: #{name}" if Environment.test?
-        require path
-      rescue => e
-        puts "- case: #{name} (#{e.message})" if Environment.test?
+      super
+    end
+
+    # 読まずに飛ばすテストファイル（core が omission として数える）。
+    #
+    # ⚠ **前提を満たさないハンドラ・ワーカーのテストは、読まずに飛ばす。**`disable?` の判定には DB や
+    # SNS が要るものが多く、手元や CI では作れない（`Handler.create` が nil・`No database` など）。
+    # 写しの頃は判定の例外も `- case:` で飛ばしていたので、**判定で例外になったら理由を添えて飛ばす**。
+    # ⚠ ここで飛ばすのは判定まで。**ファイルの `require` で落ちたものは飛ばさず、失敗にする**（core の検知）。
+    def self.skip_case?(name)
+      return false unless target = skip_target(name)
+      return 'disabled' if target.disable?
+      return false
+    rescue => e
+      return "#{e.class}: #{e.message}"
+    end
+
+    # ⚠ 作れなかった（nil）ときは例外にして、上の `rescue` で理由に変える。
+    def self.skip_target(name)
+      case name
+      when /_handler$/
+        return Handler.create(name) || raise(Ginseng::ImplementError, "#{name} を作れない")
+      when /_worker$/
+        return Worker.create(name) || raise(Ginseng::ImplementError, "#{name} を作れない")
       end
+      return nil
     end
 
     # `report_error` のデッドマン（#4693）の窓を開け直す。
@@ -101,25 +122,6 @@ module Mulukhiya
       # Redis 未起動などで落ちても、ここでスイート全体を止めない。実際に辞書を
       # 触るテストがその場で落ちる。
       e.log
-    end
-
-    def self.names(cases = nil)
-      return file_map(cases).keys.to_set
-    end
-
-    def self.file_map(cases = nil)
-      finder = Ginseng::FileFinder.new
-      finder.dir = dir
-      finder.patterns.push('*.rb')
-      all = finder.exec.to_h {|path| [File.basename(path, '.rb'), path]}
-      return all unless cases
-      targets = cases.split(',').map(&:underscore)
-        .map {|v| [v, "#{v}_test", v.sub(/_test$/, '')]}.flatten.compact
-      return all.slice(*targets)
-    end
-
-    def self.dir
-      return File.join(Environment.dir, 'test')
     end
   end
 end

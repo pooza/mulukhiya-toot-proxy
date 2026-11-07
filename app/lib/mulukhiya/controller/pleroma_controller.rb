@@ -6,9 +6,11 @@ module Mulukhiya
   class PleromaController < MastodonController
     put '/api/:version/pleroma/statuses/:status_id/reactions/:emoji' do
       verify_token_integrity!
-      # ⚠ `post_reaction` は流さない（PR #4844 の Codex P1）。パイプラインは Misskey にしか無く、
-      # `Event.new` が上流で反映した後に落ちて 500 になる。ハンドラは #4566 の非ゴール。
       reporter.response = sns.reaction(params[:status_id], params[:emoji])
+      # 上流へ反映した後に流す（Misskey の `/api/notes/reactions/create` と同じ順・#4884）。
+      # ⚠ パイプライン（`/handler/pipeline/pleroma/post_reaction`）が無いと、ここで落ちて 500 になる
+      # （PR #4844 の Codex P1）。設定から消さない。
+      Event.new(:post_reaction, {reporter:, sns:}).dispatch(params)
       @renderer.message = reporter.response.parsed_response
       @renderer.status = reporter.response.code
       return @renderer.to_s

@@ -70,8 +70,13 @@ module Mulukhiya
         return TagContainer.new
       end
 
+      # 添付は `objects` の `Document`（新しい順）。⚠ `data->>'actor'` と `data->>'type'` の組には
+      # Akkoma の索引（`objects_actor_type`）が効く（dev29 の EXPLAIN で Bitmap Index Scan）。
+      # ⚠ v4 の `attachment.sql.erb`（URL の JSON の式で引く）は戻さない。v4 でも呼び出し元が無く、
+      # 索引も効かない（#4861）。⚠ 一覧を読み込まず dataset で返す（`clear_attachments` は `first` と `count`）。
       def attachments
-        return []
+        condition = Sequel.lit("data->>'actor' = ? AND data->>'type' = 'Document'", ap_id)
+        return Attachment.where(condition).reverse(:id)
       end
 
       # ⚠ 投稿は `Status` と同じく API で読む（`objects` の JSON を開く SQL は持たない）。
@@ -107,11 +112,11 @@ module Mulukhiya
         return acct.to_s.sub(/^@/, '')
       end
 
-      # ⚠ 作成日時は `created_at` ではなく `inserted_at`（Ecto）。
+      # ⚠ 作成日時は `created_at` ではなく `inserted_at`（Ecto）。UTC（タイムゾーンなし）なので読み直す (#4864)。
       def self.founded_at
         return @founded_at if defined?(@founded_at) && @founded_at
         return nil unless account = where(local: true).order(:inserted_at).first
-        return @founded_at = account.inserted_at.getlocal
+        return @founded_at = NaiveTime.utc(account.inserted_at).getlocal
       rescue => e
         e.log
         return nil
