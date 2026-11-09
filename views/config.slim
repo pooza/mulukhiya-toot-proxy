@@ -104,7 +104,7 @@ html lang='ja' data-theme='light'
                   |  ({{handler.name}})
               p.handler-description v-if='handler.description' {{handler.description}}
               label
-                input type='checkbox' :checked='handler.disabled' :disabled='!handler.toggleable' @change='onChangeHandler(handler, $event)'
+                input type='checkbox' :checked='handler.disabled' :disabled='!handler.toggleable || pending[handler.name]' @change='onChangeHandler(handler, $event)'
                 | 無効化
               .description v-if='!handler.toggleable' 切り替えられません
       - if sns
@@ -144,6 +144,7 @@ html lang='ja' data-theme='light'
               config: null,
               result: null,
               handlers: [],
+              pending: {},
               programs: [],
               piefed: {
                 communities: {},
@@ -242,8 +243,11 @@ html lang='ja' data-theme='light'
               this.form.program.minutes = result.minutes
             },
             // 失敗したらチェックを元に戻す（画面と保存された設定をずらさない）。
+            // ⚠ 書き込みが終わるまでそのチェックを押せなくする。続けて切り替えると 2 本が並んで走り、
+            // 返る順によっては最後に選んだのと逆の値が保存される（PR #4903 の Codex P2）。
             onChangeHandler (handler, e) {
               const disable = e.target.checked
+              this.pending[handler.name] = true
               this.methods.toggleUserHandler(handler.name, disable)
                 .then(r => {
                   handler.disabled = r.disabled
@@ -253,6 +257,8 @@ html lang='ja' data-theme='light'
                 }).catch(err => {
                   e.target.checked = handler.disabled
                   Swal.fire({text: this.methods.createErrorMessage(err), icon: 'error'})
+                }).finally(() => {
+                  this.pending[handler.name] = false
                 })
             },
             toggleVisibility (name) {
