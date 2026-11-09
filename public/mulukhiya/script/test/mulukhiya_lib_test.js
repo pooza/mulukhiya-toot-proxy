@@ -285,6 +285,25 @@ describe('MulukhiyaLib', () => {
       assert.equal(data.result, 'ok')
     })
 
+    it('getUserHandlers', async () => {
+      methods.setToken('user-token')
+      mockAxios('/mulukhiya/api/handler/list', [
+        { name: 'default_tag', label: 'デフォルトタグ', description: null, toggleable: true, disabled: false },
+      ])
+      const data = await methods.getUserHandlers()
+      assert.isArray(data)
+      assert.equal(data[0].name, 'default_tag')
+      assert.isTrue(data[0].toggleable)
+    })
+
+    it('toggleUserHandler', async () => {
+      methods.setToken('user-token')
+      mockAxios('/mulukhiya/api/handler/config', { name: 'default_tag', disabled: true })
+      const data = await methods.toggleUserHandler('default_tag', true)
+      assert.equal(data.name, 'default_tag')
+      assert.isTrue(data.disabled)
+    })
+
     it('updateHandlerParams', async () => {
       methods.setToken('admin-token')
       mockAxios('/mulukhiya/api/admin/handler/config', { result: 'ok' })
