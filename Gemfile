@@ -3,14 +3,14 @@ ruby '>= 4.0.2', '< 5.0'
 gem 'concurrent-ruby'
 gem 'dry-validation'
 gem 'faye-websocket', github: 'pooza/faye-websocket-ruby'
-gem 'ginseng-core', github: 'pooza/ginseng-core', tag: 'v5.0.0', require: 'ginseng'
-gem 'ginseng-fediverse', github: 'pooza/ginseng-fediverse', tag: 'v7.1.0',
+gem 'ginseng-core', github: 'pooza/ginseng-core', tag: 'v7.0.0', require: 'ginseng'
+gem 'ginseng-fediverse', github: 'pooza/ginseng-fediverse', tag: 'v8.0.0',
   require: 'ginseng/fediverse'
 gem 'ginseng-piefed', github: 'pooza/ginseng-piefed', tag: 'v0.6.1', require: 'ginseng/piefed'
-gem 'ginseng-postgres', github: 'pooza/ginseng-postgres', tag: 'v2.0.1'
+gem 'ginseng-postgres', github: 'pooza/ginseng-postgres', tag: 'v2.0.3'
 gem 'ginseng-redis', github: 'pooza/ginseng-redis', tag: 'v2.0.8', require: 'ginseng/redis'
-gem 'ginseng-web', github: 'pooza/ginseng-web', tag: 'v3.0.4', require: 'ginseng/web'
-gem 'ginseng-youtube', github: 'pooza/ginseng-youtube', tag: 'v3.0.2', require: 'ginseng/you_tube'
+gem 'ginseng-web', github: 'pooza/ginseng-web', tag: 'v4.0.0', require: 'ginseng/web'
+gem 'ginseng-youtube', github: 'pooza/ginseng-youtube', tag: 'v4.0.0', require: 'ginseng/you_tube'
 gem 'icalendar'
 # ⚠⚠ **推移依存だが上限をこちらで持つ (#4699)。**`json` を要求している gem は
 # どれも `json (>= 2.3)` のように**下限しか書いていない**ので、`bundle update` の
@@ -67,7 +67,7 @@ group :development do
   # RuboCop 設定の正本。本体と minitest/performance/rake プラグインもこの gem が抱える。
   # ⚠⚠ タグではなく SHA で固定する（pooza/ginseng-style#75）。タグは付け替えられる。
   gem 'ginseng-style', github: 'pooza/ginseng-style',
-    ref: '2818c5618476302e4a10454f1b621502a053f492', require: false # v1.1.14
+    ref: '127c2854e76811eeec41e21c7bf262b4a527d2b7', require: false # v1.1.15
   gem 'ostruct' # https://github.com/pooza/mulukhiya-toot-proxy/issues/4229
   gem 'rack-test'
   gem 'rails-erb-lint'

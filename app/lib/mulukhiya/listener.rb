@@ -132,7 +132,11 @@ module Mulukhiya
     def initialize
       return unless @sns = info_agent_service
       @uri = @sns.streaming_uri
+      # 🔴 トークンは URL ではなくヘッダで渡す（ginseng-fediverse 8.0.0・#4899）。付け忘れると Mastodon は 401、
+      # ⚠⚠ Misskey は黙って匿名で繋がり、`main` / `homeTimeline` だけが来なくなる。
+      # Pleroma 系・Meisskey はヘッダを読まないので、gem が `{}` を返して従来どおり URL に載せる。
       @client = Faye::WebSocket::Client.new(uri.to_s, [], {
+        headers: @sns.streaming_headers,
         tls: {
           verify_peer: verify_peer?,
           root_cert_file:,
