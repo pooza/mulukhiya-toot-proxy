@@ -78,7 +78,10 @@ module Mulukhiya
       stub_request(:get, SHORTENED).to_return(status: 301, headers: {'Location' => PUBLIC_DEST})
       stub_request(:get, PUBLIC_DEST).to_return(status: 200, body: 'ok')
 
-      assert_equal(['203.0.113.1', '198.51.100.2'], recorded_pins {resolve})
+      # ⚠ ginseng-core 6.0.0 から、validator を渡さない要求でもホップごとに `pin(options, nil)` が呼ばれる
+      # （#4896）。`pin` は文字列でないアドレスでは options をそのまま返すので、こちらの固定は外れない。
+      # 見たいのは「検証したアドレスがホップごとに渡ること」なので nil は除く。
+      assert_equal(['203.0.113.1', '198.51.100.2'], recorded_pins {resolve}.compact)
     end
 
     # 真偽値を返す validator でも壊れないこと（pinning しないだけ）。

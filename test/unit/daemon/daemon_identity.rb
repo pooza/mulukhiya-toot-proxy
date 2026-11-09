@@ -199,7 +199,8 @@ module Mulukhiya
       assert_false(File.exist?(daemon.pid_file))
     end
 
-    # ⚠ 身元が分からないときは上流の挙動のまま（止めにいく）。
+    # ⚠ 身元を確かめられないときは、送らずに止まる（pid ファイルは残す）。
+    # ginseng-core 7.0.0 で変わった（pooza/ginseng-core#756・#4896）。6.x までは止めにいっていた。
     def test_stop_with_identity_unavailable
       pid = spawn_process('sleep', '30')
       daemon = create_daemon(pid)
@@ -207,9 +208,9 @@ module Mulukhiya
       daemon.define_singleton_method(:send_signal) {|*args| signals.push(args)}
       daemon.define_singleton_method(:process_command_line) {|_| ''}
 
-      silence_stderr {daemon.send(:run_stop)}
-
-      assert_equal([['TERM', pid]], signals)
+      assert_raise(SystemExit) {silence_stderr {daemon.send(:run_stop)}}
+      assert_empty(signals)
+      assert_path_exist(daemon.pid_file)
     end
 
     private
