@@ -423,8 +423,10 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
 ハンドラーの有効/無効はアカウント単位で制御可能。
 
 - `GET /mulukhiya/api/handler/list` で、利用者に見せるハンドラーの一覧と現在の状態を取得（#4195）
+- `POST /mulukhiya/api/handler/config` で 1 つのハンドラーを切り替え（#4196）。`toggleable: false` のものは 422 で拒む
 - `POST /mulukhiya/api/config/update` でユーザー設定を変更
 - `toggleable: true` に設定されたハンドラーはユーザーが ON/OFF 可能
+- `toggleable: false` のハンドラーには、利用者の設定（`/handler/{name}/disable`）は効かない。`/config/update` で書けても無視される（#4196）
 - 設定パス: `/handler/{handler_name}/disable` を `true` / `false` で切り替え
 
 ## エンドポイント一覧
@@ -1024,7 +1026,35 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 | `label` | string \| null | 表示用の短い名前（`config/schema/handler/*.yaml` の `label`） |
 | `description` | string \| null | 説明文（同 `description`） |
 | `toggleable` | boolean | 利用者が切り替えられるか |
-| `disabled` | boolean | 利用者の設定（`/handler/{name}/disable`）で無効にしているか |
+| `disabled` | boolean | 利用者の設定（`/handler/{name}/disable`）で無効にしているか。`toggleable: false` のものは利用者の設定が効かないので常に `false`（#4196） |
+
+#### POST /mulukhiya/api/handler/config
+
+ログイン中の利用者の設定で、1 つのハンドラーを有効/無効にする（#4196）。保存先は利用者の設定
+（`/handler/{name}/disable`）で、サーバー全体の設定は変えない（そちらは `POST /mulukhiya/api/admin/handler/config`）。
+
+- **認証**: ユーザートークン（Bearer・書き込みのスコープが要る）
+- **パラメータ**:
+
+| 名前 | 型 | 必須 | 説明 |
+|------|-----|------|------|
+| `handler` | string | 必須 | ハンドラー識別子（underscore 名） |
+| `disable` | boolean | 必須 | `true` で無効、`false` で有効。文字列の `"true"` / `"false"` も受け付ける |
+
+**レスポンス例**:
+
+```json
+{"name": "default_tag", "disabled": true}
+```
+
+**エラー**:
+
+| ステータス | 条件 |
+|-----------|------|
+| 400 | `handler` が無い |
+| 403 | 未認証 |
+| 404 | 知らないハンドラー、またはサーバー全体で無効なハンドラー |
+| 422 | `toggleable: false` のハンドラー、または `disable` が真偽値でない |
 
 #### GET /mulukhiya/api/admin/handler/list
 

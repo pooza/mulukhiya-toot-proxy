@@ -47,6 +47,13 @@ module Mulukhiya
       assert_false(entry[:toggleable])
     end
 
+    # 切り替えられないものは、利用者の設定に無効と書いてあっても動いているので `disabled: false` (#4196)。
+    def test_non_toggleable_ignores_user_config
+      entry = Handler.user_list(FakeAccount.new(['invalid_command']), @handlers).find {|v| v[:name] == 'invalid_command'}
+
+      assert_false(entry[:disabled])
+    end
+
     # サーバー全体で無効なものは見せない。
     def test_excludes_globally_disabled
       config['/handler/image_resize/disable'] = true

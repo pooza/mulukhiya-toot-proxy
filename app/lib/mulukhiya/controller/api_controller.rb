@@ -7,6 +7,11 @@ module Mulukhiya
       '/nowplaying/resolve-url',
     ].freeze
 
+    # `POST /handler/config` の `disable` に受け付ける値 (#4196)。JSON の真偽値とフォームの文字列。
+    USER_HANDLER_DISABLE_VALUES = {
+      true => true, 'true' => true, false => false, 'false' => false
+    }.freeze
+
     # API で読む投稿（Pleroma 系）を「無い」とみなす上流の応答。→ `find_status`
     NOT_FOUND_SOURCE_STATUSES = [401, 403, 404].freeze
 
@@ -1039,6 +1044,24 @@ module Mulukhiya
     get '/handler/list' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
       @renderer.message = Handler.user_list(sns.account)
+      return @renderer.to_s
+    rescue => e
+      report_error(e)
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    # 利用者の設定（UserConfig）だけを書き換える。サーバー全体の設定は `/admin/handler/config`。
+    post '/handler/config' do
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      name = Handler.user_toggleable(params[:handler])
+      disable = USER_HANDLER_DISABLE_VALUES.fetch(params[:disable]) do
+        raise Ginseng::ValidateError, "Invalid disable '#{params[:disable]}'"
+      end
+      sns.account.user_config.update!(handler: {name => {disable:}})
+      disabled = sns.account.user_config["/handler/#{name}/disable"] == true
+      @renderer.message = {name:, disabled:}
       return @renderer.to_s
     rescue => e
       report_error(e)
