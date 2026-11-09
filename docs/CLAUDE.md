@@ -215,7 +215,7 @@ git diff Gemfile.lock
   - #4850 / #4851 は新しいマイルストーン [Mastodon 5.0 対応](https://github.com/pooza/mulukhiya-toot-proxy/milestone/648) へ移した。RC / stable が出た時点の開発中の版で受ける。beta の段階の検証はいつ回してもよい
   - **5.46.0 はマージ済みの 6 件で出す**（harness-gate → リリース）
   - ⚠ Misskey の次の stable（2026.11.0・11-09 に beta.1）の harness 検証は **5.46.0 では待たない**。出たときの開発中の版（5.47.0）で検証する（メジャーでなくても検証する、は変わらない）
-- ✅ **harness-gate（develop `10b9b8b2`・2026-11-10）**: 3 系統とも 0 failures / 0 errors
+- ✅ **harness-gate（develop `10b9b8b2`、`bundle update` 後の `5e2f6b1a` でも走らせ直し・2026-11-10）**: 3 系統とも 0 failures / 0 errors（2 回とも同じ数）
   - `controller=mastodon url=http://localhost:3000`（v4.7.5）: 1922 tests・184 omissions
   - `controller=misskey url=http://localhost:3001`（2026.10.1）: 1922 tests・168 omissions
   - `controller=pleroma url=https://st.akkoma.b-shock.org`（Akkoma 3.20.1）: 1917 tests・214 omissions
@@ -223,6 +223,22 @@ git diff Gemfile.lock
     写しが黙って読み飛ばしていたファイルが表に出ただけで、退行ではない
   - ⚠ **手元の Mastodon harness の `.env` が v5.0.0-beta.1 になっていた**（gitignore・#4850 の作業の名残）。最初の実走は beta.1 で走り、
     それも 0 failures / 0 errors（1922 tests・184 omissions）だった＝ #4850 の beta 段階の材料。ゲートは `update-version.sh` で v4.7.5 へ戻し、`reset.sh` で作り直してから走らせ直した
+- ✅ **セキュリティ**: Dependabot 0 件・bundler-audit 脆弱性なし。`bundle update` は `5e2f6b1a`（sequel 5.110・sanitize 7.0.2・addressable・facets ほか。ginseng-\* は動かず）。lock が動いたので 3 系統を走らせ直した
+
+### リリース前レビュー（5 観点）の結果（2026-11-10）
+
+対象は `v5.45.0..develop`（コードは 7 ファイル・+92 / −36）。**赤 0・黄 2・緑 5**。lint は全通過。モデルはセキュリティだけ Opus、ほかは Sonnet。
+
+- **掃除 PR（手順 12）で直す**（ユーザー判断）:
+  - 黄: 非公開の投稿へのリアクションに、返信が未収載で付く（`reply_reaction_handler.rb:15`）。元の投稿の本文は出ないが、非公開の投稿があることと acct が未収載で見える。
+    Mastodon・Misskey は以前から同じで、5.46.0 で Akkoma にも広がった。元の投稿が非公開なら返信も同じ公開範囲に絞る（3 系とも）
+  - 緑: `pleroma_service.rb:58` の絵文字をパスへエスケープせずに入れている（本人の権限の範囲。1 行）
+  - 緑: `docs/api.md` に Pleroma のリアクションの口（PUT / DELETE）が無い
+- **記録のみ**:
+  - 黄: `NaiveTime.utc` は Time 以外を渡すと落ちる。列は timestamp で Sequel は Time を返すので起きない
+  - 緑: リモートの投稿へのリアクションで nodeinfo を 2〜3 回キャッシュなしで引き、応答が遅れうる（Misskey も同じ）
+  - 緑: ハンドラの失敗は `handler.errors` に回収されて Sentry に出ない（Misskey も同じ設計）
+  - 緑: `skip_case?` は判定で例外が出たファイルを理由付きで飛ばす（CI の omission の上限で見張れている）
 - ⚠ **#4880 は 2026-11-05 の実測で 5.47.0 へ送った**（[実測](https://github.com/pooza/mulukhiya-toot-proxy/issues/4880)）。形式を変えても同じ 2,407 語を載せるので誤爆は減らない。手順 1 の deploy は pooza/cure-api#389 待ち
 
 ## 予定: 5.47.0
