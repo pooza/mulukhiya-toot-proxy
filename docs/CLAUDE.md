@@ -225,6 +225,9 @@ git diff Gemfile.lock
     それも 0 failures / 0 errors（1922 tests・184 omissions）だった＝ #4850 の beta 段階の材料。ゲートは `update-version.sh` で v4.7.5 へ戻し、`reset.sh` で作り直してから走らせ直した
 - ✅ **セキュリティ**: Dependabot 0 件・bundler-audit 脆弱性なし。`bundle update` は `5e2f6b1a`（sequel 5.110・sanitize 7.0.2・addressable・facets ほか。ginseng-\* は動かず）。lock が動いたので 3 系統を走らせ直した
 
+- ✅ **ステージング 4 台**（dev24〜27・`a8492565`）: `config: OK`・health 200（外から noah 経由で全項目 OK）・version 5.46.0。
+  WebUI は dev25 / dev27 の `/mulukhiya/`・`app/status`・`app/handler` を HTML で確認（200・タイトル正常）。⚠ ブラウザ（Claude in Chrome）はタブがグループから外れて使えず、目視はしていない
+
 ### リリース前レビュー（5 観点）の結果（2026-11-10）
 
 対象は `v5.45.0..develop`（コードは 7 ファイル・+92 / −36）。**赤 0・黄 2・緑 5**。lint は全通過。モデルはセキュリティだけ Opus、ほかは Sonnet。
