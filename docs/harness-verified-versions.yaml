@@ -19,8 +19,8 @@
 # 運用方針の詳細は MEMORY の feedback_upstream-release-harness-verification 参照。
 
 mastodon:
-  verified: v4.7.4
-  verified_at: '2026-10-30'
+  verified: v4.7.5
+  verified_at: '2026-11-04'
 
 misskey:
   verified: 2026.10.1
@@ -32,7 +32,40 @@ pleroma:
   verified_at: '2026-10-31'
 
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
-last_checked: '2026-10-30'
+last_checked: '2026-11-08'
+
+# 2026-11-08 チェック結果:
+#   - Mastodon: 最新は v5.0.0-beta.1（11-04）のまま。RC はまだ。stable は v4.7.5 ＝ verified と同じ。
+#   - Misskey: 最新 stable は 2026.10.1 ＝ verified と同じ。prerelease は 2026.10.2-alpha.0（10-31）の次に
+#     **2026.11.0-alpha.0（11-06）**が出た（次の stable は 2026.10.2 でなく 2026.11.0 になる見込み）。
+#   - Akkoma: 最新 stable は v3.20.1 ＝ verified と同じ。
+#   - **新しいものは無い。実走・bump とも不要。**`last_checked` の更新のみ。
+
+# 2026-11-05 Mastodon v5.0.0-beta.1 を実走（#4850 の 1 項目め）:
+#   - beta なので `verified` は昇格させない（stable が出たら回し直す）。chubo2 の `.env.example` / `compose.yml` も
+#     v4.7.5 のまま。`.env` の MASTODON_VERSION だけ手で `v5.0.0-beta.1` に置いて reset し、
+#     `/api/v1/instance` で `version=5.0.0-beta.1` を確認した。
+#   - develop `fbf19c32`（5.46.0 へバンプした直後）で `TestHarness: controller=mastodon url=http://localhost:3000`
+#     1887 tests / 4028 assertions / **0 failures / 0 errors** / 159 omissions。v4.7.5 と 4 つの数とも同じ。
+#   - harness の DB は 5.0 のスキーマ（schema_migrations の最大 20261016161747・`accounts.private_key` は削除済み・
+#     `moderation_subscriptions` / `account_reach_filters` あり）。
+#   - **DB 直読み層を個別にも実走**: account 34 tests / status 27 tests / postgres 11 tests は omission 0、
+#     attachment 22 tests は omission 2（ページ送りに足る media が未 seed・chubo2#64＝版と無関係）。4 本とも 0 failures / 0 errors。
+#   - dev24（ステージング）にも pooza/mastodon の `merge/5.0/bshockdon`（5.0.0-beta.1）が載った。連携面の確認は #4851。
+
+# 2026-11-04 チェック結果:
+#   - Mastodon: **v4.7.5（2026-11-03T15:29Z・セキュリティ修正の patch）が出たので検証し、verified を昇格した。**
+#     harness を v4.7.5 で再構築（update-version.sh → reset.sh）し、develop `10ed154e` で
+#     `TestHarness: controller=mastodon url=http://localhost:3000` 1887 tests / 4028 assertions /
+#     **0 failures / 0 errors** / 159 omissions（前回 158 から +1）。偽 DSN の `user "u"` の 1 行は既知。
+#   - 差分の読み取り（v4.7.4...v4.7.5・9 コミット）: マイグレーション無し・`db/` の変更無し。
+#     非アクティブなアカウントのパスワード認証バイパス（GHSA-3xjw-gv43-3w62）、JSON-LD の compaction による DoS、
+#     `Forwarded` ヘッダが `X-Forwarded-For` より優先されていた件（`Rack::Request.forwarded_priority` を
+#     XFF 優先へ。`dist/nginx.conf` に `proxy_set_header Forwarded "";`）。招待の使用回数を減らさない変更。
+#     モロヘイヤが Mastodon へ渡すヘッダは `Idempotency-Key` だけ（`Controller::FORWARDED_HEADERS`）なので影響しない。
+#     pooza/mastodon の `merge/4.7/bshockdon` には v4.7.5 がマージ済み（本番は未適用）。
+#     同時に v4.6.11 / v4.5.21 / v4.4.28 も出ている（対象外）。
+#   - Misskey: 最新 stable は **2026.10.1 ＝ verified と同じ**。
 
 # 2026-10-31 Akkoma を台帳に追加（#4857）:
 #   - dev29 の Akkoma 3.20.1 に対し、develop `480834ee` で

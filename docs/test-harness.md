@@ -119,7 +119,7 @@ pkill -f '[5]435:127.0.0.1:5432'   # ⚠ 角括弧が無いと pkill が自分�
 
 - harness の SNS が localhost でないので、外部への通信を止めるテストは
   `disable_net_connect_except_harness!`（`TestCase`）を使う。`allow_localhost: true` だけだと dev29 を止める
-- 切ってある機能（メディアカタログ＝段階 5・`post_reaction` のハンドラ＝段階 4）のテストは Pleroma では止まる（[pleroma.md](pleroma.md)）
+- 切ってある機能（メディアカタログ＝段階 5）のテストは Pleroma では止まる（[pleroma.md](pleroma.md)）。`post_reaction`（段階 4 の最初）は 5.46.0 から走る
 - ⚠ **`Environment.pleroma?` で止めたテストは、段階を進めたら外す**
 - ⚠ **`local.yaml` は `/home/akkoma/repos/mulukhiya-toot-proxy/config/local.yaml` を読む。**`find` で探すと `config/sample/misskey/local.yaml` を拾い、別物の DSN になる（2026-10-31 に踏んだ）
 - ⚠ **`pkill` はトンネルを張ったのと別のコマンドで打つ。**同じコマンドの中に `5435:127.0.0.1:5432` の文字列があると、角括弧を付けていても自分のシェルに当たる（2026-10-31 に踏んだ）
