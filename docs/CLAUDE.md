@@ -228,6 +228,8 @@ git diff Gemfile.lock
 - #4734（HEIF を戻す）。FreeBSD は quarterly の pkg に `libheif` 1.23.6 が来ている（ports のビルドは要らない）。⚠ `pkg update` していないホストは古いカタログで 1.22.2_3 に見える。凍結（11/1〜11/4）の後に上げる。vulcan は Ubuntu の 1.21.2-3ubuntu0.6 で、版の条件を満たさない
 - #4898（ginseng-\* 由来の上書きの見直し・size:M・2026-11-07 起票）。上流に入っている写し（`MisskeyService#oauth_server_metadata`）と、gem の決め打ちで写すしかなかった `Redis#initialize` を消し、Redis のロックの道具・JSON の `get` / `set`・Postgres の接続まわりを返すか決める。規約側のたたき台は pooza/ginseng-style#147
 - #4896（ginseng-core 6.0.0 への追随・破壊的変更あり）。2026-11-08 に載せた（ユーザー判断）。ginseng-style v1.1.15・postgres v2.0.3 も一緒に上げる。#4898 と同じ面を触るので続けて進める
+- #4899（ginseng-core 7.0.0 / ginseng-fediverse 8.0.0 への追随・破壊的変更あり）。2026-11-10 に載せた（ユーザー判断）。core 7.0.0 は 6.0.0 を含むので #4896 とまとめて上げる。
+  ⚠ fediverse 8.0.0 は `Mulukhiya::Listener` に `headers: @sns.streaming_headers` を足さないと Misskey が黙って匿名で繋がる。上げたら認証の要るチャンネルのイベントが届くことを確かめる
 - #4897（Apple Music の MV の URL `/music-video/` が短縮されない）。2026-11-08 に載せた（ユーザー判断。5.46.0 は Mastodon 5.0 対応の回なので混ぜない）
 - on-hold のまま: #3877（本文が無く設計から）/ #4301（capsicum#344 が open）/ #4298・#3157（相手側待ち）/ #4893（Mastodon 5.0 の用語の ja 訳待ち・2026-11-06 に on-hold へ）/ #4832・#4873（報告待ち）/ #4846（総まとめ）
 
@@ -396,7 +398,7 @@ develop にすでに載っている bundler 4.0.20・ginseng-piefed v0.4.1・doc
 
 - **ブランチ**: `develop` は `origin/develop` と同一（`1ccb6283`）。open PR は #4885（5.46 のリリース PR）・#4894 / #4895（5.47.0 の #4195 / #4196・draft）。Dependabot アラート **0 件**
 - **Codex**: 未対応なし（直近マージ 5 本と open 3 本）。PR 本体への申し送りもなし
-- **新しい Issue が 1 件・マイルストーン無し**: #4899（ginseng-fediverse 8.0.0 / ginseng-core 7.0.0 への追随・ginseng の当番から）。箱はユーザーが決める
+- **新しい Issue が 1 件**: #4899（ginseng-fediverse 8.0.0 / ginseng-core 7.0.0 への追随・ginseng の当番から）。同期のあと 5.47.0 へ載せた（ユーザー判断）
 - **ginseng-\* のピン**: 前回から **core v6.0.0 → v7.0.0・fediverse v8.0.0・redis v2.1.0・web v4.0.0・youtube v4.0.0** が出た。
   - core v7.0.0 / fediverse v8.0.0 は #4899 の中身。⚠ fediverse 8.0.0 は `Mulukhiya::Listener` に `headers: @sns.streaming_headers` を足さないと、Misskey は黙って匿名で繋がる
   - redis v2.1.0 は再送・失敗のログに command とキーの頭が載る（`Logger` に当たる）。#4898 が Redis の上書きを触るので、そこで一緒に見る → **② 5.47.0**
