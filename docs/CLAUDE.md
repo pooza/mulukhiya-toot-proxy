@@ -215,6 +215,14 @@ git diff Gemfile.lock
   - #4850 / #4851 は新しいマイルストーン [Mastodon 5.0 対応](https://github.com/pooza/mulukhiya-toot-proxy/milestone/648) へ移した。RC / stable が出た時点の開発中の版で受ける。beta の段階の検証はいつ回してもよい
   - **5.46.0 はマージ済みの 6 件で出す**（harness-gate → リリース）
   - ⚠ Misskey の次の stable（2026.11.0・11-09 に beta.1）の harness 検証は **5.46.0 では待たない**。出たときの開発中の版（5.47.0）で検証する（メジャーでなくても検証する、は変わらない）
+- ✅ **harness-gate（develop `10b9b8b2`・2026-11-10）**: 3 系統とも 0 failures / 0 errors
+  - `controller=mastodon url=http://localhost:3000`（v4.7.5）: 1922 tests・184 omissions
+  - `controller=misskey url=http://localhost:3001`（2026.10.1）: 1922 tests・168 omissions
+  - `controller=pleroma url=https://st.akkoma.b-shock.org`（Akkoma 3.20.1）: 1917 tests・214 omissions
+  - omission が 5.45.0（159 / 146 / 189）から 25 / 22 / 25 増えたのは、ほぼ #4886 の「テストファイルを読まなかった（`skip_case?`: disabled）」の行（21 / 18 / 25 件）。
+    写しが黙って読み飛ばしていたファイルが表に出ただけで、退行ではない
+  - ⚠ **手元の Mastodon harness の `.env` が v5.0.0-beta.1 になっていた**（gitignore・#4850 の作業の名残）。最初の実走は beta.1 で走り、
+    それも 0 failures / 0 errors（1922 tests・184 omissions）だった＝ #4850 の beta 段階の材料。ゲートは `update-version.sh` で v4.7.5 へ戻し、`reset.sh` で作り直してから走らせ直した
 - ⚠ **#4880 は 2026-11-05 の実測で 5.47.0 へ送った**（[実測](https://github.com/pooza/mulukhiya-toot-proxy/issues/4880)）。形式を変えても同じ 2,407 語を載せるので誤爆は減らない。手順 1 の deploy は pooza/cure-api#389 待ち
 
 ## 予定: 5.47.0
