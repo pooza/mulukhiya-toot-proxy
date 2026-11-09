@@ -32,7 +32,14 @@ pleroma:
   verified_at: '2026-10-31'
 
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
-last_checked: '2026-11-04'
+last_checked: '2026-11-08'
+
+# 2026-11-08 チェック結果:
+#   - Mastodon: 最新は v5.0.0-beta.1（11-04）のまま。RC はまだ。stable は v4.7.5 ＝ verified と同じ。
+#   - Misskey: 最新 stable は 2026.10.1 ＝ verified と同じ。prerelease は 2026.10.2-alpha.0（10-31）の次に
+#     **2026.11.0-alpha.0（11-06）**が出た（次の stable は 2026.10.2 でなく 2026.11.0 になる見込み）。
+#   - Akkoma: 最新 stable は v3.20.1 ＝ verified と同じ。
+#   - **新しいものは無い。実走・bump とも不要。**`last_checked` の更新のみ。
 
 # 2026-11-05 Mastodon v5.0.0-beta.1 を実走（#4850 の 1 項目め）:
 #   - beta なので `verified` は昇格させない（stable が出たら回し直す）。chubo2 の `.env.example` / `compose.yml` も

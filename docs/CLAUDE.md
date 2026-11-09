@@ -193,11 +193,36 @@ git diff Gemfile.lock
 # 5. 問題なければコミット
 ```
 
-## 開発中: 5.46.0
+## 開発中: 5.47.0
+
+[マイルストーン 5.47.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/647)。2026-10-31 に on-hold を見直し、止める条件が無くなっていたものを載せた。`config/application.yaml` は 5.47.0 へバンプ済み（2026-11-10）。
+
+- ✅ **5.46.0 を出したので、develop の縛り（#4894 / #4895 をマージしない）は解けた**（2026-11-10）
+- **最初にやること**: 5.46.0 のリリース前レビューの掃除 PR（`release` スキルの手順 12・3 件）。非公開の投稿へのリアクションの返信の公開範囲／`pleroma_service.rb:58` の絵文字のエスケープ／`docs/api.md` の Pleroma のリアクションの口
+- Misskey 2026.11.0 の stable（11-09 に beta.1）が出たら、この版で harness の検証をする（5.46.0 から移した）
+
+- #4195 → #4196 → #4197（ユーザー向けハンドラートグル。依存の #4194 はクローズ済み）
+  - ✅ 2026-11-06 に #4195（PR #4894）・#4196（PR #4895）を draft で出した。⚠ **develop は 5.46.0 のリリース PR の元なので、5.46.0 を出すまでマージしない**（ユーザー判断）。
+    2 本は別々に develop から切った（`docs/api.md` の同じ箇所に足しているので、後の方で衝突を解く）
+  - #4196 で `Handler#disable?` が `toggleable` を見ていなかったのを直した（ユーザー判断 A）。`invalid_command`・`remote_tag` は利用者の設定では止まらなくなる。既に止めている設定も無視される
+  - #4197（設定画面）は **2 本のマージを待って着手する**（ユーザー判断）
+- #4229（rails-erb-lint の更新が無いので `erb_lint` へ替えて `ostruct` を消す）
+- #4880（`dic.json` を related 形式へ・5.46.0 から送った）。本番で引くのは gomander だけ。読む側の削除は注意書きを出した版の次にする
+- #4734（HEIF を戻す）。FreeBSD は quarterly の pkg に `libheif` 1.23.6 が来ている（ports のビルドは要らない）。⚠ `pkg update` していないホストは古いカタログで 1.22.2_3 に見える。凍結（11/1〜11/4）の後に上げる。vulcan は Ubuntu の 1.21.2-3ubuntu0.6 で、版の条件を満たさない
+- #4898（ginseng-\* 由来の上書きの見直し・size:M・2026-11-07 起票）。上流に入っている写し（`MisskeyService#oauth_server_metadata`）と、gem の決め打ちで写すしかなかった `Redis#initialize` を消し、Redis のロックの道具・JSON の `get` / `set`・Postgres の接続まわりを返すか決める。規約側のたたき台は pooza/ginseng-style#147
+- #4896（ginseng-core 6.0.0 への追随・破壊的変更あり）。2026-11-08 に載せた（ユーザー判断）。ginseng-style v1.1.15・postgres v2.0.3 も一緒に上げる。#4898 と同じ面を触るので続けて進める
+- #4899（ginseng-core 7.0.0 / ginseng-fediverse 8.0.0 への追随・破壊的変更あり）。2026-11-10 に載せた（ユーザー判断）。core 7.0.0 は 6.0.0 を含むので #4896 とまとめて上げる。
+  ⚠ fediverse 8.0.0 は `Mulukhiya::Listener` に `headers: @sns.streaming_headers` を足さないと Misskey が黙って匿名で繋がる。上げたら認証の要るチャンネルのイベントが届くことを確かめる
+- #4897（Apple Music の MV の URL `/music-video/` が短縮されない）。2026-11-08 に載せた（ユーザー判断。5.46.0 は Mastodon 5.0 対応の回なので混ぜない）
+- on-hold のまま: #3877（本文が無く設計から）/ #4301（capsicum#344 が open）/ #4298・#3157（相手側待ち）/ #4893（Mastodon 5.0 の用語の ja 訳待ち・2026-11-06 に on-hold へ）/ #4832・#4873（報告待ち）/ #4846（総まとめ）
+
+## リリース済み: 5.46.0（2026-11-10）
+
+本番 4 台へデプロイ済み（07:18〜07:24・shallu → zugoga → gomander → vulcan・`main` の `8f3994ad`・Ruby 4.0.9 据え置き）。[リリースノート](https://github.com/pooza/mulukhiya-toot-proxy/releases/tag/v5.46.0)。全台 health 200・`config: OK`・monit 復帰・vulcan は 3 ユニットとも `NRestarts=0`。デプロイ後の Sentry の新着なし
 
 [マイルストーン 5.46.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/645)。`config/application.yaml` は 5.46.0 へバンプ済み（2026-11-05）。
 
-- 5.46.0 は #4850 / #4851 / #4861 / #4864 / #4884 / #4874 / #4875 / #4876 （ginseng-\* の告知 3 件は 2026-10-30 に追加。緊急性なし＝ユーザー判断）
+- 5.46.0 は ~~#4850 / #4851~~（11-10 に「Mastodon 5.0 対応」へ移した） / #4861 / #4864 / #4884 / #4874 / #4875 / #4876 （ginseng-\* の告知 3 件は 2026-10-30 に追加。緊急性なし＝ユーザー判断）
 - ✅ **2026-11-05 に PR 6 本を出し、同日にマージした**（ユーザー承認・どれも CI 緑・Issue は open のまま＝クローズはラップ時の判断）:
   - #4886（#4876・ginseng-core v5.0.0・`TestCase.load` を core に任せる）。⚠ **写しは 50 ファイルを黙って読み飛ばしていた**（手元は DB が無く `disable?` の判定で落ちる）。`skip_case?` で理由を添えて omission にした
   - #4887（#4875・ginseng-fediverse v7.1.0）/ #4888（#4874・ginseng-piefed v0.6.1）
@@ -210,19 +235,39 @@ git diff Gemfile.lock
   - ⚠ **CI の misskey のジョブが `apt install` で止まることが 3 回あった**（10 分以上・`apt update` のミラー待ち）。ステップに時間の上限が無いので、
     取り消して回し直した。上限を付けるかは未判断
 - ✅ develop へ直接: Rails 8.1.4.1 ほか bundler-audit の勧告 12 件（`9d70fa5d`）。同期の時点の Dependabot は 0 件だった（勧告のデータベースが先に更新された）
-- **5.46.0 は Mastodon 5.0 RC 待ち**（2026-11-05 ユーザー）。残りは #4850 / #4851 だけ。
-  ⚠ **Misskey の次の stable（2026.10.2 の見込み・10-31 に alpha.0）が RC より先に出たら、その harness 検証も 5.46.0 に含める**（ユーザー判断。メジャーでなくても検証する）
+- ~~5.46.0 は Mastodon 5.0 RC 待ち~~（2026-11-05 ユーザー）→ **2026-11-10 に切り離した**（ユーザー判断 A）。Mastodon 5.0 が beta.1 から進まず、
+  develop の 50 本と 5.47.0（#4894 / #4895 のマージ・#4896 / #4899）を止めるブロッカーになっていた。
+  - #4850 / #4851 は新しいマイルストーン [Mastodon 5.0 対応](https://github.com/pooza/mulukhiya-toot-proxy/milestone/648) へ移した。RC / stable が出た時点の開発中の版で受ける。beta の段階の検証はいつ回してもよい
+  - **5.46.0 はマージ済みの 6 件で出す**（harness-gate → リリース）
+  - ⚠ Misskey の次の stable（2026.11.0・11-09 に beta.1）の harness 検証は **5.46.0 では待たない**。出たときの開発中の版（5.47.0）で検証する（メジャーでなくても検証する、は変わらない）
+- ✅ **harness-gate（develop `10b9b8b2`、`bundle update` 後の `5e2f6b1a` でも走らせ直し・2026-11-10）**: 3 系統とも 0 failures / 0 errors（2 回とも同じ数）
+  - `controller=mastodon url=http://localhost:3000`（v4.7.5）: 1922 tests・184 omissions
+  - `controller=misskey url=http://localhost:3001`（2026.10.1）: 1922 tests・168 omissions
+  - `controller=pleroma url=https://st.akkoma.b-shock.org`（Akkoma 3.20.1）: 1917 tests・214 omissions
+  - omission が 5.45.0（159 / 146 / 189）から 25 / 22 / 25 増えたのは、ほぼ #4886 の「テストファイルを読まなかった（`skip_case?`: disabled）」の行（21 / 18 / 25 件）。
+    写しが黙って読み飛ばしていたファイルが表に出ただけで、退行ではない
+  - ⚠ **手元の Mastodon harness の `.env` が v5.0.0-beta.1 になっていた**（gitignore・#4850 の作業の名残）。最初の実走は beta.1 で走り、
+    それも 0 failures / 0 errors（1922 tests・184 omissions）だった＝ #4850 の beta 段階の材料。ゲートは `update-version.sh` で v4.7.5 へ戻し、`reset.sh` で作り直してから走らせ直した
+- ✅ **セキュリティ**: Dependabot 0 件・bundler-audit 脆弱性なし。`bundle update` は `5e2f6b1a`（sequel 5.110・sanitize 7.0.2・addressable・facets ほか。ginseng-\* は動かず）。lock が動いたので 3 系統を走らせ直した
+
+- ✅ **ステージング 4 台**（dev24〜27・`a8492565`）: `config: OK`・health 200（外から noah 経由で全項目 OK）・version 5.46.0。
+  WebUI は dev25 / dev27 の `/mulukhiya/`・`app/status`・`app/handler` を HTML で確認（200・タイトル正常）。⚠ ブラウザ（Claude in Chrome）はタブがグループから外れて使えず、目視はしていない
+
+### リリース前レビュー（5 観点）の結果（2026-11-10）
+
+対象は `v5.45.0..develop`（コードは 7 ファイル・+92 / −36）。**赤 0・黄 2・緑 5**。lint は全通過。モデルはセキュリティだけ Opus、ほかは Sonnet。
+
+- **掃除 PR（手順 12）で直す**（ユーザー判断）:
+  - 黄: 非公開の投稿へのリアクションに、返信が未収載で付く（`reply_reaction_handler.rb:15`）。元の投稿の本文は出ないが、非公開の投稿があることと acct が未収載で見える。
+    Mastodon・Misskey は以前から同じで、5.46.0 で Akkoma にも広がった。元の投稿が非公開なら返信も同じ公開範囲に絞る（3 系とも）
+  - 緑: `pleroma_service.rb:58` の絵文字をパスへエスケープせずに入れている（本人の権限の範囲。1 行）
+  - 緑: `docs/api.md` に Pleroma のリアクションの口（PUT / DELETE）が無い
+- **記録のみ**:
+  - 黄: `NaiveTime.utc` は Time 以外を渡すと落ちる。列は timestamp で Sequel は Time を返すので起きない
+  - 緑: リモートの投稿へのリアクションで nodeinfo を 2〜3 回キャッシュなしで引き、応答が遅れうる（Misskey も同じ）
+  - 緑: ハンドラの失敗は `handler.errors` に回収されて Sentry に出ない（Misskey も同じ設計）
+  - 緑: `skip_case?` は判定で例外が出たファイルを理由付きで飛ばす（CI の omission の上限で見張れている）
 - ⚠ **#4880 は 2026-11-05 の実測で 5.47.0 へ送った**（[実測](https://github.com/pooza/mulukhiya-toot-proxy/issues/4880)）。形式を変えても同じ 2,407 語を載せるので誤爆は減らない。手順 1 の deploy は pooza/cure-api#389 待ち
-
-## 予定: 5.47.0
-
-[マイルストーン 5.47.0](https://github.com/pooza/mulukhiya-toot-proxy/milestones)。2026-10-31 に on-hold を見直し、止める条件が無くなっていたものを載せた。
-
-- #4195 → #4196 → #4197（ユーザー向けハンドラートグル。依存の #4194 はクローズ済み）
-- #4229（rails-erb-lint の更新が無いので `erb_lint` へ替えて `ostruct` を消す）
-- #4880（`dic.json` を related 形式へ・5.46.0 から送った）。本番で引くのは gomander だけ。読む側の削除は注意書きを出した版の次にする
-- #4734（HEIF を戻す）。FreeBSD は quarterly の pkg に `libheif` 1.23.6 が来ている（ports のビルドは要らない）。⚠ `pkg update` していないホストは古いカタログで 1.22.2_3 に見える。凍結（11/1〜11/4）の後に上げる。vulcan は Ubuntu の 1.21.2-3ubuntu0.6 で、版の条件を満たさない
-- on-hold のまま: #3877（本文が無く設計から）/ #4301（capsicum#344 が open）/ #4298・#3157（相手側待ち）/ #4893（Mastodon 5.0 の用語の ja 訳待ち・2026-11-06 に on-hold へ）/ #4832・#4873（報告待ち）/ #4846（総まとめ）
 
 ## リリース済み: 5.45.0（2026-10-31）
 
@@ -304,84 +349,53 @@ develop にすでに載っている bundler 4.0.20・ginseng-piefed v0.4.1・doc
 - 📌 **手順 12（掃除 PR）**: 5.43.0 のリリース前レビューの②は PR #4858 で消化済み＝持ち越しなし
 - bundler の件は pooza/ginseng-style#131 に申し送った（2026-10-24。横展開の判断はあちら）
 
-## リリース済み: 5.43.0（2026-10-24）
-
-**本番デプロイ: 4 台完了**（2026-10-24 11:13〜11:22、shallu → zugoga → gomander → vulcan の順・土曜の昼前）。
-全台 version 5.43.0 / health 200 / **Ruby 4.0.9**（YJIT 有効）/ `postgres.pool.waiting` 0 / `config: OK` / FreeBSD 3 台は monit 復帰 / vulcan は 3 ユニットとも `NRestarts=0`。
-`main` の `c14f1a64` / [v5.43.0](https://github.com/pooza/mulukhiya-toot-proxy/releases/tag/v5.43.0)（PR #4859）。
-[マイルストーン 5.43.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/643)。
-
-### 本番デプロイで見たこと
-
-- 4 台とも 1 回で通った。事前は 4 台とも `main` の `41c0d4e0`（5.42.0）・作業ツリーに変更なし（vulcan の `vendor/` は未追跡で従来どおり）
-- ⚠ **bundler 4.0.18**: FreeBSD 3 台は Ruby 4.0.9 側に入っていた（`gem list` で `default: 4.0.20, 4.0.18`）。vulcan だけ `gem install bundler -v 4.0.18` が走った
-- ⚠ **vulcan の rbenv は `~/.bash_profile` でしか読まれない**（ログインシェルは zsh）。`$SHELL -lc` だと `rbenv: command not found` になるので `bash -lc` で回す（systemd の unit も `bash -lc`）
-- vulcan の `/mulukhiya/api/media` 200（0.88 秒・`media_catalog: true` は local.yaml で以前から）
-- デプロイ後の Sentry に新しいイシューなし
-
-### 開発時の記録
-
-[マイルストーン 5.43.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/643)。`config/application.yaml` は 5.43.0 へバンプ済み。
-
-- open 4 件（`gh issue list --milestone 5.43.0`）。2026-10-18 に #4845 を足し、#4722 / #4375 / #4323 をクローズ（ユーザー判断）。次の [5.44.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/644) を作った（#4847 Pleroma の webhook・#4848 ginseng-core）。5.42.0 から #4375 / #4323（Misskey のメディアカタログ）を引き継いだ
-- 📌 **Misskey のメディアカタログの残り**: ✅ **ダイスキー（vulcan）で有効にした（2026-10-16 06:29・ユーザー承認・#4375 にコメント）**。
-  ワーカー 10.5 秒・`/api/media` 200（0.31 秒）・`/feed/media` 200（1.20 秒）・health 全 OK。バックアップは vulcan の `config/local.yaml.bak-4375`。
-  ダイスキーの実況は不定期でごく稀なので、日曜の見直しは要らない（2026-10-16 ユーザー指摘）。
-  → 24 時間観測（〜10-17 06:30）→ ✅ #4375 / #4323 をクローズ（10-18）→ **次は Misskey の既定値を `true` に戻す（#4838）**
-  → **PR #4852（#4838）**: `/misskey/data/media_catalog` の既定を `true` に。lint・test とも 0 failures。**2026-10-23 時点で CI・Codex の結果待ち**。
-  ⚠ リリースノートに戻し方と見るもの（`postgres.pool.waiting`）を書く・Wiki（メディアカタログ）はリリース時に反映
-- ✅ **PR #4841**（PR #4840 の Codex P2）: pgbouncer の WARN の割合が範囲の外（0 以下・1 超）なら `pgbouncer_warn_config`。**2026-10-16 マージ（`3187aaa2`）**
-- **PR #4849（#4845）**: `/mulukhiya/api/*` の書き込みの要求（GET / HEAD / OPTIONS 以外）では、`write` / `write:*` を持たないトークンを外す（403）。
-  読み取りの POST 3 本（is_cat・nowplaying/resolve・resolve-url）は除外、Misskey の本人のトークンは通す。harness 両系 0 failures、実トークンで通る側・弾く側とも確認済み。
-  **2026-10-18 時点で CI・Codex の結果待ち・マージ待ち**
-- ✅ **2026-10-24 に 4 本マージ（ユーザー承認）**: PR #4849（#4845・`ad41ea57`）/ #4852（#4838・`90bba540`）/ #4855（#4853・`1141725e`）/ #4856（#4566・`626879f7`）。
-  develop の CI 緑（`626879f7`）。Issue 4 件は open のまま（クローズはラップ時の判断）。
-  Pleroma のゲートを必須にするのは**もう少し後**（ユーザー判断）→ 受け皿 **#4857**（5.44.0）
-- **PR #4855（#4853）**: `.ruby-version` を 4.0.9 へ。mulukhiya が動く 9 台（本番 4 台・dev24〜27・dev29）すべてに 4.0.9（YJIT 有効）が入ったのを 2026-10-24 に確認してから出した。
-  ローカルの 4.0.9 で lint・test とも 0 failures。⚠ **4.0.9 の同梱 bundler は 4.0.20 だけ＝デプロイ時は `bundle install` の前に `gem install bundler -v 4.0.18`**（4.0.7 のときと同じ罠）。
-  lint の途中で出た crass 1.0.7 の advisory（GHSA-pq4g-8rxf-4g29）は 4.0.9 と無関係で、develop へ直接（`1c5a2f48`）
-- ⚠ **本番のどの辞書ソースに `interval`（5.41.0・#4690）を入れるかは未決**（ユーザー「後で決める」・2026-10-12）。こちらから急かさない
-- ✅ `bundle update` は 2026-10-16 に develop へ直接（`a141799d`・json 3.1.0 / webmock 3.34.0 / domain_name / net-imap 0.6.8・rubocop は ginseng-style の固定で据え置き）。lint・test とも 0 failures
-- ✅ **PR #4842（#4677）**: **2026-10-18 マージ（`880f5756`）**。is_cat は取れなかった acct も 600 秒覚え、1 件の取得全体を 4 秒・再送なしで諦める。本体は `IsCatService` へ。
-  ダイスキーの 504 は 09-08 が最後（相手が通知一覧から外れたと見られる）だが、美食丼は今も 1 日 1〜3 件の 499。
-  Codex の P1（締切が要求ごとに数え直されて 2 倍に延びる）を `5a5af9d5` で直し、`@codex review` 済み
-- ✅ **PR #4843（#4722）**: **2026-10-16 マージ（`1cd535ac`）**。メディア変換の締切切れはハンドラごとに 300 秒に 1 回だけ alert（残りは log）・動画は段を残す。
-  `AlertThrottle` へ寄せてコントローラと共有。#4722 の 2・3 は 5.39.0 で済んでいた
-- ✅ #4685（Idempotency-Key の再送で孤児メディア）は**上流に任せてクローズ**（2026-10-16 ユーザー判断）。Mastodon の Vacuum が未添付のメディアを 1 日で消す。`docs/api.md` に一文
-- ✅ #4233 はクローズ（表の 5 件はすべて 5.19.0〜5.25.0 で完了していた・2026-10-16 ユーザー判断）。いま長いのは `POST /annict/review` / `record` で対象外
-- **#4566（Akkoma）= この版の「前へ進む」枠**。✅ 2026-10-16 に dev29 へモロヘイヤを設置（pooza/chubo2 `3dd85d9`）し、
-  **PR #4844**（controller `pleroma`・最初の段階）で health 200・アカウント解決・pre_toot パイプラインまで dev29 で通った。
-  🔴 Akkoma の API のアカウント ID は uuid ではなく FlakeId の base62 → 照合を `api_id` に。残りはゲート（harness で dev29 に対して緑）
-  ✅ **PR #4844 は 2026-10-18 マージ（`28d80436`）**。Codex の指摘はすべて返信・リアクション済み。
-  ✅ **ゲート（手順 4）: PR #4856**（2026-10-24）。dev29 に向けて 1824 tests・0 failures / 0 errors（最初は 5 / 32）。Mastodon・Misskey の harness も 0 failures。
-  dev29 に info ユーザーを作った（pooza/chubo2 `5337c6e`）。⚠ **リリースゲートの「省略不可」に 3 系統目を入れるかはユーザー判断待ち**。
-  `~/.claude/settings.json` の `autoMode.allow` に dev29 のステージング操作全般を足した（ユーザー承認）
-  先送りの受け皿: **#4845**（スコープを見ずにトークンからアカウントを解決している・全系統・5.43.0）/
-  **#4846**（#4566 の非ゴール＝ハンドラ・listener・SQL 7 本・on-hold）。⚠ Pleroma では `post_reaction` を流していない（#4846 に記載）
-
-### リリース準備の現在地（2026-10-24）
-
-- ✅ 掃除 PR #4858 をマージ（`3f2ca5cd`）。CI の mastodon が 40 分かかったのは `apt install` の段（38 分・ミラー側）で、テストは 49 秒
-- ✅ **harness（develop `3f2ca5cd`）**: `TestHarness: controller=mastodon url=http://localhost:3000` 1858 tests・0 failures・0 errors・158 omissions /
-  `controller=misskey url=http://localhost:3001` 1861 tests・0 failures・0 errors・145 omissions /
-  （参考・必須外）`controller=pleroma url=https://st.akkoma.b-shock.org` 1846 tests・0 failures・0 errors・201 omissions
-- ✅ **ステージング 4 台（`3f2ca5cd`）**: health 200（全項目 OK）・about 5.43.0・Ruby 4.0.9・YJIT 有効・`/mulukhiya/app/home` 200。
-  ⚠ 4 台とも `gem install bundler -v 4.0.18` が要った（4.0.9 同梱は 4.0.20 だけ）。dev27 は `/api/media` 200（0.65 秒）・`/feed/media` 200（1.25 秒）・`media_catalog: true`
-- 同日に別セッションで Mastodon 本体も 4.0.9 へ上げている（ユーザー）。デプロイ後に 4 台の health を取り直して puma の脱落が無いことを確認
-
-### リリース前レビュー（5 観点）の結果（2026-10-24）
-
-対象は `v5.42.0..develop`（PR 8 本・66 ファイル）。**赤 0・黄 6・緑 6**。行き先はユーザーが承認（「提案どおり」）。
-
-- **掃除 PR #4858**（size:S を全部）: Pleroma の `find_status` が nil を返さず 502 とアラートに化ける／`GET /config` が読み取り専用のトークンで保存トークンを上書き／
-  is_cat の Redis の読み書きが再送を踏む／is_cat の締切で打ち切った acct が無言／音声の ffmpeg の段が残らない／文書 5 件（`docs/api.md` の「5.43.x まで」の誤りほか）
-- **記録のみ**:
-  - `write:*` を 1 つ持てば管理者向けの口（ハンドラ設定・ボットのトークン・puma 再起動）も通る。意図した粗さ。管理者が狭いスコープでサードパーティのアプリを認可したときだけ
-  - Misskey の media_catalog 既定 true で、未認証の `/feed/media` と cursor つきの `/api/media` が生の SQL を撃つ。Mastodon と同じ構造。戻し方はリリースノートと `docs/media_catalog.md`
-  - `POST /program/update` に認証が無い（`67080251` から・今回の差分の外）。番組表の更新ジョブを積むだけ
-  - `SNSServiceMethods#account` / `#access_token` の `rescue nil` で、DB の一部障害が 403 の log 止めに化ける（既存・#4845 は悪化させていない）
-
 ## セッション同期の記録
+
+### 2026-11-10 セッション同期の記録
+
+**本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。harness の upstream 確認は前回（11-08）から 2 日なのでスキップ。
+
+- **ブランチ**: `develop` は `origin/develop` と同一（`1ccb6283`）。open PR は #4885（5.46 のリリース PR）・#4894 / #4895（5.47.0 の #4195 / #4196・draft）。Dependabot アラート **0 件**
+- **Codex**: 未対応なし（直近マージ 5 本と open 3 本）。PR 本体への申し送りもなし
+- **新しい Issue が 1 件**: #4899（ginseng-fediverse 8.0.0 / ginseng-core 7.0.0 への追随・ginseng の当番から）。同期のあと 5.47.0 へ載せた（ユーザー判断）
+- **ginseng-\* のピン**: 前回から **core v6.0.0 → v7.0.0・fediverse v8.0.0・redis v2.1.0・web v4.0.0・youtube v4.0.0** が出た。
+  - core v7.0.0 / fediverse v8.0.0 は #4899 の中身。⚠ fediverse 8.0.0 は `Mulukhiya::Listener` に `headers: @sns.streaming_headers` を足さないと、Misskey は黙って匿名で繋がる
+  - redis v2.1.0 は再送・失敗のログに command とキーの頭が載る（`Logger` に当たる）。#4898 が Redis の上書きを触るので、そこで一緒に見る → **② 5.47.0**
+  - web v4.0.0 / youtube v4.0.0 は major だが、中身は style の参照と ginseng-core の床（>=1.23.1）の宣言だけ → **③ 見送り**（#4896 で core を上げるときに一緒に上げてよい）
+- **Annict の API**: 前回と同じ（`rails/app/graphql` は 10-17、Go 側は API の 4 ディレクトリ）。公式アカウントの新しい投稿なし
+- **辞書台帳**: **🔴 の新規なし**。delmulin の `pron.json` が ⚪ 他所のみ → 🟡 未使用（窓の中に他所からの取得が無かっただけ）。再生成を chubo2 へ（`a75c31c`）
+- **chubo2**: open 15 件（前回 16）。新しいものは #302（workstation レシピ）・#296・#291・#290・#289 など、どれもこちらへの影響なし。Issue 棚卸し 10-25・ドキュメント棚卸し 10-31 でどちらも 30 日未満
+- **Sentry**: unresolved **29 件**・**コメント 0 は 0 件**（2026-11-10 時点）。最新イベントは前回確認済みの -34 / -2F（11-07 08:23 JST）で、新しいイベントなし
+
+### 2026-11-08 セッション同期の記録
+
+**本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。
+
+- **ブランチ**: `develop` は `origin/develop` と同一（`c339bab6`）。open PR は #4885（5.46 のリリース PR）・#4894 / #4895（5.47.0 の #4195 / #4196・draft）。Dependabot アラート **0 件**
+- **Codex**: 未対応なし（直近マージ 5 本と open 3 本。#4891 の P2 は返信・👍 済み）。PR 本体への申し送りもなし
+- **Issue**: 前回から増減なし。#4896・#4897 は同期のあと 5.47.0 へ載せた（ユーザー判断）
+- **ginseng-\* のピン**: 前回からの変化は **postgres v2.0.2 → v2.0.3** だけ（`QueryTemplate#params=` が引数の Hash を書き換えなくなった・pooza/ginseng-postgres#118、上書きへの印・pooza/ginseng-style#149）。
+  モロヘイヤの `Mulukhiya::QueryTemplate` は `escape` と `dir` を差し替えるだけで、`params=` を渡したあとの Hash を読み直す箇所も無い（`announce_handler` / `mention_handler` の `params=` は `Template` 側）→ **③ 見送りのまま**（#4896 で core を上げるときに一緒に上げてよい）。core v6.0.0（#4896）・style v1.1.15 は 11-07 の判断（② #4896）のまま
+- **Annict の API**: 前回と同じ（`rails/app/graphql` は 10-17、Go 側は API の 4 ディレクトリ）。公式アカウントの新しい投稿なし
+- **辞書台帳**: **🔴 の新規なし**。状態の列は変化なし（取得回数だけ動いた）。再生成を chubo2 へ（`7f886f3`）
+- **chubo2**: open 16 件（前回 15）。増えたのは #299（ginseng-\* 由来の上書きの洗い出し・`/ginseng:audit-overrides`）で、#4898 の chubo2 版。こちらへの影響なし。Issue 棚卸し 10-25・ドキュメント棚卸し 10-31 でどちらも 30 日未満
+- **Sentry**: unresolved **29 件**・**コメント 0 は 0 件**（2026-11-08 時点）。最新イベントは前回確認済みの -34 / -2F（11-07 08:23 JST の Redis 再起動）で、新しいイベントなし
+- **harness の upstream**（前回 11-04 から 4 日）: 新しい stable・RC なし。Mastodon は v5.0.0-beta.1 のまま、Misskey は prerelease の **2026.11.0-alpha.0（11-06）** が出た、Akkoma は v3.20.1 のまま。`last_checked` を 11-08 へ
+
+### 2026-11-07 セッション同期の記録
+
+**本番には触っていない**（辞書台帳の生成と gomander の syslog の確認で、本番へ SSH した読み取りのみ）。harness の upstream 確認は前回（11-04）から 3 日なのでスキップ。
+
+- **ブランチ**: `develop` は `origin/develop` と同一（`cbcf01c4`）。open PR は #4885（5.46 のリリース PR）・#4894 / #4895（5.47.0 の #4195 / #4196・draft）。Dependabot アラート **0 件**
+- **Codex**: 未対応なし（直近マージ 5 本と open 3 本）。PR 本体への申し送りもなし
+- **新しい Issue が 2 件・どちらもマイルストーン無し**: #4896（ginseng-core 6.0.0 への追随・ginseng の当番から）と #4897（Apple Music の MV の URL が短縮されない・makoto2 のリリース前レビューの緑）。箱はユーザーが決める
+- **ginseng-\* のピン**: **core v5.0.0 → v6.0.0（major・#4896）**。既定の経路でもリダイレクトを自前で追う。メディアの添付が再送するようになる点と、リダイレクトのホップごとのログ行が増える点が、モロヘイヤが触る面（`HTTP`）に当たる。
+  ginseng-style は v1.1.15 へのずれ（rubocop 1.92 系への更新・同期スキルの追加など）。lint の結果が変わりうるので、core v6.0.0 と一緒に上げる → **② #4896 で**。postgres / redis / web / youtube は 11-06 の判断（③ 見送り）のまま
+- **Annict の API**: 前回と同じ（`rails/app/graphql` は 10-17、Go 側は API の 4 ディレクトリ）。公式アカウントの新しい投稿なし
+- **辞書台帳**: **🔴 の新規なし**。状態の列は変化なし（取得回数だけ動いた）。再生成を chubo2 へ（`d54b109`）
+- **chubo2**: open 15 件（前回 17）。新しいものは #298（Node.js の lint を Biome の共有設定へ）で、こちらへの影響なし。Issue 棚卸し 10-25・ドキュメント棚卸し 10-31 でどちらも 30 日未満
+- **Sentry**: unresolved **29 件**・**コメント 0 は 0 件**（2026-11-07 時点）。-34（count=21）と -2F（count=65）に新しいイベント。
+  gomander・5.45.0・Sidekiq で、**2026-11-07 08:23:42 JST の 1 秒間だけ**。直前に `mastodon` ユーザーが sudo で `service redis restart` を打っていて、再起動後は 8.10.2 製の RDB を 8.10.3 が読んでいる＝ Redis の pkg 更新に伴う手動の再起動。一過性・対応不要（両方にコメント済み）
 
 ### 2026-11-06 セッション同期の記録
 

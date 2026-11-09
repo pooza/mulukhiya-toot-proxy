@@ -409,10 +409,20 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
 
 > **`favorites/create` の冪等挙動（#4380 / #4383 / #4480）**: お気に入りは冪等操作のため、上流 Misskey が `ALREADY_FAVORITED`（既にお気に入り済み）を返した場合は成功（200・空ボディ `{}`）として扱う。**⚠ 5.31.0 から条件が「400 のすべて」ではなく `error.code == "ALREADY_FAVORITED"` に絞られた。** それ以外の 400（`NO_SUCH_NOTE` 等）は上流の包絡をそのまま透過する（従来は成功に丸めており、不正な `noteId` が 200 で返っていた）。**この冪等成功パスでは `post_bookmark` 副作用（PieFed ミラー `piefed_bookmark` / `result_notification`）を発火しない**。PieFed ミラーは `piefed.clip` が呼び出しごとに新規投稿を作る非冪等操作で、再お気に入りのたびに dispatch すると PieFed 重複投稿・重複通知を生むため。副作用は初回お気に入り（上流 200）時にのみ走る。mulukhiya を経由せず（直接 Misskey 等で）先にお気に入り済みの note は PieFed ミラー対象外となる。
 
+#### Pleroma 系（Akkoma）
+
+`MastodonController` を継承しているので、上の Mastodon の表のエンドポイントはそのまま通る。加えて、Pleroma 固有の絵文字リアクションの口を受ける（[pleroma.md](pleroma.md)）。
+
+| エンドポイント | メソッド | 処理内容 |
+|---------------|---------|---------|
+| `/api/v{version}/pleroma/statuses/{id}/reactions/{emoji}` | PUT | 絵文字リアクション（SNS → post_reaction。5.46.0 から） |
+| `/api/v{version}/pleroma/statuses/{id}/reactions/{emoji}` | DELETE | 絵文字リアクションの取り消し（SNS へ中継するだけ） |
+
 ### クライアント側での制御
 
 ハンドラーの有効/無効はアカウント単位で制御可能。
 
+- `GET /mulukhiya/api/handler/list` で、利用者に見せるハンドラーの一覧と現在の状態を取得（#4195）
 - `POST /mulukhiya/api/handler/config` で 1 つのハンドラーを切り替え（#4196）。`toggleable: false` のものは 422 で拒む
 - `POST /mulukhiya/api/config/update` でユーザー設定を変更
 - `toggleable: true` に設定されたハンドラーはユーザーが ON/OFF 可能
@@ -985,6 +995,38 @@ Mastodon 本体・モロヘイヤの Puma・Sidekiq を合算した値**で、`#
 **`errors`**: JSON Schema バリデーションエラーの配列。正常な設定では空配列。
 
 **`unknown_keys`**: スキーマに定義されていないキーのドット区切りパス。移行済みの旧設定や、廃止されたハンドラーのパラメータが残っている場合に検出される。不要であれば `local.yaml` から削除を検討する。
+
+#### GET /mulukhiya/api/handler/list
+
+ログイン中の利用者に見せるハンドラーの一覧と、利用者の設定での有効/無効を取得する（#4195）。
+管理者向けの `GET /mulukhiya/api/admin/handler/list` と違い、パラメータ（スキーマ・値）は返さない。
+
+- **認証**: ユーザートークン（Bearer）
+- **パラメータ**: なし
+- サーバー全体で無効なハンドラー（`/handler/{name}/disable: true`）は含めない
+- `toggleable: false` のハンドラーも含める（クライアントは切り替えのスイッチを無効にして表示する）
+
+**レスポンス例**:
+
+```json
+[
+  {
+    "name": "default_tag",
+    "label": "デフォルトタグ",
+    "description": "投稿にデフォルトのハッシュタグを付与します",
+    "toggleable": true,
+    "disabled": false
+  }
+]
+```
+
+| フィールド | 型 | 説明 |
+|-----------|------|------|
+| `name` | string | ハンドラー識別子（underscore 名） |
+| `label` | string \| null | 表示用の短い名前（`config/schema/handler/*.yaml` の `label`） |
+| `description` | string \| null | 説明文（同 `description`） |
+| `toggleable` | boolean | 利用者が切り替えられるか |
+| `disabled` | boolean | 利用者の設定（`/handler/{name}/disable`）で無効にしているか。`toggleable: false` のものは利用者の設定が効かないので常に `false`（#4196） |
 
 #### POST /mulukhiya/api/handler/config
 

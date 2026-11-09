@@ -96,6 +96,19 @@ module Mulukhiya
       }
     end
 
+    # 利用者向けのハンドラ一覧の 1 件 (#4195)。`disabled` は利用者の設定だけを見る。
+    # サーバー全体で無効なものは `Handler.user_list` が先に除く。
+    def to_user_h(account)
+      return {
+        name: underscore,
+        label:,
+        description:,
+        toggleable: toggleable?,
+        # ⚠ 切り替えられないものに利用者の設定は効かない (#4196)。書いてあっても動いているので false。
+        disabled: toggleable? && account.disable?(self),
+      }
+    end
+
     def verbose?
       return true
     end
@@ -335,6 +348,14 @@ module Mulukhiya
         e.log(name:)
       end
       handlers.compact.sort_by(&:underscore).each(&block)
+    end
+
+    # 利用者向けのハンドラ一覧 (#4195)。サーバー全体で無効なものは見せない。
+    # `toggleable: false` のものは含める（切り替えられないことをクライアントが表示する）。
+    def self.user_list(account, handlers = all)
+      return handlers
+          .reject {|handler| config.disable?(handler)}
+          .map {|handler| handler.to_user_h(account)}
     end
 
     # 利用者が切り替えてよいハンドラの名前を返す (#4196)。だめなら例外。

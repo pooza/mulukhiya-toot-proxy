@@ -1041,6 +1041,17 @@ module Mulukhiya
       return render_error(e)
     end
 
+    get '/handler/list' do
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      @renderer.message = Handler.user_list(sns.account)
+      return @renderer.to_s
+    rescue => e
+      report_error(e)
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     # 利用者の設定（UserConfig）だけを書き換える。サーバー全体の設定は `/admin/handler/config`。
     post '/handler/config' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account

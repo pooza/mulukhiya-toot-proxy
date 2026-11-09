@@ -54,16 +54,21 @@ module Mulukhiya
       })
     end
 
+    # ⚠ 絵文字はパスの一部なので符号化する（`/` や `?` を含む値で別のパスを叩かない。5.46.0 のリリース前レビュー）。
     def reaction(id, emoji, params = {})
-      return http.put("/api/v1/pleroma/statuses/#{id}/reactions/#{emoji}", {
+      return http.put(reaction_path(id, emoji), {
         headers: create_headers(params[:headers]),
       })
     end
 
     def delete_reaction(id, emoji, params = {})
-      return http.delete("/api/v1/pleroma/statuses/#{id}/reactions/#{emoji}", {
+      return http.delete(reaction_path(id, emoji), {
         headers: create_headers(params[:headers]),
       })
+    end
+
+    def reaction_path(id, emoji)
+      return "/api/v1/pleroma/statuses/#{id}/reactions/#{ERB::Util.url_encode(emoji)}"
     end
 
     def search_status_id(status)
