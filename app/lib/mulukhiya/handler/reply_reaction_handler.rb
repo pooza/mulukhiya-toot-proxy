@@ -12,12 +12,31 @@ module Mulukhiya
       return unless status = target_status(payload)
       return unless receipt = status.account
       return if receipt.reactionable? && !Environment.test?
-      visibility = bridge_account?(receipt) ? :public : :unlisted
-      sns.post({
+      sns.post(create_body(payload, status, receipt), {reply: status.to_h})
+      result.push(reply: status.id, reaction: payload[:reaction])
+    end
+
+    def create_body(payload, status, receipt)
+      visibility = reply_visibility(status, receipt)
+      body = {
         status_field => create_status(payload:, receipt:),
         visibility_field => controller_class.visibility_name(visibility),
-      }, {reply: status.to_h})
-      result.push(reply: status.id, reaction: payload[:reaction])
+      }
+      body[:visibleUserIds] = [receipt.id] if visibility == :direct && Environment.misskey_type?
+      return body
+    end
+
+    # ⚠ 元の投稿が公開・未収載でなければ、返信は相手だけに送る（5.46.0 のリリース前レビュー）。
+    # 未収載で返すと、非公開の投稿があることと、リアクションした人が誰かが見えてしまう。
+    # Mastodon・Pleroma 系は本文の先頭の acct で相手に届く。Misskey の `specified` は宛先の ID が要る。
+    def reply_visibility(status, receipt)
+      return :direct unless open_visibility?(status)
+      return bridge_account?(receipt) ? :public : :unlisted
+    end
+
+    def open_visibility?(status)
+      name = status.visibility_name.to_s
+      return [:public, :unlisted].any? {|v| controller_class.visibility_name(v) == name}
     end
 
     # ⚠ API で読む投稿（`Pleroma::Status`）は、リアクションした本人のサービスで読む（PR #4891 の Codex P2）。

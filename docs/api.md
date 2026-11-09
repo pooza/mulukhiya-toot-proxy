@@ -409,6 +409,15 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
 
 > **`favorites/create` の冪等挙動（#4380 / #4383 / #4480）**: お気に入りは冪等操作のため、上流 Misskey が `ALREADY_FAVORITED`（既にお気に入り済み）を返した場合は成功（200・空ボディ `{}`）として扱う。**⚠ 5.31.0 から条件が「400 のすべて」ではなく `error.code == "ALREADY_FAVORITED"` に絞られた。** それ以外の 400（`NO_SUCH_NOTE` 等）は上流の包絡をそのまま透過する（従来は成功に丸めており、不正な `noteId` が 200 で返っていた）。**この冪等成功パスでは `post_bookmark` 副作用（PieFed ミラー `piefed_bookmark` / `result_notification`）を発火しない**。PieFed ミラーは `piefed.clip` が呼び出しごとに新規投稿を作る非冪等操作で、再お気に入りのたびに dispatch すると PieFed 重複投稿・重複通知を生むため。副作用は初回お気に入り（上流 200）時にのみ走る。mulukhiya を経由せず（直接 Misskey 等で）先にお気に入り済みの note は PieFed ミラー対象外となる。
 
+#### Pleroma 系（Akkoma）
+
+`MastodonController` を継承しているので、上の Mastodon の表のエンドポイントはそのまま通る。加えて、Pleroma 固有の絵文字リアクションの口を受ける（[pleroma.md](pleroma.md)）。
+
+| エンドポイント | メソッド | 処理内容 |
+|---------------|---------|---------|
+| `/api/v{version}/pleroma/statuses/{id}/reactions/{emoji}` | PUT | 絵文字リアクション（SNS → post_reaction。5.46.0 から） |
+| `/api/v{version}/pleroma/statuses/{id}/reactions/{emoji}` | DELETE | 絵文字リアクションの取り消し（SNS へ中継するだけ） |
+
 ### クライアント側での制御
 
 ハンドラーの有効/無効はアカウント単位で制御可能。
