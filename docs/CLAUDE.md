@@ -390,6 +390,22 @@ develop にすでに載っている bundler 4.0.20・ginseng-piefed v0.4.1・doc
 
 ## セッション同期の記録
 
+### 2026-11-10 セッション同期の記録
+
+**本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。harness の upstream 確認は前回（11-08）から 2 日なのでスキップ。
+
+- **ブランチ**: `develop` は `origin/develop` と同一（`1ccb6283`）。open PR は #4885（5.46 のリリース PR）・#4894 / #4895（5.47.0 の #4195 / #4196・draft）。Dependabot アラート **0 件**
+- **Codex**: 未対応なし（直近マージ 5 本と open 3 本）。PR 本体への申し送りもなし
+- **新しい Issue が 1 件・マイルストーン無し**: #4899（ginseng-fediverse 8.0.0 / ginseng-core 7.0.0 への追随・ginseng の当番から）。箱はユーザーが決める
+- **ginseng-\* のピン**: 前回から **core v6.0.0 → v7.0.0・fediverse v8.0.0・redis v2.1.0・web v4.0.0・youtube v4.0.0** が出た。
+  - core v7.0.0 / fediverse v8.0.0 は #4899 の中身。⚠ fediverse 8.0.0 は `Mulukhiya::Listener` に `headers: @sns.streaming_headers` を足さないと、Misskey は黙って匿名で繋がる
+  - redis v2.1.0 は再送・失敗のログに command とキーの頭が載る（`Logger` に当たる）。#4898 が Redis の上書きを触るので、そこで一緒に見る → **② 5.47.0**
+  - web v4.0.0 / youtube v4.0.0 は major だが、中身は style の参照と ginseng-core の床（>=1.23.1）の宣言だけ → **③ 見送り**（#4896 で core を上げるときに一緒に上げてよい）
+- **Annict の API**: 前回と同じ（`rails/app/graphql` は 10-17、Go 側は API の 4 ディレクトリ）。公式アカウントの新しい投稿なし
+- **辞書台帳**: **🔴 の新規なし**。delmulin の `pron.json` が ⚪ 他所のみ → 🟡 未使用（窓の中に他所からの取得が無かっただけ）。再生成を chubo2 へ（`a75c31c`）
+- **chubo2**: open 15 件（前回 16）。新しいものは #302（workstation レシピ）・#296・#291・#290・#289 など、どれもこちらへの影響なし。Issue 棚卸し 10-25・ドキュメント棚卸し 10-31 でどちらも 30 日未満
+- **Sentry**: unresolved **29 件**・**コメント 0 は 0 件**（2026-11-10 時点）。最新イベントは前回確認済みの -34 / -2F（11-07 08:23 JST）で、新しいイベントなし
+
 ### 2026-11-08 セッション同期の記録
 
 **本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。
