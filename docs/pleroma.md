@@ -44,6 +44,7 @@ v4 の実装は `git show 46c4f4e2^:<path>` で取り出せる（SQL は `app/qu
 | webhook | ✅ 5.45.0 | `features/webhook` | 段階 1（#4847）。⚠ `media_ids` は文字列で送る（`PleromaService#post`） |
 | タグのフィード・お気に入りタグ | ✅ 5.45.0 | `features/feed` / `data/favorite_tags` | 段階 2（#4860）。⚠ タグは `hashtags` / `hashtags_objects` の表で引く（v4 は JSON の配列を開いていた） |
 | アカウントの直近の投稿・添付の参照 | ✅ | 5.46.0 | 段階 3。`recent_toot` は 5.43.0（API で読む・ゲートが要った）。添付は #4861（ID で引く経路は元から通っていた・`Account#attachments` を actor と `Document` で引く） |
+| 自分の投稿の一覧（WebUI） | ✅ 5.47.0 | `data/account_timeline` | #4900。ID は `activities` の `Create` を `actor` で引き（索引 `activities_actor_id_DESC_NULLS_LAST_index`）、中身は API で読む。activity の主キーの FlakeId が API の投稿 ID |
 | ハンドラ（post_reaction ほか） | 🟡 | — | 段階 4（1 本ずつ）。`post_reaction`（`reply_reaction`・`result_notification`）は ✅ 5.46.0（#4884）。ほかは未着手 |
 | メディアカタログ | ⬜ | `data/media_catalog` | 段階 5（`media_catalog`・重い） |
 | ストリーミング（listener） | ⬜ | `capabilities/streaming` | 段階 6 |
