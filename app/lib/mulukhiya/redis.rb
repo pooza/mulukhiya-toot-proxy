@@ -1,4 +1,8 @@
 module Mulukhiya
+  # ⚠ ロックの道具（`setnx`・`acquire`・`expire`・`acquire_token` / `release_token`・
+  # `remaining_seconds`・`stale_connection?`）は ginseng-redis に返さず、ここに置く（#4898・2026-11-10 判断）。
+  # 使っているのはモロヘイヤだけで、fail-open の倒し方や 409 の `Retry-After` に合わせて作ってある。
+  # gem に依存しない形なので、他のプロジェクトで要るようになったら返せる（pooza/ginseng-redis へ伝え済み）。
   class Redis < Ginseng::Redis::Service
     include Package
 

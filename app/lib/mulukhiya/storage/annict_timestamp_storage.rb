@@ -1,15 +1,7 @@
 module Mulukhiya
-  class AnnictTimestampStorage < Redis
-    def get(key)
-      return {} unless entry = super
-      return JSON.parse(entry)
-    rescue => e
-      e.log(key:)
+  class AnnictTimestampStorage < JSONStorage
+    def default_value
       return {}
-    end
-
-    def set(key, values)
-      super(key, values.to_json)
     end
 
     def prefix
