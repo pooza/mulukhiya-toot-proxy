@@ -2,7 +2,8 @@ module Mulukhiya
   # Apple Music の MV の URL（`/music-video/<曲名>/<id>`）(#4897)。
   #
   # ⚠ 短縮した形（`/jp/music-video/<id>`）は、曲名の付いた正規の URL へ 301 で飛ぶ（2026-11-10 実測）。
-  # ⚠ 短縮ではクエリも落とす。`uo=4` は参照元の印で、曲の `i=` のような中身を持つ値が無いため。
+  # ⚠ 短縮ではクエリも落とす（`ItunesSongURI` も同じ）。`uo=4` は参照元の印で、アルバムの中の曲を指す `i=` のような
+  # 中身を持つ値が無いため。
   class ItunesMusicVideoURI < ItunesURI
     def valid?
       return false unless itunes?
