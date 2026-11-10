@@ -220,6 +220,10 @@ git diff Gemfile.lock
 - ✅ **#4897 を PR #4906 でマージした**（2026-11-10・ユーザー承認・CI 緑・Codex 指摘なし）。`ItunesMusicVideoURI` で `/music-video/` を `/jp/music-video/<id>` へ短縮する。
   ユーザー判断で、曲（`/song/`）の短縮でも `?uo=4` を落とすようにした。dev25 / dev27 で、MV と曲の URL がハンドラで書き換わることを確かめた。
   ⚠ CI の Misskey 系は、この日 2 回とも `apt install` の 10 分タイムアウトで落ちた（テストより前）。落ちたジョブだけ流し直すと緑になった
+- ✅ **#4900 を PR #4907 でマージした**（2026-11-10・ユーザー承認・CI 緑・Codex 指摘なし）。Pleroma 系（Akkoma）で WebUI の自分の投稿の一覧（`data.account_timeline`）を使えるようにした。
+  `app/query/pleroma/statuses.sql.erb` で activities から公開・未収載・フォロワー限定の自分の投稿を引き、`Status` は API から読む（`service` にトークンを持たせてフォロワー限定も読む）。
+  dev29 で一覧・検索・2 ページ目を確かめた。Pleroma 系の全件は 1957 tests / 0 failures / 0 errors。dev29 は develop に戻し、dev25 / dev27 へも反映した（health 200）。
+  CI の omission の上限は Mastodon 384・Misskey 371 に上げた（アカウント依存のテストが 2 件増えた）。⚠ この日の CI は `apt install` の 10 分タイムアウトで計 5 回落ちた。落ちたジョブだけ流し直すと緑になる
 - Akkoma の「2 件を切らさない」: 5.46.0 で #4861・#4884 を閉じたので、#4900（自分の投稿の一覧・`account_timeline`）と #4901（ストリーミング・段階 6）を起票して 5.47.0 に載せた
 - Misskey 2026.11.0 の stable（11-09 に beta.1）が出たら、この版で harness の検証をする（5.46.0 から移した）
 
