@@ -13,6 +13,7 @@ inflections:
   itunes_uri: ItunesURI
   itunes_url_handler: ItunesURLHandler
   itunes_url_nowplaying_handler: ItunesURLNowplayingHandler
+  json_storage: JSONStorage
   mime_type: MIMEType
   note_uri: NoteURI
   oauth_client_storage: OAuthClientStorage

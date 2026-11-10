@@ -1,19 +1,15 @@
 module Mulukhiya
-  class MediaCatalogStorage < Redis
+  class MediaCatalogStorage < JSONStorage
     PAGE1_TTL = 180
     DEFAULT_TTL = 86_400
 
-    def get(key)
-      return nil unless entry = super
-      return JSON.parse(entry, symbolize_names: true)
-    rescue => e
-      e.log(key:)
-      return nil
-    end
-
     def set(key, value, ttl: nil)
       ttl ||= key.to_s.match?(/\bpage:1\b/) ? PAGE1_TTL : DEFAULT_TTL
-      setex(key, ttl, value.to_json)
+      return super
+    end
+
+    def symbolize_names?
+      return true
     end
 
     # ⚠ **応答の形・載せる範囲を変えたら鍵を変える。**2 ページ目以降は 24 時間残るので、
