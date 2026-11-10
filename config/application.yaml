@@ -737,6 +737,7 @@ service:
     patterns:
       album: /album/.*?/?([[:digit:]]+)$
       song: /song/.*?/?([[:digit:]]+)$
+      music_video: /music-video/.*?/?([[:digit:]]+)$
       track: /album/.*?/?([[:digit:]]+)$
     urls:
       lookup: https://itunes.apple.com/lookup
