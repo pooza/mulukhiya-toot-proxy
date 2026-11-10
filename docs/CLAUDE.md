@@ -206,6 +206,11 @@ git diff Gemfile.lock
     Codex の P2（同じチェックを続けて切り替えると、返る順で逆の値が保存される）は `2da431b7` で直し、返信・👍 済み。
     dev25 でブランチのまま API（一覧 31 件・切り替え 200・切り替えられないもの 422）とユーザーの目視で確かめた。⚠ `/mulukhiya/app/test` の JS のテストは未実行（ブラウザ拡張が Vivaldi で使えない）。
     ⚠ `POST /handler/config` は本文の `token` だけでは 403。`Authorization` ヘッダが要る（画面は axios の既定のヘッダで送るので問題ない）
+- ✅ **#4896 + #4899 を PR #4904 でマージした**（2026-11-10・ユーザー承認・CI 緑・Codex 指摘なし）。ginseng-core v7.0.0・fediverse v8.0.0（ほか style v1.1.15・postgres v2.0.3・web / youtube v4.0.0）。
+  `Listener` はストリーミングのトークンをヘッダで渡す。harness 3 系統とも 0 failures / 0 errors（`2c55b4ab`）。
+  dev25 / dev27 でブランチのままデーモンを止めて起動し直し（7.0.0 の身元の確認で止まらない）、info の bot へのメンションで listener の最後のイベントが更新されることを確かめた（Misskey の `main` も認証されている）。
+  ⚠ Mastodon はフォローしていない相手からの DM を通知のリクエストへ回すので、listener の確かめは**未収載のメンション**で送る。
+  ⚠ **#4895 のテスト（`UserHandlerConfigTest`）は harness でだけ 4 件落ちていた**（偽物を `sns` で差していて、`before` が作る本物が残る）。`sns_class` の差し替えに直した（`af9911c7`）。CI には harness が無いので表に出なかった
 - Akkoma の「2 件を切らさない」: 5.46.0 で #4861・#4884 を閉じたので、#4900（自分の投稿の一覧・`account_timeline`）と #4901（ストリーミング・段階 6）を起票して 5.47.0 に載せた
 - Misskey 2026.11.0 の stable（11-09 に beta.1）が出たら、この版で harness の検証をする（5.46.0 から移した）
 
