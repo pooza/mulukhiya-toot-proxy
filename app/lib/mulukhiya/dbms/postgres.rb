@@ -34,10 +34,6 @@ module Mulukhiya
       return instance.exec(name, params)&.first
     end
 
-    def self.config?
-      return dsn.present?
-    end
-
     def self.dsn
       return Ginseng::Postgres::DSN.parse(config['/postgres/dsn']) rescue nil
     end
