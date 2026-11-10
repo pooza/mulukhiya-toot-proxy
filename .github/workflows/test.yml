@@ -41,11 +41,14 @@ jobs:
         #
         # 2026-11-05 (#4884): Akkoma の DB が要るテスト（`PleromaReactionTest#test_put_and_delete`）を足したので +1。
         # 実測: mastodon 382 / misskey 369（develop の値に足した）。
+        #
+        # 2026-11-10 (#4900): アカウントが要るテスト（`AccountStatusesPagingTest` の 2 本）を足したので +2。
+        # 実測: mastodon 384（CI）/ misskey 371。
         include:
           - controller: mastodon
-            omission_baseline: 382
+            omission_baseline: 384
           - controller: misskey
-            omission_baseline: 369
+            omission_baseline: 371
     services:
       redis:
         image: redis:7
