@@ -46,8 +46,10 @@ module Mulukhiya
       set :raise_errors, false
       set :show_exceptions, false
 
-      def sns
-        return @sns ||= FakeService.new.tap {|s| s.token = token}
+      # ⚠ `sns` ではなく `sns_class` を差し替える。`Controller` の `before` が `@sns = sns_class.new` で
+      # 本物を作るので、`@sns ||=` だと harness があるときは本物が残り、偽のトークンで 403 になる。
+      def sns_class
+        return FakeService
       end
     end
 
