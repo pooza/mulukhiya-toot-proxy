@@ -211,6 +211,12 @@ git diff Gemfile.lock
   dev25 / dev27 でブランチのままデーモンを止めて起動し直し（7.0.0 の身元の確認で止まらない）、info の bot へのメンションで listener の最後のイベントが更新されることを確かめた（Misskey の `main` も認証されている）。
   ⚠ Mastodon はフォローしていない相手からの DM を通知のリクエストへ回すので、listener の確かめは**未収載のメンション**で送る。
   ⚠ **#4895 のテスト（`UserHandlerConfigTest`）は harness でだけ 4 件落ちていた**（偽物を `sns` で差していて、`before` が作る本物が残る）。`sns_class` の差し替えに直した（`af9911c7`）。CI には harness が無いので表に出なかった
+- 🟡 **#4898 の 1・3・4 を PR #4905 でマージした**（2026-11-10・ユーザー承認・CI 緑・Codex 指摘なし）。
+  gem と同じ中身の写しを消した（`MisskeyService#oauth_server_metadata`・`Environment.name` / `test?` / `development?` / `production?`・`Postgres.config?`）。
+  ginseng-redis は v2.1.0。JSON の `get` / `set` の写し 7 本を `JSONStorage` へ寄せた。写しの `MediaMetadataStorage#get` は、無い鍵で NameError を投げていた（`supernil`）。
+  ロックの道具と Postgres の `connected?` / `reconnect` / `pool` は残すと決めた（ユーザー判断）。返せる余地は pooza/ginseng-redis#81・pooza/ginseng-postgres#122 で伝えた。
+  dev25 / dev27 で health 200 を確かめ、`ScheduledStatusStorage` の往復と `MediaMetadataStorage` の無い鍵（nil）も確かめた。
+  ⚠ **残りは 2 だけ**: pooza/ginseng-redis#80（`self.class.dsn`）が着地したら `bundle update ginseng-redis` → `Mulukhiya::Redis#initialize` を消す。#4898 はそれまで閉じない
 - Akkoma の「2 件を切らさない」: 5.46.0 で #4861・#4884 を閉じたので、#4900（自分の投稿の一覧・`account_timeline`）と #4901（ストリーミング・段階 6）を起票して 5.47.0 に載せた
 - Misskey 2026.11.0 の stable（11-09 に beta.1）が出たら、この版で harness の検証をする（5.46.0 から移した）
 
