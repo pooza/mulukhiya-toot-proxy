@@ -217,6 +217,9 @@ git diff Gemfile.lock
   ロックの道具と Postgres の `connected?` / `reconnect` / `pool` は残すと決めた（ユーザー判断）。返せる余地は pooza/ginseng-redis#81・pooza/ginseng-postgres#122 で伝えた。
   dev25 / dev27 で health 200 を確かめ、`ScheduledStatusStorage` の往復と `MediaMetadataStorage` の無い鍵（nil）も確かめた。
   ⚠ **残りは 2 だけ**: pooza/ginseng-redis#80（`self.class.dsn`）が着地したら `bundle update ginseng-redis` → `Mulukhiya::Redis#initialize` を消す。#4898 はそれまで閉じない
+- ✅ **#4897 を PR #4906 でマージした**（2026-11-10・ユーザー承認・CI 緑・Codex 指摘なし）。`ItunesMusicVideoURI` で `/music-video/` を `/jp/music-video/<id>` へ短縮する。
+  ユーザー判断で、曲（`/song/`）の短縮でも `?uo=4` を落とすようにした。dev25 / dev27 で、MV と曲の URL がハンドラで書き換わることを確かめた。
+  ⚠ CI の Misskey 系は、この日 2 回とも `apt install` の 10 分タイムアウトで落ちた（テストより前）。落ちたジョブだけ流し直すと緑になった
 - Akkoma の「2 件を切らさない」: 5.46.0 で #4861・#4884 を閉じたので、#4900（自分の投稿の一覧・`account_timeline`）と #4901（ストリーミング・段階 6）を起票して 5.47.0 に載せた
 - Misskey 2026.11.0 の stable（11-09 に beta.1）が出たら、この版で harness の検証をする（5.46.0 から移した）
 
