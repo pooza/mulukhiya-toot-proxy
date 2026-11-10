@@ -562,7 +562,7 @@ pleroma:
     repost: false
     streaming: false
   data:
-    account_timeline: false
+    account_timeline: true
     favorite_tags: true
     futured_tag: false
     media_catalog: false

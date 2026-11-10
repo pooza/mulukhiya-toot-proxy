@@ -79,6 +79,30 @@ module Mulukhiya
         return Attachment.where(condition).reverse(:id)
       end
 
+      # 自分の投稿の一覧（`GET /mulukhiya/api/status/list`・#4900）。
+      #
+      # ⚠ **ID は SQL、中身は API で読む。**ID は `activities` の `Create` から引く（`actor` と `id` の組に
+      # Akkoma の索引 `activities_actor_id_DESC_NULLS_LAST_index` が使える。並びを索引に合わせて `NULLS LAST` にした。
+      # dev29 は小さすぎて実行計画には出ないが、`actor` だけで引くと索引の条件になる）。activity の主キーを
+      # FlakeId にしたものが API の投稿 ID になる（dev29 で確かめた）。中身は `Status` と同じく API で読む。
+      # ⚠ 非公開（フォロワー限定）も載せるので、自分のトークンを持ったサービスで読む。DM は載せない
+      # （Mastodon の `statuses.sql.erb` の `visibility < 3` と同じ範囲）。
+      # ⚠ 読めなかった投稿（消された直後など）は飛ばす。
+      def statuses(params = {})
+        params[:limit] ||= config['/webui/status/timeline/limit']
+        params[:page] ||= 1
+        params[:actor] = ap_id
+        params[:follower_address] = follower_address
+        return Postgres.exec(:statuses, params).filter_map do |row|
+          status = Status[FlakeId.encode(row[:id])]
+          status.service = service
+          status.to_h.merge(account: {username:, display_name:, acct: acct.to_s})
+        rescue => e
+          e.log(acct: acct.to_s, id: row[:id])
+          nil
+        end
+      end
+
       # ⚠ 投稿は `Status` と同じく API で読む（`objects` の JSON を開く SQL は持たない）。
       def recent_status
         response = service.fetch_account_statuses(api_id, {limit: 1})
