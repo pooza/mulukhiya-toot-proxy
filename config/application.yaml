@@ -560,7 +560,7 @@ pleroma:
     media_update: false
     reaction: true
     repost: false
-    streaming: false
+    streaming: true
   data:
     account_timeline: true
     favorite_tags: true
