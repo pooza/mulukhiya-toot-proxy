@@ -225,7 +225,8 @@ git diff Gemfile.lock
   dev29 で一覧・検索・2 ページ目を確かめた。Pleroma 系の全件は 1957 tests / 0 failures / 0 errors。dev29 は develop に戻し、dev25 / dev27 へも反映した（health 200）。
   CI の omission の上限は Mastodon 384・Misskey 371 に上げた（アカウント依存のテストが 2 件増えた）。⚠ この日の CI は `apt install` の 10 分タイムアウトで計 5 回落ちた。落ちたジョブだけ流し直すと緑になる
 - Akkoma の「2 件を切らさない」: 5.46.0 で #4861・#4884 を閉じたので、#4900（自分の投稿の一覧・`account_timeline`）と #4901（ストリーミング・段階 6）を起票して 5.47.0 に載せた
-- Misskey 2026.11.0 の stable（11-09 に beta.1）が出たら、この版で harness の検証をする（5.46.0 から移した）
+- ✅ **Misskey 2026.11.0 を harness で検証し、verified を昇格した**（2026-11-12）。develop `05383a94` で 1962 tests / **0 failures / 0 errors** / 168 omissions。
+  ⚠ 本番の Misskey 系へ上げる前に **Node.js の版を確かめる**（22 は起動しない・24.22.3 / 26.13.1 以上）。インフラ側（chubo2）の話
 
 - #4195 → #4196 → #4197（ユーザー向けハンドラートグル。依存の #4194 はクローズ済み）
   - ✅ 2026-11-06 に #4195（PR #4894）・#4196（PR #4895）を draft で出した。⚠ **develop は 5.46.0 のリリース PR の元なので、5.46.0 を出すまでマージしない**（ユーザー判断）。
@@ -376,6 +377,19 @@ develop にすでに載っている bundler 4.0.20・ginseng-piefed v0.4.1・doc
 - bundler の件は pooza/ginseng-style#131 に申し送った（2026-10-24。横展開の判断はあちら）
 
 ## セッション同期の記録
+
+### 2026-11-12 セッション同期の記録
+
+**本番には触っていない。**用件は Misskey 2026.11.0 の harness 検証（上の 5.47.0 の節）。辞書台帳の生成は省いた。
+
+- **ブランチ**: `develop` は `origin/develop` と同一（`05383a94`）。open PR は 0 件。Dependabot アラート **0 件**
+- **Codex**: 未対応なし（直近マージ 6 本・#4903 の P2 は返信・👍 済み）。PR 本体への申し送りもなし
+- **Issue**: 前回から増減なし
+- **ginseng-\* のピン**: ずれなし（#4904 / #4905 で取り込み済み）
+- **Annict の API**: 前回と同じ。公式アカウントの新しい投稿なし
+- **chubo2**: open 14 件。新しいものは #305（Mac に Chrome）・#307（ボットの台帳）など、こちらへの影響なし。ローカルが 11 本遅れていたので早送りした
+- **Sentry**: unresolved **28 件**・**コメント 0 は 0 件**（2026-11-12 時点）。1X（CustomFeed の null byte）に 11-10 23:00 のイベントがあるが既知の再発
+- **harness の upstream**: Misskey **2026.11.0** を検証して昇格（chubo2 `c6d50da`）。Mastodon は v5.0.0-beta.1 のまま、Akkoma は v3.20.1 のまま。`last_checked` を 11-12 へ
 
 ### 2026-11-10 セッション同期の記録
 

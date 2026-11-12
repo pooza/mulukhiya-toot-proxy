@@ -23,8 +23,8 @@ mastodon:
   verified_at: '2026-11-04'
 
 misskey:
-  verified: 2026.10.1
-  verified_at: '2026-10-24'
+  verified: 2026.11.0
+  verified_at: '2026-11-12'
 
 # Akkoma は chubo2 の harness ではなくステージングの dev29 で検証する（#4857）。
 pleroma:
@@ -32,7 +32,19 @@ pleroma:
   verified_at: '2026-10-31'
 
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
-last_checked: '2026-11-08'
+last_checked: '2026-11-12'
+
+# 2026-11-12 チェック結果:
+#   - Mastodon: 最新は v5.0.0-beta.1（11-08）のまま。RC はまだ。stable は v4.7.5 ＝ verified と同じ。
+#   - Misskey: **2026.11.0（2026-11-12T03:50Z）が出たので検証し、verified を昇格した。**
+#     harness を 2026.11.0 で再構築（update-version.sh → reset.sh）し、`/api/meta` で version=2026.11.0 を確認。
+#     develop `05383a94` で `TestHarness: controller=misskey url=http://localhost:3001`
+#     1962 tests / 4101 assertions / **0 failures / 0 errors** / 168 omissions（5.46.0 のゲートの 2026.10.1 と omission は同数。
+#     tests の増加は 5.47.0 で足したテストの分）。
+#   - 差分の読み取り: モロヘイヤの API 面に効く変更は無い。⚠ 本番向けの注意は **Node.js 22 の打ち切り**
+#     （24.22.3 / 26.13.1 以上が必要）と起動スクリプト `scripts/start.mjs` への移行（`NODE_OPTIONS` の相対パスの基準が変わる）。
+#     「特定の条件下でドライブのファイル一覧がタイムアウトして開けない問題を修正」は #4298 に関係するかもしれない。
+#   - Akkoma: 最新 stable は v3.20.1 ＝ verified と同じ。
 
 # 2026-11-08 チェック結果:
 #   - Mastodon: 最新は v5.0.0-beta.1（11-04）のまま。RC はまだ。stable は v4.7.5 ＝ verified と同じ。
