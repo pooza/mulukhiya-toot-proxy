@@ -4,9 +4,13 @@ module Mulukhiya
   class ListenerStreamingHeadersTest < TestCase
     def setup
       @captured = nil
-      captured = ->(opts) {@captured = opts}
-      Faye::WebSocket::Client.define_singleton_method(:new) do |_url, _protocols = nil, opts = {}|
-        captured.call(opts)
+      @protocols = nil
+      captured = lambda do |protocols, opts|
+        @protocols = protocols
+        @captured = opts
+      end
+      Faye::WebSocket::Client.define_singleton_method(:new) do |_url, protocols = nil, opts = {}|
+        captured.call(protocols, opts)
         Object.new
       end
       sns = Struct.new(:streaming_uri, :streaming_headers).new(
@@ -28,6 +32,23 @@ module Mulukhiya
       listener = @listener_class.new
 
       assert_equal({'Authorization' => 'Bearer secret'}, @captured[:headers])
+      assert_not_include(listener.uri.to_s, 'secret')
+      assert_equal([], @protocols)
+    end
+
+    # Pleroma 系（Akkoma）は `Authorization` を読まないので、`Sec-WebSocket-Protocol` で渡す（#4901）。
+    # 🔴 URL（逆プロキシと listener のログに残る）にもヘッダにも載せない。
+    def test_protocols
+      sns = Struct.new(:streaming_uri, :streaming_headers, :streaming_protocols).new(
+        URI.parse('wss://example.com/api/v1/streaming?stream=user'), {}, ['secret']
+      )
+      listener_class = Class.new(Listener) do
+        define_method(:info_agent_service) {sns}
+      end
+      listener = listener_class.new
+
+      assert_equal(['secret'], @protocols)
+      assert_equal({}, @captured[:headers])
       assert_not_include(listener.uri.to_s, 'secret')
     end
   end
