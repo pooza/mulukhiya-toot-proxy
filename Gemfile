@@ -64,13 +64,12 @@ gem 'sinatra', '~> 4.2.1', require: false # 🔴 事故版は 4.2.0。4.2.1 は�
 gem 'tilt', '>= 2.1.0', require: false # ⚠ ginseng-web の床をそのまま移すだけ。事故との関係は無い
 group :development do
   gem 'bundler-audit'
+  gem 'erb_lint', require: false
   # RuboCop 設定の正本。本体と minitest/performance/rake プラグインもこの gem が抱える。
   # ⚠⚠ タグではなく SHA で固定する（pooza/ginseng-style#75）。タグは付け替えられる。
   gem 'ginseng-style', github: 'pooza/ginseng-style',
     ref: '127c2854e76811eeec41e21c7bf262b4a527d2b7', require: false # v1.1.15
-  gem 'ostruct' # https://github.com/pooza/mulukhiya-toot-proxy/issues/4229
   gem 'rack-test'
-  gem 'rails-erb-lint'
   gem 'ricecream'
   # ⚠ rubocop-sequel はモロヘイヤ固有のプラグインなので、正本ではなくここに置く。
   gem 'rubocop-sequel'

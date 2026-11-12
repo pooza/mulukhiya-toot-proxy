@@ -233,7 +233,9 @@ git diff Gemfile.lock
     2 本は別々に develop から切った（`docs/api.md` の同じ箇所に足しているので、後の方で衝突を解く）
   - #4196 で `Handler#disable?` が `toggleable` を見ていなかったのを直した（ユーザー判断 A）。`invalid_command`・`remote_tag` は利用者の設定では止まらなくなる。既に止めている設定も無視される
   - #4197（設定画面）は **2 本のマージを待って着手する**（ユーザー判断）
-- #4229（rails-erb-lint の更新が無いので `erb_lint` へ替えて `ostruct` を消す）
+- #4229（rails-erb-lint の更新が無いので外して `ostruct` を消す）。⚠ **`erb_lint` へは替えなかった**（2026-11-13・ユーザー判断）。
+  erb_lint 0.9.0 は HTML 向けで、わざと壊した .erb（`<%= foo( %>`・end の無い if）を見逃した。
+  `rake erb:lint` は標準の ERB（`Ginseng::Template` と同じ `trim_mode: '-'`）でコンパイルして構文エラーを見るだけにした（旧 lint と同じ判定・gem は足さない）。gli・ostruct・actionpack が lock から消えた
 - #4880（`dic.json` を related 形式へ・5.46.0 から送った）。本番で引くのは gomander だけ。読む側の削除は注意書きを出した版の次にする
 - #4734（HEIF を戻す）。FreeBSD は quarterly の pkg に `libheif` 1.23.6 が来ている（ports のビルドは要らない）。⚠ `pkg update` していないホストは古いカタログで 1.22.2_3 に見える。凍結（11/1〜11/4）の後に上げる。vulcan は Ubuntu の 1.21.2-3ubuntu0.6 で、版の条件を満たさない
 - #4898（ginseng-\* 由来の上書きの見直し・size:M・2026-11-07 起票）。上流に入っている写し（`MisskeyService#oauth_server_metadata`）と、gem の決め打ちで写すしかなかった `Redis#initialize` を消し、Redis のロックの道具・JSON の `get` / `set`・Postgres の接続まわりを返すか決める。規約側のたたき台は pooza/ginseng-style#147
