@@ -245,6 +245,21 @@ git diff Gemfile.lock
 - #4897（Apple Music の MV の URL `/music-video/` が短縮されない）。2026-11-08 に載せた（ユーザー判断。5.46.0 は Mastodon 5.0 対応の回なので混ぜない）
 - on-hold のまま: #3877（本文が無く設計から）/ #4301（capsicum#344 が open）/ #4298・#3157（相手側待ち）/ #4893（Mastodon 5.0 の用語の ja 訳待ち・2026-11-06 に on-hold へ）/ #4832・#4873（報告待ち）/ #4846（総まとめ）
 
+## リリース済み: 5.46.1（2026-11-14・ホットフィックス）
+
+本番 4 台へデプロイ済み（07:33〜07:36・shallu → zugoga → gomander → vulcan・`main` の `2c50587c`・Ruby 4.0.9 据え置き）。[リリースノート](https://github.com/pooza/mulukhiya-toot-proxy/releases/tag/v5.46.1)。全台 version 5.46.1・health 200・`config: OK`・monit 復帰・vulcan は 3 ユニットとも `NRestarts=0`。
+
+[マイルストーン 5.46.1](https://github.com/pooza/mulukhiya-toot-proxy/milestone/649)。
+
+- **#4912（PR #4913）**: 実況のデコを手で戻した（`/decoration/restore`）あとも、番組の終わりの予約 `decoration_initialize_<username>` が残っていた。
+  `saved_state` はもう消えているので、2 回目の処理が `saved || []` で利用者のデコを全部消していた（2026-08-23・11-12 にダイスキーで起きた）。
+  手で戻したときは予約も消す。保存が無いときは空で上書きせず、付けたデコだけを外す
+- ⚠ **`UserConfigStorage#update` の `deep_compact` は空の配列も消す。**「付ける前にデコが無かった」と「もう戻した」は、どちらも `saved_state` が nil になって区別が付かない
+- ⚠ 最初は「仕様の分かりにくさ」と見立てて、ログを見る前に方針を出した。**vulcan の journalctl で restore が 2 回走っていたのを見て不具合と分かった**
+- 日曜 10:15 のダイスキーの実況の前（土曜の朝）に出した（ユーザー判断）
+- 📌 #4912 は open のまま。残りは通知の文面・保存がある場合も付けた 1 つだけを外すか・capsicum での表示（クローズはユーザー判断）
+- develop へは PR #4914 で戻す（version 行は develop の 5.47.0 を採った）
+
 ## リリース済み: 5.46.0（2026-11-10）
 
 本番 4 台へデプロイ済み（07:18〜07:24・shallu → zugoga → gomander → vulcan・`main` の `8f3994ad`・Ruby 4.0.9 据え置き）。[リリースノート](https://github.com/pooza/mulukhiya-toot-proxy/releases/tag/v5.46.0)。全台 health 200・`config: OK`・monit 復帰・vulcan は 3 ユニットとも `NRestarts=0`。デプロイ後の Sentry の新着なし
