@@ -380,6 +380,23 @@ develop にすでに載っている bundler 4.0.20・ginseng-piefed v0.4.1・doc
 
 ## セッション同期の記録
 
+### 2026-11-13 セッション同期の記録（2 回目）
+
+**本番には触っていない。**朝の同期から半日なので、辞書台帳の生成と harness の upstream 確認（`last_checked` は 11-12）は省いた。
+
+- **ブランチ**: `develop` は `origin/develop` と同一（`21169088`・#4908 のマージ）。open PR は #4909（#4901・CI 緑・Codex の指摘なし・マージ待ち）。Dependabot アラート **0 件**
+- **Codex**: #4908・#4909 とも指摘なし。PR 本体への申し送りもなし
+- **Issue**: #4910（残りのハンドラ）・#4911（メディアカタログ）を起票して 5.47.0 に載せた。5.47.0 は open 14
+- **ginseng-\* のピン**: **3 本ずれた**（どれもこちらに関係がある）
+  - ginseng-core v7.0.0 → **v7.0.1**: Logger の `unknown` / `add` もマスクを通す（pooza/ginseng-core#759）・cacert の更新。トークンの伏せ字の漏れなので早めに取り込みたい
+  - ginseng-fediverse v8.0.0 → **v9.0.0**: こちらが出した pooza/ginseng-fediverse#337（Pleroma のトークンを `Sec-WebSocket-Protocol` で渡す）の着地。
+    モロヘイヤの `PleromaService` は gem の `PleromaService` を継いでいないので、`streaming_protocols` の上書きは残す。
+    上げると全サービスが `streaming_protocols` に応えるので、`Listener` の `respond_to?` の分岐は要らなくなる
+  - ginseng-redis v2.1.0 → **v2.1.1**: pooza/ginseng-redis#80（DSN を `self.class.dsn` から引く）の着地。#4898 の後半（`Redis#initialize` の写しを消す）の待ちが解けた
+- **Annict の API**: 基準（11-05）と同じ。公式アカウントの新しい投稿なし
+- **chubo2**: open 15 件（+#309 ハドラーブロス用の CT・こちらへの影響なし）。ローカルが 5 本遅れていたので早送りした
+- **Sentry**: unresolved **28 件**・**コメント 0 は 0 件**（2026-11-13 夕方時点）
+
 ### 2026-11-13 セッション同期の記録
 
 **本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。harness の upstream 確認は前回（11-12）から 1 日なのでスキップ。
