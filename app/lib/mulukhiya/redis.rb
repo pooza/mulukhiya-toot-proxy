@@ -16,17 +16,6 @@ module Mulukhiya
       end
     LUA
 
-    def initialize(params = {})
-      unless params[:url]
-        dsn = Redis.dsn
-        dsn.db ||= 1
-        raise Ginseng::Redis::Error, "Invalid DSN '#{dsn}'" unless dsn.absolute?
-        raise Ginseng::Redis::Error, "Invalid scheme '#{dsn.scheme}'" unless dsn.scheme == 'redis'
-        params[:url] = dsn.to_s
-      end
-      super
-    end
-
     def underscore
       return self.class.to_s.split('::').last.sub(/Storage$/, '').underscore
     end
@@ -149,6 +138,8 @@ module Mulukhiya
       log(method: __method__, prefix:)
     end
 
+    # ⚠ gem の `initialize` は `self.class.dsn` を引く（ginseng-redis 2.1.1・pooza/ginseng-redis#80）ので、
+    # 上書きはこれだけで足りる。2.1.0 までは `Service.dsn` 決め打ちで、`initialize` を丸ごと写していた (#4898)。
     def self.dsn
       return Ginseng::Redis::DSN.parse(config['/user_config/redis/dsn'])
     end
