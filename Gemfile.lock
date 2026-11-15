@@ -8,10 +8,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 738ddbea2487b0c9e5c6bd1af9b6079e13b311d0
-  tag: v7.0.0
+  revision: 6d51c4d7c1a9cdb5e582ad3ff7dfc9cf790e87be
+  tag: v7.0.1
   specs:
-    ginseng-core (7.0.0)
+    ginseng-core (7.0.1)
       activesupport (>= 8.1.2.1)
       addressable (>= 2.9.0)
       cgi (>= 0.4.2)
@@ -67,10 +67,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-redis.git
-  revision: b4dc84b5af85dc42c22feabd642af823c7b51f56
-  tag: v2.1.0
+  revision: 3b3affbc1d650bb97199882f7f3249f84dba7804
+  tag: v2.1.1
   specs:
-    ginseng-redis (2.1.0)
+    ginseng-redis (2.1.1)
       redis-client
 
 GIT
