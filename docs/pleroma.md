@@ -46,7 +46,7 @@ v4 の実装は `git show 46c4f4e2^:<path>` で取り出せる（SQL は `app/qu
 | アカウントの直近の投稿・添付の参照 | ✅ | 5.46.0 | 段階 3。`recent_toot` は 5.43.0（API で読む・ゲートが要った）。添付は #4861（ID で引く経路は元から通っていた・`Account#attachments` を actor と `Document` で引く） |
 | 自分の投稿の一覧（WebUI） | ✅ 5.47.0 | `data/account_timeline` | #4900。ID は `activities` の `Create` を `actor` で引き（索引 `activities_actor_id_DESC_NULLS_LAST_index`）、中身は API で読む。activity の主キーの FlakeId が API の投稿 ID |
 | ハンドラ（post_reaction ほか） | ✅ 5.47.0 | — | 段階 4。`post_reaction` は 5.46.0（#4884）、残りは #4910 で 1 本ずつ見た（下の「ハンドラの判定」）。Pleroma 系で外すものは無かった |
-| メディアカタログ | ⬜ | `data/media_catalog` | 段階 5（`media_catalog`・重い） |
+| メディアカタログ | ✅ 5.47.0 | `data/media_catalog` | 段階 5（#4911）。ローカルの利用者ごとに `activities_actor_id_DESC_NULLS_LAST_index` で投稿を引き、`attachment` を展開して `Document` を 1 行ずつ索引で引く。cursor は `<FlakeId>.<位置>` |
 | ストリーミング（listener） | ✅ 5.47.0 | `capabilities/streaming` | 段階 6（#4901）。`PleromaListener < MastodonListener`。送り主は API の ID（FlakeId）を uuid に戻して引く |
 | 投稿の一括削除 | ⬜ | — | `deletable_statuses` |
 | お知らせ | ✅ 5.47.0 | `features/announcement` | #4910。Akkoma の `/api/v1/announcements` は Mastodon と同じ形。⚠ `announcement_push`（capsicum-relay）は false のまま |
@@ -74,7 +74,13 @@ v4 の実装は `git show 46c4f4e2^:<path>` で取り出せる（SQL は `app/qu
    判断の中心は `reactionable?`。受け手のサーバーの nodeinfo は `software.name` が `akkoma` なので、設定の `akkoma.capabilities.reaction` を立てた。
    Akkoma の利用者は絵文字リアクションを自分で見られるので、リアクションを伝える返信は投稿しない（Misskey 系から Akkoma の利用者へのリアクションも同じ）
    ✅ 残りは #4910（5.47.0）で、dev29 で投稿して確かめた。結論は下の「ハンドラの判定」。
-5. **メディアカタログ**: Mastodon / Misskey でも重かった（[media_catalog.md](media_catalog.md)）。最後に回す
+5. ✅ **メディアカタログ**（#4911・5.47.0）: Mastodon / Misskey でも重かった（[media_catalog.md](media_catalog.md)）ので、Mastodon と同じローカルの利用者ごとの LATERAL merge にした。
+   ⚠ 添付は投稿（`Note`）の JSON の `attachment` にしか無く、`Document` から投稿へは辿れない。投稿から展開し、`Document` は AP の ID で引く（`objects_unique_apid_index`）。
+   ⚠ 素直に JOIN すると、少データでは `objects` を全件読んで Hash Join する（dev29 で実測）。LATERAL と LIMIT 1 で入れ子のループに固定した。
+   ⚠ 並びは（投稿の ID DESC, 添付の位置 ASC）。cursor は `<投稿の FlakeId>.<位置>`（Misskey と同じ型・#4375）。
+   **規模の見積もり（2026-11-15・dev29 でトランザクションの中に偽のデータを入れて測り、ROLLBACK した）**: `objects` 31 万・`activities` 36 万、
+   ローカルの 1 人に Like 5 万と添付の無い投稿 1 万を新しい側に積んで、1 ページ目 107 ms・OFFSET 900 で 88 ms・cursor 1.7 ms。どれも索引だけで、全件の読み込みは無い。
+   ⚠ 1 人ぶんの走査は、その利用者の activity の数に比例する（添付の有無は索引に無い）
 6. ✅ **ストリーミング**（#4901・5.47.0）: v4 の `PleromaListener` を戻した。Akkoma のストリーミングは Mastodon 互換。
    ⚠ トークンはヘッダでも URL でもなく `Sec-WebSocket-Protocol` で渡す（Akkoma はヘッダを読まない・ginseng-fediverse 9.0.0・pooza/ginseng-fediverse#337）。
    ⚠ 送り主は v4 の `fqn` ではなく `account.id`（FlakeId）を `FlakeId.decode` して引く。
