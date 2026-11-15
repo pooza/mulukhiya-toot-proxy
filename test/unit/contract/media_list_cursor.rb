@@ -4,6 +4,12 @@ module Mulukhiya
   # ⚠ 未認証で届く。Mastodon では数字でない cursor が bigint への変換に失敗して 500 になり、
   # 要求のたびに alert の経路を踏んでいた。
   class MediaListCursorTest < TestCase
+    # ⚠ Pleroma 系の cursor は形が違う（`MediaListPleromaCursorTest`・#4911）。
+    def disable?
+      return true if Environment.pleroma?
+      return super
+    end
+
     def test_numeric_cursor_is_accepted
       assert_empty(errors(cursor: '115000000000000000'))
     end
