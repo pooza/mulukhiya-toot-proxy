@@ -570,7 +570,9 @@ pleroma:
   display_name: Pleroma
   features:
     annict: false
-    announcement: false
+    # Akkoma の `/api/v1/announcements` は Mastodon と同じ形で返す。`post_announce`・`announcement_mention` は
+    # dev29 で確かめた (#4910)。⚠ `announcement_push`（capsicum-relay への push）は別物なので false のまま。
+    announcement: true
     announcement_push: false
     feed: true
     webhook: true
