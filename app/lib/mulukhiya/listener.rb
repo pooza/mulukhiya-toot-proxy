@@ -135,7 +135,8 @@ module Mulukhiya
       # 🔴 トークンは URL ではなくヘッダで渡す（ginseng-fediverse 8.0.0・#4899）。付け忘れると Mastodon は 401、
       # ⚠⚠ Misskey は黙って匿名で繋がり、`main` / `homeTimeline` だけが来なくなる。
       # ⚠ Pleroma 系（Akkoma）はヘッダを読まないので、`Sec-WebSocket-Protocol` で渡す（#4901）。
-      @client = Faye::WebSocket::Client.new(uri.to_s, streaming_protocols, {
+      # ⚠ `streaming_protocols` は ginseng-fediverse 9.0.0 から全サービスにある（Pleroma 系以外は `[]`）。
+      @client = Faye::WebSocket::Client.new(uri.to_s, @sns.streaming_protocols, {
         headers: @sns.streaming_headers,
         tls: {
           verify_peer: verify_peer?,
@@ -145,12 +146,6 @@ module Mulukhiya
         ping: keepalive,
       })
       log(method: __method__, url: uri.to_s)
-    end
-
-    # ⚠ Pleroma 系だけがトークンを `Sec-WebSocket-Protocol` で渡す（#4901・`PleromaService#streaming_protocols`）。
-    def streaming_protocols
-      return [] unless @sns.respond_to?(:streaming_protocols)
-      return @sns.streaming_protocols
     end
 
     def create_method_name(name)

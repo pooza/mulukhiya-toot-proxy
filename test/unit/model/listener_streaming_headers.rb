@@ -13,9 +13,10 @@ module Mulukhiya
         captured.call(protocols, opts)
         Object.new
       end
-      sns = Struct.new(:streaming_uri, :streaming_headers).new(
+      sns = Struct.new(:streaming_uri, :streaming_headers, :streaming_protocols).new(
         URI.parse('wss://example.com/streaming'),
         {'Authorization' => 'Bearer secret'},
+        [],
       )
       @listener_class = Class.new(Listener) do
         define_method(:info_agent_service) {sns}
@@ -50,6 +51,15 @@ module Mulukhiya
       assert_equal(['secret'], @protocols)
       assert_equal({}, @captured[:headers])
       assert_not_include(listener.uri.to_s, 'secret')
+    end
+
+    # ⚠ Listener は `respond_to?` を見ずに `streaming_protocols` を呼ぶ（ginseng-fediverse 9.0.0 から全サービスにある）。
+    # Pleroma 系以外は空で、サブプロトコルにトークンを載せない。
+    def test_protocols_of_other_services
+      # ⚠ `new` は DB と SNS を引くので `allocate` で作る（gem の `streaming_protocols` は状態を見ない）。
+      [MastodonService, MisskeyService].each do |service_class|
+        assert_equal([], service_class.allocate.streaming_protocols, service_class.to_s)
+      end
     end
   end
 end
