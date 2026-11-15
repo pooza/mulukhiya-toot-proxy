@@ -30,12 +30,26 @@ module Mulukhiya
       next unless key?
       # ⚠ Mastodon の ID は bigint。桁が多すぎる数字も変換に失敗して 500 になるので、
       # 範囲まで見る（PR #4833 の Codex P2）。Misskey は長さだけ切る。
-      valid = if Environment.mastodon_type?
+      valid = if Environment.pleroma?
+        MediaListContract.pleroma_cursor?(value)
+      elsif Environment.mastodon_type?
         value.match?(/\A\d{1,19}\z/) && value.to_i <= MAX_BIGINT
       else
         value.match?(/\A[0-9A-Za-z]{1,64}(?:\.\d{1,3})?\z/)
       end
       key.failure('形式が正しくありません。') unless valid
+    end
+
+    # ⚠ Pleroma 系は `<投稿の ID（base62 の FlakeId）>.<attachment の中の位置>` の 2 つ組（#4911）。
+    # 位置の無い形は受けない（Misskey の 5.41.0 までの形のような互換が要らない）。
+    # 🔴 128 ビットに収まるかまで見る。収まらない ID は uuid に戻せず、SQL が 500 になる。
+    def self.pleroma_cursor?(value)
+      return false unless value.match?(/\A[0-9A-Za-z]{1,22}\.\d{1,3}\z/)
+      # ⚠ `FlakeId.decode` は 32 桁で切るので、溢れを見るのに使えない。
+      number = value.split('.').first.each_char.reduce(0) do |sum, char|
+        (sum * FlakeId::ALPHABET.length) + FlakeId::ALPHABET.index(char)
+      end
+      return number < 2**128
     end
   end
 end

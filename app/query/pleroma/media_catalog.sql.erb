@@ -1,0 +1,109 @@
+<%#
+  media_catalog の Pleroma 系（Akkoma）版（段階 5・#4911）。
+
+  ⚠ **Akkoma には添付の表が無い。**添付は投稿（`objects` の `Note`）の JSON の `attachment` に埋め込まれ、
+  上げたファイルは別に `Document` の行として残る。`Document` からは投稿へ辿れない（索引も無い）ので、
+  投稿から `attachment` を展開し、その `id`（AP の ID）で `Document` の行を引く（`objects_unique_apid_index`）。
+
+  ⚠⚠ **駆動はローカルの利用者（Mastodon 版と同じ LATERAL merge）。**`activities` を新しい順に舐めて
+  ローカル・公開・添付つきで捨てる形は、連合した投稿が増えるほど捨てる行が増える（2026-05-19 の型）。
+  利用者ごとに `activities_actor_id_DESC_NULLS_LAST_index`（actor, id DESC NULLS LAST）で新しい順に
+  top-N を取り、それを merge して全体の top-N を採る。⚠ 添付の有無は索引に無いので、1 人ぶんの走査は
+  その利用者の activity の数に比例する（ローカルの利用者の activity の数を超えない）。
+
+  ⚠ **並びは（投稿の ID DESC, 添付の位置 ASC）。**Misskey 版と同じく、1 つの投稿に添付が複数あると
+  投稿の ID だけでは一意に並ばないので、cursor は `<投稿の ID>.<位置>` の 2 つ組にする（#4375）。
+  投稿の ID は API の表記（base62 の FlakeId）で受け渡し、ここでは uuid に戻して使う。
+
+  ⚠ **添付の展開とキーワードの判定は LATERAL の内側で、添付 1 件ごとに行う**（PR #4919 の Codex P2）。
+  投稿単位で添付の名前をまとめて当てると、キーワードが片方の代替テキストにしか無くても、同じ投稿の
+  ほかの添付まで出る。Mastodon 版も添付ごとに判定している。
+  内側の LIMIT は（添付の）行で limit + offset。行で数えるので、全体の top-N は必ずその中にある。
+  cursor の判定も内側に置く（外で捨てると、その分だけ件数が足りなくなる）。
+
+  🔴 **公開だけ。**`to` に Public があるものが公開、`cc` にだけあるものは未収載（公開タイムラインに出ない）。
+-%>
+<% cursor_status, cursor_order = params[:cursor].to_s.split('.', 2) if params[:cursor] %>
+<%# ⚠ テンプレートは `Ginseng::Template` の中で評価されるので、完全な名前で書く。 -%>
+<% cursor_uuid = Mulukhiya::FlakeId.decode(cursor_status) if cursor_status %>
+<% offset = params[:offset].to_i %>
+SELECT
+  documents.id,
+  posts.status_id::text AS status_uuid,
+  posts.file_order,
+  posts.status_text,
+  posts.sensitive,
+  posts.spoiler_text,
+  local_users.username,
+  local_users.display_name
+FROM (
+  SELECT users.ap_id, users.nickname::text AS username, users.name AS display_name
+  FROM users
+  WHERE (users.local = true)
+    AND (users.is_active = true)
+    AND (users.invisible = false)
+    <% unless params[:only_person].to_i.zero? %>
+      AND (users.actor_type = 'Person')
+    <% end %>
+    <% if test_account %>
+      AND (users.id <> '<%= test_account.id %>')
+    <% end %>
+) AS local_users
+CROSS JOIN LATERAL (
+  SELECT
+    activities.id AS status_id,
+    picked.attachment,
+    picked.file_order,
+    coalesce(objects.data->'source'->>'content', objects.data->>'content') AS status_text,
+    coalesce(objects.data->>'sensitive', 'false') = 'true' AS sensitive,
+    objects.data->>'summary' AS spoiler_text
+  FROM activities
+    INNER JOIN objects ON objects.data->>'id' = activities.data->>'object'
+    CROSS JOIN LATERAL jsonb_array_elements(objects.data->'attachment') WITH ORDINALITY AS picked(attachment, file_order)
+  WHERE (activities.actor = local_users.ap_id)
+    AND (activities.data->>'type' = 'Create')
+    AND (activities.data->'to' @> '["https://www.w3.org/ns/activitystreams#Public"]')
+    AND (objects.data->>'type' IN ('Note', 'Question'))
+    AND (jsonb_typeof(objects.data->'attachment') = 'array')
+    <%# RSS はぼかせないので、閲覧注意・CW つきを外す（`safe` は feed だけが渡す）。 -%>
+    <% if params[:safe] %>
+      AND (coalesce(objects.data->>'sensitive', 'false') <> 'true')
+      AND (coalesce(objects.data->>'summary', '') = '')
+    <% end %>
+    <% if params[:rule] %>
+      <% params[:rule].keywords.each do |keyword| %>
+        AND (concat_ws(E'\t', coalesce(objects.data->'source'->>'content', objects.data->>'content'), objects.data->>'summary', picked.attachment->>'name') LIKE '%<%= escape(keyword) %>%')
+      <% end %>
+      <% params[:rule].negative_keywords.each do |keyword| %>
+        AND (coalesce(objects.data->'source'->>'content', objects.data->>'content', '') NOT LIKE '%<%= escape(keyword) %>%')
+        AND (coalesce(objects.data->>'summary', '') NOT LIKE '%<%= escape(keyword) %>%')
+        AND (coalesce(picked.attachment->>'name', '') NOT LIKE '%<%= escape(keyword) %>%')
+      <% end %>
+    <% end %>
+    <% if cursor_uuid && cursor_order %>
+      AND (activities.id <= '<%= cursor_uuid %>')
+      AND NOT (activities.id = '<%= cursor_uuid %>' AND picked.file_order <= <%= cursor_order.to_i %>)
+    <% elsif cursor_uuid %>
+      AND (activities.id < '<%= cursor_uuid %>')
+    <% end %>
+  ORDER BY activities.id DESC NULLS LAST, picked.file_order ASC
+  LIMIT <%= params[:limit] + offset %>
+) AS posts
+<%# ⚠ `Document` は 1 行ずつ索引（`objects_unique_apid_index`）で引く。素直に JOIN すると、少データでは
+    `objects` の全件を舐めて Hash Join する計画になる（dev29 で実測）。`objects` は連合した投稿で
+    いちばん大きくなる表なので、LATERAL と LIMIT 1 で入れ子のループに固定する。 -%>
+CROSS JOIN LATERAL (
+  SELECT objects.id
+  FROM objects
+  WHERE (objects.data->>'id' = posts.attachment->>'id')
+    AND (objects.data->>'type' = 'Document')
+  LIMIT 1
+) AS documents
+ORDER BY
+  posts.status_id DESC,
+  posts.file_order ASC
+LIMIT <%= params[:limit] %>
+<% unless params[:cursor] %>
+  <%# ページ幅は呼び出し側が計算して渡す。has_next 用の +1 を混ぜない (#4632) -%>
+  OFFSET <%= offset %>
+<% end %>

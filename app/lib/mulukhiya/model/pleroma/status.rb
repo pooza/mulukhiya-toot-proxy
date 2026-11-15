@@ -68,6 +68,18 @@ module Mulukhiya
 
       alias public_uri uri
 
+      # ⚠ ID は API の表記（base62 の FlakeId）。Akkoma の投稿の URL は `/notice/<ID>`。
+      def self.create_uri(type, params)
+        service = PleromaService.new
+        params[:id] ||= params[:status_id]
+        case type.to_sym
+        in :public
+          return service.create_uri("/notice/#{params[:id]}")
+        in :webui
+          return service.create_uri("/mulukhiya/app/status/#{params[:id]}")
+        end
+      end
+
       def attachments
         return data[:media_attachments] || []
       end

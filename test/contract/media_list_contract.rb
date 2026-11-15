@@ -41,7 +41,8 @@ module Mulukhiya
 
       assert_empty(errors)
 
-      errors = @contract.call(cursor: '12345').errors
+      # ⚠ Pleroma 系の cursor は `<FlakeId>.<位置>` の 2 つ組（#4911）。
+      errors = @contract.call(cursor: Environment.pleroma? ? 'BBRwXUDu0uwfOACCsy.1' : '12345').errors
 
       assert_empty(errors)
 

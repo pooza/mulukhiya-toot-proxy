@@ -224,6 +224,11 @@ git diff Gemfile.lock
   `app/query/pleroma/statuses.sql.erb` で activities から公開・未収載・フォロワー限定の自分の投稿を引き、`Status` は API から読む（`service` にトークンを持たせてフォロワー限定も読む）。
   dev29 で一覧・検索・2 ページ目を確かめた。Pleroma 系の全件は 1957 tests / 0 failures / 0 errors。dev29 は develop に戻し、dev25 / dev27 へも反映した（health 200）。
   CI の omission の上限は Mastodon 384・Misskey 371 に上げた（アカウント依存のテストが 2 件増えた）。⚠ この日の CI は `apt install` の 10 分タイムアウトで計 5 回落ちた。落ちたジョブだけ流し直すと緑になる
+- ✅ **2026-11-15 に PR #4916（#4734・HEIF を libheif の版で戻す）・#4917（ginseng-fediverse 9.0.0）・#4918（#4910・Akkoma の残りのハンドラとお知らせ）をマージした**（ユーザー承認・CI 緑・Codex 指摘なし）。
+  HEIF は dev25（libheif 1.23.6）で HEIC が WebP になり、dev27・dev29（1.21.2）では閉じたまま。#4910 は Pleroma 系で外すハンドラが無く、お知らせ（`features/announcement`）を戻した
+- ✅ develop へ直接: puma 8.1.0（bundler-audit の勧告 3 件・`e8e222c0`）
+- 🟡 **#4911（Akkoma のメディアカタログ）**: PR を出した。dev29 で偽の大量データを入れて EXPLAIN を取り（ROLLBACK 済み）、Pleroma 系の全件 1982 tests / 0 failures / 0 errors。
+  ⚠ dev29 に info の公開の投稿（添付 2 枚 × 3 件）を置いた（カタログのテストの材料）。⚠ 偽のデータの分だけ `objects` の連番が 31 万へ飛んでいる（害なし）
 - Akkoma の「2 件を切らさない」: 5.46.0 で #4861・#4884 を閉じたので、#4900（自分の投稿の一覧・`account_timeline`）と #4901（ストリーミング・段階 6）を起票して 5.47.0 に載せた
 - ✅ **Misskey 2026.11.0 を harness で検証し、verified を昇格した**（2026-11-12）。develop `05383a94` で 1962 tests / **0 failures / 0 errors** / 168 omissions。
   ⚠ 本番の Misskey 系へ上げる前に **Node.js の版を確かめる**（22 は起動しない・24.22.3 / 26.13.1 以上）。インフラ側（chubo2）の話
