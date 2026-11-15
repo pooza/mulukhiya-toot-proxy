@@ -22,7 +22,8 @@
   🔴 **公開だけ。**`to` に Public があるものが公開、`cc` にだけあるものは未収載（公開タイムラインに出ない）。
 -%>
 <% cursor_status, cursor_order = params[:cursor].to_s.split('.', 2) if params[:cursor] %>
-<% cursor_uuid = FlakeId.decode(cursor_status) if cursor_status %>
+<%# ⚠ テンプレートは `Ginseng::Template` の中で評価されるので、完全な名前で書く。 -%>
+<% cursor_uuid = Mulukhiya::FlakeId.decode(cursor_status) if cursor_status %>
 <% offset = params[:offset].to_i %>
 SELECT
   documents.id,
