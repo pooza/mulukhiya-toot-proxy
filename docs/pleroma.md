@@ -79,7 +79,8 @@ v4 の実装は `git show 46c4f4e2^:<path>` で取り出せる（SQL は `app/qu
    ⚠ 素直に JOIN すると、少データでは `objects` を全件読んで Hash Join する（dev29 で実測）。LATERAL と LIMIT 1 で入れ子のループに固定した。
    ⚠ 並びは（投稿の ID DESC, 添付の位置 ASC）。cursor は `<投稿の FlakeId>.<位置>`（Misskey と同じ型・#4375）。
    **規模の見積もり（2026-11-15・dev29 でトランザクションの中に偽のデータを入れて測り、ROLLBACK した）**: `objects` 31 万・`activities` 36 万、
-   ローカルの 1 人に Like 5 万と添付の無い投稿 1 万を新しい側に積んで、1 ページ目 107 ms・OFFSET 900 で 88 ms・cursor 1.7 ms。どれも索引だけで、全件の読み込みは無い。
+   ローカルの 1 人に Like 5 万と添付の無い投稿 1 万を新しい側に積んで、1 ページ目 77 ms・OFFSET 900 で 66 ms・cursor 1.1 ms。どれも索引だけで、全件の読み込みは無い（添付の展開を内側へ移した形・Incremental Sort が索引の順を使って途中で止まる）。
+   ⚠ キーワードは添付 1 件ごとに当てる（PR #4919 の Codex P2）。投稿単位でまとめると、同じ投稿のほかの添付まで出る
    ⚠ 1 人ぶんの走査は、その利用者の activity の数に比例する（添付の有無は索引に無い）
 6. ✅ **ストリーミング**（#4901・5.47.0）: v4 の `PleromaListener` を戻した。Akkoma のストリーミングは Mastodon 互換。
    ⚠ トークンはヘッダでも URL でもなく `Sec-WebSocket-Protocol` で渡す（Akkoma はヘッダを読まない・ginseng-fediverse 9.0.0・pooza/ginseng-fediverse#337）。

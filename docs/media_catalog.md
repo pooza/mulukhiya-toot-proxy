@@ -17,7 +17,7 @@ Misskey は、5.42.0 の cursor の修正（#4375）のあと、ダイスキー�
 - Mastodon の重さは **ローカルアカウント数にほぼ比例**する（温まった状態の 1 クエリで、47 アカウントが数十 ms、384 アカウントが 0.5〜0.6 秒）。⚠ **384 を超える規模は未検証**。キャッシュが空の初回は 384 アカウントで 12 秒かかったことがある
 - Misskey の重さは **ローカルのノート数に比例**する。ダイスキー（添付つきの公開ノート約 1,400・`note` 約 33 万行）では、追加の index なしで 1 ページ目 69 ms・OFFSET 2500 で 153 ms、`MediaCatalogUpdateWorker` は 10.5 秒だった。⚠ **ローカルのノートが桁で多いサーバーは未検証**
 - 有効になると、`MediaCatalogUpdateWorker` が定期的に動き、WebUI にメディアフィードが出る
-- Pleroma 系の重さは**ローカルの利用者の activity の数に比例**する（偽のデータで 31 万行の `objects` に対して 1 ページ目 107 ms）。⚠ 実運用の Akkoma では未検証
+- Pleroma 系の重さは**ローカルの利用者の activity の数に比例**する（偽のデータで 31 万行の `objects` に対して 1 ページ目 77 ms）。⚠ 実運用の Akkoma では未検証
 - 重いと感じたら、overlay（`local.yaml`）に `/mastodon/data/media_catalog: false`（Misskey は `/misskey/data/media_catalog: false`・Pleroma 系は `/pleroma/data/media_catalog: false`）を書けば、無効だった版と同じ状態（503 を返す）に戻る。データは失われない
 - アップグレード直後は `/mulukhiya/api/health` の `postgres.pool.waiting` が 0 のままかを見る
 - **載るのは公開の投稿だけ**（5.41.0）。未収載（Misskey ではホーム公開）は載せない。閲覧注意・CW つきは `sensitive` / `status.spoiler_text` の印を付けて返し、CW つきは本文を返さない。WebUI は押すまで表示しない。RSS（`/feed/media`）には閲覧注意・CW つきを載せない
