@@ -47,7 +47,7 @@ v4 の実装は `git show 46c4f4e2^:<path>` で取り出せる（SQL は `app/qu
 | 自分の投稿の一覧（WebUI） | ✅ 5.47.0 | `data/account_timeline` | #4900。ID は `activities` の `Create` を `actor` で引き（索引 `activities_actor_id_DESC_NULLS_LAST_index`）、中身は API で読む。activity の主キーの FlakeId が API の投稿 ID |
 | ハンドラ（post_reaction ほか） | 🟡 | — | 段階 4（1 本ずつ）。`post_reaction`（`reply_reaction`・`result_notification`）は ✅ 5.46.0（#4884）。ほかは未着手 |
 | メディアカタログ | ⬜ | `data/media_catalog` | 段階 5（`media_catalog`・重い） |
-| ストリーミング（listener） | ⬜ | `capabilities/streaming` | 段階 6 |
+| ストリーミング（listener） | ✅ 5.47.0 | `capabilities/streaming` | 段階 6（#4901）。`PleromaListener < MastodonListener`。送り主は API の ID（FlakeId）を uuid に戻して引く |
 | 投稿の一括削除 | ⬜ | — | `deletable_statuses` |
 | Annict・お知らせ・decoration・compose template | ⬜ | `features/*` | 未定 |
 
@@ -73,7 +73,10 @@ v4 の実装は `git show 46c4f4e2^:<path>` で取り出せる（SQL は `app/qu
    判断の中心は `reactionable?`。受け手のサーバーの nodeinfo は `software.name` が `akkoma` なので、設定の `akkoma.capabilities.reaction` を立てた。
    Akkoma の利用者は絵文字リアクションを自分で見られるので、リアクションを伝える返信は投稿しない（Misskey 系から Akkoma の利用者へのリアクションも同じ）
 5. **メディアカタログ**: Mastodon / Misskey でも重かった（[media_catalog.md](media_catalog.md)）。最後に回す
-6. **ストリーミング**: v4 の `PleromaListener` を戻す。Akkoma のストリーミングは Mastodon 互換
+6. ✅ **ストリーミング**（#4901・5.47.0）: v4 の `PleromaListener` を戻した。Akkoma のストリーミングは Mastodon 互換。
+   ⚠ トークンはヘッダではなくクエリで渡る（Akkoma はヘッダを読まない・gem の `PleromaService#create_streaming_headers` は `{}`）。
+   ⚠ 送り主は v4 の `fqn` ではなく `account.id`（FlakeId）を `FlakeId.decode` して引く。
+   `mention` / `follow` は基本のパイプライン（`welcome_mention` など）がそのまま流れる
 
 ## 残っている穴
 
