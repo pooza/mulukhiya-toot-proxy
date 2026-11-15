@@ -565,7 +565,7 @@ pleroma:
     account_timeline: true
     favorite_tags: true
     futured_tag: false
-    media_catalog: false
+    media_catalog: true
   dbms: postgres
   display_name: Pleroma
   features:
