@@ -111,6 +111,19 @@ module Mulukhiya
       nil
     end
 
+    # HEIF を開けた・閉じた状態でブロックを走らせ、終わったらホストの本来の状態へ戻す (#4734)。
+    #
+    # ⚠ **HEIF のテストはこれを通す。**開くかどうかは読み込んでいる libheif の版で決まるので、
+    # 素で書くと、開発機（1.23.6）と CI（Ubuntu の古い版）で答えが逆になる。
+    def with_heif(enabled)
+      LibHeif.instance_variable_set(:@enabled, enabled)
+      Mulukhiya.setup_vips
+      yield
+    ensure
+      LibHeif.instance_variable_set(:@enabled, nil)
+      Mulukhiya.setup_vips
+    end
+
     # プロセスをまたいで居座る共有キャッシュを、スイート開始時に既知の状態へ戻す。
     #
     # ⚠ **「実走の前に手で UNLINK する」を手順書に書くだけでは弱い (#4583)。**
