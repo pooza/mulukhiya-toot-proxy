@@ -4,13 +4,9 @@ module Mulukhiya
   # ⚠ 未認証で届く。Mastodon では数字でない cursor が bigint への変換に失敗して 500 になり、
   # 要求のたびに alert の経路を踏んでいた。
   class MediaListCursorTest < TestCase
-    # ⚠ Pleroma 系の cursor は形が違う（`MediaListPleromaCursorTest`・#4911）。
-    def disable?
-      return true if Environment.pleroma?
-      return super
-    end
-
     def test_numeric_cursor_is_accepted
+      omit_on_pleroma
+
       assert_empty(errors(cursor: '115000000000000000'))
     end
 
@@ -19,12 +15,15 @@ module Mulukhiya
     end
 
     def test_symbols_are_rejected
+      omit_on_pleroma
+
       assert_not_empty(errors(cursor: "1' OR '1'='1"))
       assert_not_empty(errors(cursor: ''))
     end
 
     # ⚠ Mastodon の ID は bigint。範囲の外の数字は変換に失敗する（PR #4833 の Codex P2）。
     def test_out_of_range_cursor_is_rejected
+      omit_on_pleroma
       # ⚠ Misskey の ID は英数字なので、長い数字も 64 文字までは形として通る。
       assert_equal(Environment.mastodon_type?, errors(cursor: '9' * 27).present?)
       assert_equal(Environment.mastodon_type?, errors(cursor: (2**63).to_s).present?)
@@ -34,6 +33,8 @@ module Mulukhiya
 
     # ⚠ Misskey の cursor は `<note_id>.<fileIds の中の位置>` の 2 つ組 (#4375)。
     def test_composite_cursor_depends_on_the_server_type
+      omit_on_pleroma
+
       assert_equal(Environment.mastodon_type?, errors(cursor: 'a1b2c3.2').present?)
       assert_not_empty(errors(cursor: 'a1b2c3.'))
       assert_not_empty(errors(cursor: 'a1b2c3.x'))
@@ -43,6 +44,7 @@ module Mulukhiya
     end
 
     def test_alphabetic_cursor_depends_on_the_server_type
+      omit_on_pleroma
       result = errors(cursor: 'a1b2c3')
 
       assert_equal(Environment.mastodon_type?, result.present?)
@@ -60,12 +62,24 @@ module Mulukhiya
     # ⚠ cursor つきの要求では `page` は無視される＝上限にも掛からない（PR #4833 の Codex P2）。
     def test_page_cap_is_ignored_with_a_cursor
       config['/webui/media/catalog/max_page'] = 5
-      cursor = Environment.mastodon_type? ? '115000000000000000' : 'a1b2c3'
+      cursor = if Environment.pleroma?
+        'BBRwXUDu0uwfOACCsy.1'
+      elsif Environment.mastodon_type?
+        '115000000000000000'
+      else
+        'a1b2c3'
+      end
 
       assert_empty(errors(page: 51, cursor:))
     end
 
     private
+
+    # ⚠ Pleroma 系の cursor は形が違う（`MediaListPleromaCursorTest`・#4911）。ページの上限は共通なので、
+    # クラスごとは止めない。
+    def omit_on_pleroma
+      omit('Pleroma 系の cursor は MediaListPleromaCursorTest で見る') if Environment.pleroma?
+    end
 
     def errors(params)
       return MediaListContract.new.exec(params)
