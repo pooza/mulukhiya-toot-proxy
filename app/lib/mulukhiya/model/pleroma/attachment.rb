@@ -77,7 +77,7 @@ module Mulukhiya
           next unless attachment = attachments[row[:id]]
           flags = catalog_flags(row)
           status = {id: FlakeId.encode(row[:status_uuid])}
-          attachment.to_h.except(:data).merge(
+          attachment.to_h.except(:data, :inserted_at, :updated_at).merge(
             sensitive: flags[:sensitive],
             account: row.slice(:username, :display_name),
             status: {

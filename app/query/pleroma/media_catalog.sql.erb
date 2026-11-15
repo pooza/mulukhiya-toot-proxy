@@ -83,13 +83,21 @@ CROSS JOIN LATERAL (
   LIMIT <%= params[:limit] + offset + (cursor_uuid ? 1 : 0) %>
 ) AS posts
 CROSS JOIN LATERAL jsonb_array_elements(posts.attachments) WITH ORDINALITY AS picked(attachment, file_order)
-  INNER JOIN objects AS documents ON documents.data->>'id' = picked.attachment->>'id'
-WHERE (documents.data->>'type' = 'Document')
-  <% if cursor_uuid && cursor_order %>
-    AND NOT (posts.status_id = '<%= cursor_uuid %>' AND picked.file_order <= <%= cursor_order.to_i %>)
-  <% elsif cursor_uuid %>
-    AND (posts.status_id < '<%= cursor_uuid %>')
-  <% end %>
+<%# ⚠ `Document` は 1 行ずつ索引（`objects_unique_apid_index`）で引く。素直に JOIN すると、少データでは
+    `objects` の全件を舐めて Hash Join する計画になる（dev29 で実測）。`objects` は連合した投稿で
+    いちばん大きくなる表なので、LATERAL と LIMIT 1 で入れ子のループに固定する。 -%>
+CROSS JOIN LATERAL (
+  SELECT objects.id
+  FROM objects
+  WHERE (objects.data->>'id' = picked.attachment->>'id')
+    AND (objects.data->>'type' = 'Document')
+  LIMIT 1
+) AS documents
+<% if cursor_uuid && cursor_order %>
+  WHERE NOT (posts.status_id = '<%= cursor_uuid %>' AND picked.file_order <= <%= cursor_order.to_i %>)
+<% elsif cursor_uuid %>
+  WHERE (posts.status_id < '<%= cursor_uuid %>')
+<% end %>
 ORDER BY
   posts.status_id DESC,
   picked.file_order ASC
