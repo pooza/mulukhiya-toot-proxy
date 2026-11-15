@@ -15,9 +15,11 @@
   投稿の ID だけでは一意に並ばないので、cursor は `<投稿の ID>.<位置>` の 2 つ組にする（#4375）。
   投稿の ID は API の表記（base62 の FlakeId）で受け渡し、ここでは uuid に戻して使う。
 
-  ⚠ **内側の LIMIT は limit + offset（cursor つきは +1）。**投稿 1 件から 1 行以上出るので、
-  利用者ごとに limit + offset 件の投稿を取れば、全体の top-N は必ずその中にある。cursor の投稿は
-  出し切った添付を外で捨てるので、1 件ぶん余計に取る。
+  ⚠ **添付の展開とキーワードの判定は LATERAL の内側で、添付 1 件ごとに行う**（PR #4919 の Codex P2）。
+  投稿単位で添付の名前をまとめて当てると、キーワードが片方の代替テキストにしか無くても、同じ投稿の
+  ほかの添付まで出る。Mastodon 版も添付ごとに判定している。
+  内側の LIMIT は（添付の）行で limit + offset。行で数えるので、全体の top-N は必ずその中にある。
+  cursor の判定も内側に置く（外で捨てると、その分だけ件数が足りなくなる）。
 
   🔴 **公開だけ。**`to` に Public があるものが公開、`cc` にだけあるものは未収載（公開タイムラインに出ない）。
 -%>
@@ -28,7 +30,7 @@
 SELECT
   documents.id,
   posts.status_id::text AS status_uuid,
-  picked.file_order,
+  posts.file_order,
   posts.status_text,
   posts.sensitive,
   posts.spoiler_text,
@@ -50,18 +52,19 @@ FROM (
 CROSS JOIN LATERAL (
   SELECT
     activities.id AS status_id,
-    objects.data->'attachment' AS attachments,
+    picked.attachment,
+    picked.file_order,
     coalesce(objects.data->'source'->>'content', objects.data->>'content') AS status_text,
     coalesce(objects.data->>'sensitive', 'false') = 'true' AS sensitive,
     objects.data->>'summary' AS spoiler_text
   FROM activities
     INNER JOIN objects ON objects.data->>'id' = activities.data->>'object'
+    CROSS JOIN LATERAL jsonb_array_elements(objects.data->'attachment') WITH ORDINALITY AS picked(attachment, file_order)
   WHERE (activities.actor = local_users.ap_id)
     AND (activities.data->>'type' = 'Create')
     AND (activities.data->'to' @> '["https://www.w3.org/ns/activitystreams#Public"]')
     AND (objects.data->>'type' IN ('Note', 'Question'))
     AND (jsonb_typeof(objects.data->'attachment') = 'array')
-    AND (0 < jsonb_array_length(objects.data->'attachment'))
     <%# RSS はぼかせないので、閲覧注意・CW つきを外す（`safe` は feed だけが渡す）。 -%>
     <% if params[:safe] %>
       AND (coalesce(objects.data->>'sensitive', 'false') <> 'true')
@@ -69,39 +72,36 @@ CROSS JOIN LATERAL (
     <% end %>
     <% if params[:rule] %>
       <% params[:rule].keywords.each do |keyword| %>
-        AND (concat_ws(E'\t', coalesce(objects.data->'source'->>'content', objects.data->>'content'), objects.data->>'summary', (SELECT string_agg(attachment->>'name', E'\t') FROM jsonb_array_elements(objects.data->'attachment') AS attachment)) LIKE '%<%= escape(keyword) %>%')
+        AND (concat_ws(E'\t', coalesce(objects.data->'source'->>'content', objects.data->>'content'), objects.data->>'summary', picked.attachment->>'name') LIKE '%<%= escape(keyword) %>%')
       <% end %>
       <% params[:rule].negative_keywords.each do |keyword| %>
         AND (coalesce(objects.data->'source'->>'content', objects.data->>'content', '') NOT LIKE '%<%= escape(keyword) %>%')
         AND (coalesce(objects.data->>'summary', '') NOT LIKE '%<%= escape(keyword) %>%')
-        AND (coalesce((SELECT string_agg(attachment->>'name', E'\t') FROM jsonb_array_elements(objects.data->'attachment') AS attachment), '') NOT LIKE '%<%= escape(keyword) %>%')
+        AND (coalesce(picked.attachment->>'name', '') NOT LIKE '%<%= escape(keyword) %>%')
       <% end %>
     <% end %>
-    <% if cursor_uuid %>
+    <% if cursor_uuid && cursor_order %>
       AND (activities.id <= '<%= cursor_uuid %>')
+      AND NOT (activities.id = '<%= cursor_uuid %>' AND picked.file_order <= <%= cursor_order.to_i %>)
+    <% elsif cursor_uuid %>
+      AND (activities.id < '<%= cursor_uuid %>')
     <% end %>
-  ORDER BY activities.id DESC NULLS LAST
-  LIMIT <%= params[:limit] + offset + (cursor_uuid ? 1 : 0) %>
+  ORDER BY activities.id DESC NULLS LAST, picked.file_order ASC
+  LIMIT <%= params[:limit] + offset %>
 ) AS posts
-CROSS JOIN LATERAL jsonb_array_elements(posts.attachments) WITH ORDINALITY AS picked(attachment, file_order)
 <%# ⚠ `Document` は 1 行ずつ索引（`objects_unique_apid_index`）で引く。素直に JOIN すると、少データでは
     `objects` の全件を舐めて Hash Join する計画になる（dev29 で実測）。`objects` は連合した投稿で
     いちばん大きくなる表なので、LATERAL と LIMIT 1 で入れ子のループに固定する。 -%>
 CROSS JOIN LATERAL (
   SELECT objects.id
   FROM objects
-  WHERE (objects.data->>'id' = picked.attachment->>'id')
+  WHERE (objects.data->>'id' = posts.attachment->>'id')
     AND (objects.data->>'type' = 'Document')
   LIMIT 1
 ) AS documents
-<% if cursor_uuid && cursor_order %>
-  WHERE NOT (posts.status_id = '<%= cursor_uuid %>' AND picked.file_order <= <%= cursor_order.to_i %>)
-<% elsif cursor_uuid %>
-  WHERE (posts.status_id < '<%= cursor_uuid %>')
-<% end %>
 ORDER BY
   posts.status_id DESC,
-  picked.file_order ASC
+  posts.file_order ASC
 LIMIT <%= params[:limit] %>
 <% unless params[:cursor] %>
   <%# ページ幅は呼び出し側が計算して渡す。has_next 用の +1 を混ぜない (#4632) -%>
