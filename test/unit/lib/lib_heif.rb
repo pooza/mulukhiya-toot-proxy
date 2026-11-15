@@ -1,0 +1,28 @@
+module Mulukhiya
+  # HEIF を libheif の版で開け閉めする判定 (#4734)。
+  class LibHeifTest < TestCase
+    def test_enable_by_version
+      assert_false(LibHeif.enable?('1.21.2', loader: true), 'vulcan（Ubuntu）')
+      assert_false(LibHeif.enable?('1.22.2', loader: true))
+      assert_true(LibHeif.enable?('1.23.4', loader: true))
+      assert_true(LibHeif.enable?('1.23.6', loader: true))
+      assert_true(LibHeif.enable?('1.24.0', loader: true))
+    end
+
+    # ⚠ 分からないときは閉じる。
+    def test_disable_when_unknown
+      assert_false(LibHeif.enable?(nil, loader: true))
+      assert_false(LibHeif.enable?('', loader: true))
+      assert_false(LibHeif.enable?('1.23.4-rc1', loader: true))
+      assert_false(LibHeif.enable?('1.23.6', loader: false), 'libvips に heif のローダが無い')
+    end
+
+    # 読み込んでいる libheif の版が取れること（取れないホストでは nil＝閉じる）。
+    def test_version
+      version = LibHeif.version
+      omit('libheif が読めない') unless version
+
+      assert_match(/\A\d+\.\d+\.\d+\z/, version)
+    end
+  end
+end

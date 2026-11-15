@@ -34,12 +34,28 @@ module Mulukhiya
     # libheif** に渡る。そのときの例外は `magickload: ... ReadHEICImage` になるので、
     # **`VipsForeignLoad` で断られたこと**まで見て、フォールバックが閉じているかを固定する。
     def test_heif_is_blocked_without_falling_back_to_imagemagick
-      error = assert_raises(Vips::Error) do
-        Vips::Image.new_from_file(@heic.path)
-      end
+      with_heif(false) do
+        error = assert_raises(Vips::Error) do
+          Vips::Image.new_from_file(@heic.path)
+        end
 
-      assert_include(error.message, 'VipsForeignLoad')
-      assert_not_include(error.message, 'magickload')
+        assert_include(error.message, 'VipsForeignLoad')
+        assert_not_include(error.message, 'magickload')
+      end
+    end
+
+    # libheif が新しいホストでは heif のローダが開く (#4734)。⚠ **開けても `magickload` へは
+    # 渡さない**（ヘッダだけの fixture は heif のローダで断られる）。
+    def test_heif_opens_without_imagemagick_when_enabled
+      omit('libvips に heif のローダが無い') unless LibHeif.loader?
+      with_heif(true) do
+        error = assert_raises(Vips::Error) do
+          Vips::Image.new_from_file(@heic.path)
+        end
+
+        assert_include(error.message.downcase, 'heif')
+        assert_not_include(error.message, 'magickload')
+      end
     end
 
     # ⚠ ブロックは `ImageFile#type` の `rescue` に飲まれるので、**ハンドラから見ると
@@ -49,10 +65,12 @@ module Mulukhiya
     # `test_heif_is_blocked_without_falling_back_to_imagemagick` が見ている
     # （修正を外すと、そこだけが落ちることを確認済み）。
     def test_blocked_file_is_not_treated_as_image
-      file = ImageFile.new(@heic.path)
+      with_heif(false) do
+        file = ImageFile.new(@heic.path)
 
-      assert_equal(MIMEType::DEFAULT, file.type)
-      assert_false(file.image?)
+        assert_equal(MIMEType::DEFAULT, file.type)
+        assert_false(file.image?)
+      end
     end
 
     # ⚠⚠ **`VipsForeignSaveCgif` は上流（Mastodon）の許可リストに無いが、こちらには要る。**
