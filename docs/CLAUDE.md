@@ -412,7 +412,7 @@ develop にすでに載っている bundler 4.0.20・ginseng-piefed v0.4.1・doc
 - **ブランチ**: `develop` は `origin/develop` と同一（`9e11e0c0`）。**open PR は 0**（#4909 は 11-15 にマージ済み・#4901 は open のまま）。Dependabot アラート **0 件**
 - **Codex**: #4914 の P2 は返信・👍 済み（#4912・5.48.0 で、付けたデコの ID を別に保存して戻すときに外す）。#4919 の P2 も返信・👍 済み。#4915〜#4918 は指摘なし。PR 本体への申し送りもなし
 - **Issue**: 前回から増減なし（open 25）
-- **ginseng-\* のピン**: 11-15 に取り込んだ 3 本（core v7.0.1・fediverse v9.0.0・redis v2.1.1）の先に、**また 3 本ずれた**。取り込みは未判断
+- **ginseng-\* のピン**: 11-15 に取り込んだ 3 本（core v7.0.1・fediverse v9.0.0・redis v2.1.1）の先に、**また 3 本ずれた**。判断（ユーザー）: redis は①すぐ取り込む（develop へ直接・`rake lint` 緑・`rake test` 1937 tests / 0 failures / 0 errors）、core・piefed は②次のマイルストーン（core は拒否のログ行が増えるので harness で確かめてから・piefed は core のついで）
   - ginseng-core v7.0.1 → **v7.1.0**: `host_validator` の拒否を `GatewayError#rejection`（`:rejected_host` / `:unresolvable_host`）で分け、拒否したら error を 1 行残す。`uri:` を受ける validator にはホップの URI も渡す。
     型は `GatewayError` のまま・文言は `Rejected host` の前方一致を保つので、`RemoteHost.validator` / `ProgramFetcher` / `MediaFile.download` は壊れない見込み。拒否のログ行が増える
   - ginseng-redis v2.1.1 → **v2.1.2**: URL として読めない DSN の例外にパスワードを載せない（pooza/ginseng-redis#85）。資格情報の漏れの塞ぎ
