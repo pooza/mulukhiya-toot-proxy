@@ -405,6 +405,26 @@ develop にすでに載っている bundler 4.0.20・ginseng-piefed v0.4.1・doc
 
 ## セッション同期の記録
 
+### 2026-11-16 セッション同期の記録
+
+**本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。
+
+- **ブランチ**: `develop` は `origin/develop` と同一（`9e11e0c0`）。**open PR は 0**（#4909 は 11-15 にマージ済み・#4901 は open のまま）。Dependabot アラート **0 件**
+- **Codex**: #4914 の P2 は返信・👍 済み（#4912・5.48.0 で、付けたデコの ID を別に保存して戻すときに外す）。#4919 の P2 も返信・👍 済み。#4915〜#4918 は指摘なし。PR 本体への申し送りもなし
+- **Issue**: 前回から増減なし（open 25）
+- **ginseng-\* のピン**: 11-15 に取り込んだ 3 本（core v7.0.1・fediverse v9.0.0・redis v2.1.1）の先に、**また 3 本ずれた**。取り込みは未判断
+  - ginseng-core v7.0.1 → **v7.1.0**: `host_validator` の拒否を `GatewayError#rejection`（`:rejected_host` / `:unresolvable_host`）で分け、拒否したら error を 1 行残す。`uri:` を受ける validator にはホップの URI も渡す。
+    型は `GatewayError` のまま・文言は `Rejected host` の前方一致を保つので、`RemoteHost.validator` / `ProgramFetcher` / `MediaFile.download` は壊れない見込み。拒否のログ行が増える
+  - ginseng-redis v2.1.1 → **v2.1.2**: URL として読めない DSN の例外にパスワードを載せない（pooza/ginseng-redis#85）。資格情報の漏れの塞ぎ
+  - ginseng-piefed v0.6.1 → **v0.7.0**: `Service#api_version` を params で上書きできる・テストの直し・style v1.1.15。モロヘイヤが触る面には当たらない
+- **Annict の API**: 基準（11-05）と同じ。公式アカウントの新しい投稿なし
+- **chubo2**: open 9 件（#305・#309・#311・#313 などが閉じた）。ローカルが 5 本遅れていたので早送りした（infra-note の変更なし・`infra-common.md` / `infra-history.md` のみ）。Issue 棚卸し（10-25）・ドキュメント棚卸し（10-31）とも 30 日未満
+- **辞書台帳**（`7985049`）: 🔴 直書き（gomander の GAS）・台帳に無い 2 行（delmulin の `pron.json` / `character/v1/detail.json`）は既知。
+  **新しく 🔴 台帳に無い が 1 行: `precure.ml/api/dic/v1/tags.json`**（#4880 の手順 2 で gomander が引き始めた口。nginx は公開・取得は 🟢 2,407 語）。台帳のセルはユーザーの持ち物。
+  🟡 は b-shock の `service.json` が 4 台とも間欠（3〜5/144・#4659 の型）、delmulin の `common.json` は 🟡 → 🟢
+- **harness の upstream**: 新しいものは無い（Mastodon v5.0.0-beta.1 のまま・Misskey 2026.11.0・Akkoma v3.20.1）。`last_checked` を 11-16 へ
+- **Sentry**: unresolved **26 件**（11-15 から 2 減）・**コメント 0 は 0 件**（2026-11-16 時点）。最新イベントは 1X の 11-10 23:00 のままで、確認済み
+
 ### 2026-11-15 セッション同期の記録
 
 **本番には触っていない。**辞書台帳の生成は省いた。harness の upstream 確認は `last_checked`（11-12）から 3 日なのでスキップ。
