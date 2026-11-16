@@ -420,7 +420,8 @@ develop にすでに載っている bundler 4.0.20・ginseng-piefed v0.4.1・doc
 - **Annict の API**: 基準（11-05）と同じ。公式アカウントの新しい投稿なし
 - **chubo2**: open 9 件（#305・#309・#311・#313 などが閉じた）。ローカルが 5 本遅れていたので早送りした（infra-note の変更なし・`infra-common.md` / `infra-history.md` のみ）。Issue 棚卸し（10-25）・ドキュメント棚卸し（10-31）とも 30 日未満
 - **辞書台帳**（`7985049`）: 🔴 直書き（gomander の GAS）・台帳に無い 2 行（delmulin の `pron.json` / `character/v1/detail.json`）は既知。
-  **新しく 🔴 台帳に無い が 1 行: `precure.ml/api/dic/v1/tags.json`**（#4880 の手順 2 で gomander が引き始めた口。nginx は公開・取得は 🟢 2,407 語）。台帳のセルはユーザーの持ち物。
+  **新しく 🔴 台帳に無い が 1 行: `precure.ml/api/dic/v1/tags.json`**（#4880 の手順 2 で gomander が引き始めた口。nginx は公開・取得は 🟢 2,407 語）。
+  → ユーザーの依頼で、こちらがキュアスタ！の台帳の「真琴単語」の下へ「タグ」の行を足した（Sheets のコネクタ）。作り直して 🔴 が消え、転送先も一致（✓）
   🟡 は b-shock の `service.json` が 4 台とも間欠（3〜5/144・#4659 の型）、delmulin の `common.json` は 🟡 → 🟢
 - **harness の upstream**: 新しいものは無い（Mastodon v5.0.0-beta.1 のまま・Misskey 2026.11.0・Akkoma v3.20.1）。`last_checked` を 11-16 へ
 - **Sentry**: unresolved **26 件**（11-15 から 2 減）・**コメント 0 は 0 件**（2026-11-16 時点）。最新イベントは 1X の 11-10 23:00 のままで、確認済み
