@@ -74,9 +74,9 @@ module Mulukhiya
   # **アニメ GIF をリサイズして `.gif` へ書き戻す**。上流の並びをそのまま写すと
   # `VipsForeignSave: ... is not a known file format` で GIF が壊れる。
   #
-  # ⚠ **HEIF は読み込んでいる libheif が 1.23.4 以上のときだけ開ける (#4734)。**
+  # ⚠ **HEIF は読み込んでいる libheif が `LibHeif::SAFE_VERSION` 以上のときだけ開ける (#4734)。**
   # 判定は `LibHeif.enabled?`。FreeBSD は pkg で上がるが、vulcan（Ubuntu）は 1.21.2 のままなので、
-  # ホストで分かれる。未修正の GHSA は GHSA-x8r2-mggj-j6wr (critical) ほか 3 件。
+  # ホストで分かれる。
   # ⚠ 開けるのは `VipsForeignLoadHeif` だけ。`magickload` は閉じたまま（HEIF を開けても
   # 開けなくても、ImageMagick の HEIC デリゲートへは渡さない）。
   #
