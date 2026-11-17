@@ -216,7 +216,7 @@ git diff Gemfile.lock
   ginseng-redis は v2.1.0。JSON の `get` / `set` の写し 7 本を `JSONStorage` へ寄せた。写しの `MediaMetadataStorage#get` は、無い鍵で NameError を投げていた（`supernil`）。
   ロックの道具と Postgres の `connected?` / `reconnect` / `pool` は残すと決めた（ユーザー判断）。返せる余地は pooza/ginseng-redis#81・pooza/ginseng-postgres#122 で伝えた。
   dev25 / dev27 で health 200 を確かめ、`ScheduledStatusStorage` の往復と `MediaMetadataStorage` の無い鍵（nil）も確かめた。
-  ⚠ **残りは 2 だけ**: pooza/ginseng-redis#80（`self.class.dsn`）が着地したら `bundle update ginseng-redis` → `Mulukhiya::Redis#initialize` を消す。#4898 はそれまで閉じない
+  ✅ 残りの 2（`Mulukhiya::Redis#initialize` の写し）は、pooza/ginseng-redis#80 の着地を受けて 2026-11-15 に消した（`74a0b5fd`・ginseng-redis v2.1.1）。#4898 の作業はすべて済んだ
 - ✅ **#4897 を PR #4906 でマージした**（2026-11-10・ユーザー承認・CI 緑・Codex 指摘なし）。`ItunesMusicVideoURI` で `/music-video/` を `/jp/music-video/<id>` へ短縮する。
   ユーザー判断で、曲（`/song/`）の短縮でも `?uo=4` を落とすようにした。dev25 / dev27 で、MV と曲の URL がハンドラで書き換わることを確かめた。
   ⚠ CI の Misskey 系は、この日 2 回とも `apt install` の 10 分タイムアウトで落ちた（テストより前）。落ちたジョブだけ流し直すと緑になった
@@ -233,6 +233,10 @@ git diff Gemfile.lock
 - 🟡 **#4880 の手順 2 を終えた**（2026-11-15）。precure.ml の `tags.json` の口は pooza/chubo2#314（はじめ pooza/mastodon#1006 で頼んだが、nginx の設定なので移した）。
   gomander の `local.yaml` を `tags.json`（`type: related`）へ切り替え、再起動した（ユーザー承認）。切り替え前後とも 10/10・空 0・3,968 語。dev25 も同じ切り替え。元の設定は両機の `config/local.yaml.bak-4880`。
   残りは手順 3（注意書き）・4（`MecabRemoteDictionary` を消す・注意書きの次の版）・5（`dic.json` を止める）
+  - ✅ 手順 3 の wiki を 2026-11-17 に書いた（wiki `ba86fa5`・「公開されている辞書」「ハッシュタグ辞書」「タグ付けに関する設定項目」）。mecab 型は 5.48.0 で読めなくなる予定と案内した。
+    ⚠ **リリースノート（5.47.0）にも同じ注意書きを入れる。**#4880 は閉じずに 5.48.0 へ移し、手順 4 を行う
+- 📌 #4912（5.48.0）の範囲を 2026-11-17 に決めた（ユーザー判断・Issue にコメント済み）。**5.47.0 を出してから着手する。**
+  付けたデコ 1 つだけを外す（ID を別に保存・丸ごとの上書きをやめる・PR #4914 の Codex の P2 も直る）、通知に番組名とデコ名、実況中かどうかと外れる時刻を返す API
 - ⚠ dev25 / dev27 は次に develop を載せるとき `bundle install` が要る（puma 8.1.0）
 - Akkoma の「2 件を切らさない」: 5.46.0 で #4861・#4884 を閉じたので、#4900（自分の投稿の一覧・`account_timeline`）と #4901（ストリーミング・段階 6）を起票して 5.47.0 に載せた
 - ✅ **Misskey 2026.11.0 を harness で検証し、verified を昇格した**（2026-11-12）。develop `05383a94` で 1962 tests / **0 failures / 0 errors** / 168 omissions。
