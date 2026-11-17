@@ -1,16 +1,20 @@
 module Mulukhiya
   # HEIF の取り込みを、libheif の版で開け閉めする (#4734)。
   #
-  # ⚠⚠ **版で分けるのは、本番の libheif が揃わないから。**FreeBSD の 3 台は pkg で 1.23.4 以上に
-  # 上がるが、vulcan（Ubuntu）は 1.21.2 のまま。許可リストはコードの全体設定なので、
+  # ⚠⚠ **版で分けるのは、本番の libheif が揃わないから。**FreeBSD の 3 台は pkg で上がるが、
+  # vulcan（Ubuntu の LTS）は 1.21.2 のまま（修正は版の番号を変えずに取り込むので、版では判定できない）。許可リストはコードの全体設定なので、
   # ホストごとに設定を書き分けるのではなく、**読み込んでいる libheif に聞く**。
   # 版が上がれば、コードを変えずに開く。
   #
   # ⚠ **分からないときは閉じる。**libheif が読めない・版が読めない・libvips に heif のローダが
   # 無いときは、5.37.1（#4733）と同じく止めたままにする。
   module LibHeif
-    # 未修正の GHSA（GHSA-x8r2-mggj-j6wr ほか 3 件）が直った版 (#4733)。
-    SAFE_VERSION = '1.23.4'.freeze
+    # 公開済みの GHSA が直った版。
+    # ⚠⚠ **この値はすぐ古くなる。**#4733 を書いた 2026-09 の時点では 1.23.4 だったが、その後も
+    # 1.23.5（09-21）・1.23.6（10-05・high 4 件）・1.23.7（10-26・high 13 件。ヒープの解放後の使用・
+    # バッファ溢れを含む）と勧告が続いた（5.47.1）。上げるときは
+    # `gh api repos/strukturag/libheif/security-advisories` の `patched_versions` の最大を見る。
+    SAFE_VERSION = '1.23.7'.freeze
 
     def self.version
       return native.heif_get_version
