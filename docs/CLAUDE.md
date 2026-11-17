@@ -201,6 +201,19 @@ git diff Gemfile.lock
 - #4880 の手順 4（`MecabRemoteDictionary` とスキーマの `mecab` 型を消す）。注意書きは 5.47.0 の wiki とリリースノートで出した
 - #4920（Akkoma のメディアカタログで、項目ごとの Redis の接続と同期の取得。引き金は Akkoma の本番投入）
 - ginseng-core v7.1.0・ginseng-piefed v0.7.0 の取り込み（2026-11-18 のピンのずれ）
+- #4924（HEIF を開く libheif の基準の版を設定で上げられるようにする。⚠ 設定はコードの値より下げられない形に）
+
+## リリース済み: 5.47.1（2026-11-18・ホットフィックス）
+
+本番 4 台へデプロイ済み（07:21〜07:22・`main` の `4e46cad0`）。[リリースノート](https://github.com/pooza/mulukhiya-toot-proxy/releases/tag/v5.47.1)。全台 version 5.47.1・health 200・`config: OK`・monit 復帰・vulcan は `NRestarts=0`。develop へは PR #4925 で戻した（version 行は develop の 5.48.0 を採った）。
+
+- **PR #4923**: HEIF を開く libheif の基準（`LibHeif::SAFE_VERSION`）を 1.23.4 → 1.23.7。5.47.0 のデプロイ後に、ユーザーの「ダイスキーで HEIF を使うには」という質問から調べて分かった
+  - 1.23.4 のあとも勧告が続いていた（1.23.5 は 09-21・1.23.6 は 10-05 で high 4 件・1.23.7 は 10-26 で high 13 件。ヒープの解放後の使用・バッファ溢れを含む）。未修正の high が 1 件（`stsc` の二乗の CPU 消費・GHSA-74mj-m37q-h3q9）
+  - FreeBSD 3 台（quarterly の pkg は 1.23.6）は 07:02〜07:22 の間だけ HEIF を開いていた。その間に HEIF の取り込みは無かった
+  - dev25（1.23.6）でブランチのまま `enabled: false` と、HEIF の取り込みが 422 になることを確かめた
+- ⚠ **固定の版はすぐ古くなる。**基準を上げるときは `gh api repos/strukturag/libheif/security-advisories` の `patched_versions` の最大を見る。設定で上げられるようにする件は #4924（5.48.0）
+- ⚠ **vulcan（Ubuntu 26.04 LTS）は版の判定では開かない。**LTS は修正を版の番号を変えずに取り込み（`1.21.2-3ubuntu0.7`）、libheif の GHSA には CVE 番号が無いので、Ubuntu の変更履歴と突き合わせられない
+- ⚠ HEIF の取り込みを試すとき、`X-Mulukhiya` ヘッダを付けるとモロヘイヤを素通りする（Mastodon が 500 を返す）
 
 ## リリース済み: 5.47.0（2026-11-18）
 
