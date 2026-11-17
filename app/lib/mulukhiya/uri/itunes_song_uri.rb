@@ -35,6 +35,7 @@ module Mulukhiya
 
     def song_id=(id)
       self.path = "/#{config['/service/itunes/country']}/song/#{id}"
+      self.query = nil
       self.fragment = nil
     end
   end

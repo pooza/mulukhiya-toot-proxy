@@ -1,6 +1,6 @@
 module Mulukhiya
   # ストリーミングを切った系統では listener を起動対象に入れない（PR #4844 の Codex P1）。
-  # ⚠ 入れると `nil.start` で落ち、`/health` も 503 になる（Pleroma 系は listener を持たない）。
+  # ⚠ 入れると `nil.start` で落ち、`/health` も 503 になる。
   class ListenerDaemonStreamingTest < TestCase
     def setup
       Environment.singleton_class.alias_method(:__orig_controller_class, :controller_class)

@@ -8,11 +8,13 @@ inflections:
   http: HTTP
   http_status: HTTPStatus
   itunes_album_uri: ItunesAlbumURI
+  itunes_music_video_uri: ItunesMusicVideoURI
   itunes_song_uri: ItunesSongURI
   itunes_track_uri: ItunesTrackURI
   itunes_uri: ItunesURI
   itunes_url_handler: ItunesURLHandler
   itunes_url_nowplaying_handler: ItunesURLNowplayingHandler
+  json_storage: JSONStorage
   mime_type: MIMEType
   note_uri: NoteURI
   oauth_client_storage: OAuthClientStorage

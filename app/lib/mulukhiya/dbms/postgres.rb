@@ -1,6 +1,9 @@
 require 'ginseng/postgres'
 
 module Mulukhiya
+  # ⚠ `connected?`・`reconnect`・`pool` は ginseng-postgres に返さず、ここに置く（#4898・2026-11-10 判断）。
+  # 使っているのはモロヘイヤだけで、`pool` は pgbouncer と組で読む health の前提に合わせてある。
+  # 返せる形なので、他のプロジェクトで要るようになったら持っていける（pooza/ginseng-postgres へ伝え済み）。
   class Postgres < Ginseng::Postgres::Database
     include Package
 
@@ -32,10 +35,6 @@ module Mulukhiya
 
     def self.first(name, params = {})
       return instance.exec(name, params)&.first
-    end
-
-    def self.config?
-      return dsn.present?
     end
 
     def self.dsn

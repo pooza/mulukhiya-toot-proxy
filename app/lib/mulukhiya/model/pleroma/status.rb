@@ -68,6 +68,18 @@ module Mulukhiya
 
       alias public_uri uri
 
+      # ⚠ ID は API の表記（base62 の FlakeId）。Akkoma の投稿の URL は `/notice/<ID>`。
+      def self.create_uri(type, params)
+        service = PleromaService.new
+        params[:id] ||= params[:status_id]
+        case type.to_sym
+        in :public
+          return service.create_uri("/notice/#{params[:id]}")
+        in :webui
+          return service.create_uri("/mulukhiya/app/status/#{params[:id]}")
+        end
+      end
+
       def attachments
         return data[:media_attachments] || []
       end
@@ -85,6 +97,15 @@ module Mulukhiya
 
       def self.[](id)
         return new(id)
+      end
+
+      # 投稿が消されたと分かる上流の応答（5.47.0 のリリース前レビュー）。→ `Account#status_entry`
+      DELETED_SOURCE_STATUSES = [404, 410].freeze
+
+      # 読み込みの失敗が「消された投稿」によるものか。それ以外（停止・失効・タイムアウト）は false。
+      def self.deleted_error?(error)
+        return false unless error.is_a?(Ginseng::GatewayError)
+        return DELETED_SOURCE_STATUSES.member?(error.source_status)
       end
     end
   end

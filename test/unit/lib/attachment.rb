@@ -2,8 +2,6 @@ module Mulukhiya
   class AttachmentTest < TestCase
     def disable?
       return true unless Environment.dbms_class&.config?
-      # Pleroma 系はカタログの SQL を持たない（docs/pleroma.md の段階 5）。
-      return true if Environment.pleroma?
       return super
     end
 
@@ -162,8 +160,9 @@ module Mulukhiya
       following_ids = following[:items].map {|v| v[:id]}
 
       assert_empty(first_ids & following_ids)
-      # ⚠ 添付の ID の降順で並ぶのは Mastodon だけ。Misskey はノートの降順・ノートの中は添付の順 (#4375)。
-      return unless Environment.mastodon_type?
+      # ⚠ 添付の ID の降順で並ぶのは Mastodon だけ。Misskey・Pleroma 系は投稿の降順・投稿の中は添付の順
+      # (#4375・#4911)。⚠ `mastodon_type?` は Pleroma 系でも真なので使わない。
+      return unless Environment.mastodon?
 
       assert_equal(first_ids.sort.reverse, first_ids)
       assert_operator(following_ids.max, :<, first_ids.min) if following_ids.present?
@@ -205,10 +204,10 @@ module Mulukhiya
     #
     # ⚠ **Mastodon 限定。**この下限比較は「返る `:id` が並び順のキーであること」に
     # 依存する。Misskey は `note.id` で並べて `drive_file.id` を返すので、
-    # `min` が窓の境界を意味しない。
+    # `min` が窓の境界を意味しない。Pleroma 系も投稿で並べて `Document` の ID を返す（#4911）。
     def test_catalog_only_person_is_subset_within_baseline_range
       return unless @attachment
-      omit('Misskey は :id が並び順のキーではない') if Environment.misskey_type?
+      omit('Misskey・Pleroma 系は :id が並び順のキーではない') unless Environment.mastodon?
       all_ids = attachment_class.catalog(limit: 10, skip_cache: true)[:items].map {|v| v[:id]}
       omit('baseline が空（media 未 seed・chubo2#64）') if all_ids.empty?
       person_ids = attachment_class.catalog(limit: 10, only_person: 1, skip_cache: true)
@@ -225,6 +224,11 @@ module Mulukhiya
     # `user.host`（⚠ **`userHost` を持つのは `note` / `drive_file` 側だけ**）。
     # catalog はローカルアカウントしか返さないので、username で一意に引ける。
     def person_account?(username)
+      # ⚠ Pleroma 系は `users`。ローカルは `local`、種別は `actor_type`（#4911）。
+      if Environment.pleroma?
+        row = attachment_class.db[:users].where(nickname: username, local: true).first
+        return row.present? && row[:actor_type] == 'Person'
+      end
       if Environment.misskey_type?
         row = attachment_class.db[:user].where(username:, host: nil).first
         return row.present? && row[:isBot] == false

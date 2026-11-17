@@ -1,18 +1,6 @@
 module Mulukhiya
-  class OAuthStateStorage < Redis
+  class OAuthStateStorage < JSONStorage
     TTL = 600
-
-    def get(key)
-      return nil unless entry = super
-      return JSON.parse(entry, symbolize_names: true)
-    rescue => e
-      e.log(key:)
-      return nil
-    end
-
-    def set(key, values)
-      setex(key, TTL, values.to_json)
-    end
 
     # ⚠⚠ **読み出しと削除を分けない（PR #4714 の Codex P2）。**`get` → `unlink` の
     # 2 段だと、**同じ state を使った同時 POST が両方とも通る**。`GETDEL` は
@@ -28,6 +16,14 @@ module Mulukhiya
     def consume(key)
       return nil unless raw = redis.call('GETDEL', create_key(key))
       return JSON.parse(raw, symbolize_names: true)
+    end
+
+    def ttl
+      return TTL
+    end
+
+    def symbolize_names?
+      return true
     end
 
     def prefix

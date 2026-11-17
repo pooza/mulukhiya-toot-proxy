@@ -74,9 +74,11 @@ module Mulukhiya
   # **アニメ GIF をリサイズして `.gif` へ書き戻す**。上流の並びをそのまま写すと
   # `VipsForeignSave: ... is not a known file format` で GIF が壊れる。
   #
-  # ⚠ **解除条件**: `libheif >= 1.23.4` が pkg / ports に来たら HEIF を戻す。
-  # 本番は `libheif-1.22.2_1`、ports は 2026-08-31 時点で `1.22.2_2` 止まり。
-  # 未修正の GHSA は GHSA-x8r2-mggj-j6wr (critical) ほか 3 件。
+  # ⚠ **HEIF は読み込んでいる libheif が 1.23.4 以上のときだけ開ける (#4734)。**
+  # 判定は `LibHeif.enabled?`。FreeBSD は pkg で上がるが、vulcan（Ubuntu）は 1.21.2 のままなので、
+  # ホストで分かれる。未修正の GHSA は GHSA-x8r2-mggj-j6wr (critical) ほか 3 件。
+  # ⚠ 開けるのは `VipsForeignLoadHeif` だけ。`magickload` は閉じたまま（HEIF を開けても
+  # 開けなくても、ImageMagick の HEIC デリゲートへは渡さない）。
   #
   # ⚠ **ここは `Bundler.require` の後＝全エントリポイントとテストが通る場所**に
   # 置いてある。`app/initializer/*.rb` へ置くと**起動時にしか走らず、CI 緑が
@@ -94,8 +96,10 @@ module Mulukhiya
   ].freeze
 
   def self.setup_vips
+    heif = LibHeif.enabled?
     Vips.block('VipsForeign', true)
     VIPS_ALLOWED_OPERATIONS.each {|operation| Vips.block(operation, false)}
+    Vips.block('VipsForeignLoadHeif', false) if heif
     Vips.block_untrusted(true)
   end
 

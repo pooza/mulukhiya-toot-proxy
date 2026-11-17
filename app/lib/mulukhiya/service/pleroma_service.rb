@@ -54,16 +54,21 @@ module Mulukhiya
       })
     end
 
+    # ⚠ 絵文字はパスの一部なので符号化する（`/` や `?` を含む値で別のパスを叩かない。5.46.0 のリリース前レビュー）。
     def reaction(id, emoji, params = {})
-      return http.put("/api/v1/pleroma/statuses/#{id}/reactions/#{emoji}", {
+      return http.put(reaction_path(id, emoji), {
         headers: create_headers(params[:headers]),
       })
     end
 
     def delete_reaction(id, emoji, params = {})
-      return http.delete("/api/v1/pleroma/statuses/#{id}/reactions/#{emoji}", {
+      return http.delete(reaction_path(id, emoji), {
         headers: create_headers(params[:headers]),
       })
+    end
+
+    def reaction_path(id, emoji)
+      return "/api/v1/pleroma/statuses/#{id}/reactions/#{ERB::Util.url_encode(emoji)}"
     end
 
     def search_status_id(status)
@@ -85,5 +90,22 @@ module Mulukhiya
     def default_uri
       return URI.parse(config['/pleroma/url'])
     end
+
+    # ⚠⚠ **Akkoma のストリーミングは `Authorization` を読まない (#4901)。**読むのは `access_token` の
+    # クエリか `Sec-WebSocket-Protocol` で、`MastodonService` のヘッダのままだと 401 になる。
+    # 🔴 **クエリには載せない。**逆プロキシのログと listener の `initialize` のログに残る。
+    # `Sec-WebSocket-Protocol` で渡す（dev29 の Akkoma 3.20.1 で認証されることを確かめた）。
+    # ⚠ こちらは gem の `Ginseng::Fediverse::PleromaService` を継いでいない（`MastodonService` を継ぐ）ので、自前で持つ。
+    # gem も 9.0.0 からサブプロトコルで渡す。
+    def streaming_protocols
+      return [] if token.to_s.empty?
+      return [token]
+    end
+
+    def create_streaming_headers
+      return {}
+    end
+
+    alias streaming_headers create_streaming_headers
   end
 end

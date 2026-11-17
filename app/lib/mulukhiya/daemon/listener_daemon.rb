@@ -24,7 +24,7 @@ module Mulukhiya
 
     # ⚠ ストリーミングを切った系統（`capabilities/streaming: false`）と、listener のクラスが無い系統は
     # 起動対象に入れない（PR #4844 の Codex P1）。入れると `nil.start` で落ち、`/health` も 503 になる。
-    # Mastodon / Misskey は既定で true なので挙動は変わらない。
+    # Mastodon / Misskey は既定で true。Pleroma 系も 5.47.0 から true（#4901）。
     def self.disable?
       return true unless Environment.controller_class&.streaming?
       return true unless Environment.listener_class

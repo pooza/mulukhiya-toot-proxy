@@ -3,17 +3,13 @@ module Mulukhiya
   #
   # ⚠ **読み書きの失敗は握って nil / false を返す。**キャッシュは Annict が遅いときの
   # 保険なので、Redis の不調で本来返せる応答まで落とさない。
-  class AnnictDictionaryStorage < Redis
+  class AnnictDictionaryStorage < JSONStorage
     ALERT_KEY = 'alerted'.freeze
 
     def get(key)
-      return nil unless entry = super
-      values = JSON.parse(entry)
+      values = super
       return nil unless values.is_a?(Hash) && values['entries'].is_a?(Hash)
       return values
-    rescue => e
-      e.log(key:)
-      return nil
     end
 
     # `keywords` は、この結果を作ったときの設定のキーワード（`AnnictEpisodeDictionary#same_keywords?`）。

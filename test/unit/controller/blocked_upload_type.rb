@@ -13,14 +13,29 @@ module Mulukhiya
     # 判定は Marcel のマジックバイトだけで決まる。
     HEIC_HEADER = "\x00\x00\x00\x18ftypheic\x00\x00\x00\x00heicmif1".b.freeze
 
+    # ⚠ 既定では HEIF を閉じたホストの振る舞いを見る (#4734)。開けたホストは
+    # `test_passes_heic_when_enabled`。`teardown` でホストの本来の状態へ戻す。
     def setup
+      LibHeif.instance_variable_set(:@enabled, false)
+      Mulukhiya.setup_vips
       @heic = tempfile('.heic', HEIC_HEADER)
       @png = tempfile('.png', png_bytes)
     end
 
     def teardown
       [@heic, @png].each {|f| f&.unlink}
+      LibHeif.instance_variable_set(:@enabled, nil)
+      Mulukhiya.setup_vips
       super
+    end
+
+    # libheif が新しいホストでは断らない (#4734)。
+    def test_passes_heic_when_enabled
+      with_heif(true) do
+        assert_nothing_raised do
+          controller(@heic).verify_upload_type!
+        end
+      end
     end
 
     # ⚠ **判定に vips を使っていないこと。**`ImageFile#type` は

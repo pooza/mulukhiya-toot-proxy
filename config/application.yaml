@@ -521,7 +521,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 5.46.1
+  version: 5.47.0
 parser:
   note:
     fields:
@@ -560,17 +560,19 @@ pleroma:
     media_update: false
     reaction: true
     repost: false
-    streaming: false
+    streaming: true
   data:
-    account_timeline: false
+    account_timeline: true
     favorite_tags: true
     futured_tag: false
-    media_catalog: false
+    media_catalog: true
   dbms: postgres
   display_name: Pleroma
   features:
     annict: false
-    announcement: false
+    # Akkoma の `/api/v1/announcements` は Mastodon と同じ形で返す。`post_announce`・`announcement_mention` は
+    # dev29 で確かめた (#4910)。⚠ `announcement_push`（capsicum-relay への push）は別物なので false のまま。
+    announcement: true
     announcement_push: false
     feed: true
     webhook: true
@@ -737,6 +739,7 @@ service:
     patterns:
       album: /album/.*?/?([[:digit:]]+)$
       song: /song/.*?/?([[:digit:]]+)$
+      music_video: /music-video/.*?/?([[:digit:]]+)$
       track: /album/.*?/?([[:digit:]]+)$
     urls:
       lookup: https://itunes.apple.com/lookup

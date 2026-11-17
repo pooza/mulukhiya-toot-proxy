@@ -95,14 +95,14 @@ module Mulukhiya
 
     def self.create(url)
       types.each do |type|
-        uri = "Mulukhiya::Itunes#{type.to_s.capitalize}URI".constantize.parse(url)
+        uri = "Mulukhiya::Itunes#{type.to_s.camelize}URI".constantize.parse(url)
         return uri if uri.valid?
       end
       return parse(url)
     end
 
     def self.types
-      return [:track, :album, :song]
+      return [:track, :album, :song, :music_video]
     end
 
     def self.pattern(type = :track)

@@ -8,10 +8,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: ed6daad4cc3614ce641b5102a268287fbe059401
-  tag: v5.0.0
+  revision: 6d51c4d7c1a9cdb5e582ad3ff7dfc9cf790e87be
+  tag: v7.0.1
   specs:
-    ginseng-core (5.0.0)
+    ginseng-core (7.0.1)
       activesupport (>= 8.1.2.1)
       addressable (>= 2.9.0)
       cgi (>= 0.4.2)
@@ -25,7 +25,6 @@ GIT
       httparty (>= 0.24.0)
       json-schema
       mail (>= 2.5.5)
-      multi_json
       net-protocol
       net-smtp
       nokogiri (>= 1.19.4)
@@ -43,10 +42,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 8bdda3798900508890ad22829de908042257c717
-  tag: v7.1.0
+  revision: 1fb69124a62cff6a57afaa088a34c1687330f927
+  tag: v9.0.0
   specs:
-    ginseng-fediverse (7.1.0)
+    ginseng-fediverse (9.0.0)
       ginseng-core (>= 2.1.0)
 
 GIT
@@ -59,40 +58,41 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
-  revision: dfb8e65fe645e745ae03f2cb9a84c1fb8e95188b
-  tag: v2.0.1
+  revision: dcec0767dec7dcac70b30cb64909cedf8cbb72bc
+  tag: v2.0.3
   specs:
-    ginseng-postgres (2.0.1)
+    ginseng-postgres (2.0.3)
       pg
       sequel
 
 GIT
   remote: https://github.com/pooza/ginseng-redis.git
-  revision: 3a15d90f862116ef6b5d5274bb92d8003fa7312e
-  tag: v2.0.8
+  revision: 601d16a521cdd5571cf12bf72d0a82927ae2c95c
+  tag: v2.1.2
   specs:
-    ginseng-redis (2.0.8)
+    ginseng-redis (2.1.2)
       redis-client
 
 GIT
   remote: https://github.com/pooza/ginseng-style.git
-  revision: 2818c5618476302e4a10454f1b621502a053f492
-  ref: 2818c5618476302e4a10454f1b621502a053f492
+  revision: 127c2854e76811eeec41e21c7bf262b4a527d2b7
+  ref: 127c2854e76811eeec41e21c7bf262b4a527d2b7
   specs:
-    ginseng-style (1.1.14)
-      rubocop (~> 1.91.0)
+    ginseng-style (1.1.15)
+      rubocop (~> 1.92.0)
       rubocop-minitest (~> 0.41.0)
       rubocop-performance (~> 1.27.0)
       rubocop-rake (~> 0.7.1)
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: 3a3bd6cbf8cef08974b65f9deb49f5f426a1cb1d
-  tag: v3.0.4
+  revision: 1d3b70c1f091f60f091578c9817ba0ef16843595
+  tag: v4.0.0
   specs:
-    ginseng-web (3.0.4)
+    ginseng-web (4.0.0)
       addressable (>= 2.9.0)
       erb (>= 6.0.4)
+      ginseng-core (>= 1.23.1)
       resolv (>= 0.7.2)
       rss
       sassc
@@ -100,10 +100,11 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-youtube.git
-  revision: ad7af8c8296b6918b9f1604be5855c24fb6a81aa
-  tag: v3.0.2
+  revision: e166b3faded9412bd9776935fc02cb9dc8212d6b
+  tag: v4.0.0
   specs:
-    ginseng-youtube (3.0.2)
+    ginseng-youtube (4.0.0)
+      ginseng-core (>= 1.23.1)
 
 GIT
   remote: https://github.com/pooza/rspotify.git
@@ -118,16 +119,6 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    actionpack (8.1.4.1)
-      actionview (= 8.1.4.1)
-      activesupport (= 8.1.4.1)
-      nokogiri (>= 1.8.5)
-      rack (>= 2.2.4)
-      rack-session (>= 1.0.1)
-      rack-test (>= 0.6.3)
-      rails-dom-testing (~> 2.2)
-      rails-html-sanitizer (~> 1.6)
-      useragent (~> 0.16)
     actionview (8.1.4.1)
       activesupport (= 8.1.4.1)
       builder (~> 3.1)
@@ -155,6 +146,13 @@ GEM
     auth-sanitizer (0.2.5)
       version_gem (~> 1.1, >= 1.1.16)
     base64 (0.3.0)
+    better_html (2.2.0)
+      actionview (>= 7.0)
+      activesupport (>= 7.0)
+      ast (~> 2.0)
+      erubi (~> 1.4)
+      parser (>= 2.4)
+      smart_properties
     bigdecimal (4.1.3)
     builder (3.3.0)
     bundler-audit (0.9.3)
@@ -162,7 +160,7 @@ GEM
       thor (~> 1.0)
     cgi (0.5.2)
     concurrent-ruby (1.3.8)
-    connection_pool (3.0.2)
+    connection_pool (3.0.3)
     crack (1.0.1)
       bigdecimal
       rexml
@@ -207,12 +205,19 @@ GEM
       dry-schema (~> 1.14)
       zeitwerk (~> 2.6)
     erb (6.0.7)
+    erb_lint (0.9.0)
+      activesupport
+      better_html (>= 2.0.1)
+      parser (>= 2.7.1.4)
+      rainbow
+      rubocop (>= 1)
+      smart_properties
     erubi (1.13.1)
     et-orbi (1.4.2)
       tzinfo
     etc (1.5.0)
     eventmachine (1.2.7)
-    facets (4.0.1)
+    facets (4.1.0)
     faraday (2.15.1)
       faraday-net_http (>= 2.0, < 3.6)
       json
@@ -228,7 +233,6 @@ GEM
     fugit (1.14.0)
       et-orbi (~> 1.4)
       raabro (~> 1.4)
-    gli (2.21.5)
     hashdiff (1.2.2)
     hashie (5.2.0)
       logger
@@ -274,7 +278,6 @@ GEM
     minitest (6.1.0)
       drb (~> 2.0)
       prism (>= 1.5, < 3)
-    multi_json (1.21.2)
     multi_xml (0.9.1)
       bigdecimal (>= 3.1, < 5)
     mustermann (3.1.1)
@@ -311,16 +314,15 @@ GEM
       rack (>= 1.2, < 4)
       snaky_hash (~> 2.0, >= 2.0.9)
       version_gem (~> 1.1, >= 1.1.17)
-    omniauth (2.3.1)
+    omniauth (2.4.1)
       hashie (>= 3.5.2)
       logger
       rack (>= 2.2.8)
       rack-protection (>= 2.2.0)
-    omniauth-oauth2 (1.10.0)
+    omniauth-oauth2 (1.10.1)
       oauth2 (>= 2.0.2, < 3)
       omniauth (~> 2.3, >= 2.3.1)
     optparse (0.8.1)
-    ostruct (0.6.3)
     parallel (2.3.0)
     parser (3.3.13.0)
       ast (~> 2.4.1)
@@ -335,12 +337,12 @@ GEM
     prism (2.1.0-arm64-darwin)
     prism (2.1.0-x86_64-linux-gnu)
     public_suffix (7.0.5)
-    puma (8.0.2)
+    puma (8.1.2)
       nio4r (~> 2.0)
     raabro (1.5.0)
     racc (1.8.1)
     rack (3.2.8)
-    rack-protection (4.2.1)
+    rack-protection (4.2.2)
       base64 (>= 0.1.0)
       logger (>= 1.6.0)
       rack (>= 3.0.0, < 4)
@@ -353,11 +355,6 @@ GEM
       activesupport (>= 5.0.0)
       minitest
       nokogiri (>= 1.6)
-    rails-erb-lint (1.2.6)
-      actionpack (>= 5.0)
-      gli (~> 2.21.0)
-      json
-      rainbow (>= 3.1.1, < 4.0)
     rails-html-sanitizer (1.7.2)
       loofah (~> 2.25, >= 2.25.3)
       nokogiri (>= 1.15.7, != 1.16.7, != 1.16.6, != 1.16.5, != 1.16.4, != 1.16.3, != 1.16.2, != 1.16.1, != 1.16.0.rc1, != 1.16.0)
@@ -365,7 +362,7 @@ GEM
     rake (13.4.2)
     redis-client (0.31.0)
       connection_pool
-    regexp_parser (2.13.1)
+    regexp_parser (2.13.4)
     resolv (0.7.2)
     rest-client (2.1.0)
       http-accept (>= 1.7.0, < 2.0)
@@ -376,14 +373,14 @@ GEM
     ricecream (0.2.1)
     rss (0.3.3)
       rexml
-    rubocop (1.91.0)
+    rubocop (1.92.3)
       json (>= 2.3)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.1.0)
       parallel (>= 1.10)
       parser (>= 3.3.0.2)
       rainbow (>= 2.2.2, < 4.0)
-      regexp_parser (>= 2.9.3, < 3.0)
+      regexp_parser (>= 2.11.3, < 3.0)
       rubocop-ast (>= 1.49.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 2.4.0, < 4.0)
@@ -435,11 +432,11 @@ GEM
     sidekiq-scheduler (6.0.2)
       rufus-scheduler (~> 3.2)
       sidekiq (>= 7.3, < 9)
-    sinatra (4.2.1)
+    sinatra (4.2.2)
       logger (>= 1.6.0)
       mustermann (~> 3.0)
       rack (>= 3.0.0, < 4)
-      rack-protection (= 4.2.1)
+      rack-protection (= 4.2.2)
       rack-session (>= 2.0.0, < 3)
       tilt (~> 2.0)
     slim (5.2.2)
@@ -449,6 +446,7 @@ GEM
       rexml (~> 3.2)
       rubocop (>= 1.0, < 2.0)
       slim (>= 3.0, < 6.0)
+    smart_properties (1.17.0)
     snaky_hash (2.0.9)
       hashie (>= 0.1.0, < 6)
       version_gem (~> 1.1, >= 1.1.16)
@@ -469,16 +467,15 @@ GEM
       unicode-emoji (~> 4.3)
     unicode-emoji (4.3.0)
     uri (1.1.2)
-    useragent (0.16.11)
     version_gem (1.1.17)
     webmock (3.34.0)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
-    websocket-driver (0.8.2)
+    websocket-driver (0.9.0)
       base64
-      websocket-extensions (>= 0.1.0)
-    websocket-extensions (0.1.5)
+      websocket-extensions (>= 0.2.0)
+    websocket-extensions (0.2.0)
     yajl-ruby (1.4.3)
     zeitwerk (2.8.3)
     zlib (3.2.4)
@@ -494,6 +491,7 @@ DEPENDENCIES
   bundler-audit
   concurrent-ruby
   dry-validation
+  erb_lint
   faye-websocket!
   ginseng-core!
   ginseng-fediverse!
@@ -508,13 +506,11 @@ DEPENDENCIES
   json-schema
   marcel
   optparse
-  ostruct
   parallel (~> 2.0)
   puma (~> 8.0)
   rack (~> 3.2.5)
   rack-session (>= 2.1.1)
   rack-test
-  rails-erb-lint
   resolv (~> 0.7.2)
   ricecream
   rspotify!

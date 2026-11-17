@@ -44,11 +44,13 @@ v4 の実装は `git show 46c4f4e2^:<path>` で取り出せる（SQL は `app/qu
 | webhook | ✅ 5.45.0 | `features/webhook` | 段階 1（#4847）。⚠ `media_ids` は文字列で送る（`PleromaService#post`） |
 | タグのフィード・お気に入りタグ | ✅ 5.45.0 | `features/feed` / `data/favorite_tags` | 段階 2（#4860）。⚠ タグは `hashtags` / `hashtags_objects` の表で引く（v4 は JSON の配列を開いていた） |
 | アカウントの直近の投稿・添付の参照 | ✅ | 5.46.0 | 段階 3。`recent_toot` は 5.43.0（API で読む・ゲートが要った）。添付は #4861（ID で引く経路は元から通っていた・`Account#attachments` を actor と `Document` で引く） |
-| ハンドラ（post_reaction ほか） | 🟡 | — | 段階 4（1 本ずつ）。`post_reaction`（`reply_reaction`・`result_notification`）は ✅ 5.46.0（#4884）。ほかは未着手 |
-| メディアカタログ | ⬜ | `data/media_catalog` | 段階 5（`media_catalog`・重い） |
-| ストリーミング（listener） | ⬜ | `capabilities/streaming` | 段階 6 |
+| 自分の投稿の一覧（WebUI） | ✅ 5.47.0 | `data/account_timeline` | #4900。ID は `activities` の `Create` を `actor` で引き（索引 `activities_actor_id_DESC_NULLS_LAST_index`）、中身は API で読む。activity の主キーの FlakeId が API の投稿 ID |
+| ハンドラ（post_reaction ほか） | ✅ 5.47.0 | — | 段階 4。`post_reaction` は 5.46.0（#4884）、残りは #4910 で 1 本ずつ見た（下の「ハンドラの判定」）。Pleroma 系で外すものは無かった |
+| メディアカタログ | ✅ 5.47.0 | `data/media_catalog` | 段階 5（#4911）。ローカルの利用者ごとに `activities_actor_id_DESC_NULLS_LAST_index` で投稿を引き、`attachment` を展開して `Document` を 1 行ずつ索引で引く。cursor は `<FlakeId>.<位置>` |
+| ストリーミング（listener） | ✅ 5.47.0 | `capabilities/streaming` | 段階 6（#4901）。`PleromaListener < MastodonListener`。送り主は API の ID（FlakeId）を uuid に戻して引く |
 | 投稿の一括削除 | ⬜ | — | `deletable_statuses` |
-| Annict・お知らせ・decoration・compose template | ⬜ | `features/*` | 未定 |
+| お知らせ | ✅ 5.47.0 | `features/announcement` | #4910。Akkoma の `/api/v1/announcements` は Mastodon と同じ形。⚠ `announcement_push`（capsicum-relay）は false のまま |
+| Annict・decoration・compose template | ⬜ | `features/*` | 未定 |
 
 ## 段階
 
@@ -71,8 +73,39 @@ v4 の実装は `git show 46c4f4e2^:<path>` で取り出せる（SQL は `app/qu
 4. **ハンドラ**: 判断が要るので 1 本ずつ。最初は `post_reaction` を流すところから（✅ 5.46.0・#4884）。
    判断の中心は `reactionable?`。受け手のサーバーの nodeinfo は `software.name` が `akkoma` なので、設定の `akkoma.capabilities.reaction` を立てた。
    Akkoma の利用者は絵文字リアクションを自分で見られるので、リアクションを伝える返信は投稿しない（Misskey 系から Akkoma の利用者へのリアクションも同じ）
-5. **メディアカタログ**: Mastodon / Misskey でも重かった（[media_catalog.md](media_catalog.md)）。最後に回す
-6. **ストリーミング**: v4 の `PleromaListener` を戻す。Akkoma のストリーミングは Mastodon 互換
+   ✅ 残りは #4910（5.47.0）で、dev29 で投稿して確かめた。結論は下の「ハンドラの判定」。
+5. ✅ **メディアカタログ**（#4911・5.47.0）: Mastodon / Misskey でも重かった（[media_catalog.md](media_catalog.md)）ので、Mastodon と同じローカルの利用者ごとの LATERAL merge にした。
+   ⚠ 添付は投稿（`Note`）の JSON の `attachment` にしか無く、`Document` から投稿へは辿れない。投稿から展開し、`Document` は AP の ID で引く（`objects_unique_apid_index`）。
+   ⚠ 素直に JOIN すると、少データでは `objects` を全件読んで Hash Join する（dev29 で実測）。LATERAL と LIMIT 1 で入れ子のループに固定した。
+   ⚠ 並びは（投稿の ID DESC, 添付の位置 ASC）。cursor は `<投稿の FlakeId>.<位置>`（Misskey と同じ型・#4375）。
+   **規模の見積もり（2026-11-15・dev29 でトランザクションの中に偽のデータを入れて測り、ROLLBACK した）**: `objects` 31 万・`activities` 36 万、
+   ローカルの 1 人に Like 5 万と添付の無い投稿 1 万を新しい側に積んで、1 ページ目 77 ms・OFFSET 900 で 66 ms・cursor 1.1 ms。どれも索引だけで、全件の読み込みは無い（添付の展開を内側へ移した形・Incremental Sort が索引の順を使って途中で止まる）。
+   ⚠ キーワードは添付 1 件ごとに当てる（PR #4919 の Codex P2）。投稿単位でまとめると、同じ投稿のほかの添付まで出る
+   ⚠ 1 人ぶんの走査は、その利用者の activity の数に比例する（添付の有無は索引に無い）
+6. ✅ **ストリーミング**（#4901・5.47.0）: v4 の `PleromaListener` を戻した。Akkoma のストリーミングは Mastodon 互換。
+   ⚠ トークンはヘッダでも URL でもなく `Sec-WebSocket-Protocol` で渡す（Akkoma はヘッダを読まない・ginseng-fediverse 9.0.0・pooza/ginseng-fediverse#337）。
+   ⚠ 送り主は v4 の `fqn` ではなく `account.id`（FlakeId）を `FlakeId.decode` して引く。
+   `mention` / `follow` は基本のパイプライン（`welcome_mention` など）がそのまま流れる
+
+### ハンドラの判定（#4910・2026-11-15・dev29 の Akkoma 3.20.1）
+
+**Pleroma 系だけ外す（`pipeline/pleroma` の `exclude` に足す）ものは無かった。**止まっていたものは、どれも設定か利用者の状態で止まっていた。
+
+| ハンドラ | 判定 | 確かめたこと |
+| --- | --- | --- |
+| `post_announce`・`announcement_mention` | ✅ 戻した | `features/announcement` を true にした。お知らせを足すと info が未収載で投稿し、info への「お知らせ」のメンションに一覧を返した |
+| `user_config_command`・`user_tag` | ✅ | コマンドで `user_tags` が保存され、次の投稿にタグが付いた。⚠ 保存の直後（同じ秒）の投稿にはまだ付かない（Pleroma に限らない） |
+| `scheduled_status_save` | ✅ | `scheduled_at` 付きの投稿で `ScheduledStatusStorage` に残った（結果を返さないハンドラなのでログには出ない） |
+| `image_format_convert`・`video_format_convert`・`audio_format_convert` | ✅ | PNG → WebP・AVI（mpeg4）→ MP4・WAV → MP3 |
+| `mention_visibility` | ✅ | `agent/accts` に入っている相手だけが対象。info は入っていないので変わらないのが正しい |
+| `reply_reaction`・`result_notification` | ✅ 5.46.0 | #4884 |
+| `welcome_mention` | ✅ 5.47.0 | #4901 |
+| `image_copyright`・`spotify_url_nowplaying`・`you_tube_url_nowplaying` | ⚪ 設定が無いだけ | ハンドラの設定（`tag`・`message`・`url`）や API の鍵が dev29 に無い。Pleroma 系の事情ではない |
+| `piefed_bookmark`・`piefed_clipping_command`・`webhook_image` | ⚪ 利用者の設定次第 | 利用者が PieFed・webhook を設定していると動く |
+| `invalid_command` | ⚪ 投稿次第 | コマンドの投稿のときだけ動く |
+| そのほか（`default_tag`・`dictionary_tag`・`tagging`・URL 系ほか 14 本） | ✅ | 本文の文字列を書き換えるだけで、SNS の形に依らない。`default_tag` は公開の投稿で付くことをログで見た |
+
+⚠ HEIF は libheif の版で決まる（#4734）。dev29 は Ubuntu の 1.21.2 なので、HEIC は断る（`ValidateError` の文言を確認した）。
 
 ## 残っている穴
 

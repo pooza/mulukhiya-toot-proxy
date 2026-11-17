@@ -30,6 +30,10 @@ module Mulukhiya
     def test_shorten
       assert_equal('https://music.apple.com/jp/song/1789469289', @long.shorten.to_s)
       assert_equal('https://music.apple.com/jp/song/1789469289', @song.shorten.to_s)
+      # `?uo=4` も落とす（#4897）。
+      uo = ItunesSongURI.parse("#{@long}?uo=4")
+
+      assert_equal('https://music.apple.com/jp/song/1789469289', uo.shorten.to_s)
     end
 
     def test_song?

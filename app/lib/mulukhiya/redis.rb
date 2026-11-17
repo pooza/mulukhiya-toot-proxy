@@ -1,4 +1,8 @@
 module Mulukhiya
+  # ⚠ ロックの道具（`setnx`・`acquire`・`expire`・`acquire_token` / `release_token`・
+  # `remaining_seconds`・`stale_connection?`）は ginseng-redis に返さず、ここに置く（#4898・2026-11-10 判断）。
+  # 使っているのはモロヘイヤだけで、fail-open の倒し方や 409 の `Retry-After` に合わせて作ってある。
+  # gem に依存しない形なので、他のプロジェクトで要るようになったら返せる（pooza/ginseng-redis へ伝え済み）。
   class Redis < Ginseng::Redis::Service
     include Package
 
@@ -11,17 +15,6 @@ module Mulukhiya
         return 0
       end
     LUA
-
-    def initialize(params = {})
-      unless params[:url]
-        dsn = Redis.dsn
-        dsn.db ||= 1
-        raise Ginseng::Redis::Error, "Invalid DSN '#{dsn}'" unless dsn.absolute?
-        raise Ginseng::Redis::Error, "Invalid scheme '#{dsn.scheme}'" unless dsn.scheme == 'redis'
-        params[:url] = dsn.to_s
-      end
-      super
-    end
 
     def underscore
       return self.class.to_s.split('::').last.sub(/Storage$/, '').underscore
@@ -145,6 +138,8 @@ module Mulukhiya
       log(method: __method__, prefix:)
     end
 
+    # ⚠ gem の `initialize` は `self.class.dsn` を引く（ginseng-redis 2.1.1・pooza/ginseng-redis#80）ので、
+    # 上書きはこれだけで足りる。2.1.0 までは `Service.dsn` 決め打ちで、`initialize` を丸ごと写していた (#4898)。
     def self.dsn
       return Ginseng::Redis::DSN.parse(config['/user_config/redis/dsn'])
     end

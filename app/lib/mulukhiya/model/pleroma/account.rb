@@ -79,6 +79,45 @@ module Mulukhiya
         return Attachment.where(condition).reverse(:id)
       end
 
+      # 自分の投稿の一覧（`GET /mulukhiya/api/status/list`・#4900）。
+      #
+      # ⚠ **ID は SQL、中身は API で読む。**ID は `activities` の `Create` から引く（`actor` と `id` の組に
+      # Akkoma の索引 `activities_actor_id_DESC_NULLS_LAST_index` が使える。並びを索引に合わせて `NULLS LAST` にした。
+      # dev29 は小さすぎて実行計画には出ないが、`actor` だけで引くと索引の条件になる）。activity の主キーを
+      # FlakeId にしたものが API の投稿 ID になる（dev29 で確かめた）。中身は `Status` と同じく API で読む。
+      # ⚠ 非公開（フォロワー限定）も載せるので、自分のトークンを持ったサービスで読む。DM は載せない
+      # （Mastodon の `statuses.sql.erb` の `visibility < 3` と同じ範囲）。
+      # ⚠ 読めなかった投稿（消された直後など）は飛ばす。
+      def statuses(params = {})
+        params[:limit] ||= config['/webui/status/timeline/limit']
+        params[:page] ||= 1
+        params[:actor] = ap_id
+        params[:follower_address] = follower_address
+        return Postgres.exec(:statuses, params).filter_map {|row| status_entry(row)}
+      end
+
+      # 一覧の 1 件。読めなかったら nil。
+      # ⚠⚠ **飛ばすのは「消された」と分かる上流の応答（404・410）だけ（5.47.0 のリリース前レビュー）。**
+      # 上流の停止・トークンの失効・タイムアウトまで飛ばすと、一覧が 200 の空になり、利用者には
+      # 「投稿が 0 件」に見え、`e.log` 止まりで Sentry にも出ない。それらは投げ直して `report_error` に乗せる。
+      def status_entry(row)
+        status = find_status(FlakeId.encode(row[:id]))
+        return status.to_h.merge(account: {username:, display_name:, acct: acct.to_s})
+      rescue Ginseng::GatewayError => e
+        raise unless Status.deleted_error?(e)
+        e.log(acct: acct.to_s, id: row[:id])
+        return nil
+      rescue => e
+        e.log(acct: acct.to_s, id: row[:id])
+        return nil
+      end
+
+      def find_status(id)
+        status = Status[id]
+        status.service = service
+        return status
+      end
+
       # ⚠ 投稿は `Status` と同じく API で読む（`objects` の JSON を開く SQL は持たない）。
       def recent_status
         response = service.fetch_account_statuses(api_id, {limit: 1})

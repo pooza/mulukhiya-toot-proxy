@@ -68,12 +68,6 @@ module Mulukhiya
       return oauth_uri_with_pkce(browser:)
     end
 
-    def oauth_server_metadata
-      @oauth_server_metadata ||= http.get('/.well-known/oauth-authorization-server').parsed_response
-    rescue
-      nil
-    end
-
     def oauth_authorize_endpoint
       if (metadata = oauth_server_metadata) && metadata['authorization_endpoint']
         return URI.parse(metadata['authorization_endpoint']).path

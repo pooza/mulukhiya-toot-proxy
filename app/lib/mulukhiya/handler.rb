@@ -96,6 +96,19 @@ module Mulukhiya
       }
     end
 
+    # 利用者向けのハンドラ一覧の 1 件 (#4195)。`disabled` は利用者の設定だけを見る。
+    # サーバー全体で無効なものは `Handler.user_list` が先に除く。
+    def to_user_h(account)
+      return {
+        name: underscore,
+        label:,
+        description:,
+        toggleable: toggleable?,
+        # ⚠ 切り替えられないものに利用者の設定は効かない (#4196)。書いてあっても動いているので false。
+        disabled: toggleable? && account.disable?(self),
+      }
+    end
+
     def verbose?
       return true
     end
@@ -183,8 +196,10 @@ module Mulukhiya
       return @break.present?
     end
 
+    # ⚠ 利用者の設定は `toggleable?` なものにだけ効かせる (#4196)。`/config/update` からは
+    # 切り替えられないハンドラも止められるので、ここで読まないようにする（既に止めている設定も無視する）。
     def disable?
-      return true if sns.account&.disable?(self)
+      return true if toggleable? && sns.account&.disable?(self)
       return true if config.disable?(self)
       return false
     rescue Ginseng::ConfigError
@@ -322,10 +337,10 @@ module Mulukhiya
       return nil
     end
 
-    def self.all(&block)
-      return enum_for(__method__) unless block
+    # ⚠ `sns` を渡すと、各ハンドラの `disable?` がその利用者の状態（PieFed・webhook の有無など）で判定する。
+    def self.all(sns: sns_class.new, &block)
+      return enum_for(__method__, sns:) unless block
       reporter = Reporter.new
-      sns = sns_class.new
       handlers = []
       Parallel.each(all_names, in_threads: Parallel.processor_count) do |name|
         handlers.push(create(name, {reporter:, sns:}))
@@ -333,6 +348,57 @@ module Mulukhiya
         e.log(name:)
       end
       handlers.compact.sort_by(&:underscore).each(&block)
+    end
+
+    # 利用者の投稿では動かないイベント。そのハンドラは利用者向けの一覧に出さない。
+    USER_EXCLUDED_EVENTS = [:alert].freeze
+
+    # 利用者向けのハンドラ一覧 (#4195)。サーバー全体で無効なもの・このサーバーでは動かないものは見せない。
+    # `toggleable: false` のものは含める（切り替えられないことをクライアントが表示する）。
+    # ⚠ `handlers` は利用者のトークンを持つ `sns` で作ったものを渡す（`all(sns:)`）。
+    def self.user_list(account, handlers = all)
+      excluded = user_excluded_names
+      return handlers
+          .reject {|handler| excluded.member?(handler.underscore)}
+          .select {|handler| user_visible?(handler, account)}
+          .map {|handler| handler.to_user_h(account)}
+    end
+
+    # 一覧に出すか (5.47.0 のリリース前レビュー)。サブクラスの `disable?` はサーバーの状態
+    # （Spotify の設定・リアクションの有無など）でも止まるので、それも見る。切り替えても効かないスイッチを見せない。
+    # ⚠ 利用者が自分で止めたものは、戻せるように見せる（`disable?` は利用者の設定でも true になる）。
+    # ⚠ 判定で例外が出たら見せる側に倒す（一覧から黙って消えるより、効かないスイッチが見えるほうがよい）。
+    def self.user_visible?(handler, account)
+      return false if config.disable?(handler)
+      return true if handler.toggleable? && account.disable?(handler)
+      return !handler.disable?
+    rescue => e
+      e.log(handler: handler.underscore)
+      return true
+    end
+
+    def self.user_excluded_names
+      return USER_EXCLUDED_EVENTS.each_with_object(Set[]) do |event, names|
+        names.merge(config["/handler/pipeline/base/#{event}"] || [])
+      rescue Ginseng::ConfigError
+        next
+      end
+    end
+
+    # 利用者が切り替えてよいハンドラの名前を返す (#4196)。だめなら例外。
+    # ⚠ 名前は利用者の入力なので、constantize より先に一覧と突き合わせる。
+    # ⚠ インスタンスは作らない（`new` は SNS を介して DB を触る）。設定はクラスから読む。
+    def self.user_toggleable(name, names = all_names)
+      name = name.to_s
+      raise Ginseng::RequestError, 'handler required' if name.empty?
+      unless names&.member?(name) && (config["/handler/#{name}/disable"] rescue nil) != true
+        raise Ginseng::NotFoundError, "Handler '#{name}' not found"
+      end
+      handler_class = "Mulukhiya::#{name.camelize}Handler".constantize
+      unless handler_class.handler_config(:toggleable) == true
+        raise Ginseng::ValidateError, "Handler '#{name}' is not toggleable"
+      end
+      return name
     end
 
     def self.search(pattern)

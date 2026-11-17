@@ -44,8 +44,8 @@ module Mulukhiya
 
     def test_shorten
       assert_equal('https://music.apple.com', @music.shorten.to_s)
-      assert_equal('https://music.apple.com/jp/album/1299587212?i=1299587213&uo=4', @long.shorten.to_s)
-      assert_equal('https://music.apple.com/jp/album/1299587212?i=1299587213&uo=4', @track.shorten.to_s)
+      assert_equal('https://music.apple.com/jp/album/1299587212?i=1299587213', @long.shorten.to_s)
+      assert_equal('https://music.apple.com/jp/album/1299587212?i=1299587213', @track.shorten.to_s)
     end
 
     def test_title

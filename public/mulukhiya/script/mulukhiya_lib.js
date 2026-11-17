@@ -433,6 +433,24 @@ export const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
+    // 利用者向けのハンドラ一覧と、利用者の設定での有効/無効 (#4195・#4197)。
+    globals.methods.getUserHandlers = async () => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.get(globals.methods.createURL('/mulukhiya/api/handler/list'))
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
+    // 利用者の設定で 1 つのハンドラを有効/無効にする (#4196・#4197)。サーバー全体の設定は変えない。
+    globals.methods.toggleUserHandler = async (handler, disable) => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.post('/mulukhiya/api/handler/config', {token: globals.methods.getToken(), handler: handler, disable: disable})
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
     globals.methods.getConfigAudit = async () => {
       return axios.get(globals.methods.createURL('/mulukhiya/api/admin/config/audit'))
         .then(e => e.data)

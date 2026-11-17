@@ -1,23 +1,11 @@
 module Mulukhiya
-  class MediaMetadataStorage < Redis
+  class MediaMetadataStorage < JSONStorage
     attr_reader :http
 
     def initialize(params = {})
       super
       @http = HTTP.new
       @http.retry_limit = 1
-    end
-
-    def get(uri)
-      return supernil unless entry = super
-      return JSON.parse(entry).deep_symbolize_keys
-    rescue => e
-      e.log(key:)
-      return nil
-    end
-
-    def set(uri, value)
-      setex(uri, ttl, value.to_json)
     end
 
     # ⚠⚠ **`host_validator` は外部が決めた URL を取るときに渡す**（フィードの enclosure・#4749）。
@@ -53,6 +41,10 @@ module Mulukhiya
 
     def ttl
       return config['/media/metadata/cache/ttl']
+    end
+
+    def symbolize_names?
+      return true
     end
 
     def prefix

@@ -1,0 +1,25 @@
+SELECT
+  activities.id
+FROM
+  activities
+  INNER JOIN objects ON objects.data->>'id' = activities.data->>'object'
+WHERE (activities.actor = '<%= escape(params[:actor]) %>')
+  AND (activities.data->>'type' = 'Create')
+  AND (objects.data->>'type' IN ('Note', 'Question'))
+  AND (
+    (activities.data->'to' @> '["https://www.w3.org/ns/activitystreams#Public"]')
+    OR (activities.data->'cc' @> '["https://www.w3.org/ns/activitystreams#Public"]')
+    OR (activities.data->'to' @> '["<%= escape(params[:follower_address]) %>"]')
+  )
+  <% if params[:rule] %>
+    <% params[:rule].keywords.each do |keyword| %>
+      AND (concat_ws(E'\t', coalesce(objects.data->'source'->>'content', objects.data->>'content'), objects.data->>'summary') LIKE '%<%= escape(keyword) %>%')
+    <% end %>
+    <% params[:rule].negative_keywords.each do |keyword| %>
+      AND (coalesce(objects.data->'source'->>'content', objects.data->>'content', '') NOT LIKE '%<%= escape(keyword) %>%')
+      AND (coalesce(objects.data->>'summary', '') NOT LIKE '%<%= escape(keyword) %>%')
+    <% end %>
+  <% end %>
+ORDER BY
+  activities.id DESC NULLS LAST
+LIMIT <%= params[:limit].to_i %> OFFSET <%= params[:page] ? ((params[:page].to_i - 1) * params[:limit].to_i) : 0 %>

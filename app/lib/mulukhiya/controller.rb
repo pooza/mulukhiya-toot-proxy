@@ -310,11 +310,12 @@ module Mulukhiya
     # （`Validation failed: File content type is invalid`）なので、クライアントは既に扱える。
     # `Ginseng::ValidateError` は 4xx なので `report_error` が log 止めにする＝アラートは鳴らない。
     #
-    # ⚠ **解除条件は #4733 と同じ**: `libheif >= 1.23.4` が pkg / ports に来たら
-    # `Mulukhiya::VIPS_ALLOWED_OPERATIONS` と一緒にここも戻す。
+    # ⚠ **libheif が 1.23.4 以上のホストでは断らない (#4734)。**`setup_vips` と同じ
+    # `LibHeif.enabled?` を見る（vips が開けているのにここで断る、またはその逆にならないように）。
     BLOCKED_UPLOAD_TYPES = ['image/heic', 'image/heif'].freeze
 
     def verify_upload_type!(field = :file)
+      return if LibHeif.enabled?
       path = params.dig(field, :tempfile)&.path
       return unless path
       type = MediaFile.new(path).type

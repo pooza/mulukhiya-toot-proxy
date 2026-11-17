@@ -12,6 +12,9 @@ module Mulukhiya
       dest = clone
       dest.host = config['/service/itunes/hosts'].first
       dest.album_id = album_id
+      # ⚠ 曲の ID（`i`）だけを残す。lookup の `trackViewUrl` に付く `uo=4` などは落とす
+      # （`/song/` と `/music-video/` の短縮と揃える・5.47.0 のリリース前レビュー）。
+      dest.query = nil
       dest.track_id = track_id
       return dest
     end

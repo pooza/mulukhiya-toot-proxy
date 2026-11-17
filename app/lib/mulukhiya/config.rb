@@ -142,7 +142,7 @@ module Mulukhiya
       if Environment.misskey?
         return Misskey::Role.where(isAdministrator: true).select_map(:id).map(&:to_s)
       end
-      # rubocop:disable-next Style/BitwisePredicate, Style/NumericPredicate, Layout/SpaceInsideBlockBraces
+      # rubocop:disable-next Style/BitwisePredicate, Layout/SpaceInsideBlockBraces
       return Mastodon::Role.where { (permissions.sql_number & 1) > 0 }.select_map(:id).map(&:to_s)
     rescue
       return []
