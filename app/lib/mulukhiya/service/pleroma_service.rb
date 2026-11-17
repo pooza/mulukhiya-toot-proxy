@@ -95,7 +95,8 @@ module Mulukhiya
     # クエリか `Sec-WebSocket-Protocol` で、`MastodonService` のヘッダのままだと 401 になる。
     # 🔴 **クエリには載せない。**逆プロキシのログと listener の `initialize` のログに残る。
     # `Sec-WebSocket-Protocol` で渡す（dev29 の Akkoma 3.20.1 で認証されることを確かめた）。
-    # ⚠ gem の `Ginseng::Fediverse::PleromaService` はクエリに載せるが、こちらはそれを継いでいない。
+    # ⚠ こちらは gem の `Ginseng::Fediverse::PleromaService` を継いでいない（`MastodonService` を継ぐ）ので、自前で持つ。
+    # gem も 9.0.0 からサブプロトコルで渡す。
     def streaming_protocols
       return [] if token.to_s.empty?
       return [token]

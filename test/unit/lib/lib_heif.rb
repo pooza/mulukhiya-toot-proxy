@@ -17,6 +17,13 @@ module Mulukhiya
       assert_false(LibHeif.enable?('1.23.6', loader: false), 'libvips に heif のローダが無い')
     end
 
+    # 起動時のログに出す中身（5.47.0 のリリース前レビュー）。答えは `enable?` と同じ。
+    def test_summary
+      assert_equal({version: '1.23.6', loader: true, enabled: true}, LibHeif.summary(version: '1.23.6', loader: true))
+      assert_equal({version: '1.21.2', loader: true, enabled: false}, LibHeif.summary(version: '1.21.2', loader: true))
+      assert_equal({version: nil, loader: false, enabled: false}, LibHeif.summary(version: nil, loader: false))
+    end
+
     # 読み込んでいる libheif の版が取れること（取れないホストでは nil＝閉じる）。
     def test_version
       version = LibHeif.version

@@ -93,14 +93,29 @@ module Mulukhiya
         params[:page] ||= 1
         params[:actor] = ap_id
         params[:follower_address] = follower_address
-        return Postgres.exec(:statuses, params).filter_map do |row|
-          status = Status[FlakeId.encode(row[:id])]
-          status.service = service
-          status.to_h.merge(account: {username:, display_name:, acct: acct.to_s})
-        rescue => e
-          e.log(acct: acct.to_s, id: row[:id])
-          nil
-        end
+        return Postgres.exec(:statuses, params).filter_map {|row| status_entry(row)}
+      end
+
+      # 一覧の 1 件。読めなかったら nil。
+      # ⚠⚠ **飛ばすのは「消された」と分かる上流の応答（404・410）だけ（5.47.0 のリリース前レビュー）。**
+      # 上流の停止・トークンの失効・タイムアウトまで飛ばすと、一覧が 200 の空になり、利用者には
+      # 「投稿が 0 件」に見え、`e.log` 止まりで Sentry にも出ない。それらは投げ直して `report_error` に乗せる。
+      def status_entry(row)
+        status = find_status(FlakeId.encode(row[:id]))
+        return status.to_h.merge(account: {username:, display_name:, acct: acct.to_s})
+      rescue Ginseng::GatewayError => e
+        raise unless Status.deleted_error?(e)
+        e.log(acct: acct.to_s, id: row[:id])
+        return nil
+      rescue => e
+        e.log(acct: acct.to_s, id: row[:id])
+        return nil
+      end
+
+      def find_status(id)
+        status = Status[id]
+        status.service = service
+        return status
       end
 
       # ⚠ 投稿は `Status` と同じく API で読む（`objects` の JSON を開く SQL は持たない）。

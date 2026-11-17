@@ -22,7 +22,8 @@ module Mulukhiya
         status_field => create_status(payload:, receipt:),
         visibility_field => controller_class.visibility_name(visibility),
       }
-      body[:visibleUserIds] = [receipt.id] if visibility == :direct && Environment.misskey_type?
+      # ⚠ 宛先のフィールド名は設定から引く（`/parser/note/fields/visible_users`）。持つのは Misskey だけ。
+      body[visible_users_field] = [receipt.id] if visibility == :direct && visible_users_field
       return body
     end
 

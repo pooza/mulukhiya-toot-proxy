@@ -61,5 +61,19 @@ module Mulukhiya
         assert_equal([], service_class.allocate.streaming_protocols, service_class.to_s)
       end
     end
+
+    # Pleroma 系はトークンをサブプロトコルで渡し、ヘッダには載せない（5.47.0 のリリース前レビュー）。
+    # ⚠ gem を上げたり継承を付け替えたりして、トークンがクエリやヘッダへ戻ったら落とす。
+    def test_protocols_of_pleroma
+      service = PleromaService.allocate
+      service.define_singleton_method(:token) {'secret'}
+
+      assert_equal(['secret'], service.streaming_protocols)
+      assert_equal({}, service.streaming_headers)
+
+      service.define_singleton_method(:token) {nil}
+
+      assert_equal([], service.streaming_protocols)
+    end
   end
 end

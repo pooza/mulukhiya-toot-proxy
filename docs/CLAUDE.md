@@ -259,6 +259,22 @@ git diff Gemfile.lock
 - #4897（Apple Music の MV の URL `/music-video/` が短縮されない）。2026-11-08 に載せた（ユーザー判断。5.46.0 は Mastodon 5.0 対応の回なので混ぜない）
 - on-hold のまま: #3877（本文が無く設計から）/ #4301（capsicum#344 が open）/ #4298・#3157（相手側待ち）/ #4893（Mastodon 5.0 の用語の ja 訳待ち・2026-11-06 に on-hold へ）/ #4832・#4873（報告待ち）/ #4846（総まとめ）
 
+### リリース前レビュー（5 観点）の結果（2026-11-17）
+
+対象は `v5.46.1..develop`（72 コミット・docs を除き 66 ファイル・+1542 / −228）。**赤 0・黄 6・緑 8**（重なりをまとめた数）。lint は全通過。モデルは 5 観点とも Opus。
+
+- **掃除 PR で直す**（ユーザー判断・ステージング検証の前）:
+  - 黄 Y1: 別々のハンドラを続けて切り替えると片方の設定が消える（`UserConfigStorage#update` が読む → まとめる → 書くの 3 段）。画面で、書き込み中はどのチェックも押せなくした
+  - 黄 Y2: 切り替えのたびに同期の `SAVE`。定期の BGSAVE と重なると、書けているのに 500 になり、チェックが戻る。`BGSAVE SCHEDULE` にし、失敗しても要求は失敗させない
+  - 黄 Y3: `GET /handler/list` に、このサーバーでは動かないハンドラ（Spotify 未設定・リアクションの無いサーバーなど）と通知（`alert`）のハンドラが並んでいた。利用者のトークンで作ったハンドラの `disable?` で外す（利用者が自分で止めたものは見せる）
+  - 黄 Y4: Akkoma の自分の投稿の一覧が、上流の障害で 200 の空になっていた。飛ばすのは消された投稿（404・410）だけにした
+  - 黄 Y5: HEIF を開けたか閉じたかが残らない。起動時に版・ローダ・答えを info で 1 回残す
+  - 緑: `PleromaListener` のコメント（クエリで渡る → 実際は `Sec-WebSocket-Protocol`）・`PleromaService#streaming_protocols` のテスト・libheif は soname を先に引く・`docs/api.md` の `/media` と `/handler/list` に Akkoma と除外の説明・`visibleUserIds` を設定から引く・アルバムの中の曲の短縮で `uo=4` を落とす
+- **Issue**: 黄 Y6（Akkoma のメディアカタログで項目ごとに Redis の接続を作り直す・同期取得・空のメタデータが 100 日）→ #4920（5.48.0・引き金は Akkoma の本番投入）
+- **記録のみ**:
+  - 緑: ハンドラの一覧が読めない（設定の破損）とき `POST /handler/config` は 404 として黙る。利用者の入力が長さの制限なしに例外のメッセージへ入る
+  - 緑: ginseng-core 7 は、プロセスの身元を確かめられないと stop が止まり、古い版が動き続ける。リリース手順で health の version を確かめているので見逃さない
+
 ## リリース済み: 5.46.1（2026-11-14・ホットフィックス）
 
 本番 4 台へデプロイ済み（07:33〜07:36・shallu → zugoga → gomander → vulcan・`main` の `2c50587c`・Ruby 4.0.9 据え置き）。[リリースノート](https://github.com/pooza/mulukhiya-toot-proxy/releases/tag/v5.46.1)。全台 version 5.46.1・health 200・`config: OK`・monit 復帰・vulcan は 3 ユニットとも `NRestarts=0`。
