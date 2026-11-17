@@ -20,9 +20,20 @@ module Mulukhiya
 
     # HEIF を取り込んでよいか。⚠ 起動時に 1 回だけ決める（`setup_vips` と
     # `Controller#verify_upload_type!` が同じ答えを見るように）。
+    # ⚠ 決めたときに 1 回、版・ローダの有無・答えを info で残す（5.47.0 のリリース前レビュー）。
+    # 残さないと、pkg を上げたあと本当に開いたのか、soname が変わって黙って閉じたのかが、
+    # 実際にアップロードするまで分からない。
     def self.enabled?
-      @enabled = enable?(version) if @enabled.nil?
+      if @enabled.nil?
+        summary = self.summary
+        @enabled = summary[:enabled]
+        Logger.new.info(libheif: summary)
+      end
       return @enabled
+    end
+
+    def self.summary(version: self.version, loader: loader?)
+      return {version:, loader:, enabled: enable?(version, loader:)}
     end
 
     def self.enable?(version, loader: loader?)
@@ -42,13 +53,16 @@ module Mulukhiya
 
     # ⚠ libvips が読み込むのと同じ soname を引く。`heif` だけだと、開発用の `libheif.so` が
     # 無いホストで見つからない。
+    # ⚠ **soname を先に引く**（5.47.0 のリリース前レビュー）。`libheif.so` を先にすると、/usr/local へ
+    # 別の版を入れたホストで、libvips が使うのとは違う libheif の版を見て開いてしまう余地がある。
+    # `heif` は soname で引けないホスト（macOS の `libheif.1.dylib` など）のための控え。
     # ⚠ **読み込みは呼ばれたときに行う。**定数として書くと、libheif の無いホストでは
     # このファイルを読んだ時点で `LoadError` になる。
     def self.native
       return @native ||= Module.new do
         extend FFI::Library
 
-        ffi_lib ['heif', 'libheif.so.1']
+        ffi_lib ['libheif.so.1', 'heif']
         attach_function :heif_get_version, [], :string
       end
     end

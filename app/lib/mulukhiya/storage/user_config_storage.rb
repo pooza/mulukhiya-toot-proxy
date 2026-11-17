@@ -13,6 +13,18 @@ module Mulukhiya
       save
     end
 
+    # 書いた設定をディスクへ残す。
+    # ⚠ 同期の `SAVE` は使わない（5.47.0 のリリース前レビュー）。サーバー全体を止めるうえ、定期の BGSAVE と
+    # 重なると `ERR Background save already in progress` で失敗し、**書けているのに**要求が 500 になっていた
+    # （設定画面はチェックを戻すので、画面と保存された値が逆になる）。`SCHEDULE` は実行中なら終わってから取る。
+    # ⚠ 失敗しても SET は済んでいるので、要求は失敗させない。残せなくても次の定期の保存で残る。
+    def save
+      return redis.call('BGSAVE', 'SCHEDULE')
+    rescue => e
+      e.log(storage: underscore)
+      return nil
+    end
+
     def update(key, values)
       values.deep_stringify_keys!
       if values.key?('tags')

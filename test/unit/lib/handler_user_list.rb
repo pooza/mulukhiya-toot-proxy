@@ -17,6 +17,8 @@ module Mulukhiya
       @originals = NAMES.to_h {|name| [name, (config["/handler/#{name}/disable"] rescue false)]}
       NAMES.each {|name| config["/handler/#{name}/disable"] = false}
       @handlers = [DefaultTagHandler, InvalidCommandHandler, ImageResizeHandler].map(&:allocate)
+      # ⚠ サブクラスの `disable?` はサーバーの状態（辞書・タグの設定など）を見るので、既定は「動く」に固定する。
+      @handlers.each {|handler| handler.define_singleton_method(:disable?) {false}}
     end
 
     def teardown
@@ -60,6 +62,39 @@ module Mulukhiya
       names = Handler.user_list(FakeAccount.new([]), @handlers).map {|v| v[:name]}
 
       assert_equal(['default_tag', 'invalid_command'], names)
+    end
+
+    # このサーバーでは動かないもの（サブクラスの `disable?` が true）は見せない（5.47.0 のリリース前レビュー）。
+    def test_excludes_unavailable
+      @handlers.last.define_singleton_method(:disable?) {true}
+      names = Handler.user_list(FakeAccount.new([]), @handlers).map {|v| v[:name]}
+
+      assert_equal(['default_tag', 'invalid_command'], names)
+    end
+
+    # 利用者が自分で止めたものは、`disable?` が true でも戻せるように見せる。
+    def test_includes_disabled_by_user
+      @handlers.last.define_singleton_method(:disable?) {true}
+      entry = Handler.user_list(FakeAccount.new(['image_resize']), @handlers).find {|v| v[:name] == 'image_resize'}
+
+      assert(entry[:disabled])
+    end
+
+    # 判定で例外が出たら見せる側に倒す。
+    def test_includes_when_judgement_fails
+      @handlers.last.define_singleton_method(:disable?) {raise 'broken'}
+      names = Handler.user_list(FakeAccount.new([]), @handlers).map {|v| v[:name]}
+
+      assert_includes(names, 'image_resize')
+    end
+
+    # 通知（alert）のハンドラは利用者の投稿で動かないので見せない。
+    def test_excludes_alert_handlers
+      handlers = @handlers + [SlackAlertHandler.allocate]
+      handlers.last.define_singleton_method(:disable?) {false}
+      names = Handler.user_list(FakeAccount.new([]), handlers).map {|v| v[:name]}
+
+      assert_not_include(names, 'slack_alert')
     end
   end
 end

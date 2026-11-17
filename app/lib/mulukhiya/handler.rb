@@ -337,10 +337,10 @@ module Mulukhiya
       return nil
     end
 
-    def self.all(&block)
-      return enum_for(__method__) unless block
+    # ⚠ `sns` を渡すと、各ハンドラの `disable?` がその利用者の状態（PieFed・webhook の有無など）で判定する。
+    def self.all(sns: sns_class.new, &block)
+      return enum_for(__method__, sns:) unless block
       reporter = Reporter.new
-      sns = sns_class.new
       handlers = []
       Parallel.each(all_names, in_threads: Parallel.processor_count) do |name|
         handlers.push(create(name, {reporter:, sns:}))
@@ -350,12 +350,39 @@ module Mulukhiya
       handlers.compact.sort_by(&:underscore).each(&block)
     end
 
-    # 利用者向けのハンドラ一覧 (#4195)。サーバー全体で無効なものは見せない。
+    # 利用者の投稿では動かないイベント。そのハンドラは利用者向けの一覧に出さない。
+    USER_EXCLUDED_EVENTS = [:alert].freeze
+
+    # 利用者向けのハンドラ一覧 (#4195)。サーバー全体で無効なもの・このサーバーでは動かないものは見せない。
     # `toggleable: false` のものは含める（切り替えられないことをクライアントが表示する）。
+    # ⚠ `handlers` は利用者のトークンを持つ `sns` で作ったものを渡す（`all(sns:)`）。
     def self.user_list(account, handlers = all)
+      excluded = user_excluded_names
       return handlers
-          .reject {|handler| config.disable?(handler)}
+          .reject {|handler| excluded.member?(handler.underscore)}
+          .select {|handler| user_visible?(handler, account)}
           .map {|handler| handler.to_user_h(account)}
+    end
+
+    # 一覧に出すか (5.47.0 のリリース前レビュー)。サブクラスの `disable?` はサーバーの状態
+    # （Spotify の設定・リアクションの有無など）でも止まるので、それも見る。切り替えても効かないスイッチを見せない。
+    # ⚠ 利用者が自分で止めたものは、戻せるように見せる（`disable?` は利用者の設定でも true になる）。
+    # ⚠ 判定で例外が出たら見せる側に倒す（一覧から黙って消えるより、効かないスイッチが見えるほうがよい）。
+    def self.user_visible?(handler, account)
+      return false if config.disable?(handler)
+      return true if handler.toggleable? && account.disable?(handler)
+      return !handler.disable?
+    rescue => e
+      e.log(handler: handler.underscore)
+      return true
+    end
+
+    def self.user_excluded_names
+      return USER_EXCLUDED_EVENTS.each_with_object(Set[]) do |event, names|
+        names.merge(config["/handler/pipeline/base/#{event}"] || [])
+      rescue Ginseng::ConfigError
+        next
+      end
     end
 
     # 利用者が切り替えてよいハンドラの名前を返す (#4196)。だめなら例外。

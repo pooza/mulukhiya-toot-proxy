@@ -1043,7 +1043,7 @@ module Mulukhiya
 
     get '/handler/list' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
-      @renderer.message = Handler.user_list(sns.account)
+      @renderer.message = Handler.user_list(sns.account, Handler.all(sns:))
       return @renderer.to_s
     rescue => e
       report_error(e)
