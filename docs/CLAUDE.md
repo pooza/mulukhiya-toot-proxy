@@ -405,6 +405,22 @@ develop にすでに載っている bundler 4.0.20・ginseng-piefed v0.4.1・doc
 
 ## セッション同期の記録
 
+### 2026-11-17 セッション同期の記録
+
+**本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。harness の upstream 確認は `last_checked`（11-16）から 1 日なのでスキップ。
+
+- **ブランチ**: `develop` は `origin/develop` と同一（`f6926074`）。**open PR は 0**。Dependabot アラート **0 件**
+- **Codex**: 新しい指摘なし（#4914・#4919 の P2 は返信・👍 済みのまま）。PR 本体への申し送りもなし
+- **Issue**: 前回から増減なし（open 25）
+- **ginseng-\* のピン**: 11-16 の判断どおり core v7.1.0・piefed v0.7.0 の 2 本が②（次のマイルストーン）で残る。redis は v2.1.2 で最新。新しいずれは無い
+- **Annict の API**: 基準（11-05）と同じ。公式アカウントの新しい投稿なし（最新は 11-03 の二要素認証）。
+  ⚠ `annict_api_watch.rb` の公式アカウントの取得はこの日 2 回とも空の応答（`JSON::ParserError`）。curl で直接引くと取れたので、10 秒の打ち切りに当たった一過性と見ている
+- **chubo2**: open 8 件（前回 9）。ローカルは `origin/main` と同一。Issue 棚卸し（10-25）・ドキュメント棚卸し（10-31）とも 30 日未満
+- **辞書台帳**（pooza/chubo2 `6f60a9a`）: 🔴 は既知の 3 行だけ（gomander の GAS 直書き・delmulin の `pron.json` / `character/v1/detail.json` が台帳に無い）。
+  gomander のノード表から `dic.json` が消え、口の表で `dic.json` が「⚪ 他所のみ」になった＝ #4880 の手順 2（`tags.json` への切り替え）どおり。
+  🟡 は b-shock の `service.json` が 4 台とも 🟢 に戻り、gomander の `fairy.json` が 1/145
+- **Sentry**: unresolved **26 件**・**コメント 0 は 0 件**（2026-11-17 時点）。最新イベントは 1X の 11-10 23:00 のままで、確認済み
+
 ### 2026-11-16 セッション同期の記録
 
 **本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。
