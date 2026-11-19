@@ -19,8 +19,8 @@
 # 運用方針の詳細は MEMORY の feedback_upstream-release-harness-verification 参照。
 
 mastodon:
-  verified: v4.7.5
-  verified_at: '2026-11-04'
+  verified: v4.7.6
+  verified_at: '2026-11-19'
 
 misskey:
   verified: 2026.11.0
@@ -32,7 +32,19 @@ pleroma:
   verified_at: '2026-10-31'
 
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
-last_checked: '2026-11-16'
+last_checked: '2026-11-19'
+
+# 2026-11-19 チェック結果:
+#   - Mastodon: **v4.7.6（2026-11-19T10:30Z）が出たので検証し、verified を昇格した。**
+#     harness を v4.7.6 で再構築（update-version.sh → reset.sh）し、develop `f3f45ebd` で
+#     `TestHarness: controller=mastodon url=http://localhost:3000`
+#     1992 tests / 4171 assertions / **0 failures / 0 errors** / 189 omissions（5.47.0 のゲートの v4.7.5 と tests・omission とも同数）。
+#   - 差分の読み取り: Docker イメージの Ruby を上げるセキュリティリリース（Regexp・String の脆弱性・2026-11-18 の告知）と
+#     依存の更新（puma・rails・sanitize・msgpack・omniauth）、Fixed 3 件。マイグレーションも API・シリアライザの変更も無い。
+#     ⚠ 本番向けの注意は **Docker を使わない環境は Ruby 4.0.10 / 3.4.13 / 3.3.14 以上が必要**なこと。インフラ側（chubo2・#316）の話。
+#   - ⚠ 実走の作法: `env -i ... bash -lc` は /etc/profile が PATH を作り直して rbenv が外れ、`bundle: command not found` で
+#     **テストが 1 件も走らないまま終わる**（`| grep` で絞ると空になるだけで気づきにくい）。`bash -c` で回す。
+#   - Misskey: 最新 stable は 2026.11.0 ＝ verified と同じ。Akkoma は確認していない（実運用していない系統・急がない）。
 
 # 2026-11-16 チェック結果:
 #   - **新しいものは無い。実走・bump とも不要。**`last_checked` の更新のみ。
