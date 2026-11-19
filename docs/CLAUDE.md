@@ -203,6 +203,19 @@ git diff Gemfile.lock
 - ginseng-core v7.1.0・ginseng-piefed v0.7.0 の取り込み（2026-11-18 のピンのずれ）
 - #4924（HEIF を開く libheif の基準の版を設定で上げられるようにする。⚠ 設定はコードの値より下げられない形に）
 
+## リリース済み: 5.47.2（2026-11-19・ホットフィックス）
+
+本番 4 台へデプロイ済み（21:35〜21:37・shallu → zugoga → gomander → vulcan・`main` の `769b71b5`・**Ruby 4.0.9 → 4.0.10**）。[リリースノート](https://github.com/pooza/mulukhiya-toot-proxy/releases/tag/v5.47.2)。全台 version 5.47.2・Ruby 4.0.10・YJIT 有効・health 200・`config: OK`・monit 復帰・vulcan は 3 ユニットとも `NRestarts=0`。
+
+- **PR #4927（#4926）**: `.ruby-version` を 4.0.10 へ。Ruby の正規表現と String の脆弱性 7 件（2026-11-18 の告知）。うち 2 件は細工した文字列を `downcase` するだけで起き、モロヘイヤは投稿本文のハッシュタグを `downcase` しているので当たる。起票は ginseng-style の配布（pooza/ginseng-style#156）、サーバー側は pooza/chubo2#316
+  - 同梱の bundler は 4.0.20 のままで `BUNDLED WITH` は動かず、`Gemfile.lock` の差分なし
+  - harness（ブランチ・4.0.10）: Mastodon v4.7.6 1992 tests / 189 omissions・Misskey 2026.11.0 1992 tests / 173 omissions。両系とも **0 failures / 0 errors**。Pleroma 系は回していない（ホットフィックス）
+  - ステージングは dev25 / dev27 にブランチのまま載せて health・version・YJIT を確かめた
+- ⚠ **Ruby を上げる回は、本番で先に `RBENV_VERSION=<新しい版> bundle install` を流しておくと、止めている時間が短くなる**（lock が動かない回に限る。サービスは止めずに gem だけ入る）。今回は 4 台とも 1 分前後で済んだ
+- ⚠ zugoga だけ再起動 20 秒後の health が 503 で、直後に取り直すと 200。内訳は取れていない（再起動直後の一過性と見ている）
+- ⚠ CI の Mastodon 系は `apt install` の 10 分タイムアウト（Ubuntu のミラーにつながらない）で 2 回落ち、3 回目で緑
+- ⚠ ステージングで別ブランチを `git fetch origin` だけで取れないことがある（refspec が develop だけ）。`+refs/heads/<branch>:refs/remotes/origin/<branch>` を明示する。**取得が成功してから sidekiq を止める**（dev25 で止めたまま数十秒 503 にした）
+
 ## リリース済み: 5.47.1（2026-11-18・ホットフィックス）
 
 本番 4 台へデプロイ済み（07:21〜07:22・`main` の `4e46cad0`）。[リリースノート](https://github.com/pooza/mulukhiya-toot-proxy/releases/tag/v5.47.1)。全台 version 5.47.1・health 200・`config: OK`・monit 復帰・vulcan は `NRestarts=0`。develop へは PR #4925 で戻した（version 行は develop の 5.48.0 を採った）。
