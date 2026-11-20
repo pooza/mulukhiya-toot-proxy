@@ -201,6 +201,7 @@ git diff Gemfile.lock
 - #4880 の手順 4（`MecabRemoteDictionary` とスキーマの `mecab` 型を消す）。注意書きは 5.47.0 の wiki とリリースノートで出した
 - #4920（Akkoma のメディアカタログで、項目ごとの Redis の接続と同期の取得。引き金は Akkoma の本番投入）
 - ginseng-core v7.1.0・ginseng-piefed v0.7.0 の取り込み（2026-11-18 のピンのずれ）
+- #4928（ginseng-youtube v4.0.1・ginseng-redis v2.1.3 の取り込み。どちらも patch で急ぎではない）
 - #4924（HEIF を開く libheif の基準の版を設定で上げられるようにする。⚠ 設定はコードの値より下げられない形に）
 
 ## リリース済み: 5.47.2（2026-11-19・ホットフィックス）
@@ -427,6 +428,23 @@ git diff Gemfile.lock
 - **デプロイで見ること**: #4869 で `/service/*` の検査が初めて効く。4 台の `rake config:lint` は出力の `config: OK` まで確かめる（短い鍵・`peer_tube/hosts` の型）
 
 ## セッション同期の記録
+
+### 2026-11-20 セッション同期の記録
+
+**本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。harness の upstream 確認は `last_checked`（11-19）から 1 日なのでスキップ。
+
+- **ブランチ**: `develop` は `origin/develop` と同一（`f90a2fd3`）。**open PR は 0**。Dependabot アラート **0 件**
+- **Codex**: #4922〜#4929 はどれも指摘なし（サマリーのみ）。PR 本体への申し送りもなし
+- **Issue**: open 15。#4928（ginseng-youtube / redis の取り込み）がマイルストーンなしだったので 5.48.0 へ載せた
+- **ginseng-\* のピン**: 新しいずれが 3 本。redis v2.1.2 → **v2.1.3**・youtube v4.0.0 → **v4.0.1** は #4928 で受ける。
+  fediverse v9.0.0 → **v10.0.0**（breaking: `upload_remote_resource` に受信の上限 256 MiB と `TooLargeError`）は、
+  モロヘイヤが `upload_remote_resource` を丸ごと上書きしている（`app/lib/mulukhiya/sns_service_methods.rb:27`）ので届かない。③見送ってよい見込み（取り込むなら #4928 のついで）。core v7.1.0・piefed v0.7.0 は 11-16 の判断どおり②
+- **Annict の API**: 基準（11-05）と同じ。公式アカウントの新しい投稿なし
+- **chubo2**: open 11 件（#315・#316・#317 が増えた）。ローカルが 1 本遅れていたので早送りした（infra-note の変更なし）。Issue 棚卸し（10-25）・ドキュメント棚卸し（10-31）とも 30 日未満
+- **辞書台帳**（pooza/chubo2 `b51f91a`）: 🔴 は既知の 3 行だけ。🟡 は gomander の `fairy.json` が 🟢 に戻り、delmulin の `pron.json` が「🟡 未使用」。
+  `script.google.com` の行が「⚪ 取得のみ」で 5 行増え、口の表の「その他」がほぼ 0 になった（読み辞書の正常な姿として扱う）
+- **Sentry**: unresolved **23 件**（11-17 から 3 減）・**コメント 0 は 0 件**（2026-11-20 時点）。新しいイベントは 3 件ともきゅあすきー（`server_name=mulukhiya`・5.45.0）で、
+  -1X（count 396・先方のカスタムフィードの jq の解析エラー・11-10 と 11-17）・-38（count 14・11-19 10:00Z の Redis の接続拒否）・-2W（count 2・11-19 11:25Z の AnnouncementWorker の 502）。3 件ともコメントを書いた。pooza の本番 4 台ではない
 
 ### 2026-11-17 セッション同期の記録
 
