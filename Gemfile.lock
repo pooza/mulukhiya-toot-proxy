@@ -50,10 +50,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-piefed.git
-  revision: 66e4acbc6f2c43c4f5920052914ec588e2c574d9
-  tag: v0.6.1
+  revision: 041eda1bf8bb926b74d38b50ccb0234a6c27d327
+  tag: v0.7.0
   specs:
-    ginseng-piefed (0.6.1)
+    ginseng-piefed (0.7.0)
       ginseng-core (>= 2.0.0)
 
 GIT
