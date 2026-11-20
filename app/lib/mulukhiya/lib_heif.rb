@@ -14,7 +14,11 @@ module Mulukhiya
     # 1.23.5（09-21）・1.23.6（10-05・high 4 件）・1.23.7（10-26・high 13 件。ヒープの解放後の使用・
     # バッファ溢れを含む）と勧告が続いた（5.47.1）。上げるときは
     # `gh api repos/strukturag/libheif/security-advisories` の `patched_versions` の最大を見る。
+    # ⚠ 新しい勧告が出たら、リリースを待たずに設定（`/media/heif/safe_version`）で上げられる (#4924)。
+    # 設定はこの値より**下げられない**（→ `safe_version`）。
     SAFE_VERSION = '1.23.7'.freeze
+
+    VERSION_PATTERN = /\A\d+(\.\d+)*\z/
 
     def self.version
       return native.heif_get_version
@@ -36,14 +40,35 @@ module Mulukhiya
       return @enabled
     end
 
-    def self.summary(version: self.version, loader: loader?)
-      return {version:, loader:, enabled: enable?(version, loader:)}
+    # ⚠ 使った基準の版（`safe_version`）も残す (#4924)。設定で上げたのが効いたかを、ログで確かめられるように。
+    def self.summary(version: self.version, loader: loader?, safe_version: self.safe_version)
+      return {version:, loader:, safe_version:, enabled: enable?(version, loader:, safe_version:)}
     end
 
-    def self.enable?(version, loader: loader?)
+    def self.enable?(version, loader: loader?, safe_version: self.safe_version)
       return false unless loader
-      return false unless version.to_s.match?(/\A\d+(\.\d+)*\z/)
-      return Gem::Version.new(version) >= Gem::Version.new(SAFE_VERSION)
+      return false unless version?(version)
+      return Gem::Version.new(version) >= Gem::Version.new(safe_version)
+    end
+
+    # HEIF を開く基準の版。設定（`/media/heif/safe_version`）が `SAFE_VERSION` より新しければそれを、
+    # そうでなければ `SAFE_VERSION` を使う (#4924)。
+    # ⚠⚠ **設定は上げる方向にしか効かない。**古い設定が残っていると、後のリリースで上げた
+    # `SAFE_VERSION` を黙って下げてしまうため。
+    # ⚠ 版として読めない設定も `SAFE_VERSION` に倒す（閉じる側）。スキーマでも弾く。
+    def self.safe_version(configured = configured_safe_version)
+      return SAFE_VERSION unless version?(configured)
+      return [SAFE_VERSION, configured.to_s].max_by {|v| Gem::Version.new(v)}
+    end
+
+    def self.configured_safe_version
+      return Config.instance['/media/heif/safe_version']
+    rescue Ginseng::ConfigError
+      return nil
+    end
+
+    def self.version?(version)
+      return version.to_s.match?(VERSION_PATTERN)
     end
 
     # libvips が heif のローダを持っているか。⚠ 無いのに開くと、HEIC が `ImageFile#type` の

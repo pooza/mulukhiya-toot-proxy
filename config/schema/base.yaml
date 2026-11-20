@@ -226,6 +226,12 @@ properties:
             minimum: 1
             type: integer
         type: object
+      heif:
+        properties:
+          safe_version:
+            pattern: '\A\d+(\.\d+)*\z'
+            type: string
+        type: object
     type: object
   piefed:
     properties:
