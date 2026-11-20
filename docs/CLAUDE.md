@@ -438,7 +438,7 @@ git diff Gemfile.lock
 - **Issue**: open 15。#4928（ginseng-youtube / redis の取り込み）がマイルストーンなしだったので 5.48.0 へ載せた
 - **ginseng-\* のピン**: 新しいずれが 3 本。redis v2.1.2 → **v2.1.3**・youtube v4.0.0 → **v4.0.1** は #4928 で受ける。
   fediverse v9.0.0 → **v10.0.0**（breaking: `upload_remote_resource` に受信の上限 256 MiB と `TooLargeError`）は、
-  モロヘイヤが `upload_remote_resource` を丸ごと上書きしている（`app/lib/mulukhiya/sns_service_methods.rb:27`）ので届かない。③見送ってよい見込み（取り込むなら #4928 のついで）。core v7.1.0・piefed v0.7.0 は 11-16 の判断どおり②
+  モロヘイヤが `upload_remote_resource` を丸ごと上書きしている（`app/lib/mulukhiya/sns_service_methods.rb:27`）ので届かない。**③見送り（ユーザー判断: 大きな破壊的変更を含むものは送る）**。残りの 4 本（core・piefed・redis・youtube）は gemspec を見ても fediverse v10 に縛られていないので、切り離して取り込める。core v7.1.0・piefed v0.7.0 は 11-16 の判断どおり②
 - **Annict の API**: 基準（11-05）と同じ。公式アカウントの新しい投稿なし
 - **chubo2**: open 11 件（#315・#316・#317 が増えた）。ローカルが 1 本遅れていたので早送りした（infra-note の変更なし）。Issue 棚卸し（10-25）・ドキュメント棚卸し（10-31）とも 30 日未満
 - **辞書台帳**（pooza/chubo2 `b51f91a`）: 🔴 は既知の 3 行だけ。🟡 は gomander の `fairy.json` が 🟢 に戻り、delmulin の `pron.json` が「🟡 未使用」。
