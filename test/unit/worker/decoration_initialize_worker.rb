@@ -16,7 +16,7 @@ module Mulukhiya
       worker = Worker.create(:decoration_initialize)
 
       assert_not_nil(worker)
-      assert_equal('デコレーションを復元しました。', worker.worker_config(:message))
+      assert_equal('%{program}のために付けた%{decoration}を、番組が終わったので外しました。', worker.worker_config(:message))
     end
   end
 end
