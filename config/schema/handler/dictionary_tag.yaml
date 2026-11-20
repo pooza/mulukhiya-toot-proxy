@@ -37,7 +37,6 @@ properties:
             - multi_field
             - related
             - relative
-            - mecab
           type: string
         url:
           format: uri

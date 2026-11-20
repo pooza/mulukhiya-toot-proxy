@@ -44,20 +44,19 @@ module Mulukhiya
       assert_raise(Ginseng::GatewayError) {dictionary('related').fetch}
     end
 
-    # ⚠ **3 サブクラスとも fail-open で {}。**以前は multi_field だけ外側の
+    # ⚠ **サブクラスはどれも fail-open で {}。**以前は multi_field だけ外側の
     # rescue が無く、同じ入力で呼び出し元へ NoMethodError が抜けていた。
     def test_parse_is_fail_open_for_all_types
       stub_html
-      types = ['related', 'mecab', 'multi_field']
+      types = ['related', 'multi_field']
 
       types.each {|type| assert_empty(dictionary(type).parse, "type=#{type}")}
     end
 
     # 期待する型は parse の前提と揃っていること。related は Hash、
-    # mecab / multi_field は Array。
+    # multi_field は Array。
     def test_expected_class
       assert_equal(Hash, dictionary('related').expected_class)
-      assert_equal(Array, dictionary('mecab').expected_class)
       assert_equal(Array, dictionary('multi_field').expected_class)
     end
 
@@ -101,6 +100,12 @@ module Mulukhiya
     end
 
     public
+
+    # 5.48.0 で消した mecab 型は作らない（nil＝その辞書は外れる・#4880）。
+    def test_create_rejects_removed_type
+      assert_nil(RemoteDictionary.create('url' => URL, 'type' => 'mecab'))
+      assert_kind_of(RelatedRemoteDictionary, RemoteDictionary.create('url' => URL, 'type' => 'related'))
+    end
 
     # ⚠ `interval` は last-good の鍵に含めない（5.41.0 のリリース前レビュー）。足した・変えただけで
     # 鍵が変わると、直後の失敗を埋め戻せない。解釈に効く設定（`strict`）は含めたまま。

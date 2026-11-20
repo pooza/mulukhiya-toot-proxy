@@ -110,8 +110,18 @@ module Mulukhiya
       handler.all.filter_map {|v| create(v)}.each(&block)
     end
 
+    # 廃止した `type`。読む側のクラスは無い。
+    # ⚠ 5.48.0 で `mecab` を消した (#4880)。設定に残っていると辞書が外れて語数が減るので、
+    # 定数が無いという分かりにくいエラーではなく、何をすればよいかをログに残す。
+    REMOVED_TYPES = {'mecab' => 'related'}.freeze
+
     def self.create(params)
-      return "Mulukhiya::#{type(params).camelize}RemoteDictionary".constantize.new(params)
+      name = type(params)
+      if replacement = REMOVED_TYPES[name]
+        message = "Dictionary type '#{name}' was removed. Use '#{replacement}' instead"
+        raise Ginseng::ConfigError, "#{message} (#{params['url']})"
+      end
+      return "Mulukhiya::#{name.camelize}RemoteDictionary".constantize.new(params)
     rescue => e
       e.log
       return nil
