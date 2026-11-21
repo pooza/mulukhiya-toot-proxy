@@ -61,7 +61,7 @@ module Mulukhiya
       assert_not_equal(@dic.signature, create_dictionary(DICS.take(1)).signature)
       assert_not_equal(
         @dic.signature,
-        create_dictionary([{'url' => DICS.first['url'], 'type' => 'mecab'}, DICS.last]).signature,
+        create_dictionary([{'url' => DICS.first['url'], 'type' => 'multi_field'}, DICS.last]).signature,
       )
     end
 
