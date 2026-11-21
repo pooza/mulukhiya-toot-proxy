@@ -107,6 +107,25 @@ module Mulukhiya
       assert_kind_of(RelatedRemoteDictionary, RemoteDictionary.create('url' => URL, 'type' => 'related'))
     end
 
+    # ⚠ 辞書の URL を例外メッセージへ埋めない。`dic:` で渡せばマスクが効く (PR #4932 の Codex P1)。
+    def test_create_removed_type_keeps_url_out_of_message
+      url = "#{URL}?access_token=SECRET"
+      logged = []
+      double = Object.new
+      double.define_singleton_method(:error) {|payload| logged.push(payload)}
+      double.define_singleton_method(:method_missing) {|*_args, **_kwargs| nil}
+      Logger.singleton_class.alias_method(:original_new_for_test, :new)
+      Logger.define_singleton_method(:new) {|*_args| double}
+
+      assert_nil(RemoteDictionary.create('url' => url, 'type' => 'mecab'))
+      assert_equal(1, logged.count)
+      assert_not_include(logged.first[:error].message, 'SECRET')
+      assert_equal(url, logged.first[:dic])
+    ensure
+      Logger.singleton_class.alias_method(:new, :original_new_for_test)
+      Logger.singleton_class.remove_method(:original_new_for_test)
+    end
+
     # ⚠ `interval` は last-good の鍵に含めない（5.41.0 のリリース前レビュー）。足した・変えただけで
     # 鍵が変わると、直後の失敗を埋め戻せない。解釈に効く設定（`strict`）は含めたまま。
     def test_cache_signature_ignores_interval

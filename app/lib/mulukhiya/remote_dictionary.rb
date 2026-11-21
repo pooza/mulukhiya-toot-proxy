@@ -115,15 +115,17 @@ module Mulukhiya
     # 定数が無いという分かりにくいエラーではなく、何をすればよいかをログに残す。
     REMOVED_TYPES = {'mecab' => 'related'}.freeze
 
+    # ⚠⚠ **URL を例外メッセージへ埋めない (#4630・PR #4932 の Codex P1)。**`?access_token=` 付きの
+    # URL がマスクを通らずに syslog へ残る。URL は `dic:`（値そのものが URL＝マスクが効く）で渡す。
     def self.create(params)
       name = type(params)
       if replacement = REMOVED_TYPES[name]
         message = "Dictionary type '#{name}' was removed. Use '#{replacement}' instead"
-        raise Ginseng::ConfigError, "#{message} (#{params['url']})"
+        raise Ginseng::ConfigError, message
       end
       return "Mulukhiya::#{name.camelize}RemoteDictionary".constantize.new(params)
     rescue => e
-      e.log
+      e.log(dic: params['url'].to_s)
       return nil
     end
 
