@@ -429,6 +429,22 @@ git diff Gemfile.lock
 
 ## セッション同期の記録
 
+### 2026-11-21 セッション同期の記録
+
+**本番には触っていない**（辞書台帳の生成と、Sentry の判断のための gomander のログの読み取りだけ）。harness の upstream 確認は `last_checked`（11-19）から 2 日なのでスキップ。
+
+- **ブランチ**: `develop` は `origin/develop` と同一（`0fb05348`）。open PR は 4（#4930〜#4933・どれも 5.48.0）。Dependabot アラート **0 件**
+- **Codex**: #4922〜#4929 は指摘なし。open PR に 2 件あり、どちらもテストで再現してから直した
+  - PR #4933 の P2（5.48.0 より前に付けたデコを戻すと、`live` が nil で通知の文面が `NoMethodError`・通知が届かない）→ `4277f8b1`。返信・👍 済み
+  - PR #4932 の P1（廃止した `mecab` 型のエラーに辞書の URL が入り、`?access_token=` がマスクされない・#4630 と同じ形）→ `9438fd0c`。返信・👍・`@codex review` 済み
+- **Issue**: open 15（前回から増減なし）。5.48.0 の 5 件は GitHub 上も open のまま
+- **ginseng-\* のピン**: 11-20 と同じ（core・piefed・redis・youtube は PR #4930、fediverse v10.0.0 は③見送り）。新しいずれなし
+- **Annict の API**: 基準（11-05）と同じ。公式アカウントの新しい投稿なし
+- **chubo2**: 1 本遅れていたので早送りした（infra-history に FreeBSD 4 台の nginx 1.30.7 化と、週末の一斉更新・infra-note の変更なし）。open 11 件で増減なし。棚卸しはどちらも 30 日未満
+- **辞書台帳**（pooza/chubo2 `006989e`）: 🔴 は既知の 3 行だけ。🟡 は `mstdn.b-shock.org` の `service.json` / `common.json` が各台 1/143 前後（今朝の一斉更新の再起動と見ている）
+- **Sentry**: unresolved **25 件**・**コメント 0 は 0 件**（2026-11-21 時点・判断を書いたあと）。新しく立った -39（count 11）・-3A（count 7）は
+  gomander（5.47.2）の Redis の接続拒否で、07:26 / 07:32 / 07:39 JST の 3 回。週末の一斉更新（07:37:57 に `shutdown -r now`・起動 07:40）の中なので一過性。コメントを書いた
+
 ### 2026-11-20 セッション同期の記録
 
 **本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。harness の upstream 確認は `last_checked`（11-19）から 1 日なのでスキップ。
