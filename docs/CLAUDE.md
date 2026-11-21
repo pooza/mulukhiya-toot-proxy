@@ -204,6 +204,19 @@ git diff Gemfile.lock
 - #4928（ginseng-youtube v4.0.1・ginseng-redis v2.1.3 の取り込み。どちらも patch で急ぎではない）
 - #4924（HEIF を開く libheif の基準の版を設定で上げられるようにする。⚠ 設定はコードの値より下げられない形に）
 
+5 件とも PR で develop へ入った（#4930〜#4934・2026-11-21）。
+
+### リリース前レビュー（5 観点）の結果（2026-11-21）
+
+範囲は `v5.47.2..develop`（32 ファイル・+835/−241）。**赤は 0 件**、セキュリティは指摘なし。黄 5・緑 3 の行き先はユーザーが決めた。
+
+- **掃除 PR で直した**（ステージング検証の前）: デコを付けてから記録を書いていた順番（書き込みが落ちると外れなくなる）・`docs/api.md` にデコの 3 つの口・
+  メタデータの取得に落ちた側が別のスレッドのファイルを消しうる件（#4920 で入れた行）・廃止した辞書の型の案内を wiki と同じ `relative` に・`compose_template_container.rb` の古いコメント
+- **リリース後の更新で直す**: wiki（`実況に関する設定項目`・`ImageFormatConvertHandler`・MeCab の 3 ページの「予定」の書き方）
+- **直さない**: 定数の置き場所・`VALID_KEYS` の重複（読みにくさだけ）
+- ⚠⚠ **デプロイの直前に見る（記録のみ）**: 更新をまたいで実況中だった人は、1 回限りデコが外れずに残る（5.47.2 にあった「記録が無ければ設定のデコを外す」逃げ道が無くなった）。
+  デコは Misskey だけなので **vulcan で、デプロイの時点に実況中の人がいないこと**を見てから上げる（Sidekiq の `decoration_initialize_*` の予約）
+
 ## リリース済み: 5.47.2（2026-11-19・ホットフィックス）
 
 本番 4 台へデプロイ済み（21:35〜21:37・shallu → zugoga → gomander → vulcan・`main` の `769b71b5`・**Ruby 4.0.9 → 4.0.10**）。[リリースノート](https://github.com/pooza/mulukhiya-toot-proxy/releases/tag/v5.47.2)。全台 version 5.47.2・Ruby 4.0.10・YJIT 有効・health 200・`config: OK`・monit 復帰・vulcan は 3 ユニットとも `NRestarts=0`。

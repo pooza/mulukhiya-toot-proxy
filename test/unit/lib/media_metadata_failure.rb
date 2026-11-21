@@ -51,6 +51,21 @@ module Mulukhiya
       assert_false(File.exist?(@path))
     end
 
+    # 取得が落ちた側は消さない。同じ媒体を同時に取りに行った別のスレッドが書き終えたファイルかもしれない
+    # （5.48.0 のリリース前レビュー）。
+    def test_fetch_failure_keeps_file_written_by_another_thread
+      fixture = File.binread(File.join(Environment.dir, 'test/fixture/sample.jpg'))
+      path = @path
+      stub_request(:get, URL).to_return do |_request|
+        File.binwrite(path, fixture)
+        {status: 503}
+      end
+      @storage.push(@uri)
+
+      assert_equal({}, @storage[@uri])
+      assert_path_exist(@path)
+    end
+
     def test_success_leaves_no_temporary_file
       stub_request(:get, URL).to_return(
         body: File.binread(File.join(Environment.dir, 'test/fixture/sample.jpg')),
