@@ -24,6 +24,12 @@ module Mulukhiya
     # 丸ごと保存して上書きで戻していたので、番組の途中で動かしたり足したりしたデコが巻き戻った。
     # ⚠ 既に同じデコを付けていた人は、利用者のデコなので外さない（`live` に `id` を残さない）。
     # ⚠ 前の実況のデコが残っていて、設定のデコが変わっていたら、前のものを外して付け替える。
+    #
+    # ⚠⚠ **記録（`/decoration/live`）は、デコを付ける前に書く（5.48.0 のリリース前レビュー）。**付けてから
+    # 書くと、書き込みが落ちたときに「付いているのに記録が無い」になり、番組の終わり・毎日の一括の戻し・
+    # 手で戻す口のどれもが外さない。先に書いておけば、付けるほうが落ちても、戻すときに
+    # 「記録の ID が付いていない」と見て何もしないだけで済む。
+    # ⚠ 付け替えで付けるほうが落ちると、前の実況のデコが記録から外れて残る（Misskey の API が落ちたときだけ）。
     def apply_decoration(account, program: nil, restore_at: nil)
       service = sns_class.new
       service.token = account.user_config.token
@@ -31,13 +37,13 @@ module Mulukhiya
       current = service.fetch_account_detail['avatarDecorations'] || []
       previous = account.user_config['/decoration/live/id']
       owned = previous != decoration_id && current.any? {|d| d['id'] == decoration_id}
-      update_decorations(service, current, decoration_id, previous)
       live = {started_at: Time.now.iso8601, program:, restore_at:}
       unless owned
         live[:id] = decoration_id
         live[:name] = decoration_name(service, decoration_id)
       end
       save_live(account, live)
+      update_decorations(service, current, decoration_id, previous)
       log(acct: account.acct.to_s, decoration_id:, message: owned ? 'already applied' : 'applied')
     rescue => e
       e.log

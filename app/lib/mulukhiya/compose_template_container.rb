@@ -1,7 +1,7 @@
 module Mulukhiya
   # 投稿テンプレート（定形投稿）の per-user CRUD (#4457, pooza/capsicum#767)。
   # 保存先は user_config の `/compose/templates`（モロヘイヤ自身の Redis・db 1）で、
-  # `/tagging/user_tags`・`/decoration/saved_state` と同じ per-user storage の系譜。
+  # `/tagging/user_tags`・`/decoration/live` と同じ per-user storage の系譜。
   #
   # UserConfig#update が例外を握りつぶす（`rescue => e; e.alert`）ため、書き込み後に
   # read-back で永続化を検証し、失敗時は GatewayError を上げて capsicum に返す。

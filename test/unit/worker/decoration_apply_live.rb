@@ -109,6 +109,17 @@ module Mulukhiya
       assert_equal({'id' => APPLIED, 'name' => '実況中 ゴメちゃん'}, live(config))
     end
 
+    # 記録はデコを付ける前に書く。書き込みが落ちると、付いたデコが外れなくなる（5.48.0 のリリース前レビュー）。
+    def test_live_is_saved_before_applying
+      service = stub_service([])
+      config = FakeUserConfig.new('decoration' => {'id' => APPLIED})
+      seen = []
+      service.define_singleton_method(:update_account) {|_params| seen.push(config['/decoration/live/id'])}
+      @worker.apply_decoration(FakeAccount.new(config))
+
+      assert_equal([APPLIED], seen)
+    end
+
     def test_apply_without_decoration_id
       service = stub_service([])
       config = FakeUserConfig.new({})
