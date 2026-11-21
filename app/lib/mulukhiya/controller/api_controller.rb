@@ -276,10 +276,27 @@ module Mulukhiya
     post '/decoration/restore' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.decoration?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
-      saved = sns.account.user_config['/decoration/saved_state']
-      raise Ginseng::NotFoundError, 'Not Found' unless saved.present?
-      DecorationInitializeWorker.new.restore_decoration(sns.account)
+      unless DecorationInitializeWorker.restorable?(sns.account.user_config)
+        raise Ginseng::NotFoundError, 'Not Found'
+      end
+      DecorationInitializeWorker.new.restore_decoration(sns.account, notify: false)
       @renderer.message = {config: sns.account.user_config.to_h}
+      return @renderer.to_s
+    rescue => e
+      report_error(e)
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    # 実況のために付けたデコの状態 (#4912)。capsicum のデコの画面で「実況中のデコ（番組の終わりに
+    # 外れます）」と示すためのもの。実況中でなければ `live: false` だけを返す。
+    # ⚠ `id` は番組の終わりに外すデコ。実況を始めたとき既に同じデコを付けていた人は、外さないので
+    # `id` を返さない（`live` は true）。
+    get '/decoration/live' do
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.decoration?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      @renderer.message = DecorationInitializeWorker.live_status(sns.account.user_config)
       return @renderer.to_s
     rescue => e
       report_error(e)

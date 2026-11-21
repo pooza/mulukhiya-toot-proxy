@@ -153,9 +153,16 @@ module Mulukhiya
       decoration_id = self['/decoration/id']
       return unless decoration_id
       extra = config['/worker/decoration_initialize/extra_minutes'] rescue 2
-      DecorationApplyWorker.perform_async({account_id: @account.id})
+      restore_at = (minutes + extra).to_i.minutes.after
+      # 番組名は同じコマンドのタグセットの先頭（`AnnictService.create_command_toot` の形）。
+      # 通知の文面と、実況中かを返す API（`/decoration/live`）に使う (#4912)。
+      DecorationApplyWorker.perform_async({
+        account_id: @account.id,
+        program: flatten['/tagging/user_tags']&.first,
+        restore_at: restore_at.iso8601,
+      }.compact)
       Sidekiq.set_schedule("decoration_initialize_#{@account.username}", {
-        at: (minutes + extra).to_i.minutes.after,
+        at: restore_at,
         class: 'Mulukhiya::DecorationInitializeWorker',
         args: [{account_id: @account.id}],
       })
@@ -164,9 +171,9 @@ module Mulukhiya
 
     def restore_decoration_if_saved
       return unless Environment.misskey_type?
-      return unless self['/decoration/saved_state'].present?
+      return unless DecorationInitializeWorker.restorable?(self)
       Sidekiq.remove_schedule("decoration_initialize_#{@account.username}")
-      DecorationInitializeWorker.new.restore_decoration(@account)
+      DecorationInitializeWorker.new.restore_decoration(@account, notify: false)
     rescue => e
       e.log
     end

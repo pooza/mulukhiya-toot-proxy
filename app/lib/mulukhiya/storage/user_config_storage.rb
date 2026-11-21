@@ -68,7 +68,7 @@ module Mulukhiya
 
     def self.decoration_owners(&block)
       return enum_for(__method__) unless block
-      accounts.select {|v| v.user_config['/decoration/saved_state'].present?}.each(&block)
+      accounts.select {|v| DecorationInitializeWorker.restorable?(v.user_config)}.each(&block)
     end
 
     def self.accounts(&block)

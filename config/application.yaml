@@ -956,7 +956,8 @@ worker:
     hours: 1
   decoration_initialize:
     extra_minutes: 2
-    message: デコレーションを復元しました。
+    # %{program} は「<番組名>の実況」、%{decoration} は「デコ「<デコ名>」」。分からなければ「実況」「デコ」 (#4912)。
+    message: '%{program}のために付けた%{decoration}を、番組が終わったので外しました。'
   user_tag_initialize:
     message: タグセットをクリアしました。
 youtube:
