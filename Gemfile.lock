@@ -8,10 +8,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 6d51c4d7c1a9cdb5e582ad3ff7dfc9cf790e87be
-  tag: v7.0.1
+  revision: 31af283534123caf0d9c88c16dd122748cfdd99c
+  tag: v7.1.0
   specs:
-    ginseng-core (7.0.1)
+    ginseng-core (7.1.0)
       activesupport (>= 8.1.2.1)
       addressable (>= 2.9.0)
       cgi (>= 0.4.2)
@@ -50,10 +50,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-piefed.git
-  revision: 66e4acbc6f2c43c4f5920052914ec588e2c574d9
-  tag: v0.6.1
+  revision: 041eda1bf8bb926b74d38b50ccb0234a6c27d327
+  tag: v0.7.0
   specs:
-    ginseng-piefed (0.6.1)
+    ginseng-piefed (0.7.0)
       ginseng-core (>= 2.0.0)
 
 GIT
@@ -67,10 +67,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-redis.git
-  revision: 601d16a521cdd5571cf12bf72d0a82927ae2c95c
-  tag: v2.1.2
+  revision: 4c0ff61c3077847a056808f6b2728638fa10dd08
+  tag: v2.1.3
   specs:
-    ginseng-redis (2.1.2)
+    ginseng-redis (2.1.3)
       redis-client
 
 GIT
@@ -100,10 +100,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-youtube.git
-  revision: e166b3faded9412bd9776935fc02cb9dc8212d6b
-  tag: v4.0.0
+  revision: 49f2bb19f376d131da95f921861ade78dc829b5f
+  tag: v4.0.1
   specs:
-    ginseng-youtube (4.0.0)
+    ginseng-youtube (4.0.1)
       ginseng-core (>= 1.23.1)
 
 GIT
