@@ -217,6 +217,25 @@ git diff Gemfile.lock
 - ⚠⚠ **デプロイの直前に見る（記録のみ）**: 更新をまたいで実況中だった人は、1 回限りデコが外れずに残る（5.47.2 にあった「記録が無ければ設定のデコを外す」逃げ道が無くなった）。
   デコは Misskey だけなので **vulcan で、デプロイの時点に実況中の人がいないこと**を見てから上げる（Sidekiq の `decoration_initialize_*` の予約）
 
+### リリース準備の結果（2026-11-22）
+
+- **セキュリティ**: Dependabot 0 件・bundler-audit 0 件（advisory-db 2026-11-21）。`bundle update` は `ecaf3086`（11-21）。main から develop への戻し漏れなし
+- **harness**（develop `9bb753c8`・3 系統とも 0 failures / 0 errors）:
+
+  | 系 | 結果 |
+  | --- | --- |
+  | `controller=mastodon url=http://localhost:3000`（v4.7.6） | 2012 tests / 4228 assertions / 189 omissions |
+  | `controller=misskey url=http://localhost:3001`（2026.11.0） | 2012 tests / 4283 assertions / 173 omissions |
+  | `controller=pleroma url=https://st.akkoma.b-shock.org`（3.20.1） | 2012 tests / 4349 assertions / 180 omissions |
+
+  omission は 5.47.2 と同数（Mastodon・Misskey）。⚠ Mastodon と Misskey を**並べて走らせると、モロヘイヤの Redis（6379）を取り合ってログに `Background save already in progress` が出る**（結果は緑。気になるなら 1 系統ずつ）
+- **ステージング**: dev24〜27 は 11-21 13:14 に `ecaf3086` で再起動済み（docs だけの差）。4 台とも health 200・version 5.48.0。dev29 は 5.47.0 のままだったので develop へ上げた（health 200）
+  - #4912: dev27 で `decoration/list` 200・`decoration/live` は `{"live":false}`・`decoration/restore` は 404（外すデコが無い）、dev25（Mastodon）の `decoration/live` は 404。⚠ 実況の始まりから終わりまでの通しは見ていない（単体テストのみ）
+  - #4880: ステージング 5 台・本番 4 台の `local.yaml` に `mecab` は 0 件（上げても設定エラーにならない）
+  - #4924: `LibHeif.summary` は dev25 `1.23.6`・dev27 `1.21.2` とも `safe_version: "1.23.7"`・`enabled: false`（閉じたまま）
+  - #4920: dev29 の `/mulukhiya/api/media` は 200・メタデータあり・1 回目 0.52 秒 → 2 回目 0.18 秒。再起動の後にエラーなし
+  - WebUI の目視は未実施
+
 ## リリース済み: 5.47.2（2026-11-19・ホットフィックス）
 
 本番 4 台へデプロイ済み（21:35〜21:37・shallu → zugoga → gomander → vulcan・`main` の `769b71b5`・**Ruby 4.0.9 → 4.0.10**）。[リリースノート](https://github.com/pooza/mulukhiya-toot-proxy/releases/tag/v5.47.2)。全台 version 5.47.2・Ruby 4.0.10・YJIT 有効・health 200・`config: OK`・monit 復帰・vulcan は 3 ユニットとも `NRestarts=0`。
