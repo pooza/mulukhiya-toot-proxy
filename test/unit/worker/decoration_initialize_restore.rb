@@ -136,6 +136,8 @@ module Mulukhiya
 
       assert_equal([[{'id' => 'mine', 'angle' => 0.25}]], service.updates)
       assert_nil(config['/decoration/saved_state'])
+      # `live` が無いので番組名・デコ名は一般的な言い方になる (PR #4933 の Codex P2)
+      assert_equal(['実況のために付けたデコを、番組が終わったので外しました。'], @notices)
     end
 
     # 付けたことが分からないデコは外さない。

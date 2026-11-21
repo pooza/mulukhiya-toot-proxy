@@ -70,7 +70,9 @@ module Mulukhiya
     end
 
     # 通知の文面。番組名・デコ名が分からなければ、その部分を一般的な言い方にする。
+    # ⚠ 5.48.0 より前に付けた分は `live` が nil で来る (PR #4933 の Codex P2)。
     def message(live)
+      live ||= {}
       template = worker_config(:message)
       program = live['program'].present? ? "#{live['program']}の実況" : '実況'
       decoration = live['name'].present? ? "デコ「#{live['name']}」" : 'デコ'
