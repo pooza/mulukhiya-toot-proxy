@@ -23,10 +23,12 @@ module Mulukhiya
       @saved = saved = {}
       body = File.binread(File.join(Environment.dir, 'test/fixture/sample.jpg'))
       http = Object.new
-      http.define_singleton_method(:get) {|_uri, _options = {}| body}
+      # ⚠ 本物（`Ginseng::HTTP#get`）と同じく、`body` を持つ応答を返す (#4920)。
+      response = Struct.new(:body).new(body)
+      http.define_singleton_method(:get) {|_uri, _options = {}| response}
       @storage = MediaMetadataStorage.allocate
       @storage.define_singleton_method(:http) {http}
-      @storage.define_singleton_method(:set) {|key, values| saved[key.to_s] = values}
+      @storage.define_singleton_method(:set) {|key, values, **| saved[key.to_s] = values}
       @storage.define_singleton_method(:log) {|*| nil}
     end
 
