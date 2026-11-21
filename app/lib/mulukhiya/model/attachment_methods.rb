@@ -147,13 +147,32 @@ module Mulukhiya
       return create_uri(:small)
     end
 
+    # 媒体を取りに行って得たメタデータ。Mastodon は DB の `file_meta` で上書きし、Misskey は画像以外だけ
+    # ここへ来る。全種類がここを通るのは Pleroma 系（#4920）。
+    #
+    # ⚠⚠ **項目ごとに 1 回だけ引く (#4920)。**`to_h` の `size`・`pixel_size`（幅と高さ）・`duration` が
+    # それぞれ呼ぶので、覚えないと 1 項目で 7 回前後、そのたびにストレージ（Redis の接続プールと
+    # `HTTP`）を作り直していた。100 件のページなら、キャッシュが外れるたびに約 700 本。
+    # ⚠ 覚える変数を `@meta` にしない。Misskey は `@meta` を自分で持ち、`super` でここを呼ぶ。
+    # ⚠ 取れなかった（nil）ことも覚える。
     def meta
-      storage = MediaMetadataStorage.new
+      return @remote_meta if defined?(@remote_meta)
+      storage = AttachmentMethods.media_metadata_storage
       storage.push(uri) unless storage.key?(uri)
-      return storage[uri]
+      @remote_meta = storage[uri]
+      return @remote_meta
+    # ⚠ ログに `path` を使わない。`path` を持つのは Mastodon だけで、Pleroma 系ではここで NameError になる。
     rescue => e
-      e.log(path:)
+      e.log(attachment: id)
+      @remote_meta = nil
       return nil
+    end
+
+    # ⚠ ストレージはプロセスで 1 つを使い回す (#4920)。Redis の接続はプール（スレッドから共有してよい）。
+    # 競合して 2 つ作られても、片方が捨てられるだけで害は無い。
+    def self.media_metadata_storage
+      @media_metadata_storage ||= MediaMetadataStorage.new
+      return @media_metadata_storage
     end
 
     def size_str
