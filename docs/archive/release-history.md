@@ -2,6 +2,47 @@
 
 CLAUDE.md から分離した過去のリリースノート。直近リリースは [CLAUDE.md](../CLAUDE.md) を参照。
 
+## リリース済み: 5.44.0（2026-10-26）
+
+**本番デプロイ: 4 台完了**（2026-10-26 12:07〜12:10、shallu → zugoga → gomander → vulcan の順・月曜の昼）。
+全台 version 5.44.0 / health 200 / Ruby 4.0.9（YJIT 有効）/ `postgres.pool.waiting` 0 / `config: OK` / bundler 4.0.20（追加の `gem install` 不要）/ FreeBSD 3 台は monit 復帰 / vulcan は 3 ユニットとも `NRestarts=0`。
+`main` の `8751623d` / [v5.44.0](https://github.com/pooza/mulukhiya-toot-proxy/releases/tag/v5.44.0)（PR #4872）。
+[マイルストーン 5.44.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/646)。
+
+- ✅ **辞書の鍵の実物**: 配る側の gomander（鍵 1 本）・zugoga（2 本）とも、鍵ありで 200・鍵なし / 違う鍵で 403。取りに来る側の gomander・zugoga は再起動後の更新で `empty_sources: 0`・語数も前と同じ。syslog に `Bad response 403` なし
+- ✅ wiki（Annictの設定項目・公開API）に他の運用者向けの注意書き → ✅ **Annict の運営者（榛葉さん）へリリースの報告（10-26 15:31 JST・ユーザーが送信）**。返事は無いが了解されている理解。残りは #4865 のクローズ
+
+### 開発の記録
+
+⚠⚠ **割り込みの版（2026-10-25 ユーザー判断）。**Annict の API 利用規約（**2026-11-25 施行**）への対応 #4865 と、あれば脆弱性・バグの修正だけを載せる。**施行日までに出す。**
+もとの 5.44.0 の Issue は名前ごと 1 つ後ろへずらした（旧 5.44.0 → [5.45.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/644)、旧 5.45.0 → [5.46.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/645)）。
+develop にすでに載っている bundler 4.0.20・ginseng-piefed v0.4.1・docs は、そのまま 5.44.0 で出る。
+
+- open 1 件: #4865。**2026-10-26 に Annict の運営者から回答**（[要旨と改めた計画](https://github.com/pooza/mulukhiya-toot-proxy/issues/4865#issuecomment-6399902495)）。2（タグ照会）・4（番組表）は変えない。⚠ **施行日（11-25）を過ぎてもよいと言われたが、間に合わせる**（ユーザー）
+  - **PR #4866**: エピソードブラウザの口に SNS の認証（capsicum v2.6.0 は 10-25 に出た＝マージしてよい）
+  - **PR #4867**: エピソード辞書の口に鍵（`/service/annict/dictionary/keys` ＋ `?key=`）。✅ **本番 3 台の鍵は 10-26 に設置済み**（PR のコメント）。今の 5.43.0 は `?key=` を読み飛ばすので、辞書は途切れない
+    ⚠ 10-26 の同期で Codex の P1（鍵がリクエストログに平文）・P2（16 文字の検査が効かない）を `7d19e82c` で直し、`@codex review` 待ち。**配る側の syslog に 10-26 から鍵が残っている**が、**作り直さない**（10-26 ユーザー判断: syslog は流れる。syslog を外から読める状況では、`local.yaml` から直接鍵を読める）
+  - ✅ **2 本とも 10-26 にマージ**（#4867 は Codex の再レビューで指摘なし）。PR #4870 は develop へ rebase 済み（lint・テスト緑）
+  - 残り: リリース → wiki（Annictの設定項目・公開API）に他の運用者向けの注意書き → **Annict の運営者へリリースの報告**（10-26 に方針を返信した際に約束した）。きゅあすきーの管理人への連絡はユーザーがする
+- ⚠ **旧 5.44.0 の PR #4862（#4848 ginseng-core v4.1.0）・#4863（#4847 Akkoma の webhook）は 5.45.0 の分。**develop へマージすると割り込みの版に混ざるので、5.44.0 を出すまで待つ
+- ✅ **リリース前レビュー（5 観点・`v5.43.0..develop`・2026-10-26）: 赤 1 / 黄 4 / 緑 1**（重複は 1 件に数えた）。行き先はユーザーが決めた
+  - 🔴 **未ログインでエピソードブラウザを開くと 403 のダイアログ**（#4866 の認証に画面が追いついていなかった）→ **PR #4871 で本リリースに入れた**。docs/api.md の「Bearer 認証不要」の残り（黄）と、鍵を付けない未使用の `getEpisodeTags`（緑）も同じ PR
+  - 黄・**手順 12 の掃除 PR へ**: 辞書の口で断った理由（鍵が無い・違う・16 文字未満で無視・ボットの Annict トークンが無い）がログで区別できない。姉妹サーバーが鍵を設定するときに原因が読めない
+  - 黄・**記録のみ**: 配る側の nginx の access log の伏せ字（`combined_masked`）が `key=` を見ていないかもしれない（実機の conf は未確認）。syslog と同じ理由（そのログを読める人は `local.yaml` も読める）で直さない
+  - 黄・**wiki の注意書きへ**: 鍵を切り替える順序。合わないと取りに来る側の辞書は last-good で最大 24 時間しのいだあと、エピソードの語が抜ける（本番 3 台は 10-26 に切り替え済み）
+- ✅ **harness（develop `7cdb9668`・2026-10-26）**: `TestHarness: controller=mastodon url=http://localhost:3000` 1866 tests・0 failures・0 errors・158 omissions /
+  `controller=misskey url=http://localhost:3001` 1869 tests・0 failures・0 errors・145 omissions。omission は 5.43.0 と同数
+- ✅ **ステージング 4 台（`54fc149b`・2026-10-26）**: `config: OK`・3 サービスの restart rc=0・health 200（全項目 OK・Ruby 4.0.9・YJIT 有効）・about 5.44.0・`/app/home` と `/app/episode` 200。
+  未認証の `/program/works` と鍵なしの辞書は 403（dev27 の辞書は Annict 無効で 404）。配られた HTML に PR #4871 の修正（リンクの `v-if`・ログイン時だけ `getWorks()`）が入っていることを確認。
+  ⚠ トークン付きの `/program/works` も 403 になるのは、ステージングのお知らせボットに Annict のトークンが無いため（`/config` は 200 で、SNS のトークンは通っている）。
+  ⚠ **dev25 の test bot のトークンが Mastodon 側で失効している**（公開 URL の `verify_credentials` が 401）。今回の差分とは無関係・未対処。
+  ブラウザでの目視は Chrome の許可待ちで取れなかった
+- ✅ **手順 3（セキュリティ）**: Dependabot アラート 0・bundler-audit 脆弱性なし。rack-test（PR #4868・開発用）と ginseng-core v4（PR #4862）は 5.45.0 で扱う
+- ✅ **頭でやること（済み・`9861ba4b`）**: `BUNDLED WITH` を Ruby 4.0.9 の同梱版 4.0.20 へそろえ、ginseng-piefed を v0.4.1 へ（login の排他のみ）。`rake lint` / `rake test` 通過（1785 tests・0 failures / 0 errors）。
+  ⚠ ステージング・本番は bundler 4.0.20 が Ruby 4.0.9 に同梱なので追加の `gem install` は要らない見込み
+- 📌 **手順 12（掃除 PR）**: 5.43.0 のリリース前レビューの②は PR #4858 で消化済み＝持ち越しなし
+- bundler の件は pooza/ginseng-style#131 に申し送った（2026-10-24。横展開の判断はあちら）
+
 ## リリース済み: 5.43.0（2026-10-24）
 
 **本番デプロイ: 4 台完了**（2026-10-24 11:13〜11:22、shallu → zugoga → gomander → vulcan の順・土曜の昼前）。

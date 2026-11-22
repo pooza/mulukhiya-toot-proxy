@@ -44,20 +44,19 @@ module Mulukhiya
       assert_raise(Ginseng::GatewayError) {dictionary('related').fetch}
     end
 
-    # ⚠ **3 サブクラスとも fail-open で {}。**以前は multi_field だけ外側の
+    # ⚠ **サブクラスはどれも fail-open で {}。**以前は multi_field だけ外側の
     # rescue が無く、同じ入力で呼び出し元へ NoMethodError が抜けていた。
     def test_parse_is_fail_open_for_all_types
       stub_html
-      types = ['related', 'mecab', 'multi_field']
+      types = ['related', 'multi_field']
 
       types.each {|type| assert_empty(dictionary(type).parse, "type=#{type}")}
     end
 
     # 期待する型は parse の前提と揃っていること。related は Hash、
-    # mecab / multi_field は Array。
+    # multi_field は Array。
     def test_expected_class
       assert_equal(Hash, dictionary('related').expected_class)
-      assert_equal(Array, dictionary('mecab').expected_class)
       assert_equal(Array, dictionary('multi_field').expected_class)
     end
 
@@ -101,6 +100,31 @@ module Mulukhiya
     end
 
     public
+
+    # 5.48.0 で消した mecab 型は作らない（nil＝その辞書は外れる・#4880）。
+    def test_create_rejects_removed_type
+      assert_nil(RemoteDictionary.create('url' => URL, 'type' => 'mecab'))
+      assert_kind_of(RelatedRemoteDictionary, RemoteDictionary.create('url' => URL, 'type' => 'related'))
+    end
+
+    # ⚠ 辞書の URL を例外メッセージへ埋めない。`dic:` で渡せばマスクが効く (PR #4932 の Codex P1)。
+    def test_create_removed_type_keeps_url_out_of_message
+      url = "#{URL}?access_token=SECRET"
+      logged = []
+      double = Object.new
+      double.define_singleton_method(:error) {|payload| logged.push(payload)}
+      double.define_singleton_method(:method_missing) {|*_args, **_kwargs| nil}
+      Logger.singleton_class.alias_method(:original_new_for_test, :new)
+      Logger.define_singleton_method(:new) {|*_args| double}
+
+      assert_nil(RemoteDictionary.create('url' => url, 'type' => 'mecab'))
+      assert_equal(1, logged.count)
+      assert_not_include(logged.first[:error].message, 'SECRET')
+      assert_equal(url, logged.first[:dic])
+    ensure
+      Logger.singleton_class.alias_method(:new, :original_new_for_test)
+      Logger.singleton_class.remove_method(:original_new_for_test)
+    end
 
     # ⚠ `interval` は last-good の鍵に含めない（5.41.0 のリリース前レビュー）。足した・変えただけで
     # 鍵が変わると、直後の失敗を埋め戻せない。解釈に効く設定（`strict`）は含めたまま。

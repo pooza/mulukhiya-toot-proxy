@@ -110,10 +110,23 @@ module Mulukhiya
       handler.all.filter_map {|v| create(v)}.each(&block)
     end
 
+    # 廃止した `type`。読む側のクラスは無い。
+    # ⚠ 5.48.0 で `mecab` を消した (#4880)。設定に残っていると辞書が外れて語数が減るので、
+    # 定数が無いという分かりにくいエラーではなく、何をすればよいかをログに残す。
+    # ⚠ 案内は wiki・公開辞書の設定例と同じ `relative` で書く（`related` と同じ型・5.48.0 のリリース前レビュー）。
+    REMOVED_TYPES = {'mecab' => 'relative'}.freeze
+
+    # ⚠⚠ **URL を例外メッセージへ埋めない (#4630・PR #4932 の Codex P1)。**`?access_token=` 付きの
+    # URL がマスクを通らずに syslog へ残る。URL は `dic:`（値そのものが URL＝マスクが効く）で渡す。
     def self.create(params)
-      return "Mulukhiya::#{type(params).camelize}RemoteDictionary".constantize.new(params)
+      name = type(params)
+      if replacement = REMOVED_TYPES[name]
+        message = "Dictionary type '#{name}' was removed. Use '#{replacement}' instead"
+        raise Ginseng::ConfigError, message
+      end
+      return "Mulukhiya::#{name.camelize}RemoteDictionary".constantize.new(params)
     rescue => e
-      e.log
+      e.log(dic: params['url'].to_s)
       return nil
     end
 

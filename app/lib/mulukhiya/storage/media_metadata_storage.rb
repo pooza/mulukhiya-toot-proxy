@@ -17,14 +17,19 @@ module Mulukhiya
     # ⚠ 拒否も下の rescue でネガティブキャッシュに入る（5 分おきに引き直してログを積まない・#4549）。
     def push(uri, host_validator: nil)
       path = File.join(Environment.dir, 'tmp/media', uri.to_s.sha256)
+      reading = false
       unless File.exist?(path)
         # ⚠ **URI にしてから渡す。**`RemoteHost.validate!` は `host` を持たない値を
         # ホスト名そのものとして扱うので、フィードから来る String の URL をそのまま渡すと
         # URL 全体を DNS に引いて必ず拒否する（公開ホストの enclosure が全滅する）。
         RemoteHost.validate!(Ginseng::URI.parse(uri.to_s)) if host_validator
-        File.write(path, http.get(uri, {host_validator:}.compact))
+        # ⚠ **宛先へ直接書かない (#4920)。**puma とワーカーが同じ媒体を同時に取りに行くと、
+        # 書きかけのファイルを読んで空のメタデータを置いていた。形は `MediaFile.write_atomic` (#4626)。
+        MediaFile.write_atomic(path, http.get(uri, {host_validator:}.compact).body.to_s)
       end
+      reading = true
       values = MediaFile.new(path).file.values.merge(url: uri.to_s)
+      reading = false
       set(uri, values)
       log(url: uri.to_s)
     # ⚠ ネガティブキャッシュを GatewayError だけに絞らない (#4549)。
@@ -33,10 +38,25 @@ module Mulukhiya
     # 空を置かない失敗は **毎サイクル同じ URL を叩き直し、同じログを出し続ける**。
     # 実際 URL が絶対化できない RuntimeError がこの rescue を通らず、
     # 1 サイクル 79 行 = 日 2 万行のログになっていた。
-    # 一過性の障害も ttl のあいだ諦めることになるが、それは GatewayError で既にそう。
+    #
+    # ⚠⚠ **ただし空は短く置く (#4920)。**以前は成功と同じ ttl（既定 100 日）で、一時的な取得の失敗でも
+    # その媒体は 100 日メタデータが空のままだった。1 日なら、5 分おきに舐め直すフィードでも
+    # 1 つの URL のログは 1 日 1 行で済む。
+    # ⚠ 読めなかったファイルは消す。残すと、次に引き直しても同じ壊れたファイルを読む。
+    # ⚠⚠ **消すのは、ファイルがあって読めなかったときだけ（5.48.0 のリリース前レビュー）。**取得が落ちた側が
+    # 消すと、同じ媒体を同時に取りに行った別のスレッドが書き終えたファイルを消す。読めたあとの失敗
+    # （Redis への書き込み）でも消さない。
     rescue => e
       e.log(url: uri.to_s)
-      set(uri, {})
+      FileUtils.rm_f(path) if reading
+      set(uri, {}, ttl: negative_ttl)
+    end
+
+    NEGATIVE_TTL = 86_400
+
+    # 取れなかったことを覚えておく秒数。⚠ 成功の ttl より長くはしない。
+    def negative_ttl
+      return [ttl, NEGATIVE_TTL].compact.min
     end
 
     def ttl
