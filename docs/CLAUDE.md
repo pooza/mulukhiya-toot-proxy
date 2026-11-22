@@ -193,7 +193,17 @@ git diff Gemfile.lock
 # 5. 問題なければコミット
 ```
 
-## 開発中: 5.48.0
+## 開発中: 5.49.0
+
+マイルストーンは未作成。スコープを決めたら作って割り当て、`config/application.yaml` の版を上げる。
+
+
+## リリース済み: 5.48.0（2026-11-22）
+
+本番 4 台へデプロイ済み（21:30〜21:34・shallu → zugoga → gomander → vulcan・`main` の `fc377360`・Ruby 4.0.10 据え置き）。[リリースノート](https://github.com/pooza/mulukhiya-toot-proxy/releases/tag/v5.48.0)（PR #4937）。全台 version 5.48.0・health 200・`config: OK`・FreeBSD 3 台は monit 復帰・vulcan は 3 ユニットとも `NRestarts=0`。起動時の libheif は 4 台とも `enabled: false`（FreeBSD 3 台 1.23.6・vulcan 1.21.2。基準 1.23.7）。
+
+- vulcan は上げる前に、Sidekiq の Redis（db 2）の `schedules` に個人の `decoration_initialize_<名前>` が無い＝実況中の人がいないことを確かめた（あるのは定期の `decoration_initialize` だけ）
+- デプロイ直後の shallu のログの error 2 件は Annict の `Net::ReadTimeout`（#4801 の平常）
 
 [マイルストーン 5.48.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/650)。`config/application.yaml` は 5.48.0 へバンプ済み（2026-11-18）。
 
@@ -419,45 +429,6 @@ git diff Gemfile.lock
   - 緑: ハンドラの失敗は `handler.errors` に回収されて Sentry に出ない（Misskey も同じ設計）
   - 緑: `skip_case?` は判定で例外が出たファイルを理由付きで飛ばす（CI の omission の上限で見張れている）
 - ⚠ **#4880 は 2026-11-05 の実測で 5.47.0 へ送った**（[実測](https://github.com/pooza/mulukhiya-toot-proxy/issues/4880)）。形式を変えても同じ 2,407 語を載せるので誤爆は減らない。手順 1 の deploy は pooza/cure-api#389 待ち
-
-## リリース済み: 5.45.0（2026-10-31）
-
-本番 4 台へデプロイ済み（12:07〜12:13・shallu → zugoga → gomander → vulcan・`main` の `c02001d6`・Ruby 4.0.9 据え置き）。[リリースノート](https://github.com/pooza/mulukhiya-toot-proxy/releases/tag/v5.45.0)。
-
-- ⚠ デプロイ直後の `/nodeinfo/2.0` は、次の `nodeinfo_update`（5 分ごと）まで旧版を返す。公開面で版を見るなら 10 分待つか `/mulukhiya/api/about` を見る
-- Issue 6 件とマイルストーンは 2026-10-31 に閉じた（ユーザー判断）。Akkoma の次は段階 4 の #4884（`docs/pleroma.md`「2 件を切らさない」）
-
-[マイルストーン 5.45.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/644)。`config/application.yaml` は 5.45.0 へバンプ済み（2026-10-28）。
-
-- ⚠ **#4850 / #4851（Mastodon 5.0）は 2026-10-30 に 5.46.0 へ送った**（ユーザー判断: リリースの見込みが分からないものをブロッカーにできない。5.46.0 の間に出なければまた送る）
-- ✅ **2026-10-28 に PR 4 本をマージ（ユーザー承認・CI 両系緑）**: #4868（rack-test 2.3.0）/ #4863（#4847 Akkoma の webhook）/ #4862（#4848・**マージ前に v4.2.0 へ上げた** `46f3942a`・手元で rubocop 無指摘・`rake test` 1793 tests・0 failures / 0 errors）/ #4870（#4869）。Issue は open のまま（クローズはラップ時の判断）
-- ✅ **2026-10-31 に PR 3 本をマージ（ユーザー承認・CI 緑）**: #4877（#4854）/ #4878（#4860）/ #4879（手順 12 の掃除）。Issue は open のまま（クローズはラップ時の判断）
-- **#4857**: Pleroma 系をリリースゲートの必須にした。dev29（Akkoma 3.20.1）で develop `480834ee` が 1871 tests・0 failures / 0 errors・189 omissions。台帳に `pleroma` を追加
-- **#4854 は 2026-10-28 の調査で size:L → S に縮めた**（ユーザー承認）。本番 2 台の 30 日分をなぞると、人名とふつうの言葉が同じ形の誤爆はほぼ無く、
-  多いのは**短いカタカナの語が長いカタカナ語の中に当たる誤爆**（gomander 2,687 当たり中 250・zugoga 186 中 25。3 文字以下の語に集中）。
-  方針は 3 文字以下・カタカナの語の前後にカタカナがあれば当てない（[調査結果のコメント](https://github.com/pooza/mulukhiya-toot-proxy/issues/4854#issuecomment-6455055573)）。
-  「印＋手がかり」の設計は **#4873（on-hold）** へ切り出した。この版の「機能が前へ進む」枠は #4854 のまま
-
-### リリース準備の結果（2026-10-31）
-
-- **セキュリティ**: Dependabot 0 件・bundler-audit 脆弱性なし。`bundle update` は `ac9c86b3`（ginseng-\* は動かず・bundler 4.0.20 のまま）
-- **3 系統の実走**（develop `ac9c86b3`）: すべて 0 failures / 0 errors
-  - `controller=mastodon url=http://localhost:3000`（v4.7.4）: 1887 tests・159 omissions
-  - `controller=misskey url=http://localhost:3001`（2026.10.1）: 1890 tests・146 omissions
-  - `controller=pleroma url=https://st.akkoma.b-shock.org`（3.20.1）: 1877 tests・189 omissions
-- **ステージング 4 台**（dev24〜27・`ac9c86b3`）: `config: OK`・health 200・version 5.45.0。WebUI は dev25 / dev27 を目視。dev24 の `/feed/media` の 503 は `media_catalog: false` の設定どおり
-- **dev29**: develop へ切り替えた（古い feature ブランチのままだった）。存在しないタグは 404、タグのリンクは `/tag/…` を実機で確認
-
-### リリース前レビュー（5 観点）の結果（2026-10-31）
-
-対象は `v5.44.0..develop`。**赤 0・黄 5・緑 7**。size:S は掃除 PR で直した。
-
-- **掃除 PR で直したもの**: Akkoma のタグの URL（`/tags/` は HTML に 406。dev29 で確認）／Akkoma で存在しないタグのフィードが 200／nodeinfo の取得失敗で空を書く／テストの追加（`media_ids` の文字列化・`NodeInfo#update`・`PATTERN_VERSION`）／コメントと文書（`docs/pleroma.md` の版と「表は無い」・`docs/api.md` の favorites・廃止語ほか）
-- **記録のみ**:
-  - 常に失敗する辞書のソースがあるサーバーでは、#4854 の新規則が最大 24 時間効かない。台帳の 🔴 死亡は 0 件（10-31）なので今の本番では起きない。コメントだけ足した
-  - 辞書の口で断ると syslog が 3 行（従来は 2 行）。応答の本文を変えずに 1 本へまとめる利点が小さい
-  - `AnnictEpisodeDictionary.key?` は本番から呼ばれなくなった（テストの読みやすさのために残す）
-- **デプロイで見ること**: #4869 で `/service/*` の検査が初めて効く。4 台の `rake config:lint` は出力の `config: OK` まで確かめる（短い鍵・`peer_tube/hosts` の型）
 
 ## セッション同期の記録
 
