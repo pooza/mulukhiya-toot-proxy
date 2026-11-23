@@ -50,7 +50,8 @@ v4 の実装は `git show 46c4f4e2^:<path>` で取り出せる（SQL は `app/qu
 | ストリーミング（listener） | ✅ 5.47.0 | `capabilities/streaming` | 段階 6（#4901）。`PleromaListener < MastodonListener`。送り主は API の ID（FlakeId）を uuid に戻して引く |
 | 投稿の一括削除 | ⬜ | — | `deletable_statuses` |
 | お知らせ | ✅ 5.47.0 | `features/announcement` | #4910。Akkoma の `/api/v1/announcements` は Mastodon と同じ形。⚠ `announcement_push`（capsicum-relay）は false のまま |
-| Annict・decoration・compose template | ⬜ | `features/*` | 未定 |
+| Annict・compose template | ⬜ | `features/*` | 未定 |
+| decoration（アバターデコレーション） | — | — | **対象外。**Misskey だけの機能で、Akkoma には無い（リアクションとは別物・2026-11-23） |
 
 ## 段階
 

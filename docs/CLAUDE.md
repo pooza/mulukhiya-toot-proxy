@@ -195,7 +195,15 @@ git diff Gemfile.lock
 
 ## 開発中: 5.49.0
 
-マイルストーンは未作成。スコープを決めたら作って割り当て、`config/application.yaml` の版を上げる。
+[マイルストーン 5.49.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/653)。`config/application.yaml` は 5.49.0 へバンプ済み（2026-11-23）。
+
+- #4936（about の `features` に、利用者向けのハンドラの切り替えが使えるかのフラグ。capsicum#1398 の依頼・**最低条件**）
+- #4832（ナウプレで無関係な曲の URL が載る。2026-11-23 に on-hold を外した）
+
+範囲を決めたときの判断（2026-11-23・ユーザー）:
+- #3877（Mastodon 形式のタグづけ）は念のために残すが、よほどでなければ戻さない。Misskey が `Update` に対応しておらず、分かって使わないとむしろ有害
+- on-hold のほかの 5 件（#4893・#4873・#4301・#4298・#3157）は条件がそろっていない
+- Akkoma のデコは Misskey だけの機能なので対象外（`docs/pleroma.md` を直した）
 
 
 ## リリース済み: 5.48.0（2026-11-22）
