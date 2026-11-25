@@ -443,6 +443,20 @@ git diff Gemfile.lock
 
 ## セッション同期の記録
 
+### 2026-11-26 セッション同期の記録
+
+**本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。
+
+- **ブランチ**: `develop` は `origin/develop` と同一だった（`26a68b97`）。open PR は Dependabot の #4940（icalendar 2.14.0・webmock・CI 緑）。Dependabot アラート **0 件**
+- **Codex**: 5.48.0 のリリース PR #4937 に未返信の P2（`save_live` が `update` なので Redis が落ちても記録の無いままデコが付く）。修正前に落ちるテストで再現して `update!` に直した（`d22660c4`）。返信・👍 済み
+- **Issue**: open 13（#4936・#4938・#4939 が増え、5.48.0 の 6 件がリリースで閉じた）
+- **ginseng-\* のピン**: ginseng-core v7.1.0 → **v7.1.1** の新しいずれ（`max_bytes:` を付けたときの `Response#to_s` の修正・httparty 0.25.1 の対照テスト）。fediverse v10.0.0 は③見送りのまま
+- **Annict の API**: 基準（11-05）と同じ。公式アカウントの新しい投稿なし
+- **chubo2**: ローカルは `origin/main` と同一。open 11 件（#319 が増えた）。⚠ **Issue 棚卸しは 10-25 から 32 日で期限切れ（未実施）**。ドキュメント棚卸しは 11-22
+- **辞書台帳**（pooza/chubo2 `24d63e1`）: 🔴 は既知の 3 行だけ。🟡 は `service.json`（shallu 1/144）と delmulin の `emoji.json`（vulcan 1/144）の間欠
+- **Sentry**: unresolved **21 件**（11-22 から 4 減）・**コメント 0 は 0 件**（2026-11-26 時点）。-1X に 11-24 23:15Z の新しいイベント
+- **harness の upstream**: **Mastodon v5.0.0-rc.1（11-25）**。Misskey は 2026.11.1 の RC のみ・Akkoma は変化なし。`last_checked` を 11-26 へ
+
 ### 2026-11-22 セッション同期の記録
 
 **本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。harness の upstream 確認は `last_checked`（11-19）から 3 日なのでスキップ。

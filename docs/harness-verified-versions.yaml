@@ -32,7 +32,13 @@ pleroma:
   verified_at: '2026-10-31'
 
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
-last_checked: '2026-11-19'
+last_checked: '2026-11-26'
+
+# 2026-11-26 チェック結果:
+#   - Mastodon: **v5.0.0-rc.1（2026-11-25T16:38Z）が出た**（beta.2 は 11-19）。#4850（beta → RC → stable）の RC の段。
+#     検証の進め方はこの日にユーザーと相談する。stable は v4.7.6 ＝ verified と同じ。
+#   - Misskey: **2026.11.1-rc.0〜rc.4（11-20〜11-24）**。stable は 2026.11.0 ＝ verified と同じ（RC は検証の対象外）。
+#   - Akkoma: 最新 stable は v3.20.1 ＝ verified と同じ。
 
 # 2026-11-19 チェック結果:
 #   - Mastodon: **v4.7.6（2026-11-19T10:30Z）が出たので検証し、verified を昇格した。**
