@@ -60,9 +60,11 @@ module Mulukhiya
 
     # ⚠ `update` は deep_merge なので、前の実況の項目は nil で明示して消す（残った `id` を外す相手と
     # 取り違えない）。書き込みは 1 回にまとめる。
+    # ⚠⚠ **`update!` で書く（PR #4937 の Codex の P2）。**`update` は失敗を握りつぶして nil を返すので、
+    # 記録が無いままデコを付けてしまう。例外で `apply_decoration` の rescue へ抜けて、付けずに終わる。
     def save_live(account, live)
       cleared = DecorationInitializeWorker::LIVE_KEYS.to_h {|key| [key.to_sym, nil]}
-      account.user_config.update(decoration: {live: cleared.merge(live)})
+      account.user_config.update!(decoration: {live: cleared.merge(live)})
     end
 
     # 通知の文面に使うデコの名前。取れなければ nil（文面は名前なしで組む）。
