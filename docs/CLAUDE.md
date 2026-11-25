@@ -455,9 +455,10 @@ git diff Gemfile.lock
 - **Issue**: open 13（#4936・#4938・#4939 が増え、5.48.0 の 6 件がリリースで閉じた）
 - **ginseng-\* のピン**: ginseng-core v7.1.0 → **v7.1.1** の新しいずれ（`max_bytes:` を付けたときの `Response#to_s` の修正・httparty 0.25.1 の対照テスト）。fediverse v10.0.0 は③見送りのまま
 - **Annict の API**: 基準（11-05）と同じ。公式アカウントの新しい投稿なし
-- **chubo2**: ローカルは `origin/main` と同一。open 11 件（#319 が増えた）。⚠ **Issue 棚卸しは 10-25 から 32 日で期限切れ（未実施）**。ドキュメント棚卸しは 11-22
+- **chubo2**: ローカルは `origin/main` と同一。open 11 件（#319 が増えた）。Issue 棚卸しは 10-25 から 32 日だったので同日に実施した（pooza/chubo2 の最終 Issue 棚卸しを 11-26 に）。**close 候補は 0 件**。動きは #315（HTTP/3）のきっかけが揃ったこと＝ 11-21 までに 7 台とも HTTP/2 を戻し終えた（infra-history）。ドキュメント棚卸しは 11-22
 - **辞書台帳**（pooza/chubo2 `24d63e1`）: 🔴 は既知の 3 行だけ。🟡 は `service.json`（shallu 1/144）と delmulin の `emoji.json`（vulcan 1/144）の間欠
 - **Sentry**: unresolved **21 件**（11-22 から 4 減）・**コメント 0 は 0 件**（2026-11-26 時点）。-1X に 11-24 23:15Z の新しいイベント
+- **ginseng-core v7.1.1** は #4941 / PR #4942 で取り込み（`max_bytes:` の呼び出しは 2 か所とも `.body` / `parsed_response` を読むので振る舞いは変わらない）。⚠ その `rake test` で、`d22660c4` が `DecorationApplyLiveTest` の作り物（`update` しか無い）を 4 件落としていたのが分かり、`5b50db5d` / `ddf49517` で直した
 - **harness の upstream**: **Mastodon v5.0.0-rc.1（11-25）**。Misskey は 2026.11.1 の RC のみ・Akkoma は変化なし。`last_checked` を 11-26 へ
 
 ### 2026-11-22 セッション同期の記録
