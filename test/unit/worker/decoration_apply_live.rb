@@ -22,8 +22,15 @@ module Mulukhiya
         return 'token'
       end
 
-      def update(values)
+      def update!(values)
         @values = @values.deep_merge(values.deep_stringify_keys).deep_compact
+      end
+
+      # 本物と同じく、失敗を握りつぶして nil を返す。
+      def update(values)
+        return update!(values)
+      rescue
+        return nil
       end
     end
 
@@ -118,6 +125,17 @@ module Mulukhiya
       @worker.apply_decoration(FakeAccount.new(config))
 
       assert_equal([APPLIED], seen)
+    end
+
+    # 記録が書けなかったら、デコを付けない（PR #4937 の Codex の P2）。`update` は失敗を握りつぶすので、
+    # それで書くと「付いているのに記録が無い」になり、番組の終わり・一括の戻し・手で戻す口のどれもが外さない。
+    def test_apply_without_live_record
+      service = stub_service([])
+      config = FakeUserConfig.new('decoration' => {'id' => APPLIED})
+      config.define_singleton_method(:update!) {|_values| raise Ginseng::Redis::Error, 'Connection refused'}
+      @worker.apply_decoration(FakeAccount.new(config))
+
+      assert_empty(service.updates)
     end
 
     def test_apply_without_decoration_id
