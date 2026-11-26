@@ -446,6 +446,15 @@ git diff Gemfile.lock
 
 ## セッション同期の記録
 
+### 2026-11-26 セッション同期の記録（2 回目）
+
+**本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。1 回目（07:18）からの差分だけを見た。harness の upstream・chubo2 の Issue 棚卸しは同日に済んでいるのでスキップ。
+
+- **ブランチ**: `develop` は `origin/develop` と同一（`445930cd`）。open PR は #4942（ginseng-core v7.1.1・CI 緑・Codex 指摘なし）と Dependabot の #4940（CI 緑）。Dependabot アラート **0 件**
+- **Issue / ginseng-\* のピン / Annict / chubo2**: 1 回目から変化なし（ginseng-core のずれは PR #4942 で取り込み待ち）
+- **辞書台帳**: 🔴 は既知のまま。delmulin の `emoji.json` の 🟡 は 🟢 に戻った
+- **Sentry**: unresolved **21 件**・**コメント 0 は 0 件**（2026-11-26 時点）。-33 に 11-25 23:53Z の 2 件目（count 2・gomander 5.48.0・番組表エディタの話数取得で Annict の応答遅延）。単発としてコメントを書いた
+
 ### 2026-11-26 セッション同期の記録
 
 **本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。
