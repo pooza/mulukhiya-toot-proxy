@@ -209,6 +209,8 @@ git diff Gemfile.lock
 - Akkoma のデコは Misskey だけの機能なので対象外（`docs/pleroma.md` を直した）
 - Akkoma は「淡々と実装していけばよい」（2 件を切らさない決まりのまま）
 
+- ✅ **Misskey 2026.11.1 を harness で検証し、verified を昇格した**（2026-11-26）。develop `f38ecdec` で 2013 tests / **0 failures / 0 errors** / 173 omissions（5.48.0 のゲートと omission 同数）。重大な脆弱性の修正を含む版
+
 2026-11-26（ユーザー）: #4851（新 UI への移植待ち）と #4893（用語の追従。同日 on-hold を外した＝ pooza/mastodon の台帳の知らせ待ち）は「Mastodon 5.0 対応」に置いたまま。待っているものが届いた時点の開発中の版で受ける。
 
 

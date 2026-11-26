@@ -23,8 +23,8 @@ mastodon:
   verified_at: '2026-11-19'
 
 misskey:
-  verified: 2026.11.0
-  verified_at: '2026-11-12'
+  verified: 2026.11.1
+  verified_at: '2026-11-26'
 
 # Akkoma は chubo2 の harness ではなくステージングの dev29 で検証する（#4857）。
 pleroma:
@@ -38,6 +38,13 @@ last_checked: '2026-11-26'
 #   - Mastodon: **v5.0.0-rc.1（2026-11-25T16:38Z）が出た**（beta.2 は 11-19）。#4850（beta → RC → stable）の RC の段。
 #     検証の進め方はこの日にユーザーと相談する。stable は v4.7.6 ＝ verified と同じ。
 #   - Misskey: **2026.11.1-rc.0〜rc.4（11-20〜11-24）**。stable は 2026.11.0 ＝ verified と同じ（RC は検証の対象外）。
+#   - Misskey（同日 2 回目の同期）: **2026.11.1（2026-11-26T10:16Z）が出たので検証し、verified を昇格した。**
+#     harness を 2026.11.1 で再構築（update-version.sh → reset.sh）し、`/api/meta` で version=2026.11.1 を確認。
+#     develop `f38ecdec` で `TestHarness: controller=misskey url=http://localhost:3001`・`MASTODON_*` 0 本。
+#     2013 tests / 4220 assertions / **0 failures / 0 errors** / 173 omissions（5.48.0 のゲートの 2026.11.0 と omission は同数。
+#     tests の増加は 5.49.0 で足したテストの分）。5433 への DB 接続スキップ 1 行は Mastodon harness 停止中のダミー DSN 由来。
+#   - 差分の読み取り: モロヘイヤの API 面に効く変更は無い。⚠ リリースノートは「重大な脆弱性の修正・可及的速やかに」
+#     （中身は「セキュリティに関する修正」の 1 行だけ）。ほかはフォロー解除の配送・リストの TL・管理者のアイコン強制リセットの配信などの修正。
 #   - Akkoma: 最新 stable は v3.20.1 ＝ verified と同じ。
 
 # 2026-11-19 チェック結果:
