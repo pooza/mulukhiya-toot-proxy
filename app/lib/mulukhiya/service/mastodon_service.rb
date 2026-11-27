@@ -20,6 +20,13 @@ module Mulukhiya
       return config['/mastodon/theme/color']
     end
 
+    # 添付のある投稿（`only_media`）。テスト用アカウントの後始末（`clear_attachments`）が使う（#4938）。
+    def media_statuses(account_id, params = {})
+      uri = create_uri("/api/v1/accounts/#{account_id}/statuses")
+      uri.query_values = {only_media: true, limit: params[:limit]}.compact
+      return http.get(uri, {headers: create_headers(params[:headers])}).parsed_response.to_a
+    end
+
     def repost(status, body, params = {})
       status = status_class[status] unless status.is_a?(status_class)
       values = status.payload

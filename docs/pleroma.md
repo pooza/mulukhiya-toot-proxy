@@ -48,9 +48,14 @@ v4 の実装は `git show 46c4f4e2^:<path>` で取り出せる（SQL は `app/qu
 | ハンドラ（post_reaction ほか） | ✅ 5.47.0 | — | 段階 4。`post_reaction` は 5.46.0（#4884）、残りは #4910 で 1 本ずつ見た（下の「ハンドラの判定」）。Pleroma 系で外すものは無かった |
 | メディアカタログ | ✅ 5.47.0 | `data/media_catalog` | 段階 5（#4911）。ローカルの利用者ごとに `activities_actor_id_DESC_NULLS_LAST_index` で投稿を引き、`attachment` を展開して `Document` を 1 行ずつ索引で引く。cursor は `<FlakeId>.<位置>` |
 | ストリーミング（listener） | ✅ 5.47.0 | `capabilities/streaming` | 段階 6（#4901）。`PleromaListener < MastodonListener`。送り主は API の ID（FlakeId）を uuid に戻して引く |
-| 投稿の一括削除 | ⬜ | — | `deletable_statuses` |
+| 投稿の一括削除（テスト用アカウントの添付） | ✅ 5.49.0 | — | #4938。`deletable_statuses` は戻さず、添付のある投稿を API（`only_media`）で引いて投稿ごと消す（`MediaStatusClearMethods`・Mastodon と共通）。⚠ それまでは Mastodon 系の全部で動いていなかった（下の「段階」の 7） |
 | お知らせ | ✅ 5.47.0 | `features/announcement` | #4910。Akkoma の `/api/v1/announcements` は Mastodon と同じ形。⚠ `announcement_push`（capsicum-relay）は false のまま |
-| Annict・compose template | ⬜ | `features/*` | 未定 |
+| 投稿テンプレート | ✅ | `features.compose_templates`（常に true） | #4938。保存先は利用者の設定で SNS に依らない。dev29（5.48.0）で作成・一覧・更新・削除を確かめた（2026-11-28） |
+| Annict | ⬜ | `features/annict` | #4939 |
+| ALT 編集（投稿済みの添付） | ⬜ 次の段階 | `capabilities/media_update` | #4945。Akkoma は編集の `media_attributes` を読まない。`PUT /api/v1/media/:id` のあとに投稿を編集すると変わる |
+| 投稿へのタグの追加・ナウプレの整理 | ⬜ 次の段階 | `capabilities/repost` | #4946。消して投稿し直すか、Akkoma の編集で済ませるかを決める |
+| 注目のタグ | — | `data/futured_tag` | **対象外。**Akkoma の `/api/v1/featured_tags` は `Not implemented`（404）を返す（dev29・2026-11-28）。`Pleroma::Account#featured_tags` は空を返す |
+| お知らせの push | — | `features/announcement_push` | **対象外（capsicum-relay 次第）。**モロヘイヤ側に作るものは無い（`/announcement/list` は 5.47.0 から返る）。relay が Akkoma のお知らせを扱えるようになったら、サーバーごとに true にする |
 | decoration（アバターデコレーション） | — | — | **対象外。**Misskey だけの機能で、Akkoma には無い（リアクションとは別物・2026-11-23） |
 
 ## 段階
@@ -87,6 +92,12 @@ v4 の実装は `git show 46c4f4e2^:<path>` で取り出せる（SQL は `app/qu
    ⚠ トークンはヘッダでも URL でもなく `Sec-WebSocket-Protocol` で渡す（Akkoma はヘッダを読まない・ginseng-fediverse 9.0.0・pooza/ginseng-fediverse#337）。
    ⚠ 送り主は v4 の `fqn` ではなく `account.id`（FlakeId）を `FlakeId.decode` して引く。
    `mention` / `follow` は基本のパイプライン（`welcome_mention` など）がそのまま流れる
+7. ✅ **残りの棚卸し**（#4938・5.49.0）: 投稿テンプレートは dev29 で通った。テスト用アカウントの添付の一括削除
+   （`rake mulukhiya:media:record:clean` → `clear_attachments`）は**動いていなかった**ので直した。
+   ⚠ gem の `MastodonService` に `delete_attachment` が無く、1 件ごとに `NoMethodError` で落ちていた（dev29 で 136 件が 1 件も消えなかった）。
+   Mastodon は `attachments` も無く `ImplementError`。Mastodon 系の API には投稿に付いた添付だけを消す口が無いので、v4 の Pleroma 版と同じく
+   添付のある投稿ごと消す（`MediaStatusClearMethods`）。dev29 で上限の 30 件が消えた。
+   `false` のままの設定は、作れるもの（ALT 編集 #4945・リピート #4946）と対象外（注目のタグ・お知らせの push）に分けた（上の表）
 
 ### ハンドラの判定（#4910・2026-11-15・dev29 の Akkoma 3.20.1）
 
