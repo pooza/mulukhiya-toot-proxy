@@ -1413,6 +1413,7 @@ NowPlaying 情報を除去して再投稿する。
 | `prefer` | string | 任意 | `apple_music` \| `spotify`。クライアントのユーザートグル値 |
 
 - **プロバイダ優先順位（3 段連鎖）**: ① 明示 `prefer` → ② `source_app_name` ヒント → ③ サーバー既定 `/nowplaying/resolve/default_provider`（既定値 `apple_music`）。優先側でヒットしなければもう一方のプロバイダへフォールバックして URL を返す。
+- **曲名の照合（5.49.0〜 / #4832）**: 各プロバイダの検索の先頭の曲の曲名が、`title` と合わなければ「ヒットなし」として扱う（次のプロバイダへ進む）。配信に無い曲で、無関係な曲の URL とジャケットを返さないため。表記ゆれ（全角 / 半角・大文字小文字・空白と記号・括弧の feat. やリマスター表記・「 - 」以降の副題）は落としてから、どちらかがもう一方を含めば合うとみなす。⚠ 曲名が別の文字で書かれている当たり（ローマ字とカナなど）は返らなくなる
 - **レスポンス**:
   - ヒット時: `{ "url": "https://music.apple.com/...", "provider": "apple_music", "normalized": { "title": "...", "artist": "...", "album": "..." }, "artwork_url": "https://.../480x480bb.jpg" }`（`normalized` は外部 API が返した値のみ。欠落要素は省く）
   - ヒットなし: `{ "url": null, "artwork_url": null }`（404 ではなく 200）
