@@ -211,6 +211,8 @@ git diff Gemfile.lock
 
 - ✅ **Misskey 2026.11.1 を harness で検証し、verified を昇格した**（2026-11-26）。develop `f38ecdec` で 2013 tests / **0 failures / 0 errors** / 173 omissions（5.48.0 のゲートと omission 同数）。重大な脆弱性の修正を含む版
 
+2026-11-28 の進み具合: #4936（PR #4943）・#4832（PR #4944）・#4938（PR #4947）を develop へマージした（Issue はリリースで閉じる）。#4938 で、Mastodon 系の全部でテスト用アカウントの添付の一括削除が動いていなかったのを直した。棚卸しで起票した #4945（Akkoma の ALT 編集）・#4946（Akkoma のリピート）は急がないので、[マイルストーン 5.50.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/654) を作って載せた（ユーザー: 緊急性の無い新しい Issue を開発中の版に足すのは不自然）。
+
 2026-11-26（ユーザー）: #4851（新 UI への移植待ち）と #4893（用語の追従。同日 on-hold を外した＝ pooza/mastodon の台帳の知らせ待ち）は「Mastodon 5.0 対応」に置いたまま。待っているものが届いた時点の開発中の版で受ける。
 
 
