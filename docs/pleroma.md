@@ -51,7 +51,7 @@ v4 の実装は `git show 46c4f4e2^:<path>` で取り出せる（SQL は `app/qu
 | 投稿の一括削除（テスト用アカウントの添付） | ✅ 5.49.0 | — | #4938。`deletable_statuses` は戻さず、添付のある投稿を API（`only_media`）で引いて投稿ごと消す（`MediaStatusClearMethods`・Mastodon と共通）。⚠ それまでは Mastodon 系の全部で動いていなかった（下の「段階」の 7） |
 | お知らせ | ✅ 5.47.0 | `features/announcement` | #4910。Akkoma の `/api/v1/announcements` は Mastodon と同じ形。⚠ `announcement_push`（capsicum-relay）は false のまま |
 | 投稿テンプレート | ✅ | `features.compose_templates`（常に true） | #4938。保存先は利用者の設定で SNS に依らない。dev29（5.48.0）で作成・一覧・更新・削除を確かめた（2026-11-28） |
-| Annict | ⬜ | `features/annict` | #4939 |
+| Annict | ✅ 5.49.0 | `features/annict` | #4939。Akkoma 向けに足すものは無かった（アカウントの ID・利用者の設定・webhook だけに頼る）。⚠ サーバーに Annict の OAuth アプリ（`/service/annict/oauth/client`）が要る |
 | ALT 編集（投稿済みの添付） | ⬜ 次の段階 | `capabilities/media_update` | #4945。Akkoma は編集の `media_attributes` を読まない。`PUT /api/v1/media/:id` のあとに投稿を編集すると変わる |
 | 投稿へのタグの追加・ナウプレの整理 | ⬜ 次の段階 | `capabilities/repost` | #4946。消して投稿し直すか、Akkoma の編集で済ませるかを決める |
 | 注目のタグ | — | `data/futured_tag` | **対象外。**Akkoma の `/api/v1/featured_tags` は `Not implemented`（404）を返す（dev29・2026-11-28）。`Pleroma::Account#featured_tags` は空を返す |
@@ -98,6 +98,11 @@ v4 の実装は `git show 46c4f4e2^:<path>` で取り出せる（SQL は `app/qu
    Mastodon は `attachments` も無く `ImplementError`。Mastodon 系の API には投稿に付いた添付だけを消す口が無いので、v4 の Pleroma 版と同じく
    添付のある投稿ごと消す（`MediaStatusClearMethods`）。dev29 で上限の 30 件が消えた。
    `false` のままの設定は、作れるもの（ALT 編集 #4945・リピート #4946）と対象外（注目のタグ・お知らせの push）に分けた（上の表）
+8. ✅ **Annict**（#4939・5.49.0）: `features/annict` を true にしただけ。認可・視聴記録・感想・番組表の「話数 ＋」・取り込み
+   （`AnnictPollingWorker`）は、どれもアカウントの ID（`UserConfigStorage` のキー）・利用者の設定・webhook に頼っていて、SNS の形に依らない。
+   dev29 で認可（`annict_linked` が true）と、取り込み（Annict の既存の記録が webhook でテスト用アカウントの投稿になる）を確かめた（2026-11-28）。
+   Annict への書き込み（記録・感想の投稿）は、公開で残るので実地では確かめていない。
+   ⚠ dev29 の OAuth アプリは dev24 と同じもの（リダイレクトは OOB）。secret は dev29 のソルトで暗号化し直して `config/local.yaml` に入れた
 
 ### ハンドラの判定（#4910・2026-11-15・dev29 の Akkoma 3.20.1）
 
