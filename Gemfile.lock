@@ -8,10 +8,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 31af283534123caf0d9c88c16dd122748cfdd99c
-  tag: v7.1.0
+  revision: cc06787b23d4754e74ec42f861bebc2802bcccb1
+  tag: v7.1.1
   specs:
-    ginseng-core (7.1.0)
+    ginseng-core (7.1.1)
       activesupport (>= 8.1.2.1)
       addressable (>= 2.9.0)
       cgi (>= 0.4.2)
@@ -138,7 +138,7 @@ GEM
       securerandom (>= 0.3)
       tzinfo (~> 2.0, >= 2.0.5)
       uri (>= 0.13.1)
-    addressable (2.9.2)
+    addressable (2.10.0)
       public_suffix (>= 2.0.2, < 8.0)
     anonymous_loader (0.1.5)
       version_gem (~> 1.1, >= 1.1.17)
@@ -239,7 +239,7 @@ GEM
     http-accept (1.7.0)
     http-cookie (1.1.6)
       domain_name (~> 0.5)
-    httparty (0.25.0)
+    httparty (0.25.1)
       csv
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
@@ -250,7 +250,7 @@ GEM
       ice_cube (~> 0.16)
       logger
     ice_cube (0.17.0)
-    json (3.1.0)
+    json (3.2.0)
     json-schema (6.2.1)
       addressable (~> 2.8)
       bigdecimal (>= 3.1, < 5)
