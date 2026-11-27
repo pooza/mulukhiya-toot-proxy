@@ -448,6 +448,19 @@ git diff Gemfile.lock
 
 ## セッション同期の記録
 
+### 2026-11-28 セッション同期の記録
+
+**本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。harness の upstream（11-26 から 2 日）と chubo2 の Issue 棚卸し（11-26）はスキップ。
+
+- **ブランチ**: `develop` は `origin/develop` と同一（`f8f26b8a`）。open PR は #4942（ginseng-core v7.1.1）と Dependabot の #4940（icalendar 2.14.0・webmock 3.39.0）で、どちらも CI 緑・Codex 指摘なし。Dependabot アラート **0 件**
+- **Codex**: 直近 5 マージ（#4932〜#4937）は返信・👍 とも済み
+- **Issue**: open 14（11-26 から変化なし）。5.49.0 の 6 件はすべて open
+- **ginseng-\* のピン**: ginseng-core v7.1.1 のずれ（PR #4942 で取り込み待ち）と fediverse v10.0.0（③見送り）のまま
+- **Annict の API**: 基準（11-05）と同じ。公式アカウントの新しい投稿なし
+- **chubo2**: 1 コミット取り込み（`f3521fa`・週末の一斉更新の記録。本番 4 台は pkg のみで再起動は vulcan だけ）。open 11 件で変化なし
+- **辞書台帳**（pooza/chubo2 `0bc85aa`）: 🔴 は既知の 3 行だけ。🟡 は delmulin の `pron.json` が「未使用」（access log の集計の窓が縮み、全行の件数が 3 割ほど減った回。他所からも 0 件）
+- **Sentry**: unresolved **21 件**・**コメント 0 は 0 件**（2026-11-28 時点）。11-26 から新しいイベントなし
+
 ### 2026-11-26 セッション同期の記録（2 回目）
 
 **本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。1 回目（07:18）からの差分だけを見た。harness の upstream・chubo2 の Issue 棚卸しは同日に済んでいるのでスキップ。
