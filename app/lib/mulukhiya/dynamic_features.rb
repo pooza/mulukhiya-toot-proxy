@@ -31,6 +31,11 @@ module Mulukhiya
   #                        Dashboard 登録 + user_oauth_enabled を満たすか。capsicum が
   #                        連携導線を出すか判定に使う
   #   - spotify_linked   : リクエストの SNS アカウント単位の Spotify 連携状態 (#4337)
+  #   - user_handler_config : 利用者向けのハンドラーの切り替え (`GET /handler/list` と
+  #                        `POST /handler/config`・#4195 / #4196) が使えるか (#4936)。
+  #                        サーバー設定を要さないので compose_templates と同じ presence
+  #                        ベース (true 固定)。capsicum の切り替え画面の入口の出し分けに
+  #                        使う (pooza/capsicum#1398)
   #
   # 新しい動的フラグを増やす際は REGISTRY に 1 行追加する。
   class DynamicFeatures
@@ -50,6 +55,7 @@ module Mulukhiya
       'nowplaying_url_resolver' => ->(_sns) {NowplayingUrlResolver.enabled?},
       'spotify_enabled' => ->(_sns) {SpotifyUserService.config?},
       'spotify_linked' => ->(sns) {sns.account&.spotify_linked? || false},
+      'user_handler_config' => ->(_sns) {true},
     }.freeze
 
     def initialize(sns)

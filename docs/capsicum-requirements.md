@@ -207,6 +207,7 @@ Authorization: Bearer <user_token>
 2. `GET /mulukhiya/api/handler/list`（ユーザー認証）エンドポイントの新設 → #4195
 3. `POST /mulukhiya/api/handler/config`（ユーザー認証）エンドポイントの新設 → #4196
 4. WebUI: ユーザー向けハンドラートグル画面（config.slim に統合） → #4197
+5. `/about` の `features.user_handler_config`（上の 2 本が使えるか）→ #4936（5.49.0・pooza/capsicum#1398 の依頼）
 
 ### 6.4 capsicum 側の実装予定
 
