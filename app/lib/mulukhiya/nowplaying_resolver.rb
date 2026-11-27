@@ -68,10 +68,11 @@ module Mulukhiya
     private_constant :TITLE_DECORATION_PATTERN
 
     # 括弧と「 - 」以降を落とした結果が空になる曲名（`(untitled)` など）は、落とさずに比べる。
+    # 記号だけの曲名（`...`・`!!!` など）は記号も残し、空白だけ落として比べる。
     def self.normalize_title(title)
       title = title.to_s.unicode_normalize(:nfkc).downcase
       stripped = squeeze_title(title.gsub(TITLE_DECORATION_PATTERN, ''))
-      return stripped.presence || squeeze_title(title)
+      return stripped.presence || squeeze_title(title).presence || title.gsub(/[[:space:]]/, '')
     end
 
     def self.squeeze_title(title)

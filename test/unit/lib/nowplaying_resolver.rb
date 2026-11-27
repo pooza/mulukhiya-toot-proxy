@@ -55,6 +55,8 @@ module Mulukhiya
         ['Song', 'Song [Live]'],
         ['キラメキ☆', 'キラメキ'],
         ['(untitled)', '(Untitled)'],
+        ['...', '...'],
+        ['！！！', '!!!'],
       ].each do |expected, found|
         assert_true(NowplayingResolver.new(title: expected).send(:title_match?, found), "#{expected} / #{found}")
       end
@@ -66,6 +68,7 @@ module Mulukhiya
       assert_false(resolver.send(:title_match?, 'ガンバランスdeダンス'))
       assert_false(resolver.send(:title_match?, nil))
       assert_false(resolver.send(:title_match?, ''))
+      assert_false(NowplayingResolver.new(title: '...').send(:title_match?, '!!!'))
     end
 
     def test_resolve_returns_nil_url_for_blank_title
