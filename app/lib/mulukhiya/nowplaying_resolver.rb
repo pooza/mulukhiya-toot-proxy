@@ -64,6 +64,20 @@ module Mulukhiya
       return url.sub('100x100', "#{pixel}x#{pixel}")
     end
 
+    TITLE_DECORATION_PATTERN = /[(（\[［【〔].*?[)）\]］】〕]|\s[-－–—]\s.*\z/
+    private_constant :TITLE_DECORATION_PATTERN
+
+    # 括弧と「 - 」以降を落とした結果が空になる曲名（`(untitled)` など）は、落とさずに比べる。
+    def self.normalize_title(title)
+      title = title.to_s.unicode_normalize(:nfkc).downcase
+      stripped = squeeze_title(title.gsub(TITLE_DECORATION_PATTERN, ''))
+      return stripped.presence || squeeze_title(title)
+    end
+
+    def self.squeeze_title(title)
+      return title.gsub(/[[:space:][:punct:]]/, '')
+    end
+
     private
 
     # ① prefer → ② source_app_name ヒント → ③ サーバー既定 の順で最優先プロバイダを
@@ -82,6 +96,7 @@ module Mulukhiya
 
     def search_apple_music
       return nil unless track = ItunesService.new.search(keyword, 'music')
+      return nil unless title_match?(track['trackName'])
       url = track['trackViewUrl'].presence || track['collectionViewUrl'].presence
       return nil unless url
       return {
@@ -103,6 +118,7 @@ module Mulukhiya
     def search_spotify
       return nil unless SpotifyService.config?
       return nil unless track = SpotifyService.new.search_track(keyword)
+      return nil unless title_match?(track.name)
       return nil unless url = track.external_urls['spotify'].presence
       return {
         url:,
@@ -118,6 +134,17 @@ module Mulukhiya
       # keyword は曲名・アーティスト等のユーザー入力なのでログに残さない (#4394)。
       e.log(provider: 'spotify')
       return nil
+    end
+
+    # 検索の当たりの曲名が、頼まれた曲名と合っているか (#4832)。外れを返すと、配信に無い曲で
+    # 違う曲の URL とジャケットが投稿に付く。外れを返すより何も返さないほうが害が小さいので、
+    # 合わなければ捨てる。表記ゆれ（全角 / 半角・大文字小文字・空白と記号・括弧の feat. や
+    # リマスター表記・「 - 」以降の副題）は落としてから、どちらかがもう一方を含めば合うとみなす。
+    def title_match?(found)
+      expected = self.class.normalize_title(@title)
+      found = self.class.normalize_title(found)
+      return false if expected.empty? || found.empty?
+      return expected.include?(found) || found.include?(expected)
     end
 
     # クライアントが渡した構造化メタデータをすべて検索語に含める。artist が欠落

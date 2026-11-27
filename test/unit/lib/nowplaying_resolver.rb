@@ -35,6 +35,39 @@ module Mulukhiya
       assert_nil(result[:artwork_url])
     end
 
+    # 配信に無い曲で、検索の先頭に無関係な曲が来ても返さない (#4832)。
+    def test_resolve_returns_nil_url_when_title_does_not_match
+      stub_request(:get, %r{itunes\.apple\.com/search})
+        .to_return(body: fixture('itunes_search_ganbalance.json'))
+      result = NowplayingResolver.new(title: 'capsicum1273 test', artist: 'zzqx').resolve
+
+      assert_nil(result[:url])
+      assert_nil(result[:artwork_url])
+    end
+
+    def test_title_match_absorbs_notation
+      [
+        ['ガンバランス', 'ガンバランスdeダンス'],
+        ['ＤＡＮＣＥ ＭＹ ＷＡＹ', 'Dance my way'],
+        ['Song', 'Song (feat. Someone)'],
+        ['Song (feat. Someone)', 'Song'],
+        ['Song', 'Song - 2011 Remaster'],
+        ['Song', 'Song [Live]'],
+        ['キラメキ☆', 'キラメキ'],
+        ['(untitled)', '(Untitled)'],
+      ].each do |expected, found|
+        assert_true(NowplayingResolver.new(title: expected).send(:title_match?, found), "#{expected} / #{found}")
+      end
+    end
+
+    def test_title_match_rejects_unrelated
+      resolver = NowplayingResolver.new(title: 'capsicum1273 test')
+
+      assert_false(resolver.send(:title_match?, 'ガンバランスdeダンス'))
+      assert_false(resolver.send(:title_match?, nil))
+      assert_false(resolver.send(:title_match?, ''))
+    end
+
     def test_resolve_returns_nil_url_for_blank_title
       result = NowplayingResolver.new(title: '   ').resolve
 
