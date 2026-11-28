@@ -2,6 +2,74 @@
 
 CLAUDE.md から分離した過去のリリースノート。直近リリースは [CLAUDE.md](../CLAUDE.md) を参照。
 
+## リリース済み: 5.46.1（2026-11-14・ホットフィックス）
+
+本番 4 台へデプロイ済み（07:33〜07:36・shallu → zugoga → gomander → vulcan・`main` の `2c50587c`・Ruby 4.0.9 据え置き）。[リリースノート](https://github.com/pooza/mulukhiya-toot-proxy/releases/tag/v5.46.1)。全台 version 5.46.1・health 200・`config: OK`・monit 復帰・vulcan は 3 ユニットとも `NRestarts=0`。
+
+[マイルストーン 5.46.1](https://github.com/pooza/mulukhiya-toot-proxy/milestone/649)。
+
+- **#4912（PR #4913）**: 実況のデコを手で戻した（`/decoration/restore`）あとも、番組の終わりの予約 `decoration_initialize_<username>` が残っていた。
+  `saved_state` はもう消えているので、2 回目の処理が `saved || []` で利用者のデコを全部消していた（2026-08-23・11-12 にダイスキーで起きた）。
+  手で戻したときは予約も消す。保存が無いときは空で上書きせず、付けたデコだけを外す
+- ⚠ **`UserConfigStorage#update` の `deep_compact` は空の配列も消す。**「付ける前にデコが無かった」と「もう戻した」は、どちらも `saved_state` が nil になって区別が付かない
+- ⚠ 最初は「仕様の分かりにくさ」と見立てて、ログを見る前に方針を出した。**vulcan の journalctl で restore が 2 回走っていたのを見て不具合と分かった**
+- 日曜 10:15 のダイスキーの実況の前（土曜の朝）に出した（ユーザー判断）
+- 📌 #4912 は open のまま **5.48.0 へ移した**（size:M。5.47.0 は重みが上限＝ユーザー判断「枠の大きさを守った範囲で次に」）。残りは通知の文面・保存がある場合も付けた 1 つだけを外すか・capsicum での表示。マイルストーン 5.46.1 はクローズ
+- develop へは PR #4914 で戻す（version 行は develop の 5.47.0 を採った）
+
+## リリース済み: 5.46.0（2026-11-10）
+
+本番 4 台へデプロイ済み（07:18〜07:24・shallu → zugoga → gomander → vulcan・`main` の `8f3994ad`・Ruby 4.0.9 据え置き）。[リリースノート](https://github.com/pooza/mulukhiya-toot-proxy/releases/tag/v5.46.0)。全台 health 200・`config: OK`・monit 復帰・vulcan は 3 ユニットとも `NRestarts=0`。デプロイ後の Sentry の新着なし
+
+[マイルストーン 5.46.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/645)。`config/application.yaml` は 5.46.0 へバンプ済み（2026-11-05）。
+
+- 5.46.0 は ~~#4850 / #4851~~（11-10 に「Mastodon 5.0 対応」へ移した） / #4861 / #4864 / #4884 / #4874 / #4875 / #4876 （ginseng-\* の告知 3 件は 2026-10-30 に追加。緊急性なし＝ユーザー判断）
+- ✅ **2026-11-05 に PR 6 本を出し、同日にマージした**（ユーザー承認・どれも CI 緑・Issue は open のまま＝クローズはラップ時の判断）:
+  - #4886（#4876・ginseng-core v5.0.0・`TestCase.load` を core に任せる）。⚠ **写しは 50 ファイルを黙って読み飛ばしていた**（手元は DB が無く `disable?` の判定で落ちる）。`skip_case?` で理由を添えて omission にした
+  - #4887（#4875・ginseng-fediverse v7.1.0）/ #4888（#4874・ginseng-piefed v0.6.1）
+  - #4889（#4864・Akkoma のタイムゾーンの無い時刻。`founded_at` も同じ原因で一緒に直した）
+  - #4890（#4861・Akkoma の添付。v4 の `attachment.sql.erb` は v4 でも死んでいたので戻さない）
+  - #4891（#4884・Akkoma の `post_reaction`。`akkoma.capabilities.reaction` を立てた＝ Misskey 系から Akkoma の利用者へのリアクションも返信しなくなる）。dev29 はマージ後に develop（`4863f797`）へ戻した（health 200・`config: OK`）
+    Codex の P2（リアクションした投稿を本人のサービスで読む）は `668ac53d` で直し、返信・👍 済み
+  - 4 本（#4886 / #4889 / #4890 / #4891）が CI の omission の上限（#4503）を上げていたので、マージのたびに衝突を足し算で解いた。
+    develop の上限は **mastodon 382 / misskey 369**。衝突を解いた状態でも、そのつど手元の全件と CI を通した
+  - ⚠ **CI の misskey のジョブが `apt install` で止まることが 3 回あった**（10 分以上・`apt update` のミラー待ち）。ステップに時間の上限が無いので、
+    取り消して回し直した。上限を付けるかは未判断
+- ✅ develop へ直接: Rails 8.1.4.1 ほか bundler-audit の勧告 12 件（`9d70fa5d`）。同期の時点の Dependabot は 0 件だった（勧告のデータベースが先に更新された）
+- ~~5.46.0 は Mastodon 5.0 RC 待ち~~（2026-11-05 ユーザー）→ **2026-11-10 に切り離した**（ユーザー判断 A）。Mastodon 5.0 が beta.1 から進まず、
+  develop の 50 本と 5.47.0（#4894 / #4895 のマージ・#4896 / #4899）を止めるブロッカーになっていた。
+  - #4850 / #4851 は新しいマイルストーン [Mastodon 5.0 対応](https://github.com/pooza/mulukhiya-toot-proxy/milestone/648) へ移した。RC / stable が出た時点の開発中の版で受ける。beta の段階の検証はいつ回してもよい
+  - **5.46.0 はマージ済みの 6 件で出す**（harness-gate → リリース）
+  - ⚠ Misskey の次の stable（2026.11.0・11-09 に beta.1）の harness 検証は **5.46.0 では待たない**。出たときの開発中の版（5.47.0）で検証する（メジャーでなくても検証する、は変わらない）
+- ✅ **harness-gate（develop `10b9b8b2`、`bundle update` 後の `5e2f6b1a` でも走らせ直し・2026-11-10）**: 3 系統とも 0 failures / 0 errors（2 回とも同じ数）
+  - `controller=mastodon url=http://localhost:3000`（v4.7.5）: 1922 tests・184 omissions
+  - `controller=misskey url=http://localhost:3001`（2026.10.1）: 1922 tests・168 omissions
+  - `controller=pleroma url=https://st.akkoma.b-shock.org`（Akkoma 3.20.1）: 1917 tests・214 omissions
+  - omission が 5.45.0（159 / 146 / 189）から 25 / 22 / 25 増えたのは、ほぼ #4886 の「テストファイルを読まなかった（`skip_case?`: disabled）」の行（21 / 18 / 25 件）。
+    写しが黙って読み飛ばしていたファイルが表に出ただけで、退行ではない
+  - ⚠ **手元の Mastodon harness の `.env` が v5.0.0-beta.1 になっていた**（gitignore・#4850 の作業の名残）。最初の実走は beta.1 で走り、
+    それも 0 failures / 0 errors（1922 tests・184 omissions）だった＝ #4850 の beta 段階の材料。ゲートは `update-version.sh` で v4.7.5 へ戻し、`reset.sh` で作り直してから走らせ直した
+- ✅ **セキュリティ**: Dependabot 0 件・bundler-audit 脆弱性なし。`bundle update` は `5e2f6b1a`（sequel 5.110・sanitize 7.0.2・addressable・facets ほか。ginseng-\* は動かず）。lock が動いたので 3 系統を走らせ直した
+
+- ✅ **ステージング 4 台**（dev24〜27・`a8492565`）: `config: OK`・health 200（外から noah 経由で全項目 OK）・version 5.46.0。
+  WebUI は dev25 / dev27 の `/mulukhiya/`・`app/status`・`app/handler` を HTML で確認（200・タイトル正常）。⚠ ブラウザ（Claude in Chrome）はタブがグループから外れて使えず、目視はしていない
+
+### リリース前レビュー（5 観点）の結果（2026-11-10）
+
+対象は `v5.45.0..develop`（コードは 7 ファイル・+92 / −36）。**赤 0・黄 2・緑 5**。lint は全通過。モデルはセキュリティだけ Opus、ほかは Sonnet。
+
+- **掃除 PR（手順 12）で直す**（ユーザー判断）:
+  - 黄: 非公開の投稿へのリアクションに、返信が未収載で付く（`reply_reaction_handler.rb:15`）。元の投稿の本文は出ないが、非公開の投稿があることと acct が未収載で見える。
+    Mastodon・Misskey は以前から同じで、5.46.0 で Akkoma にも広がった。元の投稿が非公開なら返信も同じ公開範囲に絞る（3 系とも）
+  - 緑: `pleroma_service.rb:58` の絵文字をパスへエスケープせずに入れている（本人の権限の範囲。1 行）
+  - 緑: `docs/api.md` に Pleroma のリアクションの口（PUT / DELETE）が無い
+- **記録のみ**:
+  - 黄: `NaiveTime.utc` は Time 以外を渡すと落ちる。列は timestamp で Sequel は Time を返すので起きない
+  - 緑: リモートの投稿へのリアクションで nodeinfo を 2〜3 回キャッシュなしで引き、応答が遅れうる（Misskey も同じ）
+  - 緑: ハンドラの失敗は `handler.errors` に回収されて Sentry に出ない（Misskey も同じ設計）
+  - 緑: `skip_case?` は判定で例外が出たファイルを理由付きで飛ばす（CI の omission の上限で見張れている）
+- ⚠ **#4880 は 2026-11-05 の実測で 5.47.0 へ送った**（[実測](https://github.com/pooza/mulukhiya-toot-proxy/issues/4880)）。形式を変えても同じ 2,407 語を載せるので誤爆は減らない。手順 1 の deploy は pooza/cure-api#389 待ち
+
 ## リリース済み: 5.45.0（2026-10-31）
 
 本番 4 台へデプロイ済み（12:07〜12:13・shallu → zugoga → gomander → vulcan・`main` の `c02001d6`・Ruby 4.0.9 据え置き）。[リリースノート](https://github.com/pooza/mulukhiya-toot-proxy/releases/tag/v5.45.0)。
