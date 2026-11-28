@@ -34,6 +34,15 @@ pleroma:
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
 last_checked: '2026-11-26'
 
+# 2026-11-28 Mastodon v5.0.0-rc.2 の実走（#4850 の RC の段）:
+#   - v5.0.0-rc.2（2026-11-26T09:36Z）が最新の RC。harness の `.env` だけを rc.2 にして reset.sh で作り直し、
+#     `/api/v1/instance` で version=5.0.0-rc.2 を確認。`.env.example` は stable 用の v4.7.6 のまま。
+#   - develop `8f19adf5` で `TestHarness: controller=mastodon url=http://localhost:3000`・`MISSKEY_*` 0 本。
+#     2021 tests / 4254 assertions / **0 failures / 0 errors** / 189 omissions（v4.7.6 の 11-19 の実走と omission は同数。
+#     tests の増加は 5.48.0・5.49.0 で足したテストの分）。5433 への DB 接続スキップ 1 行はダミー DSN 由来。
+#   - RC なので verified は昇格しない。実走のあと `.env` を v4.7.6 に戻して作り直した（beta.1 の名残でゲートを取り違えた前例がある）。
+#   - 5.49.0 は stable を待たずに出す（2026-11-28 ユーザー判断）。stable での実走と昇格は #4850 ごと 5.50.0 で受ける。
+
 # 2026-11-26 チェック結果:
 #   - Mastodon: **v5.0.0-rc.1（2026-11-25T16:38Z）が出た**（beta.2 は 11-19）。#4850（beta → RC → stable）の RC の段。
 #     検証の進め方はこの日にユーザーと相談する。stable は v4.7.6 ＝ verified と同じ。
