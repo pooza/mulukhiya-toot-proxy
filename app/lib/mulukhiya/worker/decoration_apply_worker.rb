@@ -62,9 +62,14 @@ module Mulukhiya
     # 取り違えない）。書き込みは 1 回にまとめる。
     # ⚠⚠ **`update!` で書く（PR #4937 の Codex の P2）。**`update` は失敗を握りつぶして nil を返すので、
     # 記録が無いままデコを付けてしまう。例外で `apply_decoration` の rescue へ抜けて、付けずに終わる。
+    # ⚠ `update` が持っていた `alert` はここで引き継ぐ。`apply_decoration` の rescue は `log` だけなので、
+    # そのままだと実況中にデコが付かないことが Sentry に届かない（5.49.0 のリリース前レビュー）。
     def save_live(account, live)
       cleared = DecorationInitializeWorker::LIVE_KEYS.to_h {|key| [key.to_sym, nil]}
       account.user_config.update!(decoration: {live: cleared.merge(live)})
+    rescue => e
+      e.alert
+      raise
     end
 
     # 通知の文面に使うデコの名前。取れなければ nil（文面は名前なしで組む）。

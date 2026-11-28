@@ -138,6 +138,19 @@ module Mulukhiya
       assert_empty(service.updates)
     end
 
+    # 記録が書けなかったことは alert で知らせる（`apply_decoration` の rescue は log だけ）。
+    def test_alert_without_live_record
+      stub_service([])
+      error = Ginseng::Redis::Error.new('Connection refused')
+      alerted = []
+      error.define_singleton_method(:alert) {|*| alerted.push(true)}
+      config = FakeUserConfig.new('decoration' => {'id' => APPLIED})
+      config.define_singleton_method(:update!) {|_values| raise error}
+      @worker.apply_decoration(FakeAccount.new(config))
+
+      assert_equal([true], alerted)
+    end
+
     def test_apply_without_decoration_id
       service = stub_service([])
       config = FakeUserConfig.new({})
