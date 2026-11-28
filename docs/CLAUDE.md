@@ -216,6 +216,26 @@ git diff Gemfile.lock
 
 2026-11-26（ユーザー）: #4851（新 UI への移植待ち）と #4893（用語の追従。同日 on-hold を外した＝ pooza/mastodon の台帳の知らせ待ち）は「Mastodon 5.0 対応」に置いたまま。待っているものが届いた時点の開発中の版で受ける。
 
+2026-11-28: #4939（PR #4948）をマージ。#4850 は stable 待ちのため 5.50.0 へ送った（RC の記録は上）。
+
+### リリース前レビュー（5 観点）の結果（2026-11-28）
+
+`v5.48.0..develop`（製品コード 150 行ほど）を Sonnet 5 本で。**赤 0**。行き先はユーザーが決めた（私の案どおり）。
+
+- 黄（本リリースで直した）: `DecorationApplyWorker#save_live` を `update!` に変えたとき（d22660c4）、`update` が持っていた `e.alert` が落ちて、実況のデコの記録が書けなかったことが log にしか残らなくなっていた → PR #4949 で `alert` してから raise し直す
+- 記録のみ: ナウプレの曲名照合は 1〜2 文字の曲名だと包含判定が緩い（#4832 の前より悪くはない）
+- 記録のみ: `AnnictService#crawl` の `touch` が全件の投稿の後にあり、途中で webhook が落ちると同じ記録を毎分投稿し直す（2023 年から・今回の差分ではない）
+- 記録のみ（緑）: `media_statuses` が Hash の応答を `to_a` で崩す（ginseng は 2xx 以外を例外にするのでまず通らない）／`AnnictService.accounts` を 1 回の取り込みで 3 回作る／`DEFAULT_LIMIT` の `private_constant`・「ハンドラー」表記の混在・`status_delete_limit` の二重定義
+
+### リリース準備の結果（2026-11-28）
+
+- **セキュリティ**: Dependabot の open 0・bundler-audit 問題なし。5.48.0 のあとで lock の addressable が 2.10.0 に上がっており、その上で ginseng-redis 2.1.3 は DSN のパスワードを例外の `cause` に平文で載せうる・ginseng-core 7.1.1 は読めない URL の例外を包まずに抜けさせる → **PR #4950 で ginseng-core v7.2.0・ginseng-redis v2.1.5 を取り込み**、`bundle update` のルーチン分も同梱。ginseng-fediverse v10.0.1（全角＃のフッタ・Misskey でタグが増える）は v10.0.0 と同じく③見送り
+- **harness 3 系統**（develop `c411cac6`・各系とも別シェルで相手以外の変数 0 本）:
+  - Mastodon v4.7.6: `controller=mastodon url=http://localhost:3000` 2022 tests / **0 failures / 0 errors** / 189 omissions
+  - Misskey 2026.11.1: `controller=misskey url=http://localhost:3001` 2022 tests / **0 failures / 0 errors** / 173 omissions
+  - Pleroma（dev29・Akkoma 3.20.1）: `controller=pleroma url=https://st.akkoma.b-shock.org` 2022 tests / **0 failures / 0 errors** / 180 omissions
+- **ステージング 5 台**（dev24〜27・dev29、`c411cac6`）: `config: OK`・外から health 200（全項目 OK）・version 5.49.0・about に `user_handler_config: true`。dev29 は `feature/4939-pleroma-annict` から develop へ戻した。dev29 のテスト用アカウントの Annict 連携は残してある（ユーザー判断）
+
 
 ## リリース済み: 5.48.0（2026-11-22）
 
