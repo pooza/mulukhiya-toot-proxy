@@ -6,6 +6,7 @@ module Mulukhiya
     class Account < Sequel::Model(:users)
       include Package
       include AccountMethods
+      include MediaStatusClearMethods
       include SNSMethods
 
       attr_accessor :token

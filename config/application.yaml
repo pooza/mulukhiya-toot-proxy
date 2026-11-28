@@ -521,7 +521,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 5.48.0
+  version: 5.49.0
 parser:
   note:
     fields:
@@ -557,21 +557,27 @@ pleroma:
     video_codecs:
       - h264
   capabilities:
+    # Akkoma は編集の media_attributes を読まない。作れるので #4945 で扱う。
     media_update: false
     reaction: true
+    # 消して投稿し直す（または Akkoma の編集で済ませる）。作れるので #4946 で扱う。
     repost: false
     streaming: true
   data:
     account_timeline: true
     favorite_tags: true
+    # 対象外。Akkoma の /api/v1/featured_tags は Not implemented を返す (#4938)。
     futured_tag: false
     media_catalog: true
   dbms: postgres
   display_name: Pleroma
   features:
-    annict: false
+    # 認可・視聴記録・感想・取り込みは SNS に依らない（アカウントの ID・利用者の設定・webhook）。
+    # ⚠ サーバーの設定に Annict の OAuth アプリ（/service/annict/oauth/client）が無ければ動かない (#4939)。
+    annict: true
     # Akkoma の `/api/v1/announcements` は Mastodon と同じ形で返す。`post_announce`・`announcement_mention` は
     # dev29 で確かめた (#4910)。⚠ `announcement_push`（capsicum-relay への push）は別物なので false のまま。
+    # モロヘイヤ側に作るものは無く、relay が Akkoma のお知らせを扱えるか次第 (#4938)。
     announcement: true
     announcement_push: false
     feed: true

@@ -193,7 +193,56 @@ git diff Gemfile.lock
 # 5. 問題なければコミット
 ```
 
-## 開発中: 5.48.0
+## 開発中: 5.49.0
+
+[マイルストーン 5.49.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/653)。`config/application.yaml` は 5.49.0 へバンプ済み（2026-11-23）。
+
+- #4936（about の `features` に、利用者向けのハンドラの切り替えが使えるかのフラグ。capsicum#1398 の依頼・**最低条件**）
+- #4832（ナウプレで無関係な曲の URL が載る。2026-11-23 に on-hold を外した）
+- #4938（Akkoma の残りの棚卸し: 投稿テンプレートと投稿の一括削除の確認・`false` のままの設定を「作れる（次の段階として起票）」と「対象外」に仕分ける。実装はしない）
+- #4939（Akkoma: Annict の連携）
+- #4850（Mastodon 5.0 の harness 検証。2026-11-26 に「Mastodon 5.0 対応」から移した＝ v5.0.0-rc.1（11-25）が出たので、RC での実走をこの版で受ける。閉じるのは stable での実走と `verified` の昇格のあと。この版のうちに stable が出なければ、RC の記録を残して次の版へ送る）
+  - 2026-11-28: v5.0.0-rc.2 で実走して 0 failures / 0 errors（2021 tests・189 omissions）。stable は週明けの見込みで、5.49.0 は週末に出す（ユーザー判断）ため、#4850 は 5.50.0 へ送った
+
+範囲を決めたときの判断（2026-11-23・ユーザー）:
+- #3877（Mastodon 形式のタグづけ）は念のために残すが、よほどでなければ戻さない。Misskey が `Update` に対応しておらず、分かって使わないとむしろ有害
+- on-hold のほかの 5 件（#4893・#4873・#4301・#4298・#3157）は条件がそろっていない
+- Akkoma のデコは Misskey だけの機能なので対象外（`docs/pleroma.md` を直した）
+- Akkoma は「淡々と実装していけばよい」（2 件を切らさない決まりのまま）
+
+- ✅ **Misskey 2026.11.1 を harness で検証し、verified を昇格した**（2026-11-26）。develop `f38ecdec` で 2013 tests / **0 failures / 0 errors** / 173 omissions（5.48.0 のゲートと omission 同数）。重大な脆弱性の修正を含む版
+
+2026-11-28 の進み具合: #4936（PR #4943）・#4832（PR #4944）・#4938（PR #4947）を develop へマージした（Issue はリリースで閉じる）。#4938 で、Mastodon 系の全部でテスト用アカウントの添付の一括削除が動いていなかったのを直した。棚卸しで起票した #4945（Akkoma の ALT 編集）・#4946（Akkoma のリピート）は急がないので、[マイルストーン 5.50.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/654) を作って載せた（ユーザー: 緊急性の無い新しい Issue を開発中の版に足すのは不自然）。
+
+2026-11-26（ユーザー）: #4851（新 UI への移植待ち）と #4893（用語の追従。同日 on-hold を外した＝ pooza/mastodon の台帳の知らせ待ち）は「Mastodon 5.0 対応」に置いたまま。待っているものが届いた時点の開発中の版で受ける。
+
+2026-11-28: #4939（PR #4948）をマージ。#4850 は stable 待ちのため 5.50.0 へ送った（RC の記録は上）。
+
+### リリース前レビュー（5 観点）の結果（2026-11-28）
+
+`v5.48.0..develop`（製品コード 150 行ほど）を Sonnet 5 本で。**赤 0**。行き先はユーザーが決めた（私の案どおり）。
+
+- 黄（本リリースで直した）: `DecorationApplyWorker#save_live` を `update!` に変えたとき（d22660c4）、`update` が持っていた `e.alert` が落ちて、実況のデコの記録が書けなかったことが log にしか残らなくなっていた → PR #4949 で `alert` してから raise し直す
+- 記録のみ: ナウプレの曲名照合は 1〜2 文字の曲名だと包含判定が緩い（#4832 の前より悪くはない）
+- 記録のみ: `AnnictService#crawl` の `touch` が全件の投稿の後にあり、途中で webhook が落ちると同じ記録を毎分投稿し直す（2023 年から・今回の差分ではない）
+- 記録のみ（緑）: `media_statuses` が Hash の応答を `to_a` で崩す（ginseng は 2xx 以外を例外にするのでまず通らない）／`AnnictService.accounts` を 1 回の取り込みで 3 回作る／`DEFAULT_LIMIT` の `private_constant`・「ハンドラー」表記の混在・`status_delete_limit` の二重定義
+
+### リリース準備の結果（2026-11-28）
+
+- **セキュリティ**: Dependabot の open 0・bundler-audit 問題なし。5.48.0 のあとで lock の addressable が 2.10.0 に上がっており、その上で ginseng-redis 2.1.3 は DSN のパスワードを例外の `cause` に平文で載せうる・ginseng-core 7.1.1 は読めない URL の例外を包まずに抜けさせる → **PR #4950 で ginseng-core v7.2.0・ginseng-redis v2.1.5 を取り込み**、`bundle update` のルーチン分も同梱。ginseng-fediverse v10.0.1（全角＃のフッタ・Misskey でタグが増える）は v10.0.0 と同じく③見送り
+- **harness 3 系統**（develop `c411cac6`・各系とも別シェルで相手以外の変数 0 本）:
+  - Mastodon v4.7.6: `controller=mastodon url=http://localhost:3000` 2022 tests / **0 failures / 0 errors** / 189 omissions
+  - Misskey 2026.11.1: `controller=misskey url=http://localhost:3001` 2022 tests / **0 failures / 0 errors** / 173 omissions
+  - Pleroma（dev29・Akkoma 3.20.1）: `controller=pleroma url=https://st.akkoma.b-shock.org` 2022 tests / **0 failures / 0 errors** / 180 omissions
+- **ステージング 5 台**（dev24〜27・dev29、`c411cac6`）: `config: OK`・外から health 200（全項目 OK）・version 5.49.0・about に `user_handler_config: true`。dev29 は `feature/4939-pleroma-annict` から develop へ戻した。dev29 のテスト用アカウントの Annict 連携は残してある（ユーザー判断）
+
+
+## リリース済み: 5.48.0（2026-11-22）
+
+本番 4 台へデプロイ済み（21:30〜21:34・shallu → zugoga → gomander → vulcan・`main` の `fc377360`・Ruby 4.0.10 据え置き）。[リリースノート](https://github.com/pooza/mulukhiya-toot-proxy/releases/tag/v5.48.0)（PR #4937）。全台 version 5.48.0・health 200・`config: OK`・FreeBSD 3 台は monit 復帰・vulcan は 3 ユニットとも `NRestarts=0`。起動時の libheif は 4 台とも `enabled: false`（FreeBSD 3 台 1.23.6・vulcan 1.21.2。基準 1.23.7）。
+
+- vulcan は上げる前に、Sidekiq の Redis（db 2）の `schedules` に個人の `decoration_initialize_<名前>` が無い＝実況中の人がいないことを確かめた（あるのは定期の `decoration_initialize` だけ）
+- デプロイ直後の shallu のログの error 2 件は Annict の `Net::ReadTimeout`（#4801 の平常）
 
 [マイルストーン 5.48.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/650)。`config/application.yaml` は 5.48.0 へバンプ済み（2026-11-18）。
 
@@ -420,46 +469,44 @@ git diff Gemfile.lock
   - 緑: `skip_case?` は判定で例外が出たファイルを理由付きで飛ばす（CI の omission の上限で見張れている）
 - ⚠ **#4880 は 2026-11-05 の実測で 5.47.0 へ送った**（[実測](https://github.com/pooza/mulukhiya-toot-proxy/issues/4880)）。形式を変えても同じ 2,407 語を載せるので誤爆は減らない。手順 1 の deploy は pooza/cure-api#389 待ち
 
-## リリース済み: 5.45.0（2026-10-31）
-
-本番 4 台へデプロイ済み（12:07〜12:13・shallu → zugoga → gomander → vulcan・`main` の `c02001d6`・Ruby 4.0.9 据え置き）。[リリースノート](https://github.com/pooza/mulukhiya-toot-proxy/releases/tag/v5.45.0)。
-
-- ⚠ デプロイ直後の `/nodeinfo/2.0` は、次の `nodeinfo_update`（5 分ごと）まで旧版を返す。公開面で版を見るなら 10 分待つか `/mulukhiya/api/about` を見る
-- Issue 6 件とマイルストーンは 2026-10-31 に閉じた（ユーザー判断）。Akkoma の次は段階 4 の #4884（`docs/pleroma.md`「2 件を切らさない」）
-
-[マイルストーン 5.45.0](https://github.com/pooza/mulukhiya-toot-proxy/milestone/644)。`config/application.yaml` は 5.45.0 へバンプ済み（2026-10-28）。
-
-- ⚠ **#4850 / #4851（Mastodon 5.0）は 2026-10-30 に 5.46.0 へ送った**（ユーザー判断: リリースの見込みが分からないものをブロッカーにできない。5.46.0 の間に出なければまた送る）
-- ✅ **2026-10-28 に PR 4 本をマージ（ユーザー承認・CI 両系緑）**: #4868（rack-test 2.3.0）/ #4863（#4847 Akkoma の webhook）/ #4862（#4848・**マージ前に v4.2.0 へ上げた** `46f3942a`・手元で rubocop 無指摘・`rake test` 1793 tests・0 failures / 0 errors）/ #4870（#4869）。Issue は open のまま（クローズはラップ時の判断）
-- ✅ **2026-10-31 に PR 3 本をマージ（ユーザー承認・CI 緑）**: #4877（#4854）/ #4878（#4860）/ #4879（手順 12 の掃除）。Issue は open のまま（クローズはラップ時の判断）
-- **#4857**: Pleroma 系をリリースゲートの必須にした。dev29（Akkoma 3.20.1）で develop `480834ee` が 1871 tests・0 failures / 0 errors・189 omissions。台帳に `pleroma` を追加
-- **#4854 は 2026-10-28 の調査で size:L → S に縮めた**（ユーザー承認）。本番 2 台の 30 日分をなぞると、人名とふつうの言葉が同じ形の誤爆はほぼ無く、
-  多いのは**短いカタカナの語が長いカタカナ語の中に当たる誤爆**（gomander 2,687 当たり中 250・zugoga 186 中 25。3 文字以下の語に集中）。
-  方針は 3 文字以下・カタカナの語の前後にカタカナがあれば当てない（[調査結果のコメント](https://github.com/pooza/mulukhiya-toot-proxy/issues/4854#issuecomment-6455055573)）。
-  「印＋手がかり」の設計は **#4873（on-hold）** へ切り出した。この版の「機能が前へ進む」枠は #4854 のまま
-
-### リリース準備の結果（2026-10-31）
-
-- **セキュリティ**: Dependabot 0 件・bundler-audit 脆弱性なし。`bundle update` は `ac9c86b3`（ginseng-\* は動かず・bundler 4.0.20 のまま）
-- **3 系統の実走**（develop `ac9c86b3`）: すべて 0 failures / 0 errors
-  - `controller=mastodon url=http://localhost:3000`（v4.7.4）: 1887 tests・159 omissions
-  - `controller=misskey url=http://localhost:3001`（2026.10.1）: 1890 tests・146 omissions
-  - `controller=pleroma url=https://st.akkoma.b-shock.org`（3.20.1）: 1877 tests・189 omissions
-- **ステージング 4 台**（dev24〜27・`ac9c86b3`）: `config: OK`・health 200・version 5.45.0。WebUI は dev25 / dev27 を目視。dev24 の `/feed/media` の 503 は `media_catalog: false` の設定どおり
-- **dev29**: develop へ切り替えた（古い feature ブランチのままだった）。存在しないタグは 404、タグのリンクは `/tag/…` を実機で確認
-
-### リリース前レビュー（5 観点）の結果（2026-10-31）
-
-対象は `v5.44.0..develop`。**赤 0・黄 5・緑 7**。size:S は掃除 PR で直した。
-
-- **掃除 PR で直したもの**: Akkoma のタグの URL（`/tags/` は HTML に 406。dev29 で確認）／Akkoma で存在しないタグのフィードが 200／nodeinfo の取得失敗で空を書く／テストの追加（`media_ids` の文字列化・`NodeInfo#update`・`PATTERN_VERSION`）／コメントと文書（`docs/pleroma.md` の版と「表は無い」・`docs/api.md` の favorites・廃止語ほか）
-- **記録のみ**:
-  - 常に失敗する辞書のソースがあるサーバーでは、#4854 の新規則が最大 24 時間効かない。台帳の 🔴 死亡は 0 件（10-31）なので今の本番では起きない。コメントだけ足した
-  - 辞書の口で断ると syslog が 3 行（従来は 2 行）。応答の本文を変えずに 1 本へまとめる利点が小さい
-  - `AnnictEpisodeDictionary.key?` は本番から呼ばれなくなった（テストの読みやすさのために残す）
-- **デプロイで見ること**: #4869 で `/service/*` の検査が初めて効く。4 台の `rake config:lint` は出力の `config: OK` まで確かめる（短い鍵・`peer_tube/hosts` の型）
-
 ## セッション同期の記録
+
+### 2026-11-28 セッション同期の記録
+
+**本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。harness の upstream（11-26 から 2 日）と chubo2 の Issue 棚卸し（11-26）はスキップ。
+
+- **ブランチ**: `develop` は `origin/develop` と同一（`f8f26b8a`）。open PR は #4942（ginseng-core v7.1.1）と Dependabot の #4940（icalendar 2.14.0・webmock 3.39.0）で、どちらも CI 緑・Codex 指摘なし。Dependabot アラート **0 件**
+- **Codex**: 直近 5 マージ（#4932〜#4937）は返信・👍 とも済み
+- **Issue**: open 14（11-26 から変化なし）。5.49.0 の 6 件はすべて open
+- **ginseng-\* のピン**: ginseng-core v7.1.1 のずれ（PR #4942 で取り込み待ち）と fediverse v10.0.0（③見送り）のまま
+- **Annict の API**: 基準（11-05）と同じ。公式アカウントの新しい投稿なし
+- **chubo2**: 1 コミット取り込み（`f3521fa`・週末の一斉更新の記録。本番 4 台は pkg のみで再起動は vulcan だけ）。open 11 件で変化なし
+- **辞書台帳**（pooza/chubo2 `0bc85aa`）: 🔴 は既知の 3 行だけ。🟡 は delmulin の `pron.json` が「未使用」（access log の集計の窓が縮み、全行の件数が 3 割ほど減った回。他所からも 0 件）
+- **Sentry**: unresolved **21 件**・**コメント 0 は 0 件**（2026-11-28 時点）。11-26 から新しいイベントなし
+
+### 2026-11-26 セッション同期の記録（2 回目）
+
+**本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。1 回目（07:18）からの差分だけを見た。harness の upstream・chubo2 の Issue 棚卸しは同日に済んでいるのでスキップ。
+
+- **ブランチ**: `develop` は `origin/develop` と同一（`445930cd`）。open PR は #4942（ginseng-core v7.1.1・CI 緑・Codex 指摘なし）と Dependabot の #4940（CI 緑）。Dependabot アラート **0 件**
+- **Issue / ginseng-\* のピン / Annict / chubo2**: 1 回目から変化なし（ginseng-core のずれは PR #4942 で取り込み待ち）
+- **辞書台帳**: 🔴 は既知のまま。delmulin の `emoji.json` の 🟡 は 🟢 に戻った
+- **Sentry**: unresolved **21 件**・**コメント 0 は 0 件**（2026-11-26 時点）。-33 に 11-25 23:53Z の 2 件目（count 2・gomander 5.48.0・番組表エディタの話数取得で Annict の応答遅延）。単発としてコメントを書いた
+
+### 2026-11-26 セッション同期の記録
+
+**本番には触っていない**（辞書台帳の生成で本番 4 台へ SSH した読み取りのみ）。
+
+- **ブランチ**: `develop` は `origin/develop` と同一だった（`26a68b97`）。open PR は Dependabot の #4940（icalendar 2.14.0・webmock・CI 緑）。Dependabot アラート **0 件**
+- **Codex**: 5.48.0 のリリース PR #4937 に未返信の P2（`save_live` が `update` なので Redis が落ちても記録の無いままデコが付く）。修正前に落ちるテストで再現して `update!` に直した（`d22660c4`）。返信・👍 済み
+- **Issue**: open 13（#4936・#4938・#4939 が増え、5.48.0 の 6 件がリリースで閉じた）
+- **ginseng-\* のピン**: ginseng-core v7.1.0 → **v7.1.1** の新しいずれ（`max_bytes:` を付けたときの `Response#to_s` の修正・httparty 0.25.1 の対照テスト）。fediverse v10.0.0 は③見送りのまま
+- **Annict の API**: 基準（11-05）と同じ。公式アカウントの新しい投稿なし
+- **chubo2**: ローカルは `origin/main` と同一。open 11 件（#319 が増えた）。Issue 棚卸しは 10-25 から 32 日だったので同日に実施した（pooza/chubo2 の最終 Issue 棚卸しを 11-26 に）。**close 候補は 0 件**。動きは #315（HTTP/3）のきっかけが揃ったこと＝ 11-21 までに 7 台とも HTTP/2 を戻し終えた（infra-history）。ドキュメント棚卸しは 11-22
+- **辞書台帳**（pooza/chubo2 `24d63e1`）: 🔴 は既知の 3 行だけ。🟡 は `service.json`（shallu 1/144）と delmulin の `emoji.json`（vulcan 1/144）の間欠
+- **Sentry**: unresolved **21 件**（11-22 から 4 減）・**コメント 0 は 0 件**（2026-11-26 時点）。-1X に 11-24 23:15Z の新しいイベント
+- **ginseng-core v7.1.1** は #4941 / PR #4942 で取り込み（`max_bytes:` の呼び出しは 2 か所とも `.body` / `parsed_response` を読むので振る舞いは変わらない）。⚠ その `rake test` で、`d22660c4` が `DecorationApplyLiveTest` の作り物（`update` しか無い）を 4 件落としていたのが分かり、`5b50db5d` / `ddf49517` で直した
+- **harness の upstream**: **Mastodon v5.0.0-rc.1（11-25）**。Misskey は 2026.11.1 の RC のみ・Akkoma は変化なし。`last_checked` を 11-26 へ
 
 ### 2026-11-22 セッション同期の記録
 

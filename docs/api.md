@@ -244,6 +244,7 @@ Bad response 404` のように内部メソッド名と上流ステータスが�
 | `features.nowplaying_url_resolver`（`NowplayingUrlResolver.enabled?`・#4415）。ナウプレ enrich の**逆方向**（共有 URL → メタ解決） | `POST /nowplaying/resolve-url` — capsicum の Share 経路 enrich の可否判定に使う |
 | `features.spotify_enabled`（`/service/spotify/oauth/user_oauth_enabled` + 資格情報設定時に有効） | `/spotify/oauth_uri`, `/spotify/auth`, `/spotify/currently_playing` |
 | `features.spotify_linked`（当該ユーザーが Spotify 連携済みか） | `/spotify/currently_playing` |
+| `features.user_handler_config`（常時 `true`。#4936 未デプロイのバージョンではキー自体が欠落し capsicum は false 判定して入口を出さない） | `/handler/list`, `/handler/config` |
 
 ## モロヘイヤ検出プロトコル
 
@@ -424,6 +425,7 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
 
 - `GET /mulukhiya/api/handler/list` で、利用者に見せるハンドラーの一覧と現在の状態を取得（#4195）
 - `POST /mulukhiya/api/handler/config` で 1 つのハンドラーを切り替え（#4196）。`toggleable: false` のものは 422 で拒む
+- この 2 本が使えるかは `/about` の `features.user_handler_config` で見分ける（#4936）
 - `POST /mulukhiya/api/config/update` でユーザー設定を変更
 - `toggleable: true` に設定されたハンドラーはユーザーが ON/OFF 可能
 - `toggleable: false` のハンドラーには、利用者の設定（`/handler/{name}/disable`）は効かない。`/config/update` で書けても無視される（#4196）
@@ -484,6 +486,7 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
       "program_editable": true,
       "spotify_enabled": false,
       "spotify_linked": false,
+      "user_handler_config": true,
       "webhook": true,
       "word_suggest": true
     },
@@ -1410,6 +1413,7 @@ NowPlaying 情報を除去して再投稿する。
 | `prefer` | string | 任意 | `apple_music` \| `spotify`。クライアントのユーザートグル値 |
 
 - **プロバイダ優先順位（3 段連鎖）**: ① 明示 `prefer` → ② `source_app_name` ヒント → ③ サーバー既定 `/nowplaying/resolve/default_provider`（既定値 `apple_music`）。優先側でヒットしなければもう一方のプロバイダへフォールバックして URL を返す。
+- **曲名の照合（5.49.0〜 / #4832）**: 各プロバイダの検索の先頭の曲の曲名が、`title` と合わなければ「ヒットなし」として扱う（次のプロバイダへ進む）。配信に無い曲で、無関係な曲の URL とジャケットを返さないため。表記ゆれ（全角 / 半角・大文字小文字・空白と記号・括弧の feat. やリマスター表記・「 - 」以降の副題）は落としてから、どちらかがもう一方を含めば合うとみなす。⚠ 曲名が別の文字で書かれている当たり（ローマ字とカナなど）は返らなくなる
 - **レスポンス**:
   - ヒット時: `{ "url": "https://music.apple.com/...", "provider": "apple_music", "normalized": { "title": "...", "artist": "...", "album": "..." }, "artwork_url": "https://.../480x480bb.jpg" }`（`normalized` は外部 API が返した値のみ。欠落要素は省く）
   - ヒットなし: `{ "url": null, "artwork_url": null }`（404 ではなく 200）
